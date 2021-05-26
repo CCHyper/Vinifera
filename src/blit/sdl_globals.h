@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          SDL_GLOBALS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         SDL2 globals.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,22 +25,53 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#pragma once
+
+#include "always.h"
+#include <SDL.h>
+#include <SDL_syswm.h>
+
 
 /**
- *  Include the hook headers here.
+ *  Should SDL2 be used to create the game window?
  */
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
+extern bool UseSDL2;
 
-#include "sdl_hooks.h"
-void Setup_Hooks()
-{
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Extension_Hooks();
-    SDL_Hooks();
-}
+/**
+ *  Create the window without a border?
+ */
+extern bool SDLBorderless;
+
+/**
+ *  Create the window at the size of the display as a borderless window?
+ */
+extern bool SDLBorderlessFullscreen;
+
+extern bool SDLHardwareRenderer;
+
+extern bool SDLClipMouseToWindow;
+
+/**
+ *  The window we'll be rendering to.
+ */
+extern SDL_Window *SDLWindow;
+
+/**
+ *  The window renderer.
+ */
+extern SDL_Renderer *SDLWindowRenderer;
+
+/**
+ *  The surface contained by the window.
+ */
+extern SDL_Surface *SDLWindowSurface;
+
+/**
+ *  The texture contained by the window.
+ */
+extern SDL_Texture *SDLWindowTexture;
+
+/**
+ *  256 color palette.
+ */
+extern SDL_Palette *SDLPalette;
