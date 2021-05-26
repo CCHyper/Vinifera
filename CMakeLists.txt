@@ -618,6 +618,15 @@ target_link_libraries(${PROJECT_NAME} ${REQUIRED_LIBRARIES})
 # Make build check state of git to check for uncommitted changes.
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_check_git)
 
+# Look for SDL2 if it is installed (define the SDL2WIN environment var).
+if(DEFINED ENV{SDL2WIN})
+	set(SDL2_FOUND ON)
+	message(STATUS "Found SDL2: $ENV{SDL2WIN}")
+	add_compile_definitions(SDL2_FOUND)
+	target_include_directories(${PROJECT_NAME} BEFORE PUBLIC $ENV{SDL2WIN}/include)
+	target_link_libraries(${PROJECT_NAME} $ENV{SDL2WIN}/lib/x86/SDL2.lib)
+endif()
+
 
 ################################################################################
 # Setup project IDE filters.

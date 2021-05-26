@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          SDL_GLOBALS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         SDL2 globals.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,34 +25,19 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#pragma once
 
-/**
- *  Include the hook headers here.
- */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "newswizzle_hooks.h"
-#include "extension_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
+#include "sdl_globals.h"
 
 
-#include "sdl_hooks.h"
-void Setup_Hooks()
-{
-    Vinifera_Memory_Hooks();
+bool UseSDL2 = true;
+bool SDLBorderless = false;
+bool SDLBorderlessFullscreen = true;
+bool SDLHardwareRenderer = false;
+bool SDLClipMouseToWindow = true;
 
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    NewSwizzle_Hooks();
-    Extension_Hooks();
-
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
-
-    SDL_Hooks();
-}
+SDL_Window *SDLWindow = nullptr;
+SDL_Renderer *SDLWindowRenderer = nullptr;
+SDL_Surface *SDLWindowSurface = nullptr;
+SDL_Texture *SDLWindowTexture = nullptr;
+SDL_Palette *SDLPalette = nullptr;
