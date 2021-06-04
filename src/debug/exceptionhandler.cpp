@@ -725,7 +725,7 @@ static INT_PTR Exception_Dialog()
     };
 
     DWORD retval = 0;
-    HGLOBAL hGlobalDlg = Fetch_Resource(MAKEINTRESOURCE(222), RT_DIALOG);
+    HGLOBAL hGlobalDlg = Fetch_Resource(MAKEINTRESOURCE(IDD_EXCEPTION), RT_DIALOG);
     if (hGlobalDlg != nullptr) {
         retval = DialogBoxIndirectParam(ProgramInstance, (LPDLGTEMPLATE)hGlobalDlg, MainWindow, (DLGPROC)Exception_Dialog_Proc, (LPARAM)0);
     } else {

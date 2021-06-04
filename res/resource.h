@@ -45,3 +45,13 @@
 #define MAINICON    IDI_VINIFERA
 #define MAINCURSOR  IDC_ARROW
 
+
+/**
+ *  Dialogs.
+ */
+#define IDD_VINIFERA_START                4000 // Make sure our numbers are well above Tiberian Sun's
+
+#define IDD_EXCEPTION                     4000
+
+#define IDD_VINIFERA_REPLACEABLE_START    4020 // Replaceable dialogs from here.
+//#define IDD_                            4020
