@@ -55,7 +55,7 @@ class ViniferaCommandClass : public CommandClass
 
 
 /**
- *  
+ *  Writes a PNG screenshot of the current screen buffer.
  */
 class PNGScreenCaptureCommandClass : public ViniferaCommandClass
 {
@@ -70,6 +70,28 @@ class PNGScreenCaptureCommandClass : public ViniferaCommandClass
         virtual bool Process() override;
 
         virtual KeyNumType Default_Key() const override { return KeyNumType(KN_NONE); }
+};
+
+
+/**
+ *  Select members of the specified team id.
+ * 
+ *  #NOTE: This must derive from CommandClass as we need to match ABI.
+ */
+class NewSelectTeamCommandClass : public CommandClass
+{
+    public:
+        NewSelectTeamCommandClass() : CommandClass() {}
+        virtual ~NewSelectTeamCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+    private:
+        int GroupID;
 };
 
 

@@ -26,9 +26,13 @@
  *
  ******************************************************************************/
 #include "commandext.h"
+#include "commandext_functions.h"
 #include "tibsun_globals.h"
+#include "tibsun_functions.h"
+#include "language.h"
 #include "dsurface.h"
 #include "wwmouse.h"
+#include "house.h"
 #include "unit.h"
 #include "unittype.h"
 #include "infantry.h"
@@ -166,6 +170,47 @@ bool PNGScreenCaptureCommandClass::Process()
     }
 
     return success;
+}
+
+
+/**
+ *  #issue-31 
+ * 
+ *  Select members of the specified team id.
+ * 
+ *  This is pretty much a port of the QoL upgrade to this command from Red Alert 2.
+ * 
+ *  @author: CCHyper
+ */
+const char *NewSelectTeamCommandClass::Get_Name() const
+{
+    static char buffer[32];
+    std::snprintf(buffer, sizeof(buffer), "TeamSelect_%d", GroupID);
+    return buffer;
+}
+
+const char *NewSelectTeamCommandClass::Get_UI_Name() const
+{
+    static char buffer[32];
+    std::snprintf(buffer, sizeof(buffer), Text_String(TXT_SELECT_TEAM), GroupID);
+    return buffer;
+}
+
+const char *NewSelectTeamCommandClass::Get_Category() const
+{
+    return Text_String(TXT_TEAM);
+}
+
+const char *NewSelectTeamCommandClass::Get_Description() const
+{
+    static char buffer[128];
+    std::snprintf(buffer, sizeof(buffer), Text_String(TXT_SELECT_TEAM_DESC), GroupID);
+    return buffer;
+}
+
+bool NewSelectTeamCommandClass::Process()
+{
+    return Select_Team_Command(GroupID);
 }
 
 
