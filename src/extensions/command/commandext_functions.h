@@ -30,3 +30,5 @@
 
 bool Prev_Theme_Command();
 bool Next_Theme_Command();
+bool Select_Team_Command(int group_id);
+bool Center_On_Team_Command(int group_id);

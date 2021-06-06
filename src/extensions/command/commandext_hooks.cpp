@@ -447,5 +447,14 @@ void CommandExtension_Hooks()
     Hook_Virtual(0x004EAAF0, PNGScreenCaptureCommandClass::Get_Description);
     Hook_Virtual(0x004EAB00, PNGScreenCaptureCommandClass::Process);
 
+    /**
+     *  Replace SelectTeamCommandClass with NewSelectTeamCommandClass.
+     */
+    Hook_Virtual(0x004E8D20, NewSelectTeamCommandClass::Get_Name);
+    Hook_Virtual(0x004E8D40, NewSelectTeamCommandClass::Get_UI_Name);
+    Hook_Virtual(0x004E8D70, NewSelectTeamCommandClass::Get_Category);
+    Hook_Virtual(0x004E8D80, NewSelectTeamCommandClass::Get_Description);
+    Hook_Virtual(0x004E8DB0, NewSelectTeamCommandClass::Process);
+
     Patch_Jump(0x004E95C2, &_GuardCommandClass_Process_Harvesters_Set_Mission_Patch);
 }
