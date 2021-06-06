@@ -53,6 +53,28 @@
 
 
 /**
+ *  #issue-56
+ *  
+ *  "AITriggerTypes" incorrectly reported as failed in the debug output when saving a game.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Put_All_AITriggerTypes_Fix_Error_Print_Patch)
+{
+failed:
+    JMP(0x005D68E0);
+}
+
+static void _Put_All_AITriggerTypes_Fix_Error_Print_Patch()
+{
+    /**
+     *  Remove the "failed" print.
+     */
+    Patch_Jump(0x005D615B, 0x005D6165);
+}
+
+
+/**
  *  #issue-305
  * 
  *  Fixes bug where the sidebar mouse wheel scrolling "error" sound
