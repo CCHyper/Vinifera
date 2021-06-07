@@ -31,6 +31,7 @@
 #include "tibsun_util.h"
 #include "vinifera_globals.h"
 #include "vinifera_util.h"
+#include "language.h"
 #include "iomap.h"
 #include "tactical.h"
 #include "dsurface.h"
@@ -61,7 +62,6 @@
 #include "scenarioini.h"
 #include "scenario.h"
 #include "vox.h"
-#include "language.h"
 #include "wwcrc.h"
 #include "filepcx.h"
 #include "filepng.h"
@@ -201,6 +201,81 @@ bool PNGScreenCaptureCommandClass::Process()
     }
 
     return success;
+}
+
+
+/**
+ *  Toggles the sidebar visibility.
+ * 
+ *  @author: CCHyper
+ */
+const char *ToggleSidebarCommandClass::Get_Name() const
+{
+    return "ToggleSidebar";
+}
+
+const char *ToggleSidebarCommandClass::Get_UI_Name() const
+{
+    return "Toggle Sidebar";
+}
+
+const char *ToggleSidebarCommandClass::Get_Category() const
+{
+    return Text_String(TXT_INTERFACE);
+}
+
+const char *ToggleSidebarCommandClass::Get_Description() const
+{
+    return "Toggles the sidebar visibility.";
+}
+
+#include "tspp.h"
+DEFINE_IMPLEMENTATION(bool Allocate_Surfaces(Rect &, Rect &, Rect &, Rect &, bool = false), 0x004E7310);
+
+bool ToggleSidebarCommandClass::Process()
+{
+    int screen_width = Options.ScreenWidth;
+    int screen_height = Options.ScreenHeight;
+    int sidebar_width = SidebarSurface->Width;
+    int tab_height = 16;
+
+    Vinifera_SidebarVisible = !Vinifera_SidebarVisible;
+
+    if (Vinifera_SidebarVisible) {
+        Rect hidden(0, 0, screen_width-sidebar_width, screen_height);
+        Rect comp(0, 0, screen_width-sidebar_width, screen_height);
+        Rect tile(0, 0, screen_width-sidebar_width, screen_height);
+        Rect sidebar(0, 0, sidebar_width, screen_height);
+        Allocate_Surfaces(hidden, comp, tile, sidebar);
+
+        Rect view(0, tab_height, screen_width-sidebar_width, screen_height-tab_height);
+        Map.Set_View_Dimensions(view);
+
+        DEBUG_INFO("Sidebar Visibility: OFF\n");
+
+        Sleep(2);
+
+    } else {
+        Rect hidden(0, 0, screen_width-sidebar_width, screen_height);
+        Rect comp(0, 0, screen_width, screen_height);
+        Rect tile(0, 0, screen_width, screen_height);
+        Rect sidebar(0, 0, sidebar_width, screen_height);
+        Allocate_Surfaces(hidden, comp, tile, sidebar);
+
+        Rect view(0, tab_height, screen_width, screen_height-tab_height);
+        Map.Set_View_Dimensions(view);
+
+        DEBUG_INFO("Sidebar Visibility: ON\n");
+
+        Sleep(2);
+    }
+
+    Map.Flag_To_Redraw(true);
+
+    Map.TabClass::IsToRedraw = true;
+    Map.SidebarClass::IsToRedraw = true;
+
+    return true;
 }
 
 

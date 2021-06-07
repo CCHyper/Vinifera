@@ -306,6 +306,11 @@ DECLARE_PATCH(_Select_Game_Clear_Globals_Patch)
     Vinifera_Developer_AIControl = false;
 
     /**
+     *  Clear any globals.
+     */
+    Vinifera_SidebarVisible = true;
+
+    /**
      *  Stolen bytes/code.
      */
     Map.Set_Default_Mouse(MOUSE_NORMAL);

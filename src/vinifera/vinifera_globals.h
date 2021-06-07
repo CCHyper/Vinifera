@@ -73,6 +73,8 @@ extern bool Vinifera_Developer_AIControl;
 extern bool Vinifera_SkipWWLogoMovie;
 extern bool Vinifera_SkipStartupMovies;
 
+extern bool Vinifera_SidebarVisible;
+
 extern DynamicVectorClass<MFCC *> ViniferaMapsMixes;
 extern DynamicVectorClass<MFCC *> ViniferaMoviesMixes;
 
