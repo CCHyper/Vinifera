@@ -74,6 +74,25 @@ class PNGScreenCaptureCommandClass : public ViniferaCommandClass
 
 
 /**
+ *  Toggles the sidebar visibility.
+ */
+class ToggleSidebarCommandClass : public ViniferaCommandClass
+{
+    public:
+        ToggleSidebarCommandClass() : ViniferaCommandClass() { IsDeveloper = true; }
+        virtual ~ToggleSidebarCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+        virtual KeyNumType Default_Key() const override { return KeyNumType(KN_NONE); }
+};
+
+
+/**
  *  Produces a memory dump on request.
  */
 class MemoryDumpCommandClass : public ViniferaCommandClass

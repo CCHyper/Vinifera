@@ -33,3 +33,5 @@
 extern bool Vinifera_DeveloperMode;
 
 extern char Vinifera_DebugDirectory[PATH_MAX];
+
+extern bool Vinifera_SidebarVisible;

@@ -50,6 +50,9 @@ void Init_Vinifera_Commands()
 
     //cmdptr = new PNGScreenCaptureCommandClass;
     //Commands.Add(cmdptr);
+
+    cmdptr = new ToggleSidebarCommandClass;
+    Commands.Add(cmdptr);
     
     /**
      *  Next, initialised any new commands here if the developer mode is enabled.
