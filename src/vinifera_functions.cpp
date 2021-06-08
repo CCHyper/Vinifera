@@ -43,6 +43,7 @@
 #include "tacticalext.h"
 #include "tclassfactory.h"
 #include "testlocomotion.h"
+#include "binkloaddll.h"
 #include "debughandler.h"
 #include <string>
 
@@ -277,7 +278,14 @@ bool Vinifera_Startup()
         CnCNet4::IsEnabled = false;
     }
 
-    return true;
+	/**
+	 *  Load the Bink DLL.
+	 */
+	if (!Load_Bink_DLL()) {
+		DEBUG_WARNING("Load_Bink_DLL() failed, continuing without Bink video support!\n");
+	}
+
+	return true;
 }
 
 
@@ -323,6 +331,11 @@ bool Vinifera_Shutdown()
      *  Cleanup global heaps/vectors.
      */
     EBoltClass::Clear_All();
+
+	/**
+	 *  Unload the Bink DLL.
+	 */
+	Unload_Bink_DLL();
 
     DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 

@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          VINIFERA_UTIL.H
+ *  @file          BINKMOVIE_HOOKS.H
  *
- *  @authors       CCHyper
+ *  @author        CCHyper
  *
- *  @brief         Various utility functions.
+ *  @brief         Contains the hooks for the bink movie player.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,27 +27,5 @@
  ******************************************************************************/
 #pragma once
 
-#include "always.h"
-#include "vector.h"
 
-
-class XSurface;
-class Rect;
-
-
-const char *Vinifera_Version_String();
-const char *TSpp_Version_String();
-
-void Vinifera_Draw_Version_Text(XSurface *surface, bool pre_init = false);
-
-bool Vinifera_Generate_Mini_Dump();
-
-int Vinifera_Do_WWMessageBox(const char *msg, const char *btn1, const char *btn2 = nullptr, const char *btn3 = nullptr);
-void Vinifera_DeveloperMode_Warning_WWMessageBox(const char *msg, ...);
-
-const char *Vinifera_Get_Window_Title(DWORD dwPid);
-
-bool Vinifera_Create_Zip(const char *filename, DynamicVectorClass<const char *> &filelist, const char *path = nullptr);
-bool Vinifera_Collect_Debug_Files();
-
-bool Scale_Video_Rect(Rect &rect, int area_width, int area_height, bool maintain_ratio = false, bool clamp = true);
+void BinkMovie_Hooks();

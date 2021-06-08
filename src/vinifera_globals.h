@@ -30,9 +30,17 @@
 #include "always.h"
 #include "vector.h"
 #include "ccfile.h"
+#include "tibsun_defines.h"
 
 
 class EBoltClass;
+
+
+/**
+ *  Externs to various Vinifera functions.
+ */
+ extern void Vinifera_Play_Movie(const char *, ThemeType = THEME_NONE, bool = true, bool = true, bool = true);
+ extern bool Vinifera_Is_Movie_Available(const char *);
 
 
 extern bool Vinifera_DeveloperMode;
