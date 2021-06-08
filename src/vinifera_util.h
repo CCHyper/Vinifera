@@ -27,8 +27,11 @@
  ******************************************************************************/
 #pragma once
 
+#include "always.h"
+
 
 class XSurface;
+class Rect;
 
 
 const char *Vinifera_Version_String();
@@ -40,3 +43,5 @@ bool Vinifera_Generate_Mini_Dump();
 
 int Vinifera_Do_WWMessageBox(const char *msg, const char *btn1, const char *btn2 = nullptr, const char *btn3 = nullptr);
 void Vinifera_DeveloperMode_Warning_WWMessageBox(const char *msg, ...);
+
+bool Scale_Video_Rect(Rect &rect, int max_width, int max_height, bool maintain_ratio = false);
