@@ -4,11 +4,12 @@
  *
  *  @project       Vinifera
  *
- *  @file          VINIFERA_FUNCTIONS.H
+ *  @file          BINK_LOAD_DLL.H
  *
- *  @authors       CCHyper
+ *  @author        CCHyper
  *
- *  @brief         General functions.
+ *  @brief         Utility functions for performing one-time loading of
+ *                 Bink library functions from the DLL.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -28,8 +29,24 @@
 #pragma once
 
 #include "always.h"
+#include "bink.h"
 
 
-bool Vinifera_Parse_Command_Line(int argc, char *argv[]);
-bool Vinifera_Startup();
-bool Vinifera_Shutdown();
+extern bool BinkImportsLoaded;
+
+bool Load_Bink_DLL();
+void Unload_Bink_DLL();
+
+extern BINKCLOSE BinkClose;
+extern BINKDDSURFACETYPE BinkDDSurfaceType;
+extern BINKSETVOLUME BinkSetVolume;
+extern BINKGETERROR BinkGetError;
+extern BINKOPEN BinkOpen;
+extern BINKSETSOUNDSYSTEM BinkSetSoundSystem;
+extern BINKOPENDIRECTSOUND BinkOpenDirectSound;
+extern BINKGOTO BinkGoto;
+extern BINKPAUSE BinkPause;
+extern BINKNEXTFRAME BinkNextFrame;
+extern BINKCOPYTOBUFFER BinkCopyToBuffer;
+extern BINKDOFRAME BinkDoFrame;
+extern BINKWAIT BinkWait;

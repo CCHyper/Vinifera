@@ -35,6 +35,7 @@
 #include "vinifera_hooks.h"
 #include "ext_hooks.h"
 #include "bugfix_hooks.h"
+#include "binkmovie_hooks.h"
 
 
 void Setup_Hooks()
@@ -44,4 +45,5 @@ void Setup_Hooks()
     Vinifera_Hooks();
     Extension_Hooks();
     BugFix_Hooks();
+    BinkMovie_Hooks();
 }

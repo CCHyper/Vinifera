@@ -27,6 +27,7 @@
  ******************************************************************************/
 #include "vinifera_functions.h"
 #include "vinifera_globals.h"
+#include "bink_load_dll.h"
 #include "debughandler.h"
 #include <string>
 
@@ -94,5 +95,30 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
  */
 bool Vinifera_Startup()
 {
+	/**
+	 *  Load the Bink DLL.
+	 */
+	if (!Load_Bink_DLL()) {
+		DEBUG_WARNING("Load_Bink_DLL() failed, continuing without Bink video support!\n");
+	}
+
 	return true;
 }
+
+
+/**
+ *  This function will get called on application shutdown, allowing you to
+ *  perform any memory cleanup or shutdown of new systems.
+ * 
+ *  @author: CCHyper
+ */
+bool Vinifera_Shutdown()
+{
+	/**
+	 *  Unload the Bink DLL.
+	 */
+	Unload_Bink_DLL();
+
+	return true;
+}
+

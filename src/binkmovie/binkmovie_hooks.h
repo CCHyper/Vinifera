@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          VINIFERA_FUNCTIONS.H
+ *  @file          BINKMOVIE_HOOKS.H
  *
- *  @authors       CCHyper
+ *  @author        CCHyper
  *
- *  @brief         General functions.
+ *  @brief         Contains the hooks for the bink movie player.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,9 +27,5 @@
  ******************************************************************************/
 #pragma once
 
-#include "always.h"
 
-
-bool Vinifera_Parse_Command_Line(int argc, char *argv[]);
-bool Vinifera_Startup();
-bool Vinifera_Shutdown();
+void BinkMovie_Hooks();
