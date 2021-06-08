@@ -32,6 +32,7 @@
 
 
 class XSurface;
+class Rect;
 
 
 const char *Vinifera_Version_String();
@@ -48,3 +49,5 @@ const char *Vinifera_Get_Window_Title(DWORD dwPid);
 
 bool Vinifera_Create_Zip(const char *filename, DynamicVectorClass<const char *> &filelist, const char *path = nullptr);
 bool Vinifera_Collect_Debug_Files();
+
+bool Scale_Video_Rect(Rect &rect, int max_width, int max_height, bool maintain_ratio = false);
