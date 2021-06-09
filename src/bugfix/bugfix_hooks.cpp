@@ -44,11 +44,68 @@
 #include "theme.h"
 #include "dropship.h"
 #include "msgbox.h"
+#include "wwkeyboard.h"
 #include "loadoptions.h"
 #include "debughandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+#include "command.h"
+static void Vinifera_Message_Handler(HWND hWnd, UINT lParam, UINT wParam)
+{
+    KeyNumType input = WWKeyboard->Get();
+    CommandClass *cmd = HotkeyIndex[input];
+    if () {
+        static bool _taking_screenshot = false;
+
+        /**
+            *  If we are currently playing a scenario, no need to execute this command.
+            */
+        if (bool_007E4040 || bool_007E48FC) {
+
+            /**
+                *  Are we currently executing a scroll command? This is required because
+                *  the Main_Window_Procedure function runs at a Windows level.
+                */
+            if (_taking_screenshot) {
+
+                _taking_screenshot = true;
+
+                /**
+                    *  Execute the screenshot command.
+                    */
+                CommandClass::Activate_From_Name("ScreenCapture");
+
+                _taking_screenshot = false;
+            }
+        }
+
+    }
+}
+
+
+/**
+ *  
+ */
+DECLARE_PATCH(_s)
+{
+    GET_REGISTER_STATIC(HWND, hWnd, ebp);
+    GET_STACK_STATIC(UINT, lParam, esp, 0x18);
+    GET_STACK_STATIC(UINT, wParam, esp, 0x14);
+
+    WWKeyboard->Message_Handler(hWnd, lParam, wParam);
+
+    Vinifera_Message_Handler(hWnd, lParam, wParam);
+
+    JMP(0x00685FA0)
+}
+
+static void _()
+{
+    Patch_Jump(0x00685FA0, &_s);
+}
 
 
 /**
