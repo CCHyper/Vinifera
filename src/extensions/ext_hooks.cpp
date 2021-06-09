@@ -65,7 +65,7 @@
 //#include "aitrigtypeext_hooks.h"
 //#include "scripttypeext_hooks.h"
 //#include "tagtypeext_hooks.h"
-//#include "triggertypeext_hooks.h"
+#include "triggertypeext_hooks.h"
 
 #include "unitext_hooks.h"
 #include "buildingext_hooks.h"
@@ -132,7 +132,7 @@ void Extension_Hooks()
     //AITriggerTypeClassExtension_Hooks();
     //ScriptTypeClassExtension_Hooks();
     //TagTypeClassExtension_Hooks();
-    //TriggerTypeClassExtension_Hooks();
+    TriggerTypeClassExtension_Hooks();
 
     UnitClassExtension_Hooks();
     InfantryClassExtension_Hooks();
