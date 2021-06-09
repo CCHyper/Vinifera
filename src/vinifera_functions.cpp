@@ -28,6 +28,7 @@
 #include "vinifera_functions.h"
 #include "vinifera_globals.h"
 #include "vinifera_newdel.h"
+#include "optionsext.h"
 #include "debughandler.h"
 #include <string>
 
@@ -107,6 +108,12 @@ bool Vinifera_Startup()
  */
 bool Vinifera_Shutdown()
 {
+	/**
+	 *  Delete the OptionsClass extension.
+	 */
+	delete OptionsExtension;
+	OptionsExtension = nullptr;
+
 	DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 
 	return true;
