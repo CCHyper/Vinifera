@@ -73,6 +73,8 @@
 #include "houseext_hooks.h"
 #include "teamext_hooks.h"
 #include "factoryext_hooks.h"
+#include "triggerext_hooks.h"
+#include "tactionext_hooks.h"
 #include "footext_hooks.h"
 
 #include "dropshipext_hooks.h"
@@ -143,6 +145,8 @@ void Extension_Hooks()
 	HouseClassExtension_Hooks();
     TeamClassExtension_Hooks();
     FactoryClassExtension_Hooks();
+    TriggerClassExtension_Hooks();
+    TActionClassExtension_Hooks();
     FootClassExtension_Hooks();
 
     DropshipExtension_Hooks();
