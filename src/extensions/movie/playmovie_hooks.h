@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OPTIONSEXT.H
+ *  @file          PLAYMOVIE_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended OptionsClass class.
+ *  @brief         Contains the hooks related to Play_Movie and related functions.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,38 +27,5 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
 
-
-class OptionsClass;
-class CCINIClass;
-
-
-class OptionsClassExtension final : public Extension<OptionsClass>
-{
-    public:
-        OptionsClassExtension(OptionsClass *this_ptr);
-        OptionsClassExtension(const NoInitClass &noinit);
-        ~OptionsClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override { return S_OK; }
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override { return S_OK; }
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override {}
-        virtual void Compute_CRC(WWCRCEngine &crc) const override {}
-
-        void Load_Settings();
-        void Save_Settings();
-
-        void Set();
-
-        void Set_Movie_Volume(double volume, bool feedback);
-
-    public:
-        float MovieVolume;
-};
-
-
-extern OptionsClassExtension *OptionsExtension;
+void PlayMovieExtension_Hooks();

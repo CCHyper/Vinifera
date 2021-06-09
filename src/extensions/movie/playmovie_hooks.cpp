@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OPTIONSEXT.H
+ *  @file          PLAYMOVIE_HOOKS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Extended OptionsClass class.
+ *  @brief         Contains the hooks related to Play_Movie and related functions.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,40 +25,41 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#pragma once
-
-#include "extension.h"
-#include "container.h"
-
-
-class OptionsClass;
-class CCINIClass;
+#include "playmovie_hooks.h"
+#include "fatal.h"
+#include "debughandler.h"
+#include "asserthandler.h"
 
 
-class OptionsClassExtension final : public Extension<OptionsClass>
+#if 0
+DECLARE_PATCH()
 {
-    public:
-        OptionsClassExtension(OptionsClass *this_ptr);
-        OptionsClassExtension(const NoInitClass &noinit);
-        ~OptionsClassExtension();
+    _asm { fld OptionsExtension->MovieVolume }
+    _asm { mov esi, 0x }
+    _asm { jmp esi }
+}
 
-        virtual HRESULT Load(IStream *pStm) override { return S_OK; }
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override { return S_OK; }
-        virtual int Size_Of() const override;
+DECLARE_PATCH()
+{
+    _asm { fld OptionsExtension->MovieVolume }
+    _asm { mov esi, 0x }
+    _asm { jmp esi }
+}
 
-        virtual void Detach(TARGET target, bool all = true) override {}
-        virtual void Compute_CRC(WWCRCEngine &crc) const override {}
+DECLARE_PATCH()
+{
+    _asm { fld OptionsExtension->MovieVolume }
+    _asm { mov esi, 0x }
+    _asm { jmp esi }
+}
 
-        void Load_Settings();
-        void Save_Settings();
-
-        void Set();
-
-        void Set_Movie_Volume(double volume, bool feedback);
-
-    public:
-        float MovieVolume;
-};
-
-
-extern OptionsClassExtension *OptionsExtension;
+/**
+ *  Main function for patching the hooks.
+ */
+void PlayMovieClassExtension_Hooks()
+{
+    Patch_Jump(0x00563BC2, &);
+    Patch_Jump(0x00563A89, &);
+    Patch_Jump(0x005636DD, &);
+}
+#endif

@@ -26,10 +26,13 @@
  *
  ******************************************************************************/
 #include "optionsext.h"
+#include "tibsun_globals.h"
 #include "noinit.h"
 #include "options.h"
-#include "ini.h"
+#include "ccini.h"
 #include "rawfile.h"
+#include "voc.h"
+#include "rules.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -50,6 +53,11 @@ OptionsClassExtension::OptionsClassExtension(OptionsClass *this_ptr) :
     //EXT_DEBUG_WARNING("OptionsClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
 
     IsInitialized = true;
+
+    /**
+     *  Initialise new member variables here.
+     */
+    MovieVolume = 0.7;
 }
 
 
@@ -105,7 +113,14 @@ void OptionsClassExtension::Load_Settings()
     //EXT_DEBUG_WARNING("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     
     RawFileClass file("SUN.INI");
-    INIClass ini(file);
+
+    /**
+     *  Reset the MovieVolume default.
+     */
+    MovieVolume = ThisPtr->ScoreVolume;
+
+    MovieVolume = ConfigINI.Get_Double_Clamp("Audio", "MovieVolume", 0.0f, 1.0f, MovieVolume);
+    DEBUG_INFO("MovieVolume = %f\n", MovieVolume);
 }
 
 
@@ -121,7 +136,11 @@ void OptionsClassExtension::Save_Settings()
     //EXT_DEBUG_WARNING("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     
     RawFileClass file("SUN.INI");
-    INIClass ini(file);
+
+    ConfigINI.Put_Double("Audio", "MovieVolume", MovieVolume);
+    DEBUG_INFO("MovieVolume = %f\n", MovieVolume);
+
+    ConfigINI.Save(file, false);
 }
 
 
@@ -136,4 +155,24 @@ void OptionsClassExtension::Set()
     //EXT_DEBUG_TRACE("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     //EXT_DEBUG_WARNING("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
 
+}
+
+
+/**
+ *  Sets the movie volume level. 
+ *  
+ *  @author: CCHyper
+ */
+void OptionsClassExtension::Set_Movie_Volume(double volume, bool feedback)
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("OptionsClassExtension::Set_Movie_Volume - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_WARNING("OptionsClassExtension::Set_Movie_Volume - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    MovieVolume = std::clamp(volume, 0.0, 1.0);
+    if (feedback) {
+        Sound_Effect(Rule->GenericBeep, MovieVolume);
+    }
+
+    DEBUG_INFO("MovieVolume = %f\n", MovieVolume);
 }

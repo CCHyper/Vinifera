@@ -40,6 +40,8 @@
 #include "commandext_hooks.h"
 #include "optionsext_hooks.h"
 
+#include "playmovie_hooks.h"
+
 #include "objecttypeext_hooks.h"
 #include "technotypeext_hooks.h"
 #include "buildingtypeext_hooks.h"
@@ -104,6 +106,8 @@ void Extension_Hooks()
     ToolTipManagerExtension_Hooks();
     CommandExtension_Hooks();
     OptionsClassExtension_Hooks();
+
+    PlayMovieExtension_Hooks();
 
     /**
      *  All type class extensions here.
