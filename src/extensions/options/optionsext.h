@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          VINIFERA_FUNCTIONS.H
+ *  @file          OPTIONSEXT.H
  *
- *  @authors       CCHyper
+ *  @author        CCHyper
  *
- *  @brief         General functions.
+ *  @brief         Extended OptionsClass class.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,9 +27,35 @@
  ******************************************************************************/
 #pragma once
 
-#include "always.h"
+#include "extension.h"
+#include "container.h"
 
 
-bool Vinifera_Parse_Command_Line(int argc, char *argv[]);
-bool Vinifera_Startup();
-bool Vinifera_Shutdown();
+class OptionsClass;
+class CCINIClass;
+
+
+class OptionsClassExtension final : public Extension<OptionsClass>
+{
+    public:
+        OptionsClassExtension(OptionsClass *this_ptr);
+        OptionsClassExtension(const NoInitClass &noinit);
+        ~OptionsClassExtension();
+
+        virtual HRESULT Load(IStream *pStm) override { return S_OK; }
+        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override { return S_OK; }
+        virtual int Size_Of() const override;
+
+        virtual void Detach(TARGET target, bool all = true) override {}
+        virtual void Compute_CRC(WWCRCEngine &crc) const override {}
+
+        void Load_Settings();
+        void Save_Settings();
+
+        void Set();
+
+    public:
+};
+
+
+extern OptionsClassExtension *OptionsExtension;

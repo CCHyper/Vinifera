@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          VINIFERA_FUNCTIONS.H
+ *  @file          OPTIONSEXT_HOOKS.CPP
  *
- *  @authors       CCHyper
+ *  @author        CCHyper
  *
- *  @brief         General functions.
+ *  @brief         Contains the hooks for the extended OptionsClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,11 +25,21 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#pragma once
+#include "optionsext_hooks.h"
+#include "optionsext_init.h"
+#include "optionsext.h"
+#include "fatal.h"
+#include "debughandler.h"
+#include "asserthandler.h"
 
-#include "always.h"
 
-
-bool Vinifera_Parse_Command_Line(int argc, char *argv[]);
-bool Vinifera_Startup();
-bool Vinifera_Shutdown();
+/**
+ *  Main function for patching the hooks.
+ */
+void OptionsClassExtension_Hooks()
+{
+    /**
+     *  Initialises the extended class.
+     */
+    OptionsClassExtension_Init();
+}
