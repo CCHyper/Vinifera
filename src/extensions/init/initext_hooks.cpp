@@ -42,6 +42,291 @@
 #include "hooker_macros.h"
 
 
+
+
+
+
+
+
+
+
+#include "session.h"
+#include "scenario.h"
+#include "house.h"
+#include "housetype.h"
+#include "side.h"
+#include "tibsun_functions.h"
+#include "tibsun_globals.h"
+#include "rules.h"
+
+
+/**
+ *  #issue-218
+ * 
+ *  This collection of patches are changes that allow sidebar and speech assets
+ *  for new sides.
+ * 
+ *  We abuse SessionClass::IsGDI and ScenarioClass::IsGDI in these patches
+ *  to store the current players HouseType so it can be used to fetch the
+ *  SideType from it for loading the assets. This also means this bugfix
+ *  works without extending any of the games classes.
+ * 
+ *  @warning: This does mean we are limited to 255 unique houses!
+ * 
+ *  @author: CCHyper
+ */
+static void Set_Session_House() { Session.IsGDI = (unsigned char)Session.Players.Fetch_Head()->Player.House; }
+DECLARE_PATCH(_Select_Game_PreStart_SetPlayerHouse_Patch)
+{
+    /**
+     *  This patch removes the code that sets the "IsGDI" member of SessionClass
+     *  bool based on if the house name matched "GDI" or not and stores
+     *  the player HouseType directly.
+     */
+
+    /**
+     *  We abuse SessionClass::IsGDI to store the player house. The "head"
+     *  of the Players vector is "us", the local human player.
+     * 
+     *  Accessing unions trashes the stack, so this operation is wrapped.
+     */
+    Set_Session_House();
+
+#if 0
+    /**
+     *  Original game code.
+     */
+    static HouseTypeClass *housetype;
+
+    housetype = HouseTypes[Session.Players[0]->Player.House];
+    Session.IsGDI = strcmpi("GDI", housetype->Name()) == 0;
+#endif
+
+    JMP(0x004E2D13);
+}
+
+DECLARE_PATCH(_Get_All_Remove_PrepForSide_Patch)
+{
+    static HouseTypeClass *housetype;
+
+    DEBUG_INFO("Calling Prep_For_Side()...\n");
+
+    /**
+     *  Fetch the houses side type and use this to decide which assets to load.
+     */
+    housetype = HouseTypes[HousesType(Scen->IsGDI)];
+    if (!Prep_For_Side(housetype->Side)) {
+
+        DEBUG_WARNING("Prep_For_Side(%d) failed! Trying with side 0...\n", housetype->Side);
+
+        /**
+         *  Try once again but with the Side 0 (GDI) assets.
+         */
+        if (!Prep_For_Side(SIDE_GDI)) {
+            DEBUG_ERROR("Prep_For_Side() failed!\n");
+            goto return_label;
+        }
+
+    }
+
+    DEV_DEBUG_INFO("Prep_For_Side(%d) sucessfull.\n", housetype->Side);
+
+continue_function:
+    JMP(0x005D6C6C);
+
+return_label:
+    JMP(0x005D6C61);
+}
+
+DECLARE_PATCH(_Get_All_Remove_PrepSpeechForSide_Patch)
+{
+    static HouseTypeClass *housetype;
+    static SideType speech_side;
+
+    DEBUG_INFO("Calling Prep_Speech_For_Side()...\n");
+
+    /**
+     *  Fetch the houses side type and use this to decide which assets to load.
+     */
+    housetype = HouseTypes[HousesType(Scen->IsGDI)];
+    speech_side = Scen->SpeechSide != SIDE_NONE ? Scen->SpeechSide : housetype->Side;
+    if (!Prep_Speech_For_Side(speech_side)) {
+
+        DEBUG_WARNING("Prep_Speech_For_Side(%d) failed! Trying with side 0...\n", speech_side);
+
+        /**
+         *  Try once again but with the Side 0 (GDI) assets.
+         */
+        if (!Prep_Speech_For_Side(SIDE_GDI)) {
+            DEBUG_ERROR("Prep_Speech_For_Side() failed!\n");
+            goto return_label;
+        }
+    }
+
+    DEV_DEBUG_INFO("Prep_Speech_For_Side(%d) sucessfull.\n", speech_side);
+
+continue_function:
+    JMP(0x005D6DEF);
+
+return_label:
+    JMP(0x005D6DC3);
+}
+
+static char Player_Buffer[32];
+DECLARE_PATCH(_Read_Scenario_INI_Singleplayer_Patch)
+{
+    LEA_STACK_STATIC(char *, player_buffer, esp, 0x6C);
+    
+    strncpy(Player_Buffer, player_buffer, sizeof(Player_Buffer));
+
+    /**
+     *  Store the players house to used for loading sides assets later on.
+     */
+    //Scen->IsGDI = (unsigned char)Session.IsGDI;
+    //Scen->SpeechSide = (unsigned char)Session.IsGDI;
+
+    JMP(0x005DD784);
+}
+
+DECLARE_PATCH(_Read_Scenario_INI_Multiplayer_Patch)
+{
+    /**
+     *  Store the players house to used for loading sides assets later on.
+     */
+    Scen->IsGDI = (unsigned char)Session.IsGDI;
+    //Scen->SpeechSide = (unsigned char)Session.IsGDI;
+
+    JMP(0x005DD784);
+}
+
+DECLARE_PATCH(_Read_Scenario_INI_PrepForSide_Patch)
+{
+    GET_REGISTER_STATIC(CCINIClass *, ini, ebp)
+    static HouseTypeClass *housetype;
+    static SideType speech_side;
+
+    /**
+     *  This moves the calls to Prep_For_Side and Prep_Speech_For_Side to
+     *  after the initialisation of the houses so we can load the Side from
+     *  the players chosen house type.
+     */
+
+    /**
+     *  Stolen bytes/code.
+     */
+    Scen->Read_Basic(*ini);
+
+
+
+
+
+
+
+
+    /**
+     *  If this is a campaign session, load the house from the "Player" value.
+     */
+    if (Session.Type == GAME_NORMAL) {
+
+        /**
+         *  Fetch the houses side type and use this to decide which assets to load.
+         */
+        housetype = (HouseTypeClass *)HouseTypeClass::As_Pointer(Player_Buffer);
+
+    } else {
+
+        /**
+         *  Fetch the houses side type and use this to decide which assets to load.
+         */
+        housetype = HouseTypes[HousesType(Scen->IsGDI)];
+    }
+
+    /**
+     *  Debugging code.
+     */
+    if (Vinifera_DeveloperMode) {
+
+        DEV_DEBUG_INFO("About to prepare for...\n");
+        DEV_DEBUG_INFO("  House \"%s\" (%d) with Side \"%s\" (%d)\n",
+            housetype->Name(), housetype->Get_Heap_ID(),
+            Sides[housetype->Side]->Name(), Sides[housetype->Side]->Get_Heap_ID());
+        
+        DEV_DEBUG_INFO("Side info:\n");
+        for (int i = 0; i < Sides.Count(); ++i) {
+            static SideClass *side;
+            side = Sides[i];
+            DEV_DEBUG_INFO("  Side \"%s\" (%d), Houses.Count %d\n", side->IniName, i, side->Houses.Count());
+            for (int i = 0; i < side->Houses.Count(); ++i) {
+               DEV_DEBUG_INFO("    Houses %d = %s (%d)\n", i, HouseTypes[side->Houses[i]]->Name(), side->Houses[i]);
+            }
+        }
+    }
+
+    DEBUG_INFO("Calling Prep_For_Side()...\n");
+    if (!Prep_For_Side(housetype->Side)) {
+
+        DEBUG_WARNING("Prep_For_Side(%d) failed! Trying with side 0...\n", housetype->Side);
+
+        /**
+         *  Try once again but with the Side 0 (GDI) assets.
+         */
+        if (!Prep_For_Side(SIDE_GDI)) {
+            DEBUG_ERROR("Prep_For_Side() failed!\n");
+            goto return_label;
+        }
+    }
+
+    DEV_DEBUG_INFO("Prep_For_Side(%d) sucessfull.\n", housetype->Side);
+
+    DEBUG_INFO("Calling Prep_Speech_For_Side()...\n");
+    speech_side = Scen->SpeechSide != SIDE_NONE ? Scen->SpeechSide : housetype->Side;
+    if (!Prep_Speech_For_Side(speech_side)) {
+
+        DEBUG_WARNING("Prep_Speech_For_Side(%d) failed! Trying with side 0...\n", speech_side);
+
+        /**
+         *  Try once again but with the Side 0 (GDI) assets.
+         */
+        if (!Prep_Speech_For_Side(SIDE_GDI)) {
+            DEBUG_ERROR("Prep_Speech_For_Side() failed!\n");
+            goto return_label;
+        }
+    }
+
+    DEV_DEBUG_INFO("Prep_Speech_For_Side(%d) sucessfull.\n", speech_side);
+
+
+
+
+
+    /**
+     *  Reprocess rules
+     */
+    DEBUG_INFO("Rule->Initialize()\n");
+    Rule->Initialize(*RuleINI);
+
+    DEBUG_INFO("Rule->Process()\n");
+    Rule->Process(*ini);
+
+    DEBUG_INFO("HouseClass::Read_Scenario_INI()\n");
+    HouseClass::Read_Scenario_INI(*ini);
+
+
+
+    /**
+     *  Continue function flow.
+     */
+continue_function:
+    JMP(0x005DD956);
+
+    /**
+     *  Function return.
+     */
+return_label:
+    JMP(0x005DD94B);
+}
+
+
 /**
  *  #issue-305
  * 
@@ -267,4 +552,34 @@ void GameInit_Hooks()
      */
     Patch_Jump(0x00407050, &Vinifera_Addon_Present);
 #endif
+
+    Patch_Jump(0x004E2CE4, &_Select_Game_PreStart_SetPlayerHouse_Patch);
+    Patch_Jump(0x005D6C46, &_Get_All_Remove_PrepForSide_Patch);
+    Patch_Jump(0x005D6DAA, &_Get_All_Remove_PrepSpeechForSide_Patch);
+
+    /**
+     *  Changes the default value of ScenarioClass 0x1D91 (IsGDI) from "1" to "0". This is
+     *  because we now use it as a HouseType index, and need it to default to the first index.
+     */
+    Patch_Byte(0x005DAFD0+6, 0x00); // +6 skips the opcode.
+
+    /**
+     *  Changes the default value of SessionClass 0x1D91 (IsGDI) from "1" to "0".. This is
+     *  because we now use it as a HouseType index, and need it to default to the first index.
+     */
+    Patch_Byte(0x005ED06B+1, 0x85); // changes "dl" (1) to "al" (0)
+
+    /**
+     *  Patch out the existing Prep_For_Side and Prep_Speech_For_Side calls.
+     */
+    Patch_Jump(0x005DD784, 0x005DD7B6); // Prep_For_Side
+    Patch_Jump(0x005DD818, 0x005DD845); // Prep_Speech_For_Side
+
+    /**
+     *  These fix the initial values in Read_Scenario_INI
+     */
+    Patch_Jump(0x005DD720, _Read_Scenario_INI_Singleplayer_Patch);
+    Patch_Jump(0x005DD75B, _Read_Scenario_INI_Multiplayer_Patch);
+
+    Patch_Jump(0x005DD93B, &_Read_Scenario_INI_PrepForSide_Patch);
 }
