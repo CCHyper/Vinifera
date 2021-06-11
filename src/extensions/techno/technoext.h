@@ -31,6 +31,10 @@
 #include "container.h"
 #include "techno.h"
 
+#include "colorscheme.h"
+#include "textprint.h"
+#include "vector.h"
+
 
 class TechnoClassExtension final : public Extension<TechnoClass>
 {
@@ -47,6 +51,41 @@ class TechnoClassExtension final : public Extension<TechnoClass>
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
     public:
+        /**
+         *  An instance of the floating string.
+         */
+        class FloatingStringClass
+        {
+            public:
+                FloatingStringClass(const char *string, ColorSchemeType color, TextPrintType style, Point3D &pos, int frame_time_out, int frame_count, int rate);
+                ~FloatingStringClass();
+
+                bool AI();
+
+            public:
+                const char *String;         // The text string to display.
+                ColorSchemeType Color;      // Text color scheme.
+                TextPrintType Style;        // Text print style (font etc).
+                Point3D Position;           // Starting location
+                int FrameTimeOut;
+                int FrameCount;             // The number of frames this string lasts for.
+                int Rate;                   // The rate at which this string moves.
+                bool IsNormalized;          // Is the rate normalised to the game speed?
+
+            private:
+                WWFontClass *Font;          // Pointer to the style font.
+                bool IsExpired;             // Has this string expired and ready is to delete?
+        };
+
+    public:
+        bool Add_Floating_String(const char *string, ColorSchemeType color, TextPrintType style, Point3D &pos, int frame_time_out, int frame_count, int rate);
+        bool Clear_Floating_Strings();
+
+    public:
+        /**
+         *  Vector of all floating strings for this object.
+         */
+        DynamicVectorClass<FloatingStringClass *> FloatingStrings;
 };
 
 

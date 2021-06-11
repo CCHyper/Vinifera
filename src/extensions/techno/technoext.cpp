@@ -27,6 +27,7 @@
  ******************************************************************************/
 #include "technoext.h"
 #include "techno.h"
+#include "wwfont.h"
 #include "wwcrc.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -75,6 +76,8 @@ TechnoClassExtension::~TechnoClassExtension()
 {
     //EXT_DEBUG_TRACE("TechnoClassExtension deconstructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
     //EXT_DEBUG_WARNING("TechnoClassExtension deconstructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    Clear_Floating_Strings();
 
     IsInitialized = false;
 }
@@ -155,4 +158,91 @@ void TechnoClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TechnoClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+}
+
+
+/**
+ *  Add a new floating string to this object.
+ * 
+ *  @author: CCHyper
+ */
+bool TechnoClassExtension::Add_Floating_String(
+    const char *string, ColorSchemeType color, TextPrintType style,
+    Point3D &pos, int frame_time_out, int frame_count, int rate)
+{
+    FloatingStringClass *floating_string = new FloatingStringClass(string, color, style, pos, frame_time_out, frame_count, rate);
+    if (!floating_string) {
+        return false;
+    }
+
+    FloatingStrings.Add(floating_string);
+}
+
+
+/**
+ *  Removes all the floating strings for this object.
+ * 
+ *  @author: CCHyper
+ */
+bool TechnoClassExtension::Clear_Floating_Strings()
+{
+    FloatingStrings.Clear();
+
+    return true;
+}
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+TechnoClassExtension::FloatingStringClass::FloatingStringClass(
+    const char *string, ColorSchemeType color, TextPrintType style,
+    Point3D &pos, int frame_time_out, int frame_count, int rate) :
+
+    String(nullptr),
+    Color(color),
+    Style(style),
+    Position(pos),
+    FrameTimeOut(frame_time_out),
+    FrameCount(frame_count),
+    Rate(rate),
+    IsNormalized(false),
+    Font(nullptr),
+    IsExpired(false)
+{
+    if (string) {
+        std::strcpy((char *)String, string);
+    }
+
+    Font = Font_Ptr(Style);
+}
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+TechnoClassExtension::FloatingStringClass::~FloatingStringClass()
+{
+    if (String) {
+        std::free((void *)String);
+    }
+}
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+bool TechnoClassExtension::FloatingStringClass::AI()
+{
+    if (!String) {
+        return false;
+    }
+
+    return true;
 }
