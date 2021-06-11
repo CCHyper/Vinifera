@@ -63,6 +63,7 @@
 //#include "tagtypeext_hooks.h"
 //#include "triggertypeext_hooks.h"
 
+#include "technoext_hooks.h"
 #include "buildingext_hooks.h"
 
 #include "dropshipext_hooks.h"
@@ -115,6 +116,7 @@ void Extension_Hooks()
     //TagTypeClassExtension_Hooks();
     //TriggerTypeClassExtension_Hooks();
 
+    TechnoClassExtension_Hooks();
     BuildingClassExtension_Hooks();
 
     DropshipExtension_Hooks();
