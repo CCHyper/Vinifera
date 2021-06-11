@@ -52,7 +52,15 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
         bool Read_INI(CCINIClass &ini);
 
     public:
-
+        /**
+         *  #issue-26
+         * 
+         *  Members for the Produce Cash logic.
+         */
+        unsigned ProduceCashStartup;    // Credits when captured from a house with "IsMultiplayPassive" set.
+        int ProduceCashAmount;          // Amount every give to/take from the house every delay.
+        unsigned ProduceCashDelay;      // Frame delay between amounts.
+        unsigned ProduceCashBudget;     // The total budget for this building.
 };
 
 

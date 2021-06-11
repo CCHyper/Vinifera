@@ -44,7 +44,17 @@ ExtensionMap<BuildingTypeClass, BuildingTypeClassExtension> BuildingTypeClassExt
  *  @author: CCHyper
  */
 BuildingTypeClassExtension::BuildingTypeClassExtension(BuildingTypeClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+
+    /**
+     *  #issue-26
+     * 
+     *  Members for the Produce Cash logic.
+     */
+    ProduceCashStartup(0),
+    ProduceCashAmount(0),
+    ProduceCashDelay(0),
+    ProduceCashBudget(0)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("BuildingTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -174,6 +184,16 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
+    
+    /**
+     *  #issue-26
+     * 
+     *  Read Produce Cash entries.
+     */
+    ProduceCashStartup = ini.Get_Int(ini_name, "ProduceCashStartup", ProduceCashStartup);
+    ProduceCashAmount = ini.Get_Int(ini_name, "ProduceCashAmount", ProduceCashAmount);
+    ProduceCashDelay = ini.Get_Int(ini_name, "ProduceCashDelay", ProduceCashDelay);
+    ProduceCashBudget = ini.Get_Int(ini_name, "ProduceCashBudget", ProduceCashBudget);
     
     return true;
 }

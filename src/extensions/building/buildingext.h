@@ -53,6 +53,14 @@ class BuildingClassExtension final : public Extension<BuildingClass>
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
     public:
+        /**
+         *  #issue-26
+         * 
+         *  Members for the Produce Cash logic.
+         */
+        CDTimerClass<FrameTimerClass> ProduceCashTimer;     // The delay between each cash bonus.
+        int CurrentProduceCashBudget;                       // The remaining budget for the building.
+        bool IsBudgetDepleted;                              // Has the cash budget been depleted (stops producing cash)?
 };
 
 
