@@ -67,3 +67,39 @@ bool TAction_Give_Credits(TActionClass *taction, HouseClass *house, ObjectClass 
 
     return true;
 }
+
+
+/**
+ *  #issue-158
+ * 
+ *  Give credits to the specified house.
+ * 
+ *  @author: CCHyper
+ */
+bool TAction_Give_Credits_To_House(TActionClass *taction, HouseClass *house, ObjectClass *object, TriggerClass *trigger, Cell *cell)
+{
+    if (!taction || !house) {
+        return false;
+    }
+
+    int amount = taction->Data.Value;
+
+    /**
+     *  We use "Bounds.X" as the second argument, its where the house index is stored.
+     */
+    HouseClass *hptr = HouseClass::As_Pointer(HousesType(taction->Bounds.X));
+
+    /**
+     *  If positive, grant the cash bonus.
+     *  If negative, take money from the house.
+     */
+    if (amount != 0) {
+        if (amount < 0) {
+            hptr->Spend_Money(std::abs(amount));
+        } else {
+            hptr->Refund_Money(amount);
+        }
+    }
+
+    return true;
+}

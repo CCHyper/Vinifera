@@ -59,6 +59,9 @@ static const char *TActionClass_New_Action_Name(int action)
         case TACTION_CREDITS:
             return "Give credits...";
 
+        case TACTION_CREDITS_HOUSE:
+            return "Give credits to house...";
+
         default:
             return "<invalid>";
     }
@@ -80,6 +83,9 @@ static const char *TActionClass_New_Action_Description(int action)
 
         case TACTION_CREDITS:
             return "Gives credits to the owner of the trigger.";
+
+        case TACTION_CREDITS_HOUSE:
+            return "Gives credits to the specified house.";
 
         default:
             return "<invalid>";
@@ -149,6 +155,17 @@ DECLARE_PATCH(_TAction_Operator_Extend_Switch_Patch)
          */
         case TACTION_CREDITS:
             success = TAction_Give_Credits(this_ptr, house, object, trigger, cell);
+            break;
+
+        /**
+         *  #issue-158
+         * 
+         *  Gives credits to the specified house.
+         * 
+         *  @author: CCHyper
+         */
+        case TACTION_CREDITS_HOUSE:
+            success = TAction_Give_Credits_To_House(this_ptr, house, object, trigger, cell);
             break;
 
         /**
