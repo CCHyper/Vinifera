@@ -62,6 +62,12 @@ static const char *TActionClass_New_Action_Name(int action)
         case TACTION_CREDITS_HOUSE:
             return "Give credits to house...";
 
+        case TACTION_ENABLE_SHORTGAME:
+            return "Enable short game.";
+
+        case TACTION_DISABLE_SHORTGAME:
+            return "Disable short game.";
+
         default:
             return "<invalid>";
     }
@@ -86,6 +92,12 @@ static const char *TActionClass_New_Action_Description(int action)
 
         case TACTION_CREDITS_HOUSE:
             return "Gives credits to the specified house.";
+
+        case TACTION_ENABLE_SHORTGAME:
+            return "Enables the short game session value.";
+
+        case TACTION_DISABLE_SHORTGAME:
+            return "Disables the short game session value.";
 
         default:
             return "<invalid>";
@@ -166,6 +178,28 @@ DECLARE_PATCH(_TAction_Operator_Extend_Switch_Patch)
          */
         case TACTION_CREDITS_HOUSE:
             success = TAction_Give_Credits_To_House(this_ptr, house, object, trigger, cell);
+            break;
+
+        /**
+         *  #issue-159
+         * 
+         *  Enable the short game session value.
+         * 
+         *  @author: CCHyper
+         */
+        case TACTION_ENABLE_SHORTGAME:
+            success = TAction_Enable_Short_Game(this_ptr, house, object, trigger, cell);
+            break;
+
+        /**
+         *  #issue-159
+         * 
+         *  Disable the short game session value.
+         * 
+         *  @author: CCHyper
+         */
+        case TACTION_DISABLE_SHORTGAME:
+            success = TAction_Disable_Short_Game(this_ptr, house, object, trigger, cell);
             break;
 
         /**

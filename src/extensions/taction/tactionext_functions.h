@@ -39,3 +39,5 @@ class TriggerClass;
 
 bool TAction_Give_Credits(TActionClass *taction, HouseClass *house, ObjectClass *object, TriggerClass *trigger, Cell *cell);
 bool TAction_Give_Credits_To_House(TActionClass *taction, HouseClass *house, ObjectClass *object, TriggerClass *trigger, Cell *cell);
+bool TAction_Enable_Short_Game(TActionClass *taction, HouseClass *house, ObjectClass *object, TriggerClass *trigger, Cell *cell);
+bool TAction_Disable_Short_Game(TActionClass *taction, HouseClass *house, ObjectClass *object, TriggerClass *trigger, Cell *cell);

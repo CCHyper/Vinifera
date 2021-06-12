@@ -34,6 +34,7 @@
 #include "objecttype.h"
 #include "trigger.h"
 #include "triggertype.h"
+#include "session.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
@@ -100,6 +101,44 @@ bool TAction_Give_Credits_To_House(TActionClass *taction, HouseClass *house, Obj
             hptr->Refund_Money(amount);
         }
     }
+
+    return true;
+}
+
+
+/**
+ *  #issue-159
+ * 
+ *  Enable the short game session value.
+ * 
+ *  @author: CCHyper
+ */
+bool TAction_Enable_Short_Game(TActionClass *taction, HouseClass *house, ObjectClass *object, TriggerClass *trigger, Cell *cell)
+{
+    if (!taction) {
+        return false;
+    }
+
+    Session.Options.ShortGame = true;
+
+    return true;
+}
+
+
+/**
+ *  #issue-159
+ * 
+ *  Disable the short game session value.
+ * 
+ *  @author: CCHyper
+ */
+bool TAction_Disable_Short_Game(TActionClass *taction, HouseClass *house, ObjectClass *object, TriggerClass *trigger, Cell *cell)
+{
+    if (!taction) {
+        return false;
+    }
+
+    Session.Options.ShortGame = false;
 
     return true;
 }

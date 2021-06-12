@@ -42,8 +42,10 @@ typedef enum NewTActionType
      *  Add new TActionTypes from here, do not reorder these!
      */
 
-    TACTION_CREDITS,            // Gives credits to the owner of the trigger.
-    TACTION_CREDITS_HOUSE,      // Gives credits to the specified house.
+    TACTION_CREDITS,               // Gives credits to the owner of the trigger.
+    TACTION_CREDITS_HOUSE,         // Gives credits to the specified house.
+    TACTION_ENABLE_SHORTGAME,      // Enables the short game session value.
+    TACTION_DISABLE_SHORTGAME,     // Disables the short game session value.
 
     /**
      *  The new total TActionType count.
