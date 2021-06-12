@@ -43,6 +43,7 @@ typedef enum NewTActionType
      */
 
     TACTION_CREDITS,            // Gives credits to the owner of the trigger.
+    TACTION_CREDITS_HOUSE,      // Gives credits to the specified house.
 
     /**
      *  The new total TActionType count.
