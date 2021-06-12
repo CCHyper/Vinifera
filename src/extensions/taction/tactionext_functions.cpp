@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          VINIFERA_GLOBALS.H
+ *  @file          TACTIONEXT_FUNCTIONS.CPP
  *
- *  @authors       CCHyper
+ *  @author        CCHyper
  *
- *  @brief         Vinifera defines and constants.
+ *  @brief         Contains the supporting functions for the extended TActionClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,27 +25,45 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#pragma once
+#include "tactionext_functions.h"
+#include "vinifera_defines.h"
+#include "taction.h"
+#include "house.h"
+#include "housetype.h"
+#include "object.h"
+#include "objecttype.h"
+#include "trigger.h"
+#include "triggertype.h"
+#include "debughandler.h"
+#include "asserthandler.h"
 
-#include "always.h"
-#include "tibsun_defines.h"
 
-
-typedef enum NewTActionType
+/**
+ *  #issue-158
+ * 
+ *  Gives credits to the owner of the trigger.
+ * 
+ *  @author: CCHyper
+ */
+bool TAction_Give_Credits(TActionClass *taction, HouseClass *house, ObjectClass *object, TriggerClass *trigger, Cell *cell)
 {
-    /**
-     *  This offsets the new TAction enum so they are correctly numbered.
-     */
-    NEW_TACTION_PAD = TACTION_TALK_BUBBLE, // The last TActionType
+    if (!taction || !house) {
+        return false;
+    }
+
+    int amount = taction->Data.Value;
 
     /**
-     *  Add new TActionTypes from here, do not reorder these!
+     *  If positive, grant the cash bonus.
+     *  If negative, take money from the house.
      */
+    if (amount != 0) {
+        if (amount < 0) {
+            house->Spend_Money(std::abs(amount));
+        } else {
+            house->Refund_Money(amount);
+        }
+    }
 
-    TACTION_CREDITS,            // Gives credits to the owner of the trigger.
-
-    /**
-     *  The new total TActionType count.
-     */
-    NEW_TACTION_COUNT
-};
+    return true;
+}
