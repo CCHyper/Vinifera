@@ -26,6 +26,7 @@
  *
  ******************************************************************************/
 #include "tactionext_hooks.h"
+#include "tactionext_functions.h"
 #include "taction.h"
 #include "vinifera_defines.h"
 #include "house.h"
@@ -54,6 +55,10 @@ static const char *TActionClass_New_Action_Name(int action)
     }
 
     switch (action) {
+
+        case TACTION_CREDITS:
+            return "Give credits...";
+
         default:
             return "<invalid>";
     }
@@ -72,6 +77,10 @@ static const char *TActionClass_New_Action_Description(int action)
     }
 
     switch (action) {
+
+        case TACTION_CREDITS:
+            return "Gives credits to the owner of the trigger.";
+
         default:
             return "<invalid>";
     }
@@ -130,6 +139,17 @@ DECLARE_PATCH(_TAction_Operator_Extend_Switch_Patch)
     }
 
     switch (this_ptr->Action) {
+
+        /**
+         *  #issue-158
+         * 
+         *  Gives credits to the owner of the trigger.
+         * 
+         *  @author: CCHyper
+         */
+        case TACTION_CREDITS:
+            success = TAction_Give_Credits(this_ptr, house, object, trigger, cell);
+            break;
 
         /**
          *  Unexpected TActionType.
