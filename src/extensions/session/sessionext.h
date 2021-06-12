@@ -53,6 +53,27 @@ class SessionClassExtension final : public Extension<SessionClass>
         void Write_MultiPlayer_Settings();
 
     public:
+        typedef struct SkirmishOptionsType
+        {
+            char Handle[20];
+            HousesType Side;
+            PlayerColorType Color;
+            int Credits;
+            int GameSpeed;
+            int UnitCount;
+            int AIPlayers;
+            int AIDifficulty;
+            bool Bases;
+            bool BridgeDestruction;
+            bool Goodies;
+            bool ShortGame;
+            bool CrapEngineers;
+            bool FogOfWar;
+            bool RedeployMCV;
+            int ScenarioIndex;
+        } SkirmishOptionsType;
+
+        SkirmishOptionsType SkirmishOptions;
 };
 
 
