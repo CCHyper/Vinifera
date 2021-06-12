@@ -72,6 +72,7 @@
 #include "infantryext_hooks.h"
 #include "houseext_hooks.h"
 #include "teamext_hooks.h"
+#include "tactionext_hooks.h"
 #include "factoryext_hooks.h"
 #include "footext_hooks.h"
 
@@ -142,6 +143,7 @@ void Extension_Hooks()
     BuildingClassExtension_Hooks();
 	HouseClassExtension_Hooks();
     TeamClassExtension_Hooks();
+    TActionClassExtension_Hooks();
     FactoryClassExtension_Hooks();
     FootClassExtension_Hooks();
 
