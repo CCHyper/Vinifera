@@ -34,6 +34,7 @@
  */
 #include "mainloopext_hooks.h"
 
+#include "scenarioext_hooks.h"
 #include "tacticalext_hooks.h"
 #include "displayext_hooks.h"
 #include "tooltipext_hooks.h"
@@ -98,6 +99,7 @@ void Extension_Hooks()
     /**
      *  All class extensions here.
      */
+    ScenarioClassExtension_Hooks();
     TacticalExtension_Hooks();
     DisplayClassExtension_Hooks();
     ToolTipManagerExtension_Hooks();
