@@ -54,6 +54,51 @@
 #include "hooker_macros.h"
 
 
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_TechnoClass_What_Action_RallyPoint_Patch)
+{
+    GET_REGISTER_STATIC(TechnoClass *, this_ptr, edi);
+    GET_STACK_STATIC(bool, altdown, esp, 0x17);
+    GET_STACK_STATIC(bool, ctrldown, esp, 0x16);
+    GET_STACK_STATIC(bool, shiftdown, esp, 0x15);
+
+#if 0
+; Factory Rally Point Enhancements
+
+; Factories can set rally points when holding the Alt key. This hack allows to
+; set rally points without holding the Alt key instead. This will interfere with
+; Mobile War Factories, which use the Alt-less click for undeploying.
+
+; Author: AlexB
+; Date: 2016-11-24
+#endif
+
+
+#if 0
+    if (altdown) {
+        goto return_ACTION_RALLY_TO_POINT;
+    }
+#endif
+
+    /**
+     *  
+     */
+can_player_move:
+    JMP(0x00631F3A);
+
+    /**
+     *  
+     */
+return_ACTION_RALLY_TO_POINT:
+    JMP(0x00631F2B);
+}
+
+
 /**
  *  #issue-594
  * 
@@ -705,4 +750,5 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x00630390, &_TechnoClass_Fire_At_Suicide_Patch);
     Patch_Jump(0x00631223, &_TechnoClass_Fire_At_Electric_Bolt_Patch);
     Patch_Jump(0x00636F09, &_TechnoClass_Is_Allowed_To_Retaliate_Can_Retaliate_Patch);
+    Patch_Jump(0x00631F23, &_TechnoClass_What_Action_RallyPoint_Patch);
 }
