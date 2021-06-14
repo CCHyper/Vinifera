@@ -46,4 +46,13 @@ void ScenarioClassExtension_Hooks()
      *  @author: CCHyper
      */
     Patch_Call(0x005E08E3, &Vinifera_Assign_Houses);
+
+    /**
+     *  #issue-338
+     * 
+     *  Hooks in the new Create_Units() function.
+     * 
+     *  @author: CCHyper
+     */
+    Patch_Call(0x005DD320, &Vinifera_Create_Units);
 }
