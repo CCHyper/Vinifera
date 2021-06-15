@@ -244,10 +244,10 @@ static void Tactical_Draw_Debug_Overlay()
 
     char buffer[256];
     std::snprintf(buffer, sizeof(buffer),
-        "[%s]  %3d  %3d  0x%08X",
+        "[%s] %*3d %*3d 0x%08X",
         strupr(Scen->ScenarioName),
-        Session.DesiredFrameRate,
-        FramesPerSecond,
+        3, Session.DesiredFrameRate,
+        3, FramesPerSecond,
         CurrentObjects.Count() == 1 ? CurrentObjects.Fetch_Head() : 0
     );
 
