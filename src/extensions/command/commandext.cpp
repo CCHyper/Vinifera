@@ -2206,3 +2206,66 @@ bool Step10FramesCommandClass::Process()
 
     return true;
 }
+
+
+/**
+ *  Change the owner of the selected object from the available houses.
+ * 
+ *  @author: CCHyper
+ */
+const char *CycleHouseCommandClass::Get_Name() const
+{
+    return "ChangeOwner";
+}
+
+const char *CycleHouseCommandClass::Get_UI_Name() const
+{
+    return "Change Owner";
+}
+
+const char *CycleHouseCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *CycleHouseCommandClass::Get_Description() const
+{
+    return "Change the owner of the selected object from the available houses.";
+}
+
+bool CycleHouseCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    /**
+     *  Fetch the currently selected object and cycle
+     */
+    if (CurrentObjects.Count() == 1) {
+        ObjectClass *object = CurrentObjects.Fetch_Head();
+        if (object && object->Is_Techno()) {
+            TechnoClass *techno = reinterpret_cast<TechnoClass *>(object);
+            if (techno) {
+
+                /**
+                 *  Fetch the next house on the Houses heap and assign it to the object.
+                 */
+                HouseClass *old_owner = techno->House;
+                int current_owner_id = techno->House->Get_Heap_ID();
+                HouseClass *new_owner = Houses[++current_owner_id % (Houses.Count())];
+                techno->Captured(new_owner);
+
+                /**
+                 *  Something might have changed that might affect the sidebar
+                 *  list of buildable objects for these houses, then flag that
+                 *  the sidebar must be recalculated.
+                 */
+                old_owner->IsRecalcNeeded = true;
+                new_owner->IsRecalcNeeded = true;
+            }
+        }
+    }
+
+    return true;
+}

@@ -158,7 +158,7 @@ void Init_Vinifera_Commands()
         cmdptr = new PlaceCrateCommandClass;
         Commands.Add(cmdptr);
 
-        cmdptr = new CursorPositionCommandClass;
+        cmdptr = new CycleHouseCommandClass;
         Commands.Add(cmdptr);
 
         cmdptr = new ToggleFrameStepCommandClass;
