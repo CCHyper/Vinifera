@@ -36,12 +36,70 @@
 #include "scenario.h"
 #include "session.h"
 #include "colorscheme.h"
+#include "convert.h"
 #include "fatal.h"
 #include "vinifera_util.h"
 #include "vinifera_gitinfo.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <timeapi.h>
+
+
+static bool Scenario_Ambient_Dark()
+{
+    return Scen->AmbientCurrent <= 50;
+}
+
+/**
+ *  f
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Tactical_Draw_Band_Tint_Patch)
+{
+    GET_REGISTER_STATIC(int, band_rect_x, edx);
+    GET_REGISTER_STATIC(int, band_rect_y, esi);
+    GET_REGISTER_STATIC(int, band_rect_w, eax);
+    GET_REGISTER_STATIC(int, band_rect_h, ecx);
+
+    static RGBClass color_black(0,0,0);
+    static RGBClass color_white(255,255,255);
+    static Rect fill_band_rect;
+    static Rect band_rect;
+
+    static bool checkbox_pattern = false;
+
+    /**
+     *  Draw the rubber band tint rect.
+     * 
+     *  Fill_Rect_Trans() doesnt not take a relative rect, so we need
+     *  to need to adjust it with the TacticalRect manually.
+     */
+    fill_band_rect.X = TacticalRect.X+band_rect_x;
+    fill_band_rect.Y = TacticalRect.Y+band_rect_y;
+    fill_band_rect.Width = (band_rect_w-band_rect_x)+1;
+    fill_band_rect.Height = (band_rect_h-band_rect_y)+1;
+
+    if (Scenario_Ambient_Dark()) {
+        TempSurface->Fill_Rect_Trans(fill_band_rect, color_white, 15);
+    } else {
+        TempSurface->Fill_Rect_Trans(fill_band_rect, color_black, 25);
+    }
+
+    /**
+     *  Draw the rubber band rect.
+     */
+    band_rect.X = band_rect_x;
+    band_rect.Y = band_rect_y;
+    band_rect.Width = (band_rect_w-band_rect_x)+1;
+    band_rect.Height = (band_rect_h-band_rect_y)+1;
+
+    TempSurface->Draw_Rect(TacticalRect, band_rect, NormalDrawer->inline_02(COLOR_WHITE));
+
+    JMP(0x00616601);
+}
 
 
 /**
