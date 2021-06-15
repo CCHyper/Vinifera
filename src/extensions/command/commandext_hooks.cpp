@@ -161,16 +161,7 @@ void Init_Vinifera_Commands()
         cmdptr = new CycleHouseCommandClass;
         Commands.Add(cmdptr);
 
-        cmdptr = new ToggleFrameStepCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new Step1FrameCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new Step5FramesCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new Step10FramesCommandClass;
+        cmdptr = new TogglePlaceAnywhereCommandClass;
         Commands.Add(cmdptr);
     }
 

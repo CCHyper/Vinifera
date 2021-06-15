@@ -2269,3 +2269,41 @@ bool CycleHouseCommandClass::Process()
 
     return true;
 }
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+const char *TogglePlaceAnywhereCommandClass::Get_Name() const
+{
+    return "TogglePlaceAnywhere";
+}
+
+const char *TogglePlaceAnywhereCommandClass::Get_UI_Name() const
+{
+    return "Toggle Place Anywhere";
+}
+
+const char *TogglePlaceAnywhereCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *TogglePlaceAnywhereCommandClass::Get_Description() const
+{
+    return "TogglePlaceAnywhere.";
+}
+
+bool TogglePlaceAnywhereCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    Map.IsProximityCheck = true;
+    Map.IsShroudCheck = true;
+
+    return true;
+}
