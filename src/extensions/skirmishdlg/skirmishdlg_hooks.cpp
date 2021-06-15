@@ -28,7 +28,10 @@
 #include "skirmishdlg_hooks.h"
 #include "tibsun_defines.h"
 #include "tibsun_globals.h"
+#include "housetype.h"
 #include "session.h"
+#include "rules.h"
+#include "addon.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -37,6 +40,64 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  
+ * 
+ *  
+ */
+DECLARE_PATCH(_SkirmishDialog_Dialog_FSRuleINI_Load_Houses_Sides_Patch)
+{
+    /**
+     *  Stolen bytes/code (function prolog).
+     */
+    _asm { push ecx }
+    _asm { push esi }
+
+    _asm { mov dword ptr [esp+4], 0xFFFFFFFF }
+
+    static HouseTypeClass *housetype;
+    static int i;
+
+    /**
+     *  Clear the previously loaded Houses and Sides. This makes
+     *  sure no additions from Firestorm creep into normal Tiberian Sun.
+     */
+    HouseTypes.Clear();
+    Sides.Clear();
+
+    /**
+     *  Read HouseTypes.
+     */
+    Rule->Houses(*RuleINI);
+    if (Is_Addon_Set(ADDON_FIRESTORM)) {
+        Rule->Houses(FSRuleINI);
+    }
+
+    /**
+     *  Read SideTypes.
+     */
+    Rule->Sides(*RuleINI);
+    if (Is_Addon_Set(ADDON_FIRESTORM)) {
+        Rule->Sides(FSRuleINI);
+    }
+
+    /**
+     *  Load all HouseType data from the INI's
+     */
+    for (i = 0; i < HouseTypes.Count(); ++i) {
+        housetype = HouseTypes[i];
+        if (housetype) {
+            housetype->Read_INI(*RuleINI);
+            if (Is_Addon_Set(ADDON_FIRESTORM)) {
+                housetype->Read_INI(FSRuleINI);
+            }
+        }
+    }
+
+    JMP(0x005F7407);
+}
 
 
 /**
@@ -92,4 +153,5 @@ DECLARE_PATCH(_SkirmishDialog_InitDialog_AIPlayers_Patch)
 void SkirmishDialog_Hooks()
 {
     Patch_Jump(0x005F7759, &_SkirmishDialog_InitDialog_AIPlayers_Patch);
+    Patch_Jump(0x005F73B0, &_SkirmishDialog_Dialog_FSRuleINI_Load_Houses_Sides_Patch);
 }
