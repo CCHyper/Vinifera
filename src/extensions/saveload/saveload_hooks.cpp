@@ -26,9 +26,9 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
+#include "saveloadext.h"
 #include "ext_hooks.h"
 #include "iomap.h"
-#include "saveload.h"
 #include "vinifera_globals.h"
 #include "vinifera_util.h"
 #include "debughandler.h"
@@ -265,8 +265,8 @@ void SaveLoad_Hooks()
     /**
      *  Hook the new save and load system in.
      */
-    Patch_Jump(0x005D68F7, &_Put_All_Vinifera_Data);
-    Patch_Jump(0x005D78ED, &_Load_All_Vinifera_Data);
+    //Patch_Jump(0x005D68F7, &_Put_All_Vinifera_Data);
+    //Patch_Jump(0x005D78ED, &_Load_All_Vinifera_Data);
     Patch_Jump(0x005D505E, &_Save_Game_Put_Game_Version);
 
     /**
