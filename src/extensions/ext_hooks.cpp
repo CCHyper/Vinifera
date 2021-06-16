@@ -62,7 +62,7 @@
 #include "campaignext_hooks.h"
 #include "tiberiumext_hooks.h"
 //#include "taskforceext_hooks.h"
-//#include "aitrigtypeext_hooks.h"
+#include "aitrigtypeext_hooks.h"
 //#include "scripttypeext_hooks.h"
 //#include "tagtypeext_hooks.h"
 //#include "triggertypeext_hooks.h"
@@ -129,7 +129,7 @@ void Extension_Hooks()
     CampaignClassExtension_Hooks();
     TiberiumClassExtension_Hooks();
     //TaskForceClassExtension_Hooks();
-    //AITriggerTypeClassExtension_Hooks();
+    AITriggerTypeClassExtension_Hooks();
     //ScriptTypeClassExtension_Hooks();
     //TagTypeClassExtension_Hooks();
     //TriggerTypeClassExtension_Hooks();
