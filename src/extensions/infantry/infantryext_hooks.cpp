@@ -46,6 +46,77 @@
 
 
 /**
+ *  #issue-82
+ * 
+ *  This removes the explosion when a Jumpjet infantry is killed while in the air.
+ * 
+ *  @author: CCHyper
+ * 
+ *  @update: Remove this patch as this effect is desired (Jumpjet jet pack exploding).
+ */
+#if 0
+DECLARE_PATCH(_InfantryClass_Take_Damage_JumpJet_Remove_Explosion_Patch)
+{
+    JMP(0x004D282A);
+}
+#endif
+
+
+/**
+ *  #issue-82
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_InfantryClass_Take_Damage_JumpJet_Do_Tumble_Patch)
+{
+    GET_REGISTER_STATIC(InfantryClass *, this_ptr, esi);
+    static const InfantryTypeClass *infantrytype;
+
+    infantrytype = reinterpret_cast<const InfantryTypeClass *>(this_ptr->Class_Of());
+
+
+    // jumpjet loco process handle crashing
+
+    // YR 005185F9
+
+    if (infantrytype->IsJumpJet) {
+        if (!Infantry_Crash()) { // YR 004DEBB0
+        }
+
+        this_ptr->entry_E4();
+        goto return_IS_DEAD;
+
+    } else {
+        this_ptr->entry_E4();
+        goto return_IS_DEAD;
+    }
+
+    /**
+     *  Stolen code.
+     */
+    //if (!infantrytype->IsJumpJet) {
+    //    goto normal_infantry;
+    //}
+
+    //this_ptr->Do_Action(DO_TUMBLE, true);
+
+return_IS_DEAD:
+    JMP(0x004D2834);
+
+//detach:
+//    JMP(0x004D282A);
+//
+//do_explode_anim:
+//    JMP(0x004D279D);
+//    
+//normal_infantry:
+//    JMP(0x004D27C6);
+}
+
+
+/**
  *  #issue-264
  * 
  *  Implements EnterTransportSound for infantry when they enter a transport.
@@ -464,4 +535,6 @@ void InfantryClassExtension_Hooks()
     Patch_Jump(0x004D7168, &_InfantryClass_What_Action_Mechanic_Patch);
     Patch_Jump(0x004D87E9, &_InfantryClass_Firing_AI_Mechanic_Patch);
     Patch_Jump(0x004D3A7B, &_InfantryClass_Per_Cell_Process_Transport_Attach_Sound_Patch);
+    //Patch_Jump(0x004D279D, &_InfantryClass_Take_Damage_JumpJet_Remove_Explosion_Patch);
+    Patch_Jump(0x004D282A, &_InfantryClass_Take_Damage_JumpJet_Do_Tumble_Patch);
 }
