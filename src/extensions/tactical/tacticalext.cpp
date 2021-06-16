@@ -41,7 +41,13 @@ TacticalMapExtension *TacticalExtension = nullptr;
  *  @author: CCHyper
  */
 TacticalMapExtension::TacticalMapExtension(Tactical *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+
+    /**
+     *  Custom text members.
+     */
+    IsCustomTextSet(false),
+    CustomTextTimer(0)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("TacticalMapExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -57,7 +63,13 @@ TacticalMapExtension::TacticalMapExtension(Tactical *this_ptr) :
  *  @author: CCHyper
  */
 TacticalMapExtension::TacticalMapExtension(const NoInitClass &noinit) :
-    Extension(noinit)
+    Extension(noinit),
+
+    /**
+     *  Custom text members.
+     */
+    IsCustomTextSet(false),
+    CustomTextTimer(noinit)
 {
     IsInitialized = false;
 }

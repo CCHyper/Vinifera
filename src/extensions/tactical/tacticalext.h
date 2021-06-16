@@ -28,6 +28,8 @@
 #pragma once
 
 #include "extension.h"
+#include "ttimer.h"
+#include "stimer.h"
 
 
 class Tactical;
@@ -52,6 +54,12 @@ class TacticalMapExtension final : public Extension<Tactical>
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
     public:
+
+        /**
+         *  Custom screen text members.
+         */
+        bool IsCustomTextSet;                          // Has custom text been set?
+        CDTimerClass<MSTimerClass> CustomTextTimer;    // The lifetime timer for the screen text.
 };
 
 

@@ -308,6 +308,18 @@ DECLARE_PATCH(_Tactical_Render_Patch)
 #endif
 
     /**
+     *  Has a custom text been set? If so, check to see if its time to
+     *  remove it from the screen and reset the timer.
+     */
+    if (TacticalExtension->IsCustomTextSet) {
+        if (TacticalExtension->CustomTextTimer.Expired()) {
+            TacticalExtension->CustomTextTimer.Stop();
+            TacticalExtension->IsCustomTextSet = false;
+            this_ptr->Clear_Caption_Text();
+        }       
+    }
+
+    /**
      *  Stolen bytes/code.
      */
 original_code:
