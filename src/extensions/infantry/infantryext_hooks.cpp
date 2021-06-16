@@ -37,6 +37,39 @@
 
 
 /**
+ *  A fake class for implementing new member functions which allow
+ *  access to the "this" pointer of the intended class.
+ * 
+ *  @note: This must not contain a constructor or deconstructor!
+ *  @note: All functions must be prefixed with "_" to prevent accidental virtualization.
+ */
+class InfantryClassFake final : public InfantryClass
+{
+    public:
+        int _Mission_Guard_Area();
+};
+
+
+/**
+ *  Implementation of Mission_Guard_Area() for InfantryClass.
+ */
+int InfantryClassFake::_Mission_Guard_Area()
+{
+    /**
+     *  #issue-366
+     * 
+     *  Fixes a bug were infantry do not switch to use DO_STAND_GUARD when
+     *  issued with a "Area Guard" order.
+     * 
+     *  @author: CCHyper
+     */
+    Do_Action(DO_STAND_GUARD);
+
+    return FootClass::Mission_Guard_Area();
+}
+
+
+/**
  *  #issue-80
  * 
  *  Fixes the bug where the Jumpjet uses the wrong DoType when idle on the
@@ -214,4 +247,5 @@ void InfantryClassExtension_Hooks()
     Patch_Jump(0x004D8C83, &_InfantryClass_Doing_AI_JumpJet_Idle_Patch);
     Patch_Jump(0x004D50C9, &_InfantryClass_AI_JumpJet_Idle_Between_Firing_Patch);
     Patch_Jump(0x004D9076, &_InfantryClass_Movement_AI_JumpJet_Not_Moving_Patch);
+    Change_Virtual_Address(0x006D22E4, Get_Func_Address(&InfantryClassFake::_Mission_Guard_Area));
 }
