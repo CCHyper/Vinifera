@@ -278,6 +278,98 @@ bool ManualPlaceCommandClass::Process()
 }
 
 
+const char *QuickSaveCommandClass::Get_Name() const
+{
+    return "QuickSave";
+}
+
+const char *QuickSaveCommandClass::Get_UI_Name() const
+{
+    return "Quick Save";
+}
+
+const char *QuickSaveCommandClass::Get_Category() const
+{
+    return "New";
+}
+
+const char *QuickSaveCommandClass::Get_Description() const
+{
+    return "Perform a quick save.";
+}
+
+#include "tacticalext.h"
+bool QuickSaveCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    char buffer[128];
+    std::snprintf(buffer, sizeof(buffer), "Quick Save: %s (%s)", Scen->Description, "");
+
+    if (Save_Game("QUICKSAVE.SAV", buffer)) {
+
+        TacticalExtension->CustomTextTimer.Stop();
+
+        std::strncpy(TacticalMap->ScreenText, "Game Saved", sizeof(TacticalMap->ScreenText));
+
+        TacticalExtension->IsCustomTextSet = true;
+
+        TacticalExtension->CustomTextTimer = SECONDS_TO_MILLISECONDS(3);
+        TacticalExtension->CustomTextTimer.Start();
+
+        return true;
+    }
+
+    return false;
+}
+
+
+const char *QuickLoadCommandClass::Get_Name() const
+{
+    return "QuickLoad";
+}
+
+const char *QuickLoadCommandClass::Get_UI_Name() const
+{
+    return "Quick Load";
+}
+
+const char *QuickLoadCommandClass::Get_Category() const
+{
+    return "New";
+}
+
+const char *QuickLoadCommandClass::Get_Description() const
+{
+    return "Load the last quick save if one exists.";
+}
+
+bool QuickLoadCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    if (Load_Game("QUICKSAVE.SAV")) {
+
+        TacticalExtension->CustomTextTimer.Stop();
+
+        std::strncpy(TacticalMap->ScreenText, "Game Loaded", sizeof(TacticalMap->ScreenText));
+
+        TacticalExtension->IsCustomTextSet = true;
+
+        TacticalExtension->CustomTextTimer = SECONDS_TO_MILLISECONDS(3);
+        TacticalExtension->CustomTextTimer.Start();
+
+        return true;
+    }
+
+    return false;
+}
+
+
 /**
  *  Produces a memory dump on request.
  * 
