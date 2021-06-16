@@ -93,10 +93,52 @@ continue_check_scatter:
 }
 
 
+
+#include "scenarioini.h"
+#include "tibsun_inline.h"
+DECLARE_PATCH(_MinimapCrash)
+{
+    GET_REGISTER_STATIC(TechnoClass *, this_ptr, esi);
+    GET_REGISTER_STATIC(unsigned, _ebx, ebx);
+
+    static Cell cell;
+
+    cell.X = this_ptr->Coord.X / CELL_LEPTON_W;
+    cell.Y = this_ptr->Coord.Y / CELL_LEPTON_H;
+
+    if (this_ptr->IsInLimbo && this_ptr->field_207) {
+        DEBUG_WARNING("Writing map...\n");
+        Write_Scenario_INI("verylikley_minimapcrash.map", true);
+        DEBUG_WARNING("Very likley object causing radar crash? Coord: %d,%d,%d Cell: %d,%d\n",
+            this_ptr->Coord.X, this_ptr->Coord.Y, this_ptr->Coord.Z, cell.X, cell.Y);
+        JMP_REG(eax, 0x0063A46E);
+    }
+
+    if (this_ptr->IsInLimbo) {
+        DEBUG_WARNING("Writing map...\n");
+        Write_Scenario_INI("possible_minimapcrash.map", true);
+        DEBUG_WARNING("Possible object causing radar crash? Coord: %d,%d,%d Cell: %d,%d\n",
+            this_ptr->Coord.X, this_ptr->Coord.Y, this_ptr->Coord.Z, cell.X, cell.Y);
+        JMP_REG(eax, 0x0063A46E);
+    }
+
+    if (!this_ptr->field_207) {
+        JMP_REG(eax, 0x0063A46E);
+    }
+
+    _asm { mov esi, this_ptr }
+    _asm { mov ebx, _ebx }
+    //_asm { xor bl, bl }
+    JMP_REG(ecx, 0x0063A44A);
+}
+
+
 /**
  *  Main function for patching the hooks.
  */
 void UnitClassExtension_Hooks()
 {
     Patch_Jump(0x006517BE, &_UnitClass_Per_Cell_Process_AutoHarvest_Assign_Harvest_Mission_Patch);
+
+    Patch_Jump(0x0063A440, &_MinimapCrash);
 }
