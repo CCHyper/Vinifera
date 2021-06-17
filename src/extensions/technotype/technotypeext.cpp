@@ -27,6 +27,8 @@
  ******************************************************************************/
 #include "technotypeext.h"
 #include "technotype.h"
+#include "tibsun_globals.h"
+#include "rules.h"
 #include "ccini.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -53,7 +55,16 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(TechnoTypeClass *this_ptr) :
     ShakePixelYLo(0),
     ShakePixelXHi(0),
     ShakePixelXLo(0),
-    IsImmuneToEMP(false)
+    IsImmuneToEMP(false),
+    IsJumpJet(false),
+    JumpjetTurnRate(Rule->JumpjetTurnRate),
+    JumpjetSpeed(Rule->JumpjetSpeed),
+    JumpjetClimb(Rule->JumpjetClimb),
+    JumpjetCruiseHeight(Rule->JumpjetCruiseHeight),
+    JumpjetAcceleration(Rule->JumpjetAcceleration),
+    JumpjetWobblesPerSecond(Rule->JumpjetWobblesPerSecond),
+    JumpjetWobbleDeviation(Rule->JumpjetWobbleDeviation),
+    JumpjetCloakDetectionRadius(Rule->JumpjetCloakDetectionRadius)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("TechnoTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -171,6 +182,7 @@ void TechnoTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
     crc(ShakePixelXHi);
     crc(ShakePixelXLo);
     crc(IsImmuneToEMP);
+    crc(IsJumpJet);
 }
 
 
@@ -190,7 +202,7 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
-    
+
     CloakSound = ini.Get_VocType(ini_name, "CloakSound", CloakSound);
     UncloakSound = ini.Get_VocType(ini_name, "UncloakSound", UncloakSound);
     IsShakeScreen = ini.Get_Bool(ini_name, "CanShakeScreen", IsShakeScreen);
@@ -199,6 +211,20 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     ShakePixelXHi = ini.Get_Int(ini_name, "ShakeXhi", ShakePixelXHi);
     ShakePixelXLo = ini.Get_Int(ini_name, "ShakeXlo", ShakePixelXLo);
     IsImmuneToEMP = ini.Get_Bool(ini_name, "ImmuneToEMP", IsImmuneToEMP);
+
+    /**
+     *  IsJumpJet is now moved to TechnoType, but this will handle the original InfantryType cases too.
+     */
+    IsJumpJet = ini.Get_Bool(ini_name, "JumpJet", IsJumpJet);
+
+    JumpjetTurnRate = ini.Get_Int(ini_name , "JumpjetTurnRate", JumpjetTurnRate);
+    JumpjetSpeed = ini.Get_Int(ini_name , "JumpjetSpeed", JumpjetSpeed);
+    JumpjetClimb = ini.Get_Int(ini_name , "JumpjetClimb", JumpjetClimb);
+    JumpjetCruiseHeight = ini.Get_Int(ini_name , "JumpjetHeight", JumpjetCruiseHeight);
+    JumpjetAcceleration = ini.Get_Int(ini_name , "JumpjetAccel", JumpjetAcceleration);
+    JumpjetWobblesPerSecond = ini.Get_Int(ini_name , "JumpjetWobbles", JumpjetWobblesPerSecond);
+    JumpjetWobbleDeviation = ini.Get_Int(ini_name , "JumpjetDeviation", JumpjetWobbleDeviation);
+    JumpjetCloakDetectionRadius = ini.Get_Int(ini_name , "JumpjetCloakDetectionRadius", JumpjetCloakDetectionRadius);
 
     return true;
 }

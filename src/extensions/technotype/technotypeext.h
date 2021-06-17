@@ -83,6 +83,23 @@ class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
          *  by EMP, unless this is set for them.
          */
         bool IsImmuneToEMP;
+
+        /**
+         *  
+         */
+        bool IsJumpJet;
+
+        /**
+         *  Jumpjet overrides.
+         */
+        int JumpjetTurnRate;
+        int JumpjetSpeed;
+        double JumpjetClimb;
+        int JumpjetCruiseHeight;
+        double JumpjetAcceleration;
+        double JumpjetWobblesPerSecond;
+        int JumpjetWobbleDeviation;
+        int JumpjetCloakDetectionRadius;
 };
 
 

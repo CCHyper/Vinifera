@@ -179,6 +179,11 @@ void Extension_Hooks()
     CCINIClassExtension_Hooks();
 
     /**
+     *  Locomotors
+     */
+    JumpjetLocomotionClassExtension_Hooks();
+
+    /**
      *  Dialogs and associated code.
      */
     SkirmishDialog_Hooks();
