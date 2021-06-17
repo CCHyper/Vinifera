@@ -77,6 +77,8 @@
 
 #include "dropshipext_hooks.h"
 
+#include "cciniext_hooks.h"
+
 #include "skirmishdlg_hooks.h"
 
 #include "hooker.h"
@@ -146,6 +148,8 @@ void Extension_Hooks()
     FootClassExtension_Hooks();
 
     DropshipExtension_Hooks();
+
+    CCINIClassExtension_Hooks();
 
     /**
      *  Dialogs and associated code.
