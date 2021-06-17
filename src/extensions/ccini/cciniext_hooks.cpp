@@ -58,11 +58,22 @@ class CCINIClassFake final : public CCINIClass
  */
 long CCINIClassFake::_Get_Owners(const char *section, const char *entry, const long defvalue)
 {
-    char buffer[128];
+    /**
+     *  #issue-372
+     * 
+     *  Increases the buffer size from 128 to 2048.
+     * 
+     *  @author: CCHyper
+     */
+    //char buffer[128];
+    char buffer[2048];
 
     long ownable = defvalue;
 
     if (CCINIClass::Get_String(section, entry, "", buffer, sizeof(buffer)) > 0) {
+
+        //DEV_DEBUG_INFO("Get_Owners(\"%s\",\"%s\") - \"%s\"\n", section, entry, buffer);
+
         ownable = 0;
         char *name = std::strtok(buffer, ",");
         while (name) {
@@ -80,7 +91,15 @@ long CCINIClassFake::_Get_Owners(const char *section, const char *entry, const l
  */
 bool CCINIClassFake::_Put_Owners(const char *section, const char *entry, long value)
 {
-    char buffer[128];
+    /**
+     *  #issue-372
+     * 
+     *  Increases the buffer size from 128 to 2048.
+     * 
+     *  @author: CCHyper
+     */
+    //char buffer[128];
+    char buffer[2048];
 
     buffer[0] = '\0';
 
@@ -99,6 +118,9 @@ bool CCINIClassFake::_Put_Owners(const char *section, const char *entry, long va
     }
 
     if (buffer[0] != '\0') {
+
+        //DEV_DEBUG_INFO("Put_Owners(\"%s\",\"%s\") - \"%s\"\n", section, entry, buffer);
+
         return CCINIClass::Put_String(section, entry, buffer);
     }
 
