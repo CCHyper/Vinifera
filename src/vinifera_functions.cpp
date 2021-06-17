@@ -27,6 +27,8 @@
  ******************************************************************************/
 #include "vinifera_functions.h"
 #include "vinifera_globals.h"
+#include "openal_globals.h"
+#include "openal_load_dll.h"
 #include "debughandler.h"
 #include <string>
 
@@ -94,5 +96,37 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
  */
 bool Vinifera_Startup()
 {
+	/**
+	 *  Load the Bink DLL.
+	 */
+	if (!Load_OpenAL_DLL()) {
+		//MessageBox(nullptr, "Failed to load OpenAL library, please reinstall Vinifera." "Error!", MB_OK|MB_ICONERROR);
+		//return false;
+
+		DEBUG_WARNING("Load_OpenAL_DLL() failed, continuing without OpenAL audio support!\n");
+	}
+
+	if (OpenALImportsLoaded) {
+		DEBUG_INFO("Continuing with OpenAL support enabled.\n");
+		OpenALInitialised = true;
+	}
+
+	return true;
+}
+
+
+/**
+ *  This function will get called on application shutdown, allowing you to
+ *  perform any memory cleanup or shutdown of new systems.
+ * 
+ *  @author: CCHyper
+ */
+bool Vinifera_Shutdown()
+{
+	/**
+	 *  Unload the Bink DLL.
+	 */
+	Unload_OpenAL_DLL();
+
 	return true;
 }

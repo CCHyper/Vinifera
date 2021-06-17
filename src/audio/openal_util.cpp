@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          OPENAL_UTIL.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         Various OpenAL utility functions.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,25 +25,56 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
-
-/**
- *  Include the hook headers here.
- */
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "bugfix_hooks.h"
-#include "openal_hooks.h"
+#include "openal_util.h"
 
 
-void Setup_Hooks()
+ALenum Get_OpenAL_Format(int bits, int channels)
 {
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Extension_Hooks();
-    BugFix_Hooks();
-    OpenAL_Audio_Hooks();
+    switch (bits) {
+        case 16:
+            if (channels > 1) {
+                return AL_FORMAT_STEREO16;
+            } else {
+                return AL_FORMAT_MONO16;
+            }
+
+        case 8:
+            if (channels > 1) {
+                return AL_FORMAT_STEREO8;
+            } else {
+                return AL_FORMAT_MONO8;
+            }
+
+        default:
+            return -1;
+    }
+}
+
+
+const char *Get_OpenAL_Error(ALenum error)
+{
+    switch (error) {
+        case AL_NO_ERROR:
+            return "No error occurred.";
+
+        case AL_INVALID_NAME:
+            return "Invalid device name.";
+
+        case AL_INVALID_ENUM:
+            return "Invalid Enum.";
+
+        case AL_INVALID_VALUE:
+            return "Invalid value.";
+
+        case AL_INVALID_OPERATION:
+            return "Invalid operation.";
+
+        case AL_OUT_OF_MEMORY:
+            return "Out of memory.";
+
+        default:
+            break;
+    }
+
+    return "Unknown error.";
 }
