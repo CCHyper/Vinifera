@@ -27,6 +27,7 @@
  ******************************************************************************/
 #include "technotypeext.h"
 #include "technotype.h"
+#include "rules.h"
 #include "ccini.h"
 #include "filepng.h"
 #include "swizzle.h"
@@ -69,7 +70,27 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(TechnoTypeClass *this_ptr) :
     VoiceDeploy(),
     VoiceHarvest(),
     IdleRate(0),
-    CameoImageSurface(nullptr)
+    CameoImageSurface(nullptr),
+
+    /**
+     *  Levitation locomotor overrides.
+     * 
+     *  As these are all overrides to the global Rules values, initialise
+     *  the defaults of these values to that of the globals.
+     */
+    LevitationDrag(Levitation_Drag),
+    LevitationMaxVelocityWhenHappy(Levitation_MaxVelocityWhenHappy),
+    LevitationMaxVelocityWhenFollowing(Levitation_MaxVelocityWhenFollowing),
+    LevitationMaxVelocityWhenPissedOff(Levitation_MaxVelocityWhenPissedOff),
+    LevitationAccelerationProbability(Levitation_AccelerationProbability),
+    LevitationAccelerationDuration(Levitation_AccelerationDuration),
+    LevitationAcceleration(Levitation_Acceleration),
+    LevitationInitialBoost(Levitation_InitialBoost),
+    LevitationMaxBlockCount(Levitation_MaxBlockCount),
+    LevitationIntentionalDeacceleration(Levitation_IntentionalDeacceleration),
+    LevitationIntentionalDriftVelocity(Levitation_IntentionalDriftVelocity),
+    LevitationProximityDistance(Levitation_ProximityDistance),
+    LevitationPropulsionSoundEffect(Levitation_PropulsionSoundEffect)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TechnoTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -85,7 +106,8 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(TechnoTypeClass *this_ptr) :
  *  @author: CCHyper
  */
 TechnoTypeClassExtension::TechnoTypeClassExtension(const NoInitClass &noinit) :
-    Extension(noinit)
+    Extension(noinit),
+    LevitationPropulsionSoundEffect()
 {
     IsInitialized = false;
 }
@@ -122,6 +144,11 @@ HRESULT TechnoTypeClassExtension::Load(IStream *pStm)
     if (FAILED(hr)) {
         return E_FAIL;
     }
+
+    /**
+     *  Clear any vectors here.
+     */
+    LevitationPropulsionSoundEffect.Clear();
 
     new (this) TechnoTypeClassExtension(NoInitClass());
 
@@ -217,6 +244,19 @@ void TechnoTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
     crc(ShakePixelXHi);
     crc(ShakePixelXLo);
     crc(SoylentValue);
+    crc(LevitationDrag);
+    crc(LevitationMaxVelocityWhenHappy);
+    crc(LevitationMaxVelocityWhenFollowing);
+    crc(LevitationMaxVelocityWhenPissedOff);
+    crc(LevitationAccelerationProbability);
+    crc(LevitationAccelerationDuration);
+    crc(LevitationAcceleration);
+    crc(LevitationInitialBoost);
+    crc(LevitationMaxBlockCount);
+    crc(LevitationIntentionalDeacceleration);
+    crc(LevitationIntentionalDriftVelocity);
+    crc(LevitationProximityDistance);
+    crc(LevitationPropulsionSoundEffect.Count());
 }
 
 
@@ -281,6 +321,23 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     if (imagesurface) {
         CameoImageSurface = imagesurface;
     }
+
+    /**
+     *  Levitation locomotor overrides.
+     */
+    LevitationDrag = ini.Get_Double(ini_name, "LevitationDrag", LevitationDrag);
+    LevitationMaxVelocityWhenHappy = ini.Get_Double(ini_name, "LevitationMaxVelocityWhenHappy", LevitationMaxVelocityWhenHappy);
+    LevitationMaxVelocityWhenFollowing = ini.Get_Double(ini_name, "LevitationMaxVelocityWhenFollowing", LevitationMaxVelocityWhenFollowing);
+    LevitationMaxVelocityWhenPissedOff = ini.Get_Double(ini_name, "LevitationMaxVelocityWhenPissedOff", LevitationMaxVelocityWhenPissedOff);
+    LevitationAccelerationProbability = ini.Get_Double(ini_name, "LevitationAccelerationProbability", LevitationAccelerationProbability);
+    LevitationAccelerationDuration = ini.Get_Int(ini_name, "LevitationAccelerationDuration", LevitationAccelerationDuration);
+    LevitationAcceleration = ini.Get_Double(ini_name, "LevitationAcceleration", LevitationAcceleration);
+    LevitationInitialBoost = ini.Get_Double(ini_name, "LevitationInitialBoost", LevitationInitialBoost);
+    LevitationMaxBlockCount = ini.Get_Int(ini_name, "LevitationMaxBlockCount", LevitationMaxBlockCount);
+    LevitationIntentionalDeacceleration = ini.Get_Double(ini_name, "LevitationIntentionalDeacceleration", LevitationIntentionalDeacceleration);
+    LevitationIntentionalDriftVelocity = ini.Get_Double(ini_name, "LevitationIntentionalDriftVelocity", LevitationIntentionalDriftVelocity);
+    LevitationProximityDistance = ini.Get_Double(ini_name, "LevitationProximityDistance", LevitationProximityDistance);
+    LevitationPropulsionSoundEffect = ini.Get_VoxType_List(ini_name, "LevitationPropulsionSoundEffect", LevitationPropulsionSoundEffect);
 
     return true;
 }

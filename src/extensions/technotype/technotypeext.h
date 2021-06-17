@@ -146,6 +146,23 @@ class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
          *  Pointer to the cameo image surface.
          */
         BSurface *CameoImageSurface;
+
+        /**
+         *  Levitation locomotor overrides.
+         */
+        double LevitationDrag;
+        double LevitationMaxVelocityWhenHappy;
+        double LevitationMaxVelocityWhenFollowing;
+        double LevitationMaxVelocityWhenPissedOff;
+        double LevitationAccelerationProbability;
+        int LevitationAccelerationDuration;
+        double LevitationAcceleration;
+        double LevitationInitialBoost;
+        int LevitationMaxBlockCount;
+        double LevitationIntentionalDeacceleration;
+        double LevitationIntentionalDriftVelocity;
+        double LevitationProximityDistance;
+        TypeList<VocType> LevitationPropulsionSoundEffect;
 };
 
 

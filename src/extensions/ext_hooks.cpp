@@ -249,6 +249,11 @@ void Extension_Hooks()
     FetchRes_Hooks();
 
     /**
+     *  Locomotors
+     */
+    LevitateLocomotionClassExtension_Hooks();
+
+    /**
      *  Dialogs and associated code.
      */
     SkirmishDialog_Hooks();
