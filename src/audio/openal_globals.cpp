@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          TACTICALEXT_HOOKS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         Contains the hooks for the OpenAL audio engine.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,34 +25,31 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
-
-/**
- *  Include the hook headers here.
- */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "bugfix_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-#include "openal_hooks.h"
+#include "openal_globals.h"
 
 
-void Setup_Hooks()
-{
-    Vinifera_Memory_Hooks();
+bool OpenALInitialised = false;
+bool OpenALInitDirectSound = true; // We still need to initialise DirectSound as its used by the VQ playback.
 
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Extension_Hooks();
-    BugFix_Hooks();
+OpenALAudioClass OpenALAudio;
 
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
-
-    OpenAL_Audio_Hooks();
-}
+LPALSOURCEF alSourcef = nullptr;
+LPALSOURCEQUEUEBUFFERS alSourceQueueBuffers = nullptr;
+LPALBUFFERDATA alBufferData = nullptr;
+LPALGENBUFFERS alGenBuffers = nullptr;
+LPALDELETEBUFFERS alDeleteBuffers = nullptr;
+LPALSOURCEUNQUEUEBUFFERS alSourceUnqueueBuffers = nullptr;
+LPALGETSOURCEI alGetSourcei = nullptr;
+LPALSOURCESTOP alSourceStop = nullptr;
+LPALSOURCEPLAY alSourcePlay = nullptr;
+LPALDELETESOURCES alDeleteSources = nullptr;
+LPALGENSOURCES alGenSources = nullptr;
+LPALCOPENDEVICE alcOpenDevice = nullptr;
+LPALCCLOSEDEVICE alcCloseDevice = nullptr;
+LPALCCREATECONTEXT alcCreateContext = nullptr;
+LPALCDESTROYCONTEXT alcDestroyContext = nullptr;
+LPALCSUSPENDCONTEXT alcSuspendContext = nullptr;
+LPALCPROCESSCONTEXT alcProcessContext = nullptr;
+LPALCMAKECONTEXTCURRENT alcMakeContextCurrent = nullptr;
+LPALCGETCONTEXTSDEVICE alcGetContextsDevice = nullptr;
+LPALCGETERROR alcGetError = nullptr;
