@@ -723,6 +723,82 @@ class CursorPositionCommandClass : public ViniferaCommandClass
 };
 
 
+/**
+ *  
+ */
+class RotateLeftCommandClass : public ViniferaCommandClass
+{
+    public:
+        RotateLeftCommandClass() : ViniferaCommandClass() { IsDeveloper = true; }
+        virtual ~RotateLeftCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+        virtual KeyNumType Default_Key() const override { return KeyNumType(KN_NONE); }
+};
+
+
+/**
+ *  
+ */
+class RotateRightCommandClass : public ViniferaCommandClass
+{
+    public:
+        RotateRightCommandClass() : ViniferaCommandClass() { IsDeveloper = true; }
+        virtual ~RotateRightCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+        virtual KeyNumType Default_Key() const override { return KeyNumType(KN_NONE); }
+};
+
+
+/**
+ *  
+ */
+class RotateTurretLeftCommandClass : public ViniferaCommandClass
+{
+    public:
+        RotateTurretLeftCommandClass() : ViniferaCommandClass() { IsDeveloper = true; }
+        virtual ~RotateTurretLeftCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+        virtual KeyNumType Default_Key() const override { return KeyNumType(KN_NONE); }
+};
+
+
+/**
+ *  
+ */
+class RotateTurretRightCommandClass : public ViniferaCommandClass
+{
+    public:
+        RotateTurretRightCommandClass() : ViniferaCommandClass() { IsDeveloper = true; }
+        virtual ~RotateTurretRightCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+        virtual KeyNumType Default_Key() const override { return KeyNumType(KN_NONE); }
+};
+
+
 #ifndef DEBUG
 /**
  *  Based class for all new developer/debug command classes.

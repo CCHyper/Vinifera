@@ -160,6 +160,18 @@ void Init_Vinifera_Commands()
 
         cmdptr = new CursorPositionCommandClass;
         Commands.Add(cmdptr);
+
+        cmdptr = new RotateLeftCommandClass;
+        Commands.Add(cmdptr);
+
+        cmdptr = new RotateRightCommandClass;
+        Commands.Add(cmdptr);
+
+        cmdptr = new RotateTurretLeftCommandClass;
+        Commands.Add(cmdptr);
+
+        cmdptr = new RotateTurretRightCommandClass;
+        Commands.Add(cmdptr);
     }
 
 #ifndef NDEBUG

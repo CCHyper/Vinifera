@@ -2042,3 +2042,307 @@ bool CursorPositionCommandClass::Process()
 
     return true;
 }
+
+
+/**
+ *  Utility functions
+ */
+static void Rotate_Left_DirType(FacingClass &facing_instance)
+{
+    DirType dir = facing_instance.Current();
+    dir = DirType(--dir % DIR_MAX);
+    facing_instance.DesiredFacing.Set(dir);
+}
+
+static void Rotate_Left_FacingType(FacingClass &facing_instance)
+{
+    FacingType facing = facing_instance.Current();
+    facing = FacingType(--facing % FACING_COUNT);
+    facing_instance.DesiredFacing.Set(facing);
+}
+
+static void Rotate_Left_Facing32(FacingClass &facing_instance)
+{
+    int dir32 = facing_instance.Current();
+    dir32 = --dir32 % 32;
+    facing_instance.DesiredFacing.Set(dir32);
+}
+
+static void Rotate_Right_DirType(FacingClass &facing_instance)
+{
+    DirType dir = facing_instance.Current();
+    dir = DirType(++dir % DIR_MAX);
+    facing_instance.DesiredFacing.Set(dir);
+}
+
+static void Rotate_Right_FacingType(FacingClass &facing_instance)
+{
+    FacingType facing = facing_instance.Current();
+    facing = FacingType(++facing % FACING_COUNT);
+    facing_instance.DesiredFacing.Set(facing);
+}
+
+static void Rotate_Right_Facing32(FacingClass &facing_instance)
+{
+    int dir32 = facing_instance.Current();
+    dir32 = ++dir32 % 32;
+    facing_instance.DesiredFacing.Set(dir32);
+}
+
+
+/**
+ *  @author: CCHyper
+ */
+const char *RotateLeftCommandClass::Get_Name() const
+{
+    return "RotateLeft";
+}
+
+const char *RotateLeftCommandClass::Get_UI_Name() const
+{
+    return "Rotate Left";
+}
+
+const char *RotateLeftCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *RotateLeftCommandClass::Get_Description() const
+{
+    return "Rotate Left";
+}
+
+bool RotateLeftCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    if (CurrentObjects.Count() == 1) {
+        ObjectClass *techno = CurrentObjects.Fetch_Head();
+        if (techno && techno->Is_Foot()) {
+            FootClass *foot = reinterpret_cast<FootClass *>(techno);
+            if (foot && !foot->Locomotion->Is_Moving_Now()) {
+
+                switch (foot->What_Am_I()) {
+                    case RTTI_INFANTRY:
+                        Rotate_Left_FacingType(foot->PrimaryFacing);
+                        break;
+
+                    case RTTI_UNIT:
+                    {
+                        UnitClass *unit = reinterpret_cast<UnitClass *>(foot);
+                        if (unit->Class->IsVoxel) {
+                            Rotate_Left_Facing32(foot->PrimaryFacing);
+                            //Rotate_Left_DirType(foot->PrimaryFacing);
+                        } else {
+                            Rotate_Left_FacingType(foot->PrimaryFacing);
+                        }
+                        break;
+                    }
+
+                    case RTTI_AIRCRAFT:
+                        Rotate_Left_Facing32(foot->PrimaryFacing);
+                        break;
+                };
+
+            }
+        }
+    }
+
+    return true;
+}
+
+
+/**
+ *  @author: CCHyper
+ */
+const char *RotateRightCommandClass::Get_Name() const
+{
+    return "RotateRight";
+}
+
+const char *RotateRightCommandClass::Get_UI_Name() const
+{
+    return "Rotate Right";
+}
+
+const char *RotateRightCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *RotateRightCommandClass::Get_Description() const
+{
+    return "Rotate Right";
+}
+
+bool RotateRightCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    if (CurrentObjects.Count() == 1) {
+        ObjectClass *techno = CurrentObjects.Fetch_Head();
+        if (techno && techno->Is_Foot()) {
+            FootClass *foot = reinterpret_cast<FootClass *>(techno);
+            if (foot && !foot->Locomotion->Is_Moving_Now()) {
+
+                switch (foot->What_Am_I()) {
+                    case RTTI_INFANTRY:
+                        Rotate_Right_FacingType(foot->PrimaryFacing);
+                        break;
+
+                    case RTTI_UNIT:
+                    {
+                        UnitClass *unit = reinterpret_cast<UnitClass *>(foot);
+                        if (unit->Class->IsVoxel) {
+                            Rotate_Right_Facing32(foot->PrimaryFacing);
+                            //Rotate_Right_DirType(foot->PrimaryFacing);
+                        } else {
+                            Rotate_Right_FacingType(foot->PrimaryFacing);
+                        }
+                        break;
+                    }
+
+                    case RTTI_AIRCRAFT:
+                        Rotate_Right_Facing32(foot->PrimaryFacing);
+                        break;
+                };
+
+            }
+        }
+    }
+
+    return true;
+}
+
+
+/**
+ *  @author: CCHyper
+ */
+const char *RotateTurretLeftCommandClass::Get_Name() const
+{
+    return "RotateTurretLeft";
+}
+
+const char *RotateTurretLeftCommandClass::Get_UI_Name() const
+{
+    return "Rotate Turret Left";
+}
+
+const char *RotateTurretLeftCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *RotateTurretLeftCommandClass::Get_Description() const
+{
+    return "Rotate Turret Left";
+}
+
+bool RotateTurretLeftCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    if (CurrentObjects.Count() == 1) {
+        ObjectClass *techno = CurrentObjects.Fetch_Head();
+        if (techno && techno->Is_Foot()) {
+            FootClass *foot = reinterpret_cast<FootClass *>(techno);
+            if (foot && !foot->Locomotion->Is_Moving_Now() && !foot->IsFiring) {
+
+                switch (foot->What_Am_I()) {
+                    case RTTI_INFANTRY:
+                        Rotate_Left_FacingType(foot->SecondaryFacing);
+                        break;
+
+                    case RTTI_UNIT:
+                    {
+                        UnitClass *unit = reinterpret_cast<UnitClass *>(foot);
+                        if (unit->Class->IsVoxel) {
+                            Rotate_Left_Facing32(foot->SecondaryFacing);
+                        } else {
+                            Rotate_Left_FacingType(foot->SecondaryFacing);
+                        }
+                        break;
+                    }
+
+                    case RTTI_AIRCRAFT:
+                        Rotate_Left_Facing32(foot->SecondaryFacing);
+                        break;
+                };
+
+            }
+        }
+    }
+
+    return true;
+}
+
+
+/**
+ *  @author: CCHyper
+ */
+const char *RotateTurretRightCommandClass::Get_Name() const
+{
+    return "RotateTurretRight";
+}
+
+const char *RotateTurretRightCommandClass::Get_UI_Name() const
+{
+    return "Rotate Turret Right";
+}
+
+const char *RotateTurretRightCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *RotateTurretRightCommandClass::Get_Description() const
+{
+    return "Rotate Turret Right";
+}
+
+bool RotateTurretRightCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    if (CurrentObjects.Count() == 1) {
+        ObjectClass *techno = CurrentObjects.Fetch_Head();
+        if (techno && techno->Is_Foot()) {
+            FootClass *foot = reinterpret_cast<FootClass *>(techno);
+            if (foot && !foot->Locomotion->Is_Moving_Now() && !foot->IsFiring) {
+
+                switch (foot->What_Am_I()) {
+                    case RTTI_INFANTRY:
+                        Rotate_Right_FacingType(foot->SecondaryFacing);
+                        break;
+
+                    case RTTI_UNIT:
+                    {
+                        UnitClass *unit = reinterpret_cast<UnitClass *>(foot);
+                        if (unit->Class->IsVoxel) {
+                            Rotate_Right_Facing32(foot->SecondaryFacing);
+                        } else {
+                            Rotate_Right_FacingType(foot->SecondaryFacing);
+                        }
+                        break;
+                    }
+
+                    case RTTI_AIRCRAFT:
+                        Rotate_Right_Facing32(foot->SecondaryFacing);
+                        break;
+                };
+
+            }
+        }
+    }
+
+    return true;
+}
