@@ -183,6 +183,8 @@ bool UnitTypeClassExtension::Read_INI(CCINIClass &ini)
     }
 
     IsTotable = ini.Get_Bool(ini_name, "Totable", IsTotable);
+
+    UnloadingHarvesterClass = ini.Get_Unit(ini_name, "UnloadingHarvester", UnloadingHarvesterClass);
     
     return true;
 }

@@ -56,6 +56,11 @@ class UnitTypeClassExtension final : public Extension<UnitTypeClass>
          *  Can this unit be picked up (toted) by the carryall aircraft?
          */
         bool IsTotable;
+
+        /**
+         *  The graphic class to switch to when a harvester is unloading at a refinery.
+         */
+        const UnitTypeClass *UnloadingHarvesterClass;
 };
 
 
