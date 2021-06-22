@@ -2042,3 +2042,40 @@ bool CursorPositionCommandClass::Process()
 
     return true;
 }
+
+
+/**
+ *  Toggles the availability of the radar.
+ * 
+ *  @author: CCHyper
+ */
+const char *ToggleRadarCommandClass::Get_Name() const
+{
+    return "ToggleRadar";
+}
+
+const char *ToggleRadarCommandClass::Get_UI_Name() const
+{
+    return "Toggle Radar";
+}
+
+const char *ToggleRadarCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *ToggleRadarCommandClass::Get_Description() const
+{
+    return "Toggles the availability of the radar.";
+}
+
+bool ToggleRadarCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    Scen->IsFreeRadar = !Scen->IsFreeRadar;
+
+    return true;
+}

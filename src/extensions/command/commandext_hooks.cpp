@@ -160,6 +160,9 @@ void Init_Vinifera_Commands()
 
         cmdptr = new CursorPositionCommandClass;
         Commands.Add(cmdptr);
+
+        cmdptr = new ToggleRadarCommandClass;
+        Commands.Add(cmdptr);
     }
 
 #ifndef NDEBUG
