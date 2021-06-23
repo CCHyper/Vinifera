@@ -52,6 +52,15 @@ class AircraftTypeClassExtension final : public Extension<AircraftTypeClass>
         bool Read_INI(CCINIClass &ini);
 
     public:
+        /**
+         *  
+         */
+        bool IsDualRotors;
+
+        /**
+         *  Does this aircraft have a "bobbing" effect while its flying?
+         */
+        bool IsJitter;
 
 };
 

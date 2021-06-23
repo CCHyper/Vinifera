@@ -44,7 +44,8 @@ ExtensionMap<AircraftTypeClass, AircraftTypeClassExtension> AircraftTypeClassExt
  *  @author: CCHyper
  */
 AircraftTypeClassExtension::AircraftTypeClassExtension(AircraftTypeClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    IsDualRotors(false)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("AircraftTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -175,5 +176,7 @@ bool AircraftTypeClassExtension::Read_INI(CCINIClass &ini)
         return false;
     }
     
+    IsDualRotors = ini.Get_Bool(ini_name, "DualRotors", IsDualRotors);
+
     return true;
 }
