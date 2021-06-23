@@ -33,6 +33,9 @@
 
 class AircraftClass;
 class HouseClass;
+class FacingClass;
+class Point2D;
+class Rect;
 
 
 class AircraftClassExtension final : public Extension<AircraftClass>
@@ -48,6 +51,15 @@ class AircraftClassExtension final : public Extension<AircraftClass>
 
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
+
+        void Draw_Shape(Point2D &point, Rect &bounds);
+        void Draw_Shape_Rotors(Point2D &point, Rect &bounds);
+        void Draw_Voxel_Rotors(Point2D &point, Rect &bounds);
+        void Draw_Shadow(Point2D &point, Rect &bounds);
+        void Draw_Rotor_Shadow(Point2D &point, Rect &bounds);
+
+    protected:
+        int Shape_Number(FacingClass &facing, int facings_count);
 
     public:
 };

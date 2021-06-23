@@ -27,7 +27,12 @@
  ******************************************************************************/
 #include "aircraftext.h"
 #include "aircraft.h"
+#include "aircrafttype.h"
+#include "aircrafttypeext.h"
 #include "wwcrc.h"
+#include "drawshape.h"
+#include "matrix3d.h"
+#include "tibsun_inline.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -155,4 +160,341 @@ void AircraftClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("AircraftClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Replace "Class->Rotation" with new Facings= loaded from ArtINI for aircrafts
+
+// use turret image for voxel rotors?
+
+
+
+
+
+// TODO: Move to TS++
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+void Move_Point(Point2D &xy, DirType dir, int distance)
+{
+    double radians = (double)(dir - 0x3FFF) * -0.00009587672516830327;
+
+    xy.Y -= (WWMath::Sin(radians) * distance);
+    xy.X += (WWMath::Cos(radians) * distance);
+}
+
+
+
+
+/**
+ *  Renders an aircraft object with shape graphics at the location specified.
+ * 
+ *  @author: CCHyper
+ */
+void AircraftClassExtension::Draw_Shape(Point2D &point, Rect &bounds)
+{
+    ASSERT(ThisPtr != nullptr);
+    //DEV_DEBUG_TRACE("AircraftClassExtension::Draw_Shape - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    const ShapeFileStruct *shapefile = (const ShapeFileStruct *)ThisPtr->Get_Image_Data();
+    if (!shapefile) {
+        return;
+    }
+
+    ShapeFlagsType flags = SHAPE_NORMAL|SHAPE_CENTER;
+
+    int shapenum = Shape_Number(ThisPtr->PrimaryFacing, ThisPtr->Class->Rotation);
+
+    /**
+     *  Draw the root body of the aircraft.
+     */
+    ThisPtr->Draw_Object(shapefile, shapenum, point, bounds, DIR_N,
+        256, 0, ThisPtr->Get_Z_Gradient(), false, bounds.Width, nullptr, 0, 0, 0, flags);
+}
+
+
+/**
+ *  Draw shape rotor blades on the aircraft.
+ * 
+ *  @author: CCHyper
+ */
+void AircraftClassExtension::Draw_Shape_Rotors(Point2D &point, Rect &bounds)
+{
+    ASSERT(ThisPtr != nullptr);
+    //DEV_DEBUG_TRACE("AircraftClassExtension::Draw_Shape_Rotors - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    
+    const AircraftTypeClass *aircrafttype = ThisPtr->Class;
+    if (!aircrafttype->IsTurretEquipped) {
+        return;
+    }
+
+    int shapenum;
+
+    const ShapeFileStruct *left_rotor = (const ShapeFileStruct *)AircraftTypeClass::LRotorData;
+    const ShapeFileStruct *right_rotor = (const ShapeFileStruct *)AircraftTypeClass::RRotorData;
+
+    if (!left_rotor || !right_rotor) {
+        return;
+    }
+
+    Point2D draw_point = point;
+    ShapeFlagsType flags = SHAPE_NORMAL|SHAPE_CENTER;
+    int height = ThisPtr->Get_Height();
+
+
+    // TODO: Handle the visual of it increasing in speed by setting height levels to change at?
+    /**
+     *  The rotor shape number depends on whether the helicopter is idling
+     *  or not. A landed helicopter uses slow moving "idling" blades.
+     */
+    if (height == 0) {
+        shapenum = (ThisPtr->Fetch_Stage() % 8) + 4;
+        flags |= SHAPE_TRANS75;
+    } else {
+        shapenum = ThisPtr->Fetch_Stage() % 4;
+        flags |= SHAPE_TRANS50;
+    }
+
+
+
+    // TEMP: enable dual rotors somehow
+    if (false) {
+
+        int _stretch[FACING_COUNT] = { 8, 9, 10, 9, 8, 9, 10, 9 };
+
+        /**
+         *  Dual rotors offset along flight axis.
+         */
+        draw_point.Y -= Lepton_To_Pixel(height);
+
+        FacingType face = Dir_Facing(ThisPtr->SecondaryFacing.Current().Get_Dir());
+
+        /**
+         *  TODO: Draw front?
+         */
+        Move_Point(draw_point, ThisPtr->SecondaryFacing.Current().Get_Dir(), _stretch[face]);
+
+        ThisPtr->Draw_Object(right_rotor, shapenum, draw_point, bounds, DIR_N,
+            256, 0, ThisPtr->Get_Z_Gradient(), false, bounds.Width, nullptr, 0, 0, 0, flags);
+
+        /**
+         *  TODO: Draw back?
+         */
+        Move_Point(draw_point, ThisPtr->SecondaryFacing.Current().Get_Dir()+DIR_S, _stretch[face]*2);
+
+        ThisPtr->Draw_Object(left_rotor, shapenum, draw_point, bounds, DIR_N,
+            256, 0, ThisPtr->Get_Z_Gradient(), false, bounds.Width, nullptr, 0, 0, 0, flags);
+
+    } else {
+
+        draw_point.Y -= (Lepton_To_Pixel(height) - 2);
+
+        /**
+         *  Single rotor centered about shape.
+         */
+        ThisPtr->Draw_Object(right_rotor, shapenum, draw_point, bounds, DIR_N,
+            256, 0, ThisPtr->Get_Z_Gradient(), false, bounds.Width, nullptr, 0, 0, 0, flags);
+
+    }
+}
+
+
+#include "tspp.h"
+DEFINE_IMPLEMENTATION(Matrix3D &Voxel_Matrix(), 0x00754BE0);
+
+
+/**
+ *  Renders an aircraft object with shape graphics at the location specified.
+ * 
+ *  @author: CCHyper
+ */
+void AircraftClassExtension::Draw_Voxel_Rotors(Point2D &point, Rect &bounds)
+{
+    ASSERT(ThisPtr != nullptr);
+    //DEV_DEBUG_TRACE("AircraftClassExtension::Draw_Voxel_Rotors - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    const AircraftTypeClass *aircrafttype = ThisPtr->Class;
+
+    //if (!aircrafttype->IsTurretEquipped || !aircrafttype->TurretVoxel) {
+    //    return;
+    //}
+
+
+
+
+
+    Matrix3D matrix;
+
+    Point2D draw_point = ThisPtr->Locomotion()->Draw_Point();
+    Point2D shadow_point = ThisPtr->Locomotion()->Shadow_Point();
+
+    Matrix3D draw_matrix = ThisPtr->Locomotion()->Draw_Matrix();
+    Matrix3D shadow_matrix = ThisPtr->Locomotion()->Shadow_Matrix();
+
+    Matrix3D d_m = draw_matrix * Voxel_Matrix();
+    Matrix3D s_m = shadow_matrix * Voxel_Matrix();
+
+    int turret_face = Dir_To_32(ThisPtr->SecondaryFacing.Current());
+
+
+
+    // TEMP: enable dual rotors somehow
+    if (false) {
+
+
+        // TODO Dual
+
+
+    } else {
+
+
+
+
+
+
+        //matrix.Translate_X(aircrafttype->TurretOffset / 8);
+        matrix.Translate_X(aircrafttype->TurretOffset * double(0.1657281546769136)); // YR
+
+        matrix.Rotate_Z(turret_face * -0.1963495408493621);
+
+        matrix.Translate();
+
+
+
+
+
+
+
+        matrix.Translate();
+
+        matrix.Rotate_Y();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // 004A5D10 draw shadow
+
+
+
+
+        ThisPtr->entry_328(
+            ThisPtr->Class->BodyVoxel,
+            0,
+            -1,
+            &ThisPtr->Class->field_D4,
+            ?,
+            ?,
+            some matrix?,
+            ?,
+            ?
+        );
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+}
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+void AircraftClassExtension::Draw_Shadow(Point2D &point, Rect &bounds)
+{
+    ASSERT(ThisPtr != nullptr);
+    //DEV_DEBUG_TRACE("AircraftClassExtension::Draw_Shadow - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+
+}
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+void AircraftClassExtension::Draw_Rotor_Shadow(Point2D &point, Rect &bounds)
+{
+    ASSERT(ThisPtr != nullptr);
+    //DEV_DEBUG_TRACE("AircraftClassExtension::Draw_Rotor_Shadow - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+
+}
+
+
+/**
+ *  Fetch the shape number to use for the desired facing.
+ * 
+ *  @author: CCHyper
+ */
+int AircraftClassExtension::Shape_Number(FacingClass &facing, int facings_count)
+{
+    ASSERT(ThisPtr != nullptr);
+    //DEV_DEBUG_TRACE("AircraftClassExtension::Shape_Number - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    int shapenum = 0;
+
+    /**
+     *  Fetch the current facing value in the required units.
+     */
+    switch (facings_count) {
+
+        case 8:
+            shapenum = Dir_To_8(facing.Current());
+            break;
+
+        case 16:
+            shapenum = Dir_To_16(facing.Current());
+            break;
+
+        case 32:
+            shapenum = Dir_To_32(facing.Current());
+            break;
+
+        case 64:
+            shapenum = Dir_To_64(facing.Current());
+            break;
+
+        default:
+            shapenum = 0;
+            break;
+    };
+
+    return shapenum;
 }

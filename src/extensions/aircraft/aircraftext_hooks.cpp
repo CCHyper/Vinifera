@@ -28,7 +28,9 @@
 #include "aircraftext_hooks.h"
 #include "aircraftext_init.h"
 #include "aircraft.h"
+#include "aircraftext.h"
 #include "aircrafttype.h"
+#include "aircrafttypeext.h"
 #include "object.h"
 #include "target.h"
 #include "unit.h"
@@ -43,6 +45,93 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_AircraftClass_Draw_It_Draw_Shape_Draw_Rotors_Patch)
+{
+    GET_REGISTER_STATIC(AircraftClass *, this_ptr, ebp);
+    GET_STACK_STATIC(Point2D *, point, esp, 0xCC);
+    GET_STACK_STATIC(Rect *, bounds, esp, 0xD0);
+    static AircraftClassExtension *aircraftext;
+
+    aircraftext = AircraftClassExtensions.find(this_ptr);
+    if (aircraftext) {
+
+        /**
+         *  All the drawing code before this depends on IsVoxel, so checking
+         *  this is false gives us a if/else scenario so we can draw the shape
+         *  graphics here.
+         */
+        if (!this_ptr->Class->IsVoxel) {
+            aircraftext->Draw_Shape(*point, *bounds);
+        }
+
+    }
+
+    /**
+     *  If this aircraft is equipped with rotor blades, then draw them at this time.
+     */
+    if (this_ptr->Class->IsRotorEquipped) {
+        this_ptr->Draw_Rotors(*point, *bounds);
+    }
+
+    /**
+     *  This draws any overlay graphics on the aircraft.
+     */
+    this_ptr->FootClass::Draw_It(*point, *bounds);
+
+    /**
+     *  Function return.
+     */
+    _asm { pop esi }
+    JMP(0x00408F88);
+}
+
+
+/**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_AircraftClass_Draw_Rotors_Patch)
+{
+    GET_REGISTER_STATIC(AircraftClass *, this_ptr, ecx);
+    GET_STACK_STATIC(Point2D *, point, esp, 0x04);
+    GET_STACK_STATIC(Rect *, bounds, esp, 0x08);
+    static AircraftClassExtension *aircraftext;
+
+    _asm { pushad }
+
+    aircraftext = AircraftClassExtensions.find(this_ptr);
+    if (aircraftext) {
+
+        /**
+         *  Depending on the image type, draw the rotor blades to match.
+         */
+        if (!this_ptr->Class->IsVoxel) {
+            aircraftext->Draw_Shape_Rotors(*point, *bounds);
+        } else {
+            aircraftext->Draw_Voxel_Rotors(*point, *bounds);
+        }
+
+    }
+
+    _asm { popad }
+
+    /**
+     *  Function return.
+     */
+    JMP(0x00408FA8);
+}
 
 
 /**
@@ -264,4 +353,6 @@ void AircraftClassExtension_Hooks()
     Patch_Jump(0x0040B819, &_AircraftClass_What_Action_Is_Totable_Patch);
     Patch_Jump(0x0040A413, &_AircraftClass_Mission_Move_LAND_Is_Moving_Check_Patch);
     Patch_Jump(0x0040988C, &_AircraftClass_Mission_Unload_Transport_Detach_Sound_Patch);
+    Patch_Jump(0x00408F77, &_AircraftClass_Draw_It_Draw_Shape_Draw_Rotors_Patch);
+    Patch_Jump(0x00408FA0, &_AircraftClass_Draw_Rotors_Patch);
 }
