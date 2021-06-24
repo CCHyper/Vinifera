@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          WARHEADTYPEEXT.H
+ *  @file          TECHNOEXT_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended WarheadTypeClass class.
+ *  @brief         Contains the hooks for the extended TechnoClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,41 +27,5 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
 
-
-class WarheadTypeClass;
-class CCINIClass;
-
-
-class WarheadTypeClassExtension final : public Extension<WarheadTypeClass>
-{
-    public:
-        WarheadTypeClassExtension(WarheadTypeClass *this_ptr);
-        WarheadTypeClassExtension(const NoInitClass &noinit);
-        ~WarheadTypeClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        bool Read_INI(CCINIClass &ini);
-
-    public:
-        /**
-         *  Does this warhead instantly destroy walls regardless of the warhead damage value?
-         */
-        bool IsWallAbsoluteDestroyer;
-
-        /**
-         *  Can this warhead damage friendly units?
-         */
-        bool IsAffectsAllies;
-};
-
-
-extern ExtensionMap<WarheadTypeClass, WarheadTypeClassExtension> WarheadTypeClassExtensions;
+void TechnoClassExtension_Hooks();

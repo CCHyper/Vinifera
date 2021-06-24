@@ -67,6 +67,7 @@
 //#include "tagtypeext_hooks.h"
 //#include "triggertypeext_hooks.h"
 
+#include "technoext_hooks.h"
 #include "unitext_hooks.h"
 #include "buildingext_hooks.h"
 #include "infantryext_hooks.h"
@@ -136,6 +137,7 @@ void Extension_Hooks()
     //TagTypeClassExtension_Hooks();
     //TriggerTypeClassExtension_Hooks();
 
+    TechnoClassExtension_Hooks();
     UnitClassExtension_Hooks();
     InfantryClassExtension_Hooks();
     BuildingClassExtension_Hooks();
