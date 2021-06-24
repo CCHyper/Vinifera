@@ -75,6 +75,7 @@
 #include "teamext_hooks.h"
 #include "factoryext_hooks.h"
 #include "footext_hooks.h"
+#include "bulletext_hooks.h"
 
 #include "combatext_hooks.h"
 
@@ -144,6 +145,7 @@ void Extension_Hooks()
     TeamClassExtension_Hooks();
     FactoryClassExtension_Hooks();
     FootClassExtension_Hooks();
+    BulletClassExtension_Hooks();
 
     CombatExtension_Hooks();
 
