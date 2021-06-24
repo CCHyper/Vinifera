@@ -75,6 +75,8 @@
 #include "factoryext_hooks.h"
 #include "footext_hooks.h"
 
+#include "combatext_hooks.h"
+
 #include "dropshipext_hooks.h"
 
 #include "skirmishdlg_hooks.h"
@@ -137,13 +139,11 @@ void Extension_Hooks()
     UnitClassExtension_Hooks();
     InfantryClassExtension_Hooks();
     BuildingClassExtension_Hooks();
-    HouseClassExtension_Hooks();
-	UnitClassExtension_Hooks();
-    BuildingClassExtension_Hooks();
-	HouseClassExtension_Hooks();
     TeamClassExtension_Hooks();
     FactoryClassExtension_Hooks();
     FootClassExtension_Hooks();
+
+    CombatExtension_Hooks();
 
     DropshipExtension_Hooks();
 
