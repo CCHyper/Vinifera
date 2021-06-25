@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          VINIFERA_GLOBALS.H
+ *  @file          LINETRAIL.H
  *
- *  @authors       CCHyper
+ *  @author        CCHyper
  *
- *  @brief         Vinifera global values.
+ *  @brief         Graphical line trails for Objects.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -28,31 +28,49 @@
 #pragma once
 
 #include "always.h"
-#include "vector.h"
-#include "linetrail.h"
+#include "rgb.h"
 
 
-class LineTrail;
+class LineTrail
+{
+    public:
+        LineTrail();
+        ~LineTrail();
+
+        void Set_Color(RGBClass &color);
+        void Set_Color_Decrement(int dec);
+
+        static void Draw_All();
+        static void Clear_All();
+
+    private:
+        void Draw_It();
+        void Update();
+        bool Is_Something() const;
+
+    private:
+        RGBClass Color;
+        LineTrail *Next;
+        int ColorDecrement;
+        int field_C; // CurrentPixel
+        int field_10;
+        int field_14;
+        int field_18;
+        int field_1C[32];
+};
 
 
-extern bool Vinifera_DeveloperMode;
+struct LineTrailType
+{
+    /**
+        *  This flag controls the colour of the LineTrail of this projectile, which is invoked by UseLineTrail. The values are standard RGB. 
+        */
+    RGBClass Color;
 
-extern char Vinifera_DebugDirectory[PATH_MAX];
+    /**
+        *  If this object has UseLineTrail=yes, then this flag defines the decrement (fadeout) of the Line Trail applied every frame.
 
-
-/**
- *  Developer mode globals.
- */
-extern bool Vinifera_Developer_InstantBuild;
-extern bool Vinifera_Developer_AIInstantBuild;
-extern bool Vinifera_Developer_BuildCheat;
-extern bool Vinifera_Developer_Unshroud;
-extern bool Vinifera_Developer_ShowCursorPosition;
-extern bool Vinifera_Developer_FrameStep;
-extern int Vinifera_Developer_FrameStepCount;
-
-
-/**
- *  Global vectors and heaps.
- */
-extern DynamicVectorClass<LineTrail *> LineTrails;
+If the player is using the Low Detail Level, the value specified in this flag is multiplied by 2. 
+        */
+    int ColorDecrement;
+};

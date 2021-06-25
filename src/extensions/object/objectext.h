@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          VINIFERA_GLOBALS.H
+ *  @file          OBJECTEXT.H
  *
- *  @authors       CCHyper
+ *  @author        CCHyper
  *
- *  @brief         Vinifera global values.
+ *  @brief         Extended ObjectClass class.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,32 +27,37 @@
  ******************************************************************************/
 #pragma once
 
-#include "always.h"
-#include "vector.h"
-#include "linetrail.h"
+#include "extension.h"
+#include "container.h"
 
 
+class ObjectClass;
+class CCINIClass;
 class LineTrail;
 
 
-extern bool Vinifera_DeveloperMode;
+class ObjectClassExtension final : public Extension<ObjectClass>
+{
+    public:
+        ObjectClassExtension(ObjectClass *this_ptr);
+        ObjectClassExtension(const NoInitClass &noinit);
+        ~ObjectClassExtension();
 
-extern char Vinifera_DebugDirectory[PATH_MAX];
+        virtual HRESULT Load(IStream *pStm) override;
+        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
+        virtual int Size_Of() const override;
+
+        virtual void Detach(TARGET target, bool all = true) override;
+        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+
+        virtual void Detach_All(bool all = false);
+
+    public:
+        /**
+         *  
+         */
+        DynamicVectorClass<LineTrail *> AttachedLineTrails;
+};
 
 
-/**
- *  Developer mode globals.
- */
-extern bool Vinifera_Developer_InstantBuild;
-extern bool Vinifera_Developer_AIInstantBuild;
-extern bool Vinifera_Developer_BuildCheat;
-extern bool Vinifera_Developer_Unshroud;
-extern bool Vinifera_Developer_ShowCursorPosition;
-extern bool Vinifera_Developer_FrameStep;
-extern int Vinifera_Developer_FrameStepCount;
-
-
-/**
- *  Global vectors and heaps.
- */
-extern DynamicVectorClass<LineTrail *> LineTrails;
+extern ExtensionMap<ObjectClass, ObjectClassExtension> ObjectClassExtensions;

@@ -27,6 +27,7 @@
  ******************************************************************************/
 #include "vinifera_functions.h"
 #include "vinifera_globals.h"
+#include "linetrail.h"
 #include "debughandler.h"
 #include <string>
 
@@ -94,5 +95,22 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
  */
 bool Vinifera_Startup()
 {
+	return true;
+}
+
+
+/**
+ *  This function will get called on application shutdown, allowing you to
+ *  perform any memory cleanup or shutdown of new systems.
+ * 
+ *  @author: CCHyper
+ */
+bool Vinifera_Shutdown()
+{
+	/**
+	 *  Cleanup any global vectors and heaps.
+	 */
+	LineTrail::Clear_All();
+
 	return true;
 }

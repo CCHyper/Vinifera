@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          VINIFERA_GLOBALS.H
+ *  @file          LINETRAIL.CPP
  *
- *  @authors       CCHyper
+ *  @author        CCHyper
  *
- *  @brief         Vinifera global values.
+ *  @brief         Graphical line trails for Objects.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,34 +25,84 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#pragma once
-
-#include "always.h"
-#include "vector.h"
 #include "linetrail.h"
-
-
-class LineTrail;
-
-
-extern bool Vinifera_DeveloperMode;
-
-extern char Vinifera_DebugDirectory[PATH_MAX];
+#include "tibsun_globals.h"
+#include "vinifera_globals.h"
+#include "options.h"
 
 
 /**
- *  Developer mode globals.
+ *  
  */
-extern bool Vinifera_Developer_InstantBuild;
-extern bool Vinifera_Developer_AIInstantBuild;
-extern bool Vinifera_Developer_BuildCheat;
-extern bool Vinifera_Developer_Unshroud;
-extern bool Vinifera_Developer_ShowCursorPosition;
-extern bool Vinifera_Developer_FrameStep;
-extern int Vinifera_Developer_FrameStepCount;
+LineTrail::LineTrail() :
+    Color(128,128,128),
+    Next(nullptr),
+    ColorDecrement(16),
+    field_C(),
+    field_10(),
+    field_14(),
+    field_18(),
+    field_1C()
+{
+}
 
 
 /**
- *  Global vectors and heaps.
+ *  
  */
-extern DynamicVectorClass<LineTrail *> LineTrails;
+LineTrail::~LineTrail()
+{
+    if (Next) {
+        //Next->~LineTrail;
+        //Next = nullptr;
+    }
+}
+
+
+void LineTrail::Set_Color(RGBClass &color)
+{
+    Color = color;
+}
+
+
+void LineTrail::Set_Color_Decrement(int dec)
+{
+    if (Options.DetailLevel == 0) {
+        dec = 2 * dec;
+    }
+    ColorDecrement = dec;
+}
+
+
+void LineTrail::Draw_It()
+{
+}
+
+
+void LineTrail::Update()
+{
+}
+
+
+bool LineTrail::Is_Something() const
+{
+    return !Next && !field_1C[field_C];
+}
+
+
+void LineTrail::Draw_All()
+{
+    for (int i = 0; i < LineTrails.Count(); ++i) {
+        LineTrail *line = LineTrails[i];
+        line->Update();
+        if (!line->Is_Something()) {
+            line->Draw_It();
+        } else if (true) {
+        }
+    }
+}
+
+
+void LineTrail::Clear_All()
+{
+}
