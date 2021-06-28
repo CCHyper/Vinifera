@@ -300,6 +300,12 @@ void Init_Vinifera_Commands()
 
         cmdptr = new RemoveTiberiumCommandClass;
         Commands.Add(cmdptr);
+
+        cmdptr = new MeteorShowerCommandClass;
+        Commands.Add(cmdptr);
+
+        cmdptr = new MeteorImpactCommandClass;
+        Commands.Add(cmdptr);
     }
 
 #ifndef NDEBUG
