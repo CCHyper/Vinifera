@@ -1,14 +1,15 @@
+#include "ebolt.h"
 /*******************************************************************************
 /*                 O P E N  S O U R C E  --  V I N I F E R A                  **
 /*******************************************************************************
  *
  *  @project       Vinifera
  *
- *  @file          VINIFERA_GLOBALS.CPP
+ *  @file          EBOLT.CPP
  *
- *  @authors       CCHyper
+ *  @author        CCHyper
  *
- *  @brief         Vinifera global values.
+ *  @brief         Graphical electric bolts.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,21 +26,26 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#pragma once
-
-#include "vinifera_globals.h"
+#include "ebolt.h"
 
 
-bool Vinifera_DeveloperMode = false;
+EBoltClass::EBoltClass() :
+	coord1(),
+	coord2(),
+	_ZAdjust(),
+	Random(),
+	Owner(nullptr),
+	Weapon(),
+	Lifetime(),
+	AlternateColor(false)
+{
+}
 
-extern char Vinifera_DebugDirectory[PATH_MAX] = { "Debug" };
 
-bool Vinifera_Developer_InstantBuild = false;
-bool Vinifera_Developer_AIInstantBuild = false;
-bool Vinifera_Developer_BuildCheat = false;
-bool Vinifera_Developer_Unshroud = false;
-bool Vinifera_Developer_ShowCursorPosition = false;
-bool Vinifera_Developer_FrameStep = false;
-int Vinifera_Developer_FrameStepCount = 0;
-
-DynamicVectorClass<EBoltClass *> EBolts;
+EBoltClass::~EBoltClass()
+{
+	if (Owner) {
+		Owner->EBolt = nullptr;
+		Owner = nullptr;
+	}
+}
