@@ -44,7 +44,8 @@ ExtensionMap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension> SuperWeaponTyp
  *  @author: CCHyper
  */
 SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(SuperWeaponTypeClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    Credits(0)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("SuperWeaponTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -174,6 +175,8 @@ bool SuperWeaponTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
+
+    Credits = ini.Get_Int(ini_name, "Credits", Credits);
     
     return true;
 }

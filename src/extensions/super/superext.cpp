@@ -27,6 +27,10 @@
  ******************************************************************************/
 #include "superext.h"
 #include "super.h"
+#include "supertype.h"
+#include "supertypeext.h"
+#include "house.h"
+#include "housetype.h"
 #include "wwcrc.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -155,4 +159,35 @@ void SuperClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("SuperClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+}
+
+
+/**
+ *  #issue-
+ * 
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool SuperClassExtension::Place_Credits(Cell &cell, bool player)
+{
+    ASSERT(ThisPtr != nullptr);
+    //DEV_DEBUG_TRACE("SuperClassExtension::Place_Credits - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    SuperWeaponTypeClassExtension *supertypeext;
+    supertypeext = SuperWeaponTypeClassExtensions.find(ThisPtr->Class);
+    if (supertypeext) {
+
+        /**
+         *  
+         */
+        int amount = supertypeext->Credits;
+        if (amount < 0) {
+            ThisPtr->House->Spend_Money(std::abs(amount));
+        } else {
+            ThisPtr->House->Refund_Money(amount);
+        }
+    }
+
+    return true;
 }

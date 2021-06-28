@@ -49,6 +49,8 @@ class SuperClassExtension final : public Extension<SuperClass>
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
+        bool Place_Credits(Cell &cell, bool player);
+
     public:
 };
 

@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SUPERTYPEEXT.H
+ *  @file          VINIFERA_GLOBALS.H
  *
- *  @author        CCHyper
+ *  @authors       CCHyper
  *
- *  @brief         Extended SuperWeaponTypeClass class.
+ *  @brief         Vinifera defines and constants.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,36 +27,24 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
+#include "always.h"
+#include "tibsun_defines.h"
 
 
-class SuperWeaponTypeClass;
-class CCINIClass;
-
-
-class SuperWeaponTypeClassExtension final : public Extension<SuperWeaponTypeClass>
+typedef enum NewSpecialWeaponType
 {
-    public:
-        SuperWeaponTypeClassExtension(SuperWeaponTypeClass *this_ptr);
-        SuperWeaponTypeClassExtension(const NoInitClass &noinit);
-        ~SuperWeaponTypeClassExtension();
+    /**
+     *  This offsets the new SpecialWeaponType enum so they are correctly numbered.
+     */
+    NEW_SPECIAL_PAD = SPECIAL_DROP_PODS, // The last SpecialWeaponType
 
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
+    /**
+     *  Add new SpecialWeaponType from here, do not reorder these!
+     */
+    SPECIAL_CREDITS,
 
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        bool Read_INI(CCINIClass &ini);
-
-    public:
-        /**
-         *  
-         */
-        int Credits;
+    /**
+     *  The new total SpecialWeaponType count.
+     */
+    NEW_SPECIAL_COUNT
 };
-
-
-extern ExtensionMap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension> SuperWeaponTypeClassExtensions;

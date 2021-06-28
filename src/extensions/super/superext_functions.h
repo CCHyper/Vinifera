@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SUPERTYPEEXT.H
+ *  @file          SUPEREXT_FUNCTIONS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended SuperWeaponTypeClass class.
+ *  @brief         Contains the supporting functions for the extended SuperClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,36 +27,11 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
+#include "always.h"
+#include "tibsun_defines.h"
 
 
-class SuperWeaponTypeClass;
-class CCINIClass;
+class SuperClass;
 
 
-class SuperWeaponTypeClassExtension final : public Extension<SuperWeaponTypeClass>
-{
-    public:
-        SuperWeaponTypeClassExtension(SuperWeaponTypeClass *this_ptr);
-        SuperWeaponTypeClassExtension(const NoInitClass &noinit);
-        ~SuperWeaponTypeClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        bool Read_INI(CCINIClass &ini);
-
-    public:
-        /**
-         *  
-         */
-        int Credits;
-};
-
-
-extern ExtensionMap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension> SuperWeaponTypeClassExtensions;
+bool Super_Give_Credits(SuperClass *super, Cell *cell, bool player);

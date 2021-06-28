@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SUPERTYPEEXT.H
+ *  @file          SUPEREXT_FUNCTIONS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Extended SuperWeaponTypeClass class.
+ *  @brief         Contains the supporting functions for the extended SuperClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,38 +25,34 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#pragma once
+#include "superext_functions.h"
+#include "supertypeext.h"
+#include "super.h"
+#include "supertype.h"
+#include "house.h"
+#include "debughandler.h"
+#include "asserthandler.h"
 
-#include "extension.h"
-#include "container.h"
 
-
-class SuperWeaponTypeClass;
-class CCINIClass;
-
-
-class SuperWeaponTypeClassExtension final : public Extension<SuperWeaponTypeClass>
+/**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+bool Super_Give_Credits(SuperClass *super, Cell *cell, bool player)
 {
-    public:
-        SuperWeaponTypeClassExtension(SuperWeaponTypeClass *this_ptr);
-        SuperWeaponTypeClassExtension(const NoInitClass &noinit);
-        ~SuperWeaponTypeClassExtension();
+    if (!super || !cell) {
+        return false;
+    }
 
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
+    SuperWeaponTypeClassExtension *supertypeext = SuperWeaponTypeClassExtensions.find(super->Class);
+    if (supertypeext) {
 
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+        super->House->Refund_Money(amount);
 
-        bool Read_INI(CCINIClass &ini);
+    }
 
-    public:
-        /**
-         *  
-         */
-        int Credits;
-};
-
-
-extern ExtensionMap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension> SuperWeaponTypeClassExtensions;
+    return true;
+}
