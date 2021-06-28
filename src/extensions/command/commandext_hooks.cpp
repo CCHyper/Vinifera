@@ -172,6 +172,12 @@ void Init_Vinifera_Commands()
 
         cmdptr = new Step10FramesCommandClass;
         Commands.Add(cmdptr);
+
+        cmdptr = new MeteorShowerCommandClass;
+        Commands.Add(cmdptr);
+
+        cmdptr = new MeteorImpactCommandClass;
+        Commands.Add(cmdptr);
     }
 
 #ifndef NDEBUG
