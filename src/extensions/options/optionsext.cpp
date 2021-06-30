@@ -26,6 +26,8 @@
  *
  ******************************************************************************/
 #include "optionsext.h"
+#include "tibsun_globals.h"
+#include "ccini.h"
 #include "noinit.h"
 #include "options.h"
 #include "ini.h"
@@ -43,7 +45,9 @@ OptionsClassExtension *OptionsExtension = nullptr;
  *  @author: CCHyper
  */
 OptionsClassExtension::OptionsClassExtension(OptionsClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+
+    IsDoubleClickSelect(false)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("OptionsClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -103,9 +107,9 @@ void OptionsClassExtension::Load_Settings()
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     //EXT_DEBUG_WARNING("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
-    
-    RawFileClass file("SUN.INI");
-    INIClass ini(file);
+
+    IsDoubleClickSelect = ConfigINI.Get_Bool("Options", "DoubleClickSelect", IsDoubleClickSelect);
+    DEBUG_INFO("IsDoubleClickSelect = %s\n", IsDoubleClickSelect ? "true" : "false");
 }
 
 
@@ -121,7 +125,11 @@ void OptionsClassExtension::Save_Settings()
     //EXT_DEBUG_WARNING("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     
     RawFileClass file("SUN.INI");
-    INIClass ini(file);
+
+    ConfigINI.Put_Bool("Options", "DoubleClickSelect", IsDoubleClickSelect);
+    DEBUG_INFO("IsDoubleClickSelect = %s\n", IsDoubleClickSelect ? "true" : "false");
+
+    ConfigINI.Save(file, false);
 }
 
 

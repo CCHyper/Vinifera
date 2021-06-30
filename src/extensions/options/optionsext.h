@@ -55,6 +55,10 @@ class OptionsClassExtension final : public Extension<OptionsClass>
         void Set();
 
     public:
+        /**
+         *  Is the double click type select mode enabled?
+         */
+        bool IsDoubleClickSelect;
 };
 
 
