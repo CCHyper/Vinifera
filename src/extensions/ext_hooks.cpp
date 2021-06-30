@@ -76,6 +76,7 @@
 #include "factoryext_hooks.h"
 #include "footext_hooks.h"
 #include "animext_hooks.h"
+#include "voxelanimext_hooks.h"
 
 #include "dropshipext_hooks.h"
 
@@ -145,6 +146,7 @@ void Extension_Hooks()
     FactoryClassExtension_Hooks();
     FootClassExtension_Hooks();
     AnimClassExtension_Hooks();
+    VoxelAnimClassExtension_Hooks();
 
     DropshipExtension_Hooks();
 
