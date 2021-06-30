@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          ANIMTYPEEXT.H
+ *  @file          ANIMEXT_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended AnimTypeClass class.
+ *  @brief         Contains the hooks for the extended AnimClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,37 +27,5 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
-#include "tibsun_defines.h"
 
-
-class AnimTypeClass;
-class CCINIClass;
-
-
-class AnimTypeClassExtension final : public Extension<AnimTypeClass>
-{
-    public:
-        AnimTypeClassExtension(AnimTypeClass *this_ptr);
-        AnimTypeClassExtension(const NoInitClass &noinit);
-        ~AnimTypeClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        bool Read_INI(CCINIClass &ini);
-
-    public:
-        /**
-         *  The sound effect to play when this anim has finished.
-         */
-        VocType StopSound;
-};
-
-
-extern ExtensionMap<AnimTypeClass, AnimTypeClassExtension> AnimTypeClassExtensions;
+void AnimClassExtension_Hooks();
