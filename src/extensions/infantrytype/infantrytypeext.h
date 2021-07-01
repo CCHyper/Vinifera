@@ -63,6 +63,16 @@ class InfantryTypeClassExtension final : public Extension<InfantryTypeClass>
          *  units, aircraft and other infantry (e.g., medic and mechanic combined)?
          */
         bool IsOmniHealer;
+
+        /**
+         *  
+         */
+        bool IsJumpJetNoMovingFire;
+
+        /**
+         *  
+         */
+        bool IsJumpJetTurn;
 };
 
 

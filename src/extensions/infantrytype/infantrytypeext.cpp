@@ -46,7 +46,9 @@ ExtensionMap<InfantryTypeClass, InfantryTypeClassExtension> InfantryTypeClassExt
 InfantryTypeClassExtension::InfantryTypeClassExtension(InfantryTypeClass *this_ptr) :
     Extension(this_ptr),
     IsMechanic(false),
-    IsOmniHealer(false)
+    IsOmniHealer(false),
+    IsJumpJetNoMovingFire(false),
+    IsJumpJetTurn(false)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("InfantryTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -182,6 +184,8 @@ bool InfantryTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IsMechanic = ini.Get_Bool(ini_name, "Mechanic", IsMechanic);
     IsOmniHealer = ini.Get_Bool(ini_name, "OmniHealer", IsOmniHealer);
+    IsJumpJetNoMovingFire = ini.Get_Bool(ini_name, "JumpJetNoMovingFire", IsJumpJetNoMovingFire);
+    IsJumpJetTurn = ini.Get_Bool(ini_name, "JumpJetTurn", IsJumpJetTurn);
     
     return true;
 }

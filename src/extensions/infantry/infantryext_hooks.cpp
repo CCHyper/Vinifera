@@ -45,6 +45,89 @@
 #include "hooker_macros.h"
 
 
+// jumpjet turn
+// 0054D64B jj loco
+
+
+/**
+ *  #issue-
+ * 
+ *  s
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_InfantryClass_Shape_Number_IsJumpJetNoMovingFire_Patch)
+{
+    GET_REGISTER_STATIC(InfantryClass *, this_ptr, ebp);
+    GET_STACK_STATIC8(bool, using_jumpjet_locomotor, esp, 0x0F);
+    static const InfantryTypeClass *infantrytype;
+    static const InfantryTypeClassExtension *infantrytypeext;
+    static bool jumpjet_turn;
+
+    jumpjet_turn = false;
+
+    infantrytype = reinterpret_cast<const InfantryTypeClass *>(this_ptr->Class_Of());
+
+    infantrytypeext = InfantryTypeClassExtensions.find(infantrytype);
+    if (infantrytypeext && infantrytypeext->IsJumpJetTurn) {
+        goto direction_to_current;
+    }
+
+    if (!using_jumpjet_locomotor || !Target_Legal(this_ptr->TarCom)) {
+        goto direction_to_current;
+    }
+
+    /**
+     *  Adjust the shape number based on where the current target is.
+     */
+direction_to_target:
+    JMP(0x004D2C7E);
+
+    /**
+     *  Adjust the shape number based on the current facing.
+     */
+direction_to_current:
+    JMP(0x004D2CEA);
+}
+
+
+/**
+ *  #issue-
+ * 
+ *  s
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_InfantryClass_Can_Fire_IsJumpJetNoMovingFire_Patch)
+{
+    GET_REGISTER_STATIC(InfantryClass *, this_ptr, esi);
+    static const InfantryTypeClass *infantrytype;
+    static const InfantryTypeClassExtension *infantrytypeext;
+
+    infantrytype = reinterpret_cast<const InfantryTypeClass *>(this_ptr->Class_Of());
+
+    infantrytypeext = InfantryTypeClassExtensions.find(infantrytype);
+    if (infantrytypeext) {
+
+        /**
+         *  
+         */
+        if (infantrytype->IsJumpJet && Infantry_Locomotor_Is_Jumpjet(this_ptr)) {
+            if (Infantry_Is_Moving(this_ptr) && infantrytypeext->IsJumpJetNoMovingFire) {
+                goto return_FIRE_MOVING;
+            }
+        }
+
+    }
+
+check_weapon:
+    JMP_REG(edi, 0x004D5B26);
+
+return_FIRE_MOVING:
+    JMP(0x004D5B85);
+}
+
+
 /**
  *  #issue-264
  * 
