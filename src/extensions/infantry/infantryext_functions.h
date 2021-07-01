@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          INFANTRYTYPEEXT.H
+ *  @file          INFANTRYEXT_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended InfantryTypeClass class.
+ *  @brief         Contains the hooks for the extended InfantryClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,41 +27,9 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
+
+class InfantryClass;
 
 
-class InfantryTypeClass;
-class CCINIClass;
-
-
-class InfantryTypeClassExtension final : public Extension<InfantryTypeClass>
-{
-    public:
-        InfantryTypeClassExtension(InfantryTypeClass *this_ptr);
-        InfantryTypeClassExtension(const NoInitClass &noinit);
-        ~InfantryTypeClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        bool Read_INI(CCINIClass &ini);
-
-    public:
-        /**
-         *  
-         */
-        bool IsJumpJetNoMovingFire;
-
-        /**
-         *  
-         */
-        bool IsJumpJetTurn;
-};
-
-
-extern ExtensionMap<InfantryTypeClass, InfantryTypeClassExtension> InfantryTypeClassExtensions;
+bool Infantry_Is_Moving(InfantryClass *this_ptr);
+bool Infantry_Locomotor_Is_Jumpjet(InfantryClass *this_ptr);

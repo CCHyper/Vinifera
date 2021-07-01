@@ -44,7 +44,10 @@ ExtensionMap<InfantryTypeClass, InfantryTypeClassExtension> InfantryTypeClassExt
  *  @author: CCHyper
  */
 InfantryTypeClassExtension::InfantryTypeClassExtension(InfantryTypeClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+
+    IsJumpJetNoMovingFire(false),
+    IsJumpJetTurn(false)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("InfantryTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -174,6 +177,9 @@ bool InfantryTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
+
+    IsJumpJetNoMovingFire = ini.Get_Bool(ini_name, "JumpJetNoMovingFire", IsJumpJetNoMovingFire);
+    IsJumpJetTurn = ini.Get_Bool(ini_name, "JumpJetTurn", IsJumpJetTurn);
     
     return true;
 }

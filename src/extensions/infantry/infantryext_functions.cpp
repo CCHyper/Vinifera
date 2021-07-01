@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          INFANTRYTYPEEXT.H
+ *  @file          INFANTRYEXT_HOOKS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Extended InfantryTypeClass class.
+ *  @brief         Contains the hooks for the extended InfantryClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,43 +25,52 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#pragma once
+#include "infantryext_functions.h"
+#include "infantry.h"
+#include "infantrytype.h"
+#include "infantrytypeext.h"
+#include "jumpjetlocomotion.h"
+#include "fatal.h"
+#include "debughandler.h"
+#include "asserthandler.h"
 
-#include "extension.h"
-#include "container.h"
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
-class InfantryTypeClass;
-class CCINIClass;
-
-
-class InfantryTypeClassExtension final : public Extension<InfantryTypeClass>
+/**
+ *  Queries if the current infantry locomotor is moving.
+ * 
+ *  @author: CCHyper
+ */
+bool Infantry_Is_Moving(InfantryClass *this_ptr)
 {
-    public:
-        InfantryTypeClassExtension(InfantryTypeClass *this_ptr);
-        InfantryTypeClassExtension(const NoInitClass &noinit);
-        ~InfantryTypeClassExtension();
+    if (!this_ptr) {
+        return false;
+    }
 
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        bool Read_INI(CCINIClass &ini);
-
-    public:
-        /**
-         *  
-         */
-        bool IsJumpJetNoMovingFire;
-
-        /**
-         *  
-         */
-        bool IsJumpJetTurn;
-};
+    return this_ptr->Locomotion->Is_Moving_Now();
+}
 
 
-extern ExtensionMap<InfantryTypeClass, InfantryTypeClassExtension> InfantryTypeClassExtensions;
+/**
+ *  Does this infantry have the jumpjet locomotor assigned?
+ * 
+ *  @author: CCHyper
+ */
+bool Infantry_Locomotor_Is_Jumpjet(InfantryClass *this_ptr)
+{
+    CLSID clsid;
+    HRESULT hr;
+
+    ILocomotionPtr *iloco;
+
+    hr = this_ptr->Locomotion->QueryInterface(__uuidof(IPersist), (void **)&iloco);
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    iloco->GetClassID(clsid);
+
+    return clsid == __uuidof(JumpjetLocomotionClass);
+}
