@@ -28,6 +28,8 @@
 #include "supertypeext.h"
 #include "supertype.h"
 #include "ccini.h"
+#include "imagecollection.h"
+#include "filepcx.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -44,7 +46,10 @@ ExtensionMap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension> SuperWeaponTyp
  *  @author: CCHyper
  */
 SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(SuperWeaponTypeClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+
+    IsCameoDataPCX(false),
+    CameoDataPCX(nullptr)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("SuperWeaponTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -96,6 +101,55 @@ HRESULT SuperWeaponTypeClassExtension::Load(IStream *pStm)
     }
 
     new (this) SuperWeaponTypeClassExtension(NoInitClass());
+
+    /**
+     *  
+     */
+    if (std::strlen(ThisPtr->SidebarImage) > 0) {
+
+        char buff[32+4];
+        std::snprintf(buff, sizeof(buff), "%s.PCX", ThisPtr->SidebarImage);
+
+        /**
+         *  
+         */
+        CCFileClass pcxfile(buff);
+        if (pcxfile.Is_Available()) {
+
+            /**
+             *  Image collection required lowercase filename.
+             */
+            strlwr(buff);
+
+            PCX_HEADER pcxhdr;
+            pcxfile.Read(&pcxhdr, sizeof(pcxhdr));
+
+            bool loaded = false;
+
+            switch (pcxhdr.BitsPixelPlane) {
+                case 8:
+                    loaded = ImageCollection.Load_Paletted_PCX(buff);
+                    break;
+
+                case 16:
+                    loaded = ImageCollection.Load_PCX(buff, 2);
+                    break;
+
+                default:
+                    break;
+            };
+
+            if (loaded) {
+
+                /**
+                 *  
+                 */
+                CameoDataPCX = ImageCollection.Get_Image_Surface(buff);
+
+                IsCameoDataPCX = (CameoDataPCX != nullptr);
+            }
+        }
+    }
     
     return hr;
 }
@@ -173,6 +227,55 @@ bool SuperWeaponTypeClassExtension::Read_INI(CCINIClass &ini)
 
     if (!ini.Is_Present(ini_name)) {
         return false;
+    }
+
+    /**
+     *  
+     */
+    if (std::strlen(ThisPtr->SidebarImage) > 0) {
+
+        char buff[32+4];
+        std::snprintf(buff, sizeof(buff), "%s.PCX", ThisPtr->SidebarImage);
+
+        /**
+         *  
+         */
+        CCFileClass pcxfile(buff);
+        if (pcxfile.Is_Available()) {
+
+            /**
+             *  Image collection required lowercase filename.
+             */
+            strlwr(buff);
+
+            PCX_HEADER pcxhdr;
+            pcxfile.Read(&pcxhdr, sizeof(pcxhdr));
+
+            bool loaded = false;
+
+            switch (pcxhdr.BitsPixelPlane) {
+                case 8:
+                    loaded = ImageCollection.Load_Paletted_PCX(buff);
+                    break;
+
+                case 16:
+                    loaded = ImageCollection.Load_PCX(buff, 2);
+                    break;
+
+                default:
+                    break;
+            };
+
+            if (loaded) {
+
+                /**
+                 *  
+                 */
+                CameoDataPCX = ImageCollection.Get_Image_Surface(buff);
+
+                IsCameoDataPCX = (CameoDataPCX != nullptr);
+            }
+        }
     }
     
     return true;

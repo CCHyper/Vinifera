@@ -34,6 +34,7 @@
 
 class TechnoTypeClass;
 class CCINIClass;
+class BSurface;
 
 
 class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
@@ -62,6 +63,16 @@ class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
          *  This is the sound effect to play when the unit is decloaking.
          */
         VocType UncloakSound;
+
+        /**
+         *  Is this cameo a PCX image file?
+         */
+        bool IsCameoDataPCX;
+
+        /**
+         *  Pointer to the pcx image.
+         */
+        BSurface *CameoDataPCX;
 };
 
 

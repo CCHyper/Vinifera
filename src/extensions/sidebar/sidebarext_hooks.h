@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SUPERTYPEEXT.H
+ *  @file          SIDEBAREXT_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended SuperWeaponTypeClass class.
+ *  @brief         Contains the hooks for the extended SidebarClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,42 +27,5 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
 
-
-class SuperWeaponTypeClass;
-class CCINIClass;
-class BSurface;
-
-
-class SuperWeaponTypeClassExtension final : public Extension<SuperWeaponTypeClass>
-{
-    public:
-        SuperWeaponTypeClassExtension(SuperWeaponTypeClass *this_ptr);
-        SuperWeaponTypeClassExtension(const NoInitClass &noinit);
-        ~SuperWeaponTypeClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        bool Read_INI(CCINIClass &ini);
-
-    public:
-        /**
-         *  Is this cameo a PCX image file?
-         */
-        bool IsCameoDataPCX;
-
-        /**
-         *  Pointer to the pcx image.
-         */
-        BSurface *CameoDataPCX;
-};
-
-
-extern ExtensionMap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension> SuperWeaponTypeClassExtensions;
+void SidebarClassExtension_Hooks();

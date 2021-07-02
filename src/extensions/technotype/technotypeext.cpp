@@ -28,6 +28,8 @@
 #include "technotypeext.h"
 #include "technotype.h"
 #include "ccini.h"
+#include "imagecollection.h"
+#include "filepcx.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -47,7 +49,9 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(TechnoTypeClass *this_ptr) :
     Extension(this_ptr),
 
     CloakSound(VOC_NONE),
-    UncloakSound(VOC_NONE)
+    UncloakSound(VOC_NONE),
+    IsCameoDataPCX(false),
+    CameoDataPCX(nullptr)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("TechnoTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -99,6 +103,58 @@ HRESULT TechnoTypeClassExtension::Load(IStream *pStm)
     }
 
     new (this) TechnoTypeClassExtension(NoInitClass());
+
+    /**
+     *  We need to reload the "Cameo" key because TechnoTypeClass does
+     *  not store the entry value. 
+     */
+    char cameo_buffer[32];
+    ArtINI.Get_String(ThisPtr->IniName, "Cameo", cameo_buffer, sizeof(cameo_buffer));
+    if (std::strlen(cameo_buffer) > 0) {
+
+        char buff[32+4];
+        std::snprintf(buff, sizeof(buff), "%s.PCX", cameo_buffer);
+
+        /**
+         *  
+         */
+        CCFileClass pcxfile(buff);
+        if (pcxfile.Is_Available()) {
+
+            /**
+             *  Image collection required lowercase filename.
+             */
+            strlwr(buff);
+
+            PCX_HEADER pcxhdr;
+            pcxfile.Read(&pcxhdr, sizeof(pcxhdr));
+
+            bool loaded = false;
+
+            switch (pcxhdr.BitsPixelPlane) {
+                case 8:
+                    loaded = ImageCollection.Load_Paletted_PCX(buff);
+                    break;
+
+                case 16:
+                    loaded = ImageCollection.Load_PCX(buff, 2);
+                    break;
+
+                default:
+                    break;
+            };
+
+            if (loaded) {
+
+                /**
+                 *  
+                 */
+                CameoDataPCX = ImageCollection.Get_Image_Surface(buff);
+
+                IsCameoDataPCX = (CameoDataPCX != nullptr);
+            }
+        }
+    }
     
     return hr;
 }
@@ -180,6 +236,58 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     
     CloakSound = ini.Get_VocType(ini_name, "CloakSound", CloakSound);
     UncloakSound = ini.Get_VocType(ini_name, "UncloakSound", UncloakSound);
+
+    /**
+     *  We need to reload the "Cameo" key because TechnoTypeClass does
+     *  not store the entry value. 
+     */
+    char cameo_buffer[32];
+    ArtINI.Get_String(ini_name, "Cameo", cameo_buffer, sizeof(cameo_buffer));
+    if (std::strlen(cameo_buffer) > 0) {
+
+        char buff[32+4];
+        std::snprintf(buff, sizeof(buff), "%s.PCX", cameo_buffer);
+
+        /**
+         *  
+         */
+        CCFileClass pcxfile(buff);
+        if (pcxfile.Is_Available()) {
+
+            /**
+             *  Image collection required lowercase filename.
+             */
+            strlwr(buff);
+
+            PCX_HEADER pcxhdr;
+            pcxfile.Read(&pcxhdr, sizeof(pcxhdr));
+
+            bool loaded = false;
+
+            switch (pcxhdr.BitsPixelPlane) {
+                case 8:
+                    loaded = ImageCollection.Load_Paletted_PCX(buff);
+                    break;
+
+                case 16:
+                    loaded = ImageCollection.Load_PCX(buff, 2);
+                    break;
+
+                default:
+                    break;
+            };
+
+            if (loaded) {
+
+                /**
+                 *  
+                 */
+                CameoDataPCX = ImageCollection.Get_Image_Surface(buff);
+
+                IsCameoDataPCX = (CameoDataPCX != nullptr);
+            }
+        }
+    }
 
     return true;
 }

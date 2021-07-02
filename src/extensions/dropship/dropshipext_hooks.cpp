@@ -44,6 +44,10 @@
 #define TEXT_PRESS_SPACE "Press SPACE to start the mission"
 
 
+// Cameo data loaded 00485430
+// draw cameo 00484912
+
+
 /**
  *  #issue-285
  * 
