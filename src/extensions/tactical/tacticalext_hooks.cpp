@@ -35,6 +35,7 @@
 #include "wwfont.h"
 #include "scenario.h"
 #include "session.h"
+#include "options.h"
 #include "colorscheme.h"
 #include "fatal.h"
 #include "vinifera_globals.h"
@@ -261,7 +262,7 @@ static void Tactical_Draw_Debug_Overlay()
      *  Fill the background area.
      */
     Rect fill_rect;
-    fill_rect.X = 160; // Width of Options tab, so we draw from there.
+    fill_rect.X = Options.SidebarOn == SIDEBAR_SIDE_LEFT ? 0 : 160; // Width of Options tab, so we draw from there.
     fill_rect.Y = 0;
     fill_rect.Width = text_rect.Width+(padding+1);
     fill_rect.Height = 16; // Tab bar height

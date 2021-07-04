@@ -42,4 +42,12 @@ void OptionsClassExtension_Hooks()
      *  Initialises the extended class.
      */
     OptionsClassExtension_Init();
+
+    /**
+     *  Removes the debug log print for "SideBar on RIGHT".
+     */
+    Patch_Byte_Range(0x00589D59, 0x90, 5);
+    Patch_Byte_Range(0x00589D5E, 0x90, 5);
+    Patch_Byte_Range(0x00589D66, 0x90, 5);
+    Patch_Byte(0x00589D6E+2, 0x8);
 }
