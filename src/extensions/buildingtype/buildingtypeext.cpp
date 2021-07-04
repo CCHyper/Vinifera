@@ -48,7 +48,8 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(BuildingTypeClass *this_p
     Extension(this_ptr),
 
     GateUpSound(VOC_NONE),
-    GateDownSound(VOC_NONE)
+    GateDownSound(VOC_NONE),
+    IsForceSellable(false)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("BuildingTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -179,13 +180,10 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
         return false;
     }
 
-    /**
-     *  #issue-65
-     * 
-     *  Gate lowering and rising sound overrides for buildings.
-     */
     GateUpSound = ini.Get_VocType(ini_name, "GateUpSound", GateUpSound);
     GateDownSound = ini.Get_VocType(ini_name, "GateDownSound", GateDownSound);
+
+    IsForceSellable = ini.Get_Bool(ini_name, "ForceSellable", IsForceSellable);
     
     return true;
 }

@@ -61,6 +61,11 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
          *  This is the sound effect to play when the animation of the gate is lowering.
          */
         VocType GateDownSound;
+
+        /**
+         *  
+         */
+        bool IsForceSellable;
 };
 
 

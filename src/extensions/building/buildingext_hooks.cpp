@@ -45,6 +45,136 @@
 
 
 /**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_Drop_Debris_ForceSellable_Patch)
+{
+    GET_REGISTER_STATIC(BuildingClass *, this_ptr, esi);
+    static BuildingTypeClass *buildingtype;
+    static BuildingTypeClassExtension *buildingtypeext;
+
+    buildingtype = this_ptr->Class;
+
+    /**
+     *  Fetch the class extension if it exists.
+     */
+    buildingtypeext = BuildingTypeClassExtensions.find(buildingtype);
+    if (buildingtypeext) {
+        
+        /**
+         *  
+         */
+        if (buildingtypeext->IsForceSellable) {
+            goto has_buildup_data;
+        }
+    }
+
+    /**
+     *  Stolen bytes/code.
+     */
+    if (this_ptr->field_30D) {
+        goto has_buildup_data;
+    }
+
+continue_func:
+    JMP(0x0042BDD7);
+
+    /**
+     *  Passes check, continues to check if the crew type is nominal.
+     */
+has_buildup_data:
+    JMP_REG(0x0042BDC2);
+}
+
+
+/**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_Sell_Back_ForceSellable_Patch)
+{
+    GET_REGISTER_STATIC(BuildingClass *, this_ptr, esi);
+    static BuildingTypeClass *buildingtype;
+    static BuildingTypeClassExtension *buildingtypeext;
+
+    buildingtype = this_ptr->Class;
+
+    /**
+     *  Fetch the class extension if it exists.
+     */
+    buildingtypeext = BuildingTypeClassExtensions.find(buildingtype);
+    if (buildingtypeext) {
+        
+        /**
+         *  
+         */
+        if (buildingtypeext->IsForceSellable) {
+            goto process_control;
+        }
+    }
+
+    /**
+     *  Stolen bytes/code.
+     */
+    if (this_ptr->field_30D) {
+        goto process_control;
+    }
+
+no_buildup_data:
+    JMP_REG(ecx, 0x0042EB8E);
+
+process_control:
+    JMP(0x0042EAF1);
+}
+
+
+/**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_Can_Demolish_ForceSellable_Patch)
+{
+    GET_REGISTER_STATIC(BuildingClass *, this_ptr, esi);
+    static BuildingTypeClass *buildingtype;
+    static BuildingTypeClassExtension *buildingtypeext;
+
+    buildingtype = this_ptr->Class;
+
+    /**
+     *  Fetch the class extension if it exists.
+     */
+    buildingtypeext = BuildingTypeClassExtensions.find(buildingtype);
+    if (buildingtypeext) {
+        
+        /**
+         *  
+         */
+        if (buildingtypeext->IsForceSellable) {
+            goto return_true;
+        }
+    }
+
+return_false:
+    _asm { xor al, al }
+    _asm { pop esi }
+    _asm { ret }
+
+return_true:
+    JMP_REG(ebx, 0x0042FF59);
+}
+
+
+/**
  *  #issue-65
  * 
  *  Gate lowering and rising sound overrides for buildings.
@@ -210,4 +340,7 @@ void BuildingClassExtension_Hooks()
     Patch_Jump(0x0042B250, &_BuildingClass_Explode_ShakeScreen_Division_BugFix_Patch);
     Patch_Jump(0x00433BB5, &_BuildingClass_Mission_Open_Gate_Open_Sound_Patch);
     Patch_Jump(0x00433C6F, &_BuildingClass_Mission_Open_Gate_Close_Sound_Patch);
+    Patch_Jump(0x0042BDBA, &_BuildingClass_Drop_Debris_ForceSellable_Patch);
+    Patch_Jump(0x0042EAE3, &_BuildingClass_Sell_Back_ForceSellable_Patch);
+    Patch_Jump(0x0042FF5D, &_BuildingClass_Can_Demolish_ForceSellable_Patch);
 }
