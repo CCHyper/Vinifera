@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OPTIONSEXT_HOOKS.CPP
+ *  @file          TABEXT_HOOKS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for the extended OptionsClass.
+ *  @brief         Contains the hooks for the extended TabClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,29 +25,33 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "optionsext_hooks.h"
-#include "optionsext_init.h"
-#include "optionsext.h"
+#include "tabext_hooks.h"
+#include "tab.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
+
+
+DECLARE_PATCH(_zzz)
+{
+	_asm { mov ecx, TempSurface }
+	_asm { mov ecx, [ecx] }
+	_asm { mov ecx, [ecx] }
+
+	_asm { push 1 }
+
+	JMP_REG(eax, 0x0060E552);
+}
 
 
 /**
  *  Main function for patching the hooks.
  */
-void OptionsClassExtension_Hooks()
+void TabClassExtension_Hooks()
 {
-    /**
-     *  Initialises the extended class.
-     */
-    OptionsClassExtension_Init();
-
-    /**
-     *  Removes the debug log print for "SideBar on RIGHT".
-     */
-    Patch_Byte_Range(0x00589D59, 0x90, 5);
-    Patch_Byte_Range(0x00589D5E, 0x90, 5);
-    Patch_Byte_Range(0x00589D66, 0x90, 5);
-    Patch_Byte(0x00589D6E+2, 0x8);
+	Patch_Byte(0x0060E9CF, 168);
+	//Patch_Jump(0x0060E54C, &_zzz);
 }

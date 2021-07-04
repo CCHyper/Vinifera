@@ -107,6 +107,13 @@ void OptionsClassExtension::Load_Settings()
     //EXT_DEBUG_WARNING("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     
     RawFileClass file("SUN.INI");
+
+    if (ConfigINI.Is_Present("Options", "SidebarOnLeft")) {
+        bool on_left = ConfigINI.Get_Bool("Options", "SidebarOnLeft", ThisPtr->SidebarOn);
+        ThisPtr->SidebarOn = on_left ? SIDEBAR_SIDE_LEFT : SIDEBAR_SIDE_RIGHT;
+    }
+
+    DEBUG_INFO("Sidebar on %s\n", ThisPtr->SidebarOn == SIDEBAR_SIDE_LEFT ? "LEFT" : "RIGHT");
 }
 
 
@@ -122,6 +129,11 @@ void OptionsClassExtension::Load_Init_Settings()
     //EXT_DEBUG_WARNING("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     
     RawFileClass file("SUN.INI");
+
+    if (ConfigINI.Is_Present("Options", "SidebarOnLeft")) {
+        bool on_left = ConfigINI.Get_Bool("Options", "SidebarOnLeft", ThisPtr->SidebarOn);
+        ThisPtr->SidebarOn = on_left ? SIDEBAR_SIDE_LEFT : SIDEBAR_SIDE_RIGHT;
+    }
 }
 
 
@@ -137,6 +149,11 @@ void OptionsClassExtension::Save_Settings()
     //EXT_DEBUG_WARNING("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     
     RawFileClass file("SUN.INI");
+
+    ConfigINI.Put_Bool("Options", "SidebarOnLeft", ThisPtr->SidebarOn);
+    DEBUG_INFO("Sidebar on %s\n", ThisPtr->SidebarOn == SIDEBAR_SIDE_LEFT ? "LEFT" : "RIGHT");
+
+    ConfigINI.Save(file, false);
 }
 
 

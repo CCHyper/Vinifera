@@ -174,8 +174,13 @@ DECLARE_PATCH(_OptionsClass_Load_Settings_Patch)
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { ret }
+    DEBUG_GAME("--------- Complete -------------------------------\n");
+
+    _asm { mov dl, [esi+0x19] }
+    JMP(0x0058A118);
+
+    //_asm { pop esi }
+    //_asm { ret }
 }
 
 
@@ -270,7 +275,7 @@ void OptionsClassExtension_Init()
 {
     Patch_Jump(0x00589A12, &_OptionsClass_Constructor_Patch);
     //Patch_Jump(0x, &_OptionsClass_Destructor_Patch);
-    Patch_Jump(0x0058A132, &_OptionsClass_Load_Settings_Patch);
+    Patch_Jump(0x0058A108, &_OptionsClass_Load_Settings_Patch);
     Patch_Jump(0x0060127E, &_WinMain_Load_Init_Options_Settings_Patch);
     Patch_Jump(0x0058A3C3, &_OptionsClass_Save_Settings_Patch);
     Patch_Jump(0x0058A5F7, &_OptionsClass_Set_Patch);

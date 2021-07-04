@@ -269,4 +269,11 @@ void DisplayClassExtension_Hooks()
     Patch_Dword(0x0047A0B5+1, ISOMAPPACK_BUFF_WIDTH);
     Patch_Dword(0x0047A0BA+1, ISOMAPPACK_BUFF_HEIGHT);
     Patch_Dword(0x0047A0C8+1, ISOMAPPACK_BUFF_WIDTH*ISOMAPPACK_BUFF_HEIGHT*sizeof(unsigned short));
+
+    /**
+     *  Removes the adjustment on DisplayClass::One_Time when Options.SidebarSide == 0.
+     * 
+     *  @author: CCHyper.
+     */
+    Patch_Byte(0x00475CD7+4, 0x00); // rect.X = 168 -> rect.X = 0
 }

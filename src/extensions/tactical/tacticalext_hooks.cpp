@@ -39,6 +39,7 @@
 #include "wwfont.h"
 #include "scenario.h"
 #include "session.h"
+#include "options.h"
 #include "colorscheme.h"
 #include "voc.h"
 #include "laserdraw.h"
@@ -284,7 +285,7 @@ static void Tactical_Draw_Debug_Overlay()
      *  Fill the background area.
      */
     Rect fill_rect;
-    fill_rect.X = 160; // Width of Options tab, so we draw from there.
+    fill_rect.X = Options.SidebarOn == SIDEBAR_SIDE_LEFT ? 0 : 168; // Width of Options tab, so we draw from there.
     fill_rect.Y = 0;
     fill_rect.Width = text_rect.Width+(padding+1);
     fill_rect.Height = 16; // Tab bar height
@@ -309,14 +310,22 @@ static void Tactical_Draw_Debug_Overlay()
      */
     std::snprintf(buffer, sizeof(buffer), "%d", Frame);
     GradFont6Ptr->String_Pixel_Rect(buffer, &text_rect);
-
+    
     fill_rect.Width = text_rect.Width+(padding+1);
     fill_rect.Height = 16;
-    fill_rect.X = CompositeSurface->Get_Width()-fill_rect.Width;
+    if (Options.SidebarOn == SIDEBAR_SIDE_LEFT) {
+        fill_rect.X = CompositeSurface->Get_Width()-fill_rect.Width-168; // Width of Options tab, so we draw from there.
+    } else {
+        fill_rect.X = CompositeSurface->Get_Width()-fill_rect.Width;
+    }
     fill_rect.Y = 0;
     CompositeSurface->Fill_Rect(fill_rect, color_black);
 
-    text_rect.X = CompositeSurface->Get_Width();
+    if (Options.SidebarOn == SIDEBAR_SIDE_LEFT) {
+        text_rect.X = CompositeSurface->Get_Width()-168; // Width of Options tab, so we draw from there.
+    } else {
+        text_rect.X = CompositeSurface->Get_Width();
+    }
     text_rect.Y = 0;
     text_rect.Width += padding;
     text_rect.Height += 3;
@@ -409,7 +418,11 @@ static void Tactical_Draw_FrameStep_Overlay()
      *  Fill the background area.
      */
     Rect fill_rect;
-    fill_rect.X = TacticalRect.X+TacticalRect.Width-text_rect.Width-(padding+1);
+    if (Options.SidebarOn == SIDEBAR_SIDE_LEFT) {
+        fill_rect.X = TacticalRect.X+TacticalRect.Width-text_rect.Width-(padding+1)-168; // Width of Options tab, so we draw from there.
+    } else {
+        fill_rect.X = TacticalRect.X+TacticalRect.Width-text_rect.Width-(padding+1);
+    }
     fill_rect.Y = 16; // Tab bar height
     fill_rect.Width = text_rect.Width+(padding+1);
     fill_rect.Height = 16;
@@ -418,7 +431,11 @@ static void Tactical_Draw_FrameStep_Overlay()
     /**
      *  Move rects into position.
      */
-    text_rect.X = TacticalRect.X+TacticalRect.Width-1;
+    if (Options.SidebarOn == SIDEBAR_SIDE_LEFT) {
+        text_rect.X = (TacticalRect.X+TacticalRect.Width-1)-168; // Width of Options tab, so we draw from there.
+    } else {
+        text_rect.X = TacticalRect.X+TacticalRect.Width-1;
+    }
     text_rect.Y = fill_rect.Y;
     text_rect.Width += padding;
     text_rect.Height += 3;
