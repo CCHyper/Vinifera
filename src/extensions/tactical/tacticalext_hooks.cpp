@@ -30,6 +30,7 @@
 #include "tacticalext.h"
 #include "tactical.h"
 #include "tibsun_globals.h"
+#include "tibsun_util.h"
 #include "dsurface.h"
 #include "textprint.h"
 #include "wwfont.h"
@@ -37,6 +38,8 @@
 #include "session.h"
 #include "colorscheme.h"
 #include "voc.h"
+#include "cell.h"
+#include "iomap.h"
 #include "fatal.h"
 #include "vinifera_globals.h"
 #include "vinifera_util.h"
@@ -227,6 +230,255 @@ DECLARE_PATCH(_Tactical_Draw_Waypoint_Paths_DrawNormalLine_Patch)
     TempSurface->entry_4C(*start_pos, *end_pos, color);
 
     JMP(0x00617307);
+}
+
+
+/**
+ *  Draws the highlight/selection shape on the cell under the mouse.
+ * 
+ *  @authors: CCHyper, tomsons26
+ */
+static void Tactical_Draw_Cell_Selection()
+{
+    /**
+     *  If we are in placement mode, don't draw anything.
+     */
+    if (Map.PendingObjectPtr || Map.IsRubberBand) {
+        return;
+    }
+
+    unsigned r;
+    unsigned g;
+    unsigned b;
+    unsigned w;
+    unsigned x;
+
+    /**
+     *  Colours taken from CELLSEL.SHP, each entry matches a cell level.
+     */
+    static unsigned _CellLevelColors[16];
+    static bool _onetime = false;
+
+    if (!_onetime) {
+        _CellLevelColors[0] = DSurface::RGBA_To_Pixel(255, 255, 255);  // 0
+        _CellLevelColors[1] = DSurface::RGBA_To_Pixel(170, 0, 170);    // 1
+        _CellLevelColors[2] = DSurface::RGBA_To_Pixel(0, 170, 170);    // 2
+        _CellLevelColors[3] = DSurface::RGBA_To_Pixel(0, 170, 0);      // 3
+        _CellLevelColors[4] = DSurface::RGBA_To_Pixel(89, 255, 85);    // 4
+        _CellLevelColors[5] = DSurface::RGBA_To_Pixel(255, 255, 85);   // 5
+        _CellLevelColors[6] = DSurface::RGBA_To_Pixel(255, 85, 85);    // 6
+        _CellLevelColors[7] = DSurface::RGBA_To_Pixel(170, 85, 0);     // 7
+        _CellLevelColors[8] = DSurface::RGBA_To_Pixel(170, 0, 0);      // 8
+        _CellLevelColors[9] = DSurface::RGBA_To_Pixel(85, 255, 255);   // 9
+        _CellLevelColors[10] = DSurface::RGBA_To_Pixel(80, 80, 255);   // 10
+        _CellLevelColors[11] = DSurface::RGBA_To_Pixel(0, 0, 170);     // 11
+        _CellLevelColors[12] = DSurface::RGBA_To_Pixel(0, 0, 0);       // 12
+        _CellLevelColors[13] = DSurface::RGBA_To_Pixel(85, 85, 85);    // 13
+        _CellLevelColors[14] = DSurface::RGBA_To_Pixel(170, 170, 170); // 14
+        _CellLevelColors[15] = DSurface::RGBA_To_Pixel(255, 255, 255); // 15
+
+        r = DSurface::RGBA_To_Pixel(255, 0, 0);
+        g = DSurface::RGBA_To_Pixel(0, 255, 0);
+        b = DSurface::RGBA_To_Pixel(0, 0, 255);
+        w = DSurface::RGBA_To_Pixel(255, 255, 255);
+        x = DSurface::RGBA_To_Pixel(255, 255, 0);
+    }
+
+    Cell cell = Get_Cell_Under_Mouse();
+
+    if (!cell) {
+        return;
+    }
+
+    /**
+     *  Fetch pointer to the cell instance in the world.
+     */
+    CellClass *cellptr = &Map[cell];
+    if (!cellptr) {
+        return;
+    }
+
+    /**
+     *  Fetch the highlight color based on cell height.
+     */
+    unsigned color = _CellLevelColors[cellptr->Level];
+
+    Rect cellrect = cellptr->Get_Rect();
+
+    /**
+     *  Determine if the cell draw rect is within the viewport.
+     */
+    Rect intersect = Intersect(cellrect, TacticalRect);
+    if (!intersect.Is_Valid()) {
+        return;
+    }
+
+    /**
+     *  Draw the cell selection.
+     */
+    switch (cellptr->field_94) {
+    
+        default:
+            break;
+    
+        /**
+         *  No ramp is a flat tile.
+         */
+        case RAMP_NONE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, CELL_PIXEL_H/2),              Point2D(CELL_PIXEL_H, 0),                color);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), color);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, CELL_PIXEL_H),     color);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H),     Point2D(0, (CELL_PIXEL_H/2)),            color);
+            break;
+    
+        case RAMP_WEST:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),            Point2D(CELL_PIXEL_H, 0),                color);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                Point2D(CELL_PIXEL_W, 0),                color);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),                Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)), color);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)), Point2D(0, (CELL_PIXEL_H/2)),            color);
+            break;
+    
+        case RAMP_NORTH:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                           Point2D(CELL_PIXEL_H, 0),                r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, 12),               b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)), Point2D(0, 0),                           w);
+            break;
+    
+        case RAMP_EAST:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                            Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  Point2D(CELL_PIXEL_H, CELL_PIXEL_H),      b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H),      Point2D(0, 0),                            w);
+            break;
+    
+        case RAMP_SOUTH:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, 0),                 g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),                 Point2D(CELL_PIXEL_H, CELL_PIXEL_H),      b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H),      Point2D(0, (CELL_PIXEL_H/2)),             w);
+            break;
+    
+        case RAMP_CORNER_NW:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),            Point2D(CELL_PIXEL_H, 0),                r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), Point2D(0, (CELL_PIXEL_H/2)),            b);
+            break;
+    
+        case RAMP_CORNER_NE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                           Point2D(CELL_PIXEL_H, 0),                r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, CELL_PIXEL_H),     b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H),     Point2D(0, 0),                           w);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                Point2D(CELL_PIXEL_H, CELL_PIXEL_H),     x);
+            break;
+    
+        case RAMP_CORNER_SE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  Point2D(CELL_PIXEL_H, CELL_PIXEL_H),      b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H),      Point2D(0, (CELL_PIXEL_H/2)),             w);
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  x);
+            break;
+    
+        case RAMP_CORNER_SW:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),        Point2D(CELL_PIXEL_H, 0),            r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),            Point2D(CELL_PIXEL_W, 0),            g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),            Point2D(CELL_PIXEL_H, CELL_PIXEL_H), b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H), Point2D(0, (CELL_PIXEL_H/2)),        w);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),            Point2D(CELL_PIXEL_H, CELL_PIXEL_H), x);
+            break;
+    
+        case RAMP_MID_NW:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                           Point2D(CELL_PIXEL_W, 0),                r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),                Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)), Point2D(0, 0),                           b);
+            break;
+    
+        case RAMP_MID_NE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                            Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  Point2D(0, 0),                            w);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  x);
+            break;
+    
+        case RAMP_MID_SE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)),  r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)),  Point2D(CELL_PIXEL_W, 0),                  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),                  Point2D(CELL_PIXEL_H, CELL_PIXEL_H),       b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H),       Point2D(0, 0),                             w);
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                             Point2D(CELL_PIXEL_W, 0),                  x);
+            break;
+    
+        case RAMP_MID_SW:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, 0),                 g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),                 Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  Point2D(0, (CELL_PIXEL_H/2)),             w);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  x);
+            break;
+    
+        case RAMP_STEEP_SE:
+            /**
+             *  PLACEHOLDER:
+             *  This tile is normally only 3 pixels graphically.
+             */
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),               Point2D(CELL_PIXEL_H, 0),                r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                   Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)-1),  Point2D(CELL_PIXEL_H, (CELL_PIXEL_H-1)), b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H-1)),    Point2D(0, (CELL_PIXEL_H/2)-1),          w);
+            break;
+    
+        case RAMP_STEEP_SW:
+            TempSurface->Draw_Line(cellrect, Point2D(0, -(CELL_PIXEL_H/2)),            Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  Point2D(0, -(CELL_PIXEL_H/2)),            w);
+            break;
+    
+        case RAMP_STEEP_NW:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                                      Point2D(CELL_PIXEL_H, 0 - CELL_PIXEL_H),            r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0 - CELL_PIXEL_H),            Point2D(CELL_PIXEL_W, 0),                           g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),                           Point2D(CELL_PIXEL_H, CELL_PIXEL_W - CELL_PIXEL_H), b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_W - CELL_PIXEL_H), Point2D(0, 0),                                      w);
+            break;
+    
+        case RAMP_STEEP_NE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, -(CELL_PIXEL_H/2)), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  Point2D(0, (CELL_PIXEL_H/2)),             w);
+            break;
+    
+        case RAMP_DOUBLE_UP_SW_NE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                       Point2D(CELL_PIXEL_W, 0),            r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),            Point2D(CELL_PIXEL_H, CELL_PIXEL_H), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H), Point2D(0, 0),                       b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),            Point2D(CELL_PIXEL_H, CELL_PIXEL_H), w);
+            break;
+    
+        case RAMP_DOUBLE_DOWN_SW_NE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  Point2D(0, (CELL_PIXEL_H/2)),             b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  w);
+            break;
+    
+        case RAMP_DOUBLE_UP_NW_SE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                       Point2D(CELL_PIXEL_W, 0),            r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),            Point2D(CELL_PIXEL_H, CELL_PIXEL_H), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H), Point2D(0, 0),                       b);
+            break;
+    
+        case RAMP_DOUBLE_DOWN_NW_SE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  Point2D(0, (CELL_PIXEL_H/2)),             b);
+            break;
+    
+    };
+
 }
 
 
@@ -472,13 +724,17 @@ DECLARE_PATCH(_Tactical_Render_Patch)
     GET_REGISTER_STATIC(Tactical *, this_ptr, ebp);
 
     /**
-     *  If the developer mode is active, draw the developer overlay.
+     *  If the developer mode is active, draw any developer overlays.
      */
     if (Vinifera_DeveloperMode) {
         Tactical_Draw_Debug_Overlay();
 
         if (Vinifera_Developer_FrameStep) {
             Tactical_Draw_FrameStep_Overlay();
+        }
+
+        if (Vinifera_Developer_ShowCursorPosition) {
+            Tactical_Draw_Cell_Selection();
         }
     }
 
