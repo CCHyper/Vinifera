@@ -29,6 +29,9 @@
 #include "tibsun_defines.h"
 #include "tibsun_globals.h"
 #include "session.h"
+#include "theme.h"
+#include "newmenu.h"
+#include "addon.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -37,6 +40,46 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+#if 0
+DECLARE_PATCH(_SkirmishDialog_Dialog_Play_Maps_Theme_Patch)
+{
+    static ThemeType theme;
+
+    if (!Theme.Still_Playing()) {
+        if (Addon_407150(2)) {
+            theme = Theme.From_Name("FSMAPS");
+            Theme.Play_Song(theme);
+        } else {
+            theme = Theme.From_Name("MAPS");
+            Theme.Play_Song(theme);
+        }
+    }
+
+    /**
+     *  Stolen bytes/code.
+     */
+    NewMenuClass::Blit();
+
+    JMP_REG(ecx, 0x005F7417);
+}
+#endif
+
+
+DECLARE_PATCH(_Select_Game_Play_Return_Theme_Patch)
+{
+    static ThemeType theme;
+
+    if (!Addon_407120(1)) {
+        theme = Theme.From_Name("FSMENU");
+        Theme.Play_Song(theme);
+    } else {
+        theme = Theme.From_Name("INTRO");
+        Theme.Play_Song(theme);
+    }
+
+    JMP(0x004E1FA7);
+}
 
 
 /**
@@ -126,4 +169,6 @@ void SkirmishDialog_Hooks()
 {
     Patch_Jump(0x005F7759, &_SkirmishDialog_InitDialog_AIPlayers_Patch);
     Patch_Jump(0x005F7812, &_SkirmishDialog_InitDialog_RestoreSideIndex_Patch);
+    //Patch_Jump(0x005F7412, &_SkirmishDialog_Dialog_Play_Maps_Theme_Patch);
+    Patch_Jump(0x004E1F6B, &_Select_Game_Play_Return_Theme_Patch);
 }
