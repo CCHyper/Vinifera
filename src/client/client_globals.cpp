@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SCENARIOEXT_HOOKS.CPP
+ *  @file          CLIENT_GLOBALS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for the extended ScenarioClass.
+ *  @brief         Various globals for the client system.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,68 +25,55 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "scenarioext_hooks.h"
-#include "scenarioext_functions.h"
-#include "client_functions.h"
 #include "client_globals.h"
 #include "tibsun_globals.h"
-#include "vinifera_util.h"
-#include "language.h"
+#include "tibsun_inline.h"
+#include "tibsun_functions.h"
+#include "cncnet5_globals.h"
+#include "cncnet5_wspudp.h"
+#include "vinifera_globals.h"
+#include "session.h"
+#include "scenario.h"
+#include "scenarioini.h"
+#include "iomap.h"
+#include "house.h"
+#include "housetype.h"
+#include "theme.h"
+#include "addon.h"
+#include "rules.h"
+#include "campaign.h"
+#include "colorscheme.h"
+#include "wwmouse.h"
+#include "wwkeyboard.h"
+#include "queue.h"
+#include "event.h"
+#include "cctooltip.h"
+#include "dsurface.h"
+#include "rawfile.h"
+#include "ccini.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
-
-#include "hooker.h"
-#include "hooker_macros.h"
-
-
-/**
- *  #issue-
- * 
- *  
- * 
- *  @author: CCHyper
- */
-static void Assign_Houses_Intercept()
-{
-    /**
-     *  Is the client mode enabled?
-     */
-    if (Client::IsActive) {
-        if (!Client::Assign_Houses()) {
-            DEBUG_WARNING("Client: Assign_Houses failed!\n");
-            Vinifera_Do_WWMessageBox("Failed to assign houses to players!", Text_String(TXT_OK));
-            Fatal("Client: Assign_Houses failed!\n");
-        }
-        return;
-    }
-
-    /**
-     *  
-     */
-    Vinifera_Assign_Houses();
-}
+#include <winsock2.h>
+#include <ctime>
 
 
-/**
- *  Main function for patching the hooks.
- */
-void ScenarioClassExtension_Hooks()
-{
-    /**
-     *  Hooks in the new Assign_Houses() function.
-     * 
-     *  @author: CCHyper
-     */
-    //Patch_Call(0x005E08E3, &Vinifera_Assign_Houses);
-    Patch_Call(0x005E08E3, &Assign_Houses_Intercept);
+bool Client::IsActive = false;
+bool Client::IsRunFromClientOnly = false;
+bool Client::IsExitOnGameFinish = false;
+bool Client::IsSkipStartupMovies = false;
 
-    /**
-     *  #issue-338
-     * 
-     *  Hooks in the new Create_Units() function.
-     * 
-     *  @author: CCHyper
-     */
-    Patch_Call(0x005DD320, &Vinifera_Create_Units);
-}
+int Client::GameID = -1;
+
+HouseClass *Client::ObserverPlayerPtr = nullptr;
+
+RawFileClass Client::ScenarioFile;
+CCINIClass Client::ScenarioINI;
+
+RawFileClass Client::SettingsFile;
+CCINIClass Client::SettingsINI;
+
+const char *Client::GameSettingsFilename = "CLIENT_GAME.INI";
+const char *Client::ClientSettingsFilename = "VINIFERA.INI";
+
+Client::GameSettingsType Client::GameSettings;

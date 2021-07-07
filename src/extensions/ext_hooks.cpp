@@ -39,6 +39,7 @@
 #include "tacticalext_hooks.h"
 #include "scenarioext_hooks.h"
 #include "displayext_hooks.h"
+#include "creditsext_hooks.h"
 #include "tooltipext_hooks.h"
 #include "commandext_hooks.h"
 
@@ -119,6 +120,7 @@ void Extension_Hooks()
     TacticalExtension_Hooks();
     ScenarioClassExtension_Hooks();
     DisplayClassExtension_Hooks();
+    CreditClassExtension_Hooks();
     ToolTipManagerExtension_Hooks();
     CommandExtension_Hooks();
 

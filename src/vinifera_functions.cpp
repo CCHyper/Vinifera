@@ -31,6 +31,8 @@
 #include "cncnet4.h"
 #include "cncnet4_globals.h"
 #include "cncnet5_globals.h"
+#include "client_functions.h"
+#include "tibsun_globals.h"
 #include "ccfile.h"
 #include "cd.h"
 #include "debughandler.h"
@@ -166,6 +168,11 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
 
     }
 
+	/**
+	 *  Parse any command line parameters for the Client.
+	 */
+	Client::Parse_Command_Line(argc, argv);
+
     if (argc > 1) {
         DEBUG_INFO("Finished parsing command line arguments.\n");
     }
@@ -225,6 +232,11 @@ bool Vinifera_Startup()
  */
 bool Vinifera_Shutdown()
 {
+	/**
+	 *  Shutdown the client system.
+	 */
+	Client::Shutdown();
+
     DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 
     return true;
@@ -254,6 +266,13 @@ int Vinifera_Init_Game(int argc, char *argv[])
     if (CD::IsFilesLocal) {
         search_paths.Add(".");
     }
+
+    /**
+     *  If the game was spawned by a external client, add the search folders
+     *  where we expect the game settings to be.
+     */
+    search_paths.Add("Client");
+    search_paths.Add("Resources");
 
     /**
      *  Add various local search drives to loading of files locally.
@@ -336,6 +355,29 @@ int Vinifera_Init_Game(int argc, char *argv[])
     delete [] new_path;
 
     DEBUG_INFO("SearchPath: %s\n", CCFileClass::RawPath);
+
+    /**
+     *  Initialise the Client system.
+     */
+    bool client = Client::Startup();
+    if (!client) {
+        DEBUG_WARNING("Failed to initialise Client, continuing without Client support!\n");
+    }
+
+    if (Client::IsActive) {
+
+        /**
+         *  The front-end client is most likely for a mod or redistribution of
+         *  Tiberian Sun so all the files will be local. Enabling this will
+         *  tell the game to skip the CD initialisation routines.
+         */
+        CD::IsFilesLocal = true;
+
+        if (Client::IsRunFromClientOnly && !CDFileClass(Client::GameSettingsFilename).Is_Available()) {
+            MessageBox(MainWindow, "This version of Tiberian Sun can only be launched via the Client!", "Tiberian Sun", MB_OK|MB_ICONEXCLAMATION);
+            return 1; // Skips Init_Game error dialog.
+        }
+    }
 
     return EXIT_SUCCESS;
 }

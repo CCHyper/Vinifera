@@ -36,6 +36,7 @@
 #include "newmenu.h"
 #include "addon.h"
 #include "dsaudio.h"
+#include "client_globals.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -431,6 +432,11 @@ static bool CCFile_Is_Available(const char *filename)
  */
 DECLARE_PATCH(_Init_Game_Skip_Startup_Movies_Patch)
 {
+    if (Client::IsActive && Client::IsSkipStartupMovies) {
+        DEBUG_INFO("Client: Skipping startup movies due to request.\n");
+        goto loading_screen;
+    }
+
     if (Vinifera_SkipStartupMovies) {
         DEBUG_INFO("Skipping startup movies.\n");
         goto skip_loading_screen;
