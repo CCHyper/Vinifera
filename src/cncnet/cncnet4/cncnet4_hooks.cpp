@@ -187,4 +187,9 @@ void CnCNet4_Hooks()
      *  Allow 0 player (AI or human) LAN games.
      */
     Patch_Jump(0x0057702F, 0x00577077);
+
+    /**
+     *  Allow up to 7 AI players.
+     */
+    Patch_Byte(0x0057C97E+3, 0x07);
 }
