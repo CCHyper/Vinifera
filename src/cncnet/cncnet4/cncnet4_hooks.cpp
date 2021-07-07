@@ -182,4 +182,9 @@ void CnCNet4_Hooks()
     Patch_Jump(0x006B4D5A, &socket_intercept);
 
     Patch_Jump(0x004E2656, &_Select_Game_Network_Create_PacketTransport_Patch);
+
+    /**
+     *  Allow 0 player (AI or human) LAN games.
+     */
+    Patch_Jump(0x0057702F, 0x00577077);
 }
