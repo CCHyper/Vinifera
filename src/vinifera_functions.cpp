@@ -31,6 +31,7 @@
 #include "cncnet4.h"
 #include "cncnet4_globals.h"
 #include "cncnet5_globals.h"
+#include "client_globals.h"
 #include "debughandler.h"
 #include <string>
 
@@ -82,6 +83,11 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
 
 	}
 
+	/**
+	 *  Parse any command line parameters for the Client.
+	 */
+	Client::Parse_Command_Line(argc, argv);
+
 	if (argc > 1) {
 		DEBUG_INFO("Finished parsing command line arguments.\n");
 	}
@@ -126,6 +132,11 @@ bool Vinifera_Startup()
  */
 bool Vinifera_Shutdown()
 {
+	/**
+	 *  Shutdown the client system.
+	 */
+	Client::Shutdown();
+
 	DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 
 	return true;

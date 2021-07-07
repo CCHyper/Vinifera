@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SCENARIOEXT_HOOKS.CPP
+ *  @file          CLIENT_HOOKS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for the extended ScenarioClass.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,62 +25,7 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "scenarioext_hooks.h"
-#include "scenarioext_functions.h"
-#include "client_globals.h"
-#include "fatal.h"
-#include "debughandler.h"
-#include "asserthandler.h"
-
-#include "hooker.h"
-#include "hooker_macros.h"
+#pragma once
 
 
-/**
- *  #issue-
- * 
- *  
- * 
- *  @author: CCHyper
- */
-static void Assign_Houses_Intercept()
-{
-    /**
-     *  Is the client mode enabled?
-     */
-    if (Client::IsActive) {
-        if (!Client::Assign_Houses()) {
-            DEBUG_WARNING("Client: Assign_Houses failed!\n");
-        }
-        return;
-    }
-
-    /**
-     *  
-     */
-    Vinifera_Assign_Houses();
-}
-
-
-/**
- *  Main function for patching the hooks.
- */
-void ScenarioClassExtension_Hooks()
-{
-    /**
-     *  Hooks in the new Assign_Houses() function.
-     * 
-     *  @author: CCHyper
-     */
-    //Patch_Call(0x005E08E3, &Vinifera_Assign_Houses);
-    Patch_Call(0x005E08E3, &Assign_Houses_Intercept);
-
-    /**
-     *  #issue-338
-     * 
-     *  Hooks in the new Create_Units() function.
-     * 
-     *  @author: CCHyper
-     */
-    Patch_Call(0x005DD320, &Vinifera_Create_Units);
-}
+void Client_Hooks();
