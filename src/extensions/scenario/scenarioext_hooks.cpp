@@ -31,19 +31,52 @@
 #include "scenarioext.h"
 #include "tibsun_functions.h"
 #include "tibsun_globals.h"
+#include "tibsun_globals.h"
+#include "vinifera_util.h"
 #include "multiscore.h"
 #include "scenario.h"
 #include "session.h"
+#include "language.h"
 #include "rules.h"
 #include "ccfile.h"
 #include "ccini.h"
 #include "addon.h"
+#include "client_functions.h"
+#include "client_globals.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+static void Assign_Houses_Intercept()
+{
+    /**
+     *  Is the client mode enabled?
+     */
+    if (Client::IsActive) {
+        if (!Client::Assign_Houses()) {
+            DEBUG_WARNING("Client: Assign_Houses failed!\n");
+            Vinifera_Do_WWMessageBox("Failed to assign houses to players!", Text_String(TXT_OK));
+            Fatal("Client: Assign_Houses failed!\n");
+        }
+        return;
+    }
+
+    /**
+     *  
+     */
+    Vinifera_Assign_Houses();
+}
 
 
 /**
@@ -159,6 +192,7 @@ void ScenarioClassExtension_Hooks()
      *  @author: CCHyper
      */
     Patch_Call(0x005E08E3, &Vinifera_Assign_Houses);
+    Patch_Call(0x005E08E3, &Assign_Houses_Intercept);
 
     /**
      *  #issue-338

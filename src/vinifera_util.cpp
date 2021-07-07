@@ -35,6 +35,8 @@
 #include "textprint.h"
 #include "dsurface.h"
 #include "cncnet4_globals.h"
+#include "cncnet5_globals.h"
+#include "client_globals.h"
 #include "wwfont.h"
 #include "msgbox.h"
 #include "minidump.h"
@@ -122,22 +124,28 @@ const char *Vinifera_Version_String()
     if (_buffer[0] == '\0') {
 
         /**
-         *  Append the CnCNet version if enabled.
+         *  Append the mode/version if enabled.
          */
-        char *cncnet_mode = nullptr;
+        char *mode = nullptr;
         if (CnCNet4::IsEnabled) {
-            cncnet_mode = " (CnCNet4)";
+            mode = " (CnCNet4)";
+        }
+        if (CnCNet5::IsActive) {
+            mode = " (CnCNet5)";
+        }
+        if (Client::IsActive) {
+            mode = " (Client)";
         }
         
 #ifndef RELEASE
         std::snprintf(_buffer, sizeof(_buffer), "Vinifera:%s%s - %s %s %s%s %s",
-            cncnet_mode != nullptr ? cncnet_mode : "",
+            mode != nullptr ? mode : "",
             Vinifera_DeveloperMode ? " (Dev)" : "",
             Vinifera_Git_Branch(), Vinifera_Git_Author(),
             Vinifera_Git_Uncommitted_Changes() ? "~" : "", Vinifera_Git_Hash_Short(), Vinifera_Git_DateTime());
 #else
         std::snprintf(_buffer, sizeof(_buffer), "Vinifera:%s%s - %s%s %s",
-            cncnet_mode != nullptr ? cncnet_mode : "",
+            mode != nullptr ? mode : "",
             Vinifera_DeveloperMode ? " (Dev)" : "",
             Vinifera_Git_Uncommitted_Changes() ? "~" : "", Vinifera_Git_Hash_Short(), Vinifera_Git_DateTime());
 #endif

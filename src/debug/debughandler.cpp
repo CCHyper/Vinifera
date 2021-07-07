@@ -33,6 +33,7 @@
 #include "tspp_gitinfo.h"
 #include "vinifera_gitinfo.h"
 #include "vinifera_globals.h"
+#include "client_functions.h"
 #include <cstdio>
 #include <cstring>
 #include <conio.h>
@@ -358,11 +359,24 @@ void __cdecl Vinifera_Debug_Handler_Startup()
     std::atexit(Vinifera_Debug_Handler_Shutdown);
 
     /**
+     *  Load the client startup settings. This makes sure the developer options
+     *  are loaded before the the console is initialised.
+     */
+    Client::Read_Client_Startup_Settings();
+
+    /**
      *  Workaround for enabling the debug console before the command lines are process by the game.
      */
     const char *cmdline = GetCommandLineA();
-    DebugHandler_DeveloperMode = Vinifera_DeveloperMode || (std::strstr(cmdline, "-DEVELOPER") != nullptr);
+    DebugHandler_DeveloperMode = Vinifera_DeveloperMode || Client::IsDeveloperModeEnabled || (std::strstr(cmdline, "-DEVELOPER") != nullptr);
     bool enable_console = Vinifera_DeveloperMode || (std::strstr(cmdline, "-CONSOLE") != nullptr);
+
+    /**
+     *  Make sure the debug console is not active if developer mode is disabled.
+     */
+    if (Client::IsDebugConsoleEnabled && !DebugHandler_DeveloperMode) {
+        enable_console = false;
+    }
 
 #ifdef NDEBUG
     if (DebugHandler_DeveloperMode) {

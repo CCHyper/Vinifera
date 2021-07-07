@@ -31,6 +31,8 @@
 #include "cncnet4.h"
 #include "cncnet4_globals.h"
 #include "cncnet5_globals.h"
+#include "client_functions.h"
+#include "tibsun_globals.h"
 #include "rulesext.h"
 #include "ccfile.h"
 #include "ccini.h"
@@ -215,6 +217,11 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
 
     }
 
+    /**
+     *  Parse any command line parameters for the Client.
+     */
+    Client::Parse_Command_Line(argc, argv);
+
     if (argc > 1) {
         DEBUG_INFO("Finished parsing command line arguments.\n");
     }
@@ -324,6 +331,11 @@ bool Vinifera_Shutdown()
      */
     EBoltClass::Clear_All();
 
+    /**
+     *  Shutdown the client system.
+     */
+    Client::Shutdown();
+
     DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 
     return true;
@@ -338,6 +350,29 @@ bool Vinifera_Shutdown()
  */
 int Vinifera_Pre_Init_Game(int argc, char *argv[])
 {
+    /**
+     *  Initialises the Client system.
+     */
+    bool client = Client::Startup();
+    if (!client) {
+        //DEBUG_WARNING("Failed to initialise Client systems, continuing without Client support!\n");
+        Client::IsActive = false;
+    }
+
+#ifndef NDEBUG
+    /**
+     *  If this is a debug build but the debugger is not present, prompt the
+     *  programmer and allow him to attach one if required.
+     */
+    if (Client::IsActive && (Client::GameSettings.IsSkirmishGame || Client::GameSettings.IsNormalGame)) {
+        if (!IsDebuggerPresent()) {
+            ShowCursor(TRUE);
+            MessageBox(nullptr, TXT_CLIENT_DEBUGGER, "Vinifera", MB_OK);
+            //ShowCursor(FALSE);
+        }
+    }
+#endif
+
     RulesClassExtension::Init_UI_Controls();
 
     /**
@@ -360,6 +395,22 @@ int Vinifera_Pre_Init_Game(int argc, char *argv[])
  */
 int Vinifera_Post_Init_Game(int argc, char *argv[])
 {
+    if (Client::IsActive) {
+
+        /**
+         *  The front-end client is most likely for a mod or redistribution of
+         *  Tiberian Sun so all the files will be local. Enabling this will
+         *  tell the game to skip the CD initialisation routines.
+         */
+        CCFileClass::Set_Search_Drives("\\.;MAPS;MAPS\\MULTIPLAYER");
+        CD::IsFilesLocal = true;
+
+        if (Client::IsRunFromClientOnly && !CDFileClass(Client::GameSettingsFilename).Is_Available()) {
+            MessageBox(MainWindow, "This version of Tiberian Sun can only be launched via the Client!", "Tiberian Sun", MB_OK|MB_ICONEXCLAMATION);
+            return 1; // Skips Init_Game error dialog.
+        }
+    }
+
     return EXIT_SUCCESS;
 }
 

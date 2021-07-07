@@ -29,6 +29,7 @@
 #include "initext_functions.h"
 #include "vinifera_globals.h"
 #include "tibsun_globals.h"
+#include "client_globals.h"
 #include "special.h"
 #include "playmovie.h"
 #include "ccfile.h"
@@ -438,6 +439,10 @@ static bool Vinifera_Init_Bootstrap_Mixfiles()
 DECLARE_PATCH(_Init_CDROM_Access_Local_Files_Patch)
 {
     _asm { add esp, 4 }
+
+    if (CCFileClass::Is_There_Search_Drives() && CD::IsFilesLocal) {
+        goto files_local;
+    }
 
     /**
      *  If there are search drives specified then all files are to be

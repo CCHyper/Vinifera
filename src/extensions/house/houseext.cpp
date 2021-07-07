@@ -44,7 +44,9 @@ ExtensionMap<HouseClass, HouseClassExtension> HouseClassExtensions;
  *  @author: CCHyper
  */
 HouseClassExtension::HouseClassExtension(HouseClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+
+    IsObserver(false)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("HouseClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -155,4 +157,6 @@ void HouseClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("HouseClassExtension::Compute_CRC - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    crc(IsObserver);
 }

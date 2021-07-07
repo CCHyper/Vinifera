@@ -33,6 +33,7 @@
 #include "object.h"
 #include "unit.h"
 #include "unittype.h"
+#include "client_globals.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -173,7 +174,19 @@ void Init_Vinifera_Commands()
     Commands.Add(cmdptr);
 
     /**
-     *  Next, initialised any new commands here if the developer mode is enabled.
+     *  Next, initialise any new commands here if the client mode is enabled.
+     */
+    if (Client::IsActive) {
+        DEBUG_INFO("Initialising client commands.\n");
+
+        for (int i = 0; i < MAX_PLAYERS; ++i) {
+            cmdptr = new JumpToPlayerCommandClass(i);
+            Commands.Add(cmdptr);
+        }
+    }
+
+    /**
+     *  Next, initialise any new commands here if the developer mode is enabled.
      */
     if (Vinifera_DeveloperMode) {
         DEBUG_INFO("Initialising developer commands.\n");

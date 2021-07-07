@@ -284,6 +284,28 @@ class JumpCameraSouthCommandClass : public ViniferaCommandClass
 
 
 /**
+ *  Jump to the home location of each player (observer mode only).
+ */
+class JumpToPlayerCommandClass : public ViniferaCommandClass
+{
+    public:
+        JumpToPlayerCommandClass(int player_id) : ViniferaCommandClass(), PlayerID(player_id) { IsDeveloper = false; }
+        virtual ~JumpToPlayerCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+        virtual KeyNumType Default_Key() const override { return KeyNumType(KN_NONE); }
+
+    protected:
+        int PlayerID;
+};
+
+
+/**
  *  Produces a memory dump on request.
  */
 class MemoryDumpCommandClass : public ViniferaCommandClass

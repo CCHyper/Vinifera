@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          HOUSEEXT.H
+ *  @file          CREDITSEXT_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended HouseClass class.
+ *  @brief         Contains the hooks for the extended CreditClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,34 +27,5 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
 
-
-class HouseClass;
-class CCINIClass;
-
-
-class HouseClassExtension final : public Extension<HouseClass>
-{
-    public:
-        HouseClassExtension(HouseClass *this_ptr);
-        HouseClassExtension(const NoInitClass &noinit);
-        ~HouseClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-    public:
-        /**
-         *  Is this an observer/spectator player?
-         */
-        bool IsObserver;
-};
-
-
-extern ExtensionMap<HouseClass, HouseClassExtension> HouseClassExtensions;
+void CreditClassExtension_Hooks();

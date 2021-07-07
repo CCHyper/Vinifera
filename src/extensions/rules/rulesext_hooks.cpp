@@ -39,6 +39,7 @@
 #include "addon.h"
 #include "wwmouse.h"
 #include "windialog.h"
+#include "client_globals.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -172,6 +173,10 @@ void RulesClassFake::_Process(CCINIClass &ini)
  */
 DECLARE_PATCH(_Init_Rules_Show_Rules_Select_Dialog_Patch)
 {
+    if (Client::IsActive) {
+        goto use_rules_ini;
+    }
+
     if (!Vinifera_DeveloperMode) {
         goto use_rules_ini;
     }

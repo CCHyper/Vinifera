@@ -29,11 +29,13 @@
 #include "tibsun_defines.h"
 #include "tibsun_globals.h"
 #include "tibsun_inline.h"
+#include "client_globals.h"
 #include "session.h"
 #include "scenario.h"
 #include "rules.h"
 #include "iomap.h"
 #include "house.h"
+#include "houseext.h"
 #include "housetype.h"
 #include "object.h"
 #include "techno.h"
@@ -260,7 +262,6 @@ void Vinifera_Assign_Houses()
         housep = new HouseClass(HouseTypes[house]);
         housep->RemapColor = ColorScheme::From_Name("LightGrey");
         housep->Init_Remap_Color();
-
     }
 
     DEBUG_INFO("Assign_Houses(exit)\n");
@@ -602,7 +603,7 @@ static bool Place_Object(ObjectClass *obj, Cell cell, FacingType facing, int dis
  * 
  *  @author: CCHyper
  */
-static DynamicVectorClass<Cell> Build_Starting_Waypoint_List(bool official)
+static DynamicVectorClass<Cell> Build_Starting_Waypoint_List(bool official, int look_for_override = -1)
 {
     DynamicVectorClass<Cell> waypts;
 
@@ -616,15 +617,25 @@ static DynamicVectorClass<Cell> Build_Starting_Waypoint_List(bool official)
         }
     }
 
-    /**
-     *  Calculate the number of waypoints (as a minimum) that will be lifted from the
-     *  mission file. Bias this number so that only the first 4 waypoints are used
-     *  if there are 4 or fewer players. Unofficial maps will pick from all the
-     *  available waypoints.
-     */
-    int look_for = std::max(min_waypts, Session.Players.Count()+Session.Options.AIPlayers);
-    if (!official) {
-        look_for = MAX_PLAYERS;
+    int look_for = 0;
+    if (look_for_override == -1) {
+        /**
+         *  Calculate the number of waypoints (as a minimum) that will be lifted from the
+         *  mission file. Bias this number so that only the first 4 waypoints are used
+         *  if there are 4 or fewer players. Unofficial maps will pick from all the
+         *  available waypoints.
+         */
+        look_for = std::max(min_waypts, Session.Players.Count()+Session.Options.AIPlayers);
+        if (!official) {
+            look_for = MAX_PLAYERS;
+        }
+
+    } else {
+
+        /**
+         *  Waypoint search override defined.
+         */
+        look_for = look_for_override;
     }
 
     for (int waycount = 0; waycount < look_for; ++waycount) {
@@ -728,7 +739,12 @@ void Vinifera_Create_Units(bool official)
     std::memset(taken, '\0', sizeof(taken));
 
     DynamicVectorClass<Cell> waypts;
-    waypts = Build_Starting_Waypoint_List(official);
+
+    if (Client::IsActive) {
+        waypts = Build_Starting_Waypoint_List(official, Client::GameSettings.Players.Count());
+    } else {
+        waypts = Build_Starting_Waypoint_List(official);
+    }
 
     /**
      *  Loop through all houses.  Computer-controlled houses, with Session.Options.Bases
@@ -746,6 +762,16 @@ void Vinifera_Create_Units(bool official)
             continue;
         }
 
+        Client::PlayerSettingsType *client_player = nullptr;
+        if (Client::IsActive) {
+            for (int i = 0; i < Client::GameSettings.Players.Count(); ++i) {
+                client_player = Client::GameSettings.Players[i];
+                if (client_player->HousePtr == hptr) {
+                    break;
+                }
+            }
+        }
+
         DynamicVectorClass<InfantryTypeClass *> available_infantry;
         DynamicVectorClass<UnitTypeClass *> available_units;
 
@@ -757,6 +783,18 @@ void Vinifera_Create_Units(bool official)
             continue;
         }
 
+        /**
+         *  Skip observer houses, they don't really exist.
+         */
+        if (Client::IsActive) {
+            HouseClassExtension *houseext;
+            houseext = HouseClassExtensions.find(hptr);
+            if (houseext && houseext->IsObserver) {
+                DEV_DEBUG_INFO("House %d (%s - \"%s\") is an observer, skipping.\n", house, hptr->Class->Name(), hptr->IniName);
+                continue;
+            }
+        }
+        
         int owner_id = 1 << hptr->Class->ID;
 
         DEBUG_INFO("Generating units for house %d (Name: %s - \"%s\", Color: %s)...\n",
@@ -815,66 +853,115 @@ void Vinifera_Create_Units(bool official)
             }
         }
 
-        /**
-         *  Pick the starting location for this house. The first house just picks
-         *  one of the valid locations at random. The other houses pick the furthest
-         *  waypoint from the existing houses.
-         */        
-        if (numtaken == 0) {
-            int pick = Random_Pick(0, waypts.Count()-1);
-            centroid = waypts[pick];
-            taken[pick] = true;
-            numtaken++;
+        bool waypoint_set = false;
 
-        } else {
+        if (Client::IsActive) {
+            if (client_player && client_player->StartLocation != -1) {
+
+                int pick;
+                if (client_player->StartLocation == WAYPT_RANDOM) {
+                    while (true) {
+                        pick = Random_Pick(0, waypts.Count()-1);
+                        if (!taken[pick]) {
+                            break;
+                        }
+                    }
+                    
+                    /**
+                     *  Fetch this position for the house.
+                     */
+                    centroid = waypts[pick];
+
+                } else {
+
+                    pick = waypts[client_player->StartLocation];
+                    if (taken[pick]) {
+                        DEBUG_WARNING("  Desired starting waypoint taken, picking random location!\n");
+                        while (true) {
+                            pick = Random_Pick(0, waypts.Count()-1);
+                            if (!taken[pick]) {
+                                break;
+                            }
+                        }
+                    }
+
+                    /**
+                     *  Fetch this position for the house.
+                     */
+                    centroid = Scen->Get_Waypoint_Location(pick);
+                }
+
+                taken[pick] = true;
+                numtaken++;
+
+                waypoint_set = true;
+            }
+        }
+
+        if (!waypoint_set) {
 
             /**
-             *  Set all waypoints to have a score of zero in preparation for giving
-             *  a distance score to all waypoints.
-             */
-            int score[MAX_STORED_WAYPOINTS];
-            std::memset(score, '\0', sizeof(score));
+             *  Pick the starting location for this house. The first house just picks
+             *  one of the valid locations at random. The other houses pick the furthest
+             *  waypoint from the existing houses.
+             */        
+            if (numtaken == 0) {
+                int pick = Random_Pick(0, waypts.Count()-1);
+                centroid = waypts[pick];
+                taken[pick] = true;
+                numtaken++;
 
-            /**
-             *  Scan through all waypoints and give a score as a value of the sum
-             *  of the distances from this waypoint to all taken waypoints.
-             */
-            for (int index = 0; index < waypts.Count(); index++) {
+            } else {
 
                 /**
-                 *  If this waypoint has not already been taken, then accumulate the
-                 *  sum of the distance between this waypoint and all other taken
-                 *  waypoints.
+                 *  Set all waypoints to have a score of zero in preparation for giving
+                 *  a distance score to all waypoints.
                  */
-                if (!taken[index]) {
-                    for (int trypoint = 0; trypoint < waypts.Count(); trypoint++) {
+                int score[MAX_STORED_WAYPOINTS];
+                std::memset(score, '\0', sizeof(score));
 
-                        if (taken[trypoint]) {
-                            score[index] += Distance(waypts[index], waypts[trypoint]);
+                /**
+                 *  Scan through all waypoints and give a score as a value of the sum
+                 *  of the distances from this waypoint to all taken waypoints.
+                 */
+                for (int index = 0; index < waypts.Count(); index++) {
+
+                    /**
+                     *  If this waypoint has not already been taken, then accumulate the
+                     *  sum of the distance between this waypoint and all other taken
+                     *  waypoints.
+                     */
+                    if (!taken[index]) {
+                        for (int trypoint = 0; trypoint < waypts.Count(); trypoint++) {
+
+                            if (taken[trypoint]) {
+                                score[index] += Distance(waypts[index], waypts[trypoint]);
+                            }
                         }
                     }
                 }
-            }
 
-            /**
-             *  Now find the waypoint with the largest score. This waypoint is the one
-             *  that is furthest from all other taken waypoints.
-             */
-            int best = 0;
-            int bestvalue = 0;
-            for (int searchindex = 0; searchindex < waypts.Count(); searchindex++) {
-                if (score[searchindex] > bestvalue || bestvalue == 0) {
-                    bestvalue = score[searchindex];
-                    best = searchindex;
+                /**
+                 *  Now find the waypoint with the largest score. This waypoint is the one
+                 *  that is furthest from all other taken waypoints.
+                 */
+                int best = 0;
+                int bestvalue = 0;
+                for (int searchindex = 0; searchindex < waypts.Count(); searchindex++) {
+                    if (score[searchindex] > bestvalue || bestvalue == 0) {
+                        bestvalue = score[searchindex];
+                        best = searchindex;
+                    }
                 }
+
+                /**
+                 *  Assign this best position to the house.
+                 */
+                centroid = waypts[best];
+                taken[best] = true;
+                numtaken++;
             }
 
-            /**
-             *  Assign this best position to the house.
-             */
-            centroid = waypts[best];
-            taken[best] = true;
-            numtaken++;
         }
 
         /**

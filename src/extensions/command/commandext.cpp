@@ -31,6 +31,10 @@
 #include "tibsun_util.h"
 #include "vinifera_globals.h"
 #include "vinifera_util.h"
+#include "client_globals.h"
+#include "client_functions.h"
+#include "house.h"
+#include "houseext.h"
 #include "iomap.h"
 #include "tactical.h"
 #include "dsurface.h"
@@ -666,6 +670,80 @@ bool JumpCameraSouthCommandClass::Process()
     int dist = Cell_To_Lepton(Map.MapSize.Width <= Map.MapSize.Height ? Map.MapSize.Height : Map.MapSize.Width);
 
     Map.Scroll_Map(FACING_S, dist);
+
+    return true;
+}
+
+
+/**
+ *  Jump to the home location of each player (observer mode only).
+ * 
+ *  @author: CCHyper
+ */
+const char *JumpToPlayerCommandClass::Get_Name() const
+{
+    static char buffer[32];
+    std::snprintf(buffer, sizeof(buffer), "JumpToPlayer%d", PlayerID);
+    return buffer;
+}
+
+const char *JumpToPlayerCommandClass::Get_UI_Name() const
+{
+    static char buffer[32];
+    std::snprintf(buffer, sizeof(buffer), "Jump to player %d", PlayerID);
+    return buffer;
+}
+
+const char *JumpToPlayerCommandClass::Get_Category() const
+{
+    return "Observer";
+}
+
+const char *JumpToPlayerCommandClass::Get_Description() const
+{
+    static char buffer[256];
+    std::snprintf(buffer, sizeof(buffer), "Jump to the home location of player %d.", PlayerID);
+    return buffer;
+}
+
+bool JumpToPlayerCommandClass::Process()
+{
+    if (!Client::IsActive) {
+        return false;
+    }
+
+    if (PlayerID >= Session.Players.Count()) {
+        return false;
+    }
+
+    if (Client::Get_Client_Node_Tag(PlayerID)->Player.IsObserver) {
+        return false;
+    }
+
+    HouseClass *hptr = Client::GameSettings.Players[PlayerID]->HousePtr;
+    if (!hptr) {
+        return false;
+    }
+
+    HouseClassExtension *houseext;
+    houseext = HouseClassExtensions.find(PlayerPtr);
+    if (!houseext || (houseext && !houseext->IsObserver)) {
+        return false;
+    }
+
+    if (hptr->IsDefeated) {
+        return false;
+    }
+
+    Coordinate coord = hptr->Center;
+    coord.Z = Map.Get_Cell_Height(hptr->Center);
+
+    //const CellClass *cellptr = &Map[coord];
+    //if (!cellptr) {
+    //    return false;
+    //}
+
+    TacticalMap->Set_Tactical_Position(coord);
 
     return true;
 }
@@ -2873,8 +2951,32 @@ const char *PlaceUnitCommandClass::Get_Description() const
     return "Places a random unit at the mouse cell.";
 }
 
+#include "client_globals.h"
+#include "client_functions.h"
 bool PlaceUnitCommandClass::Process()
 {
+    for (int j = 0; j < Client::GameSettings.Players.Count(); ++j) {
+
+        Client::PlayerSettingsType &client_player = *Client::GameSettings.Players[j];
+
+        /**
+            *  Skip over ourself.
+            */
+        if (PlayerPtr == client_player.HousePtr) {
+            continue;
+        }
+
+        if (client_player.HousePtr->Is_Ally(PlayerPtr)) {
+            Map.Sight_From(Coord_Cell(client_player.HousePtr->Center), 9, PlayerPtr, false);
+            DEBUG_INFO("  Revealed base of \"%s\" to \"%s\".\n",
+                client_player.PlayerName, PlayerPtr->IniName);
+        }
+    }
+
+    Vinifera_Developer_FrameStep = !Vinifera_Developer_FrameStep;
+    Vinifera_Developer_FrameStepCount = 0;
+
+#if 0
     if (Session.Type != GAME_SKIRMISH) {
         return false;
     }
@@ -2917,6 +3019,7 @@ bool PlaceUnitCommandClass::Process()
     } else {
         delete unit;
     }
+#endif
 
     return false;
 }

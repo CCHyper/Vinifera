@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          HOUSEEXT.H
+ *  @file          CLIENT_FUNCTIONS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended HouseClass class.
+ *  @brief         Various globals for the client front-end system.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,34 +27,42 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
+#include "always.h"
+#include "client_globals.h"
+#include "cncnet5_globals.h"
 
 
-class HouseClass;
-class CCINIClass;
-
-
-class HouseClassExtension final : public Extension<HouseClass>
+namespace Client
 {
-    public:
-        HouseClassExtension(HouseClass *this_ptr);
-        HouseClassExtension(const NoInitClass &noinit);
-        ~HouseClassExtension();
 
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
+bool Parse_Command_Line(int argc, char *argv[]);
 
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+bool Read_Client_Startup_Settings();
+bool Read_Client_Settings(CCINIClass &ini);
+bool Read_CnCNet_Settings(CCINIClass &ini);
+bool Read_Game_Settings(CCINIClass &ini);
 
-    public:
-        /**
-         *  Is this an observer/spectator player?
-         */
-        bool IsObserver;
-};
+bool Init();
+bool Startup();
+bool Shutdown();
 
+bool Start_Game();
+bool Main_Loop();
 
-extern ExtensionMap<HouseClass, HouseClassExtension> HouseClassExtensions;
+bool Create_Player_Nodes();
+bool Assign_Houses();
+
+bool Dump_End_Game_Info();
+
+const char *Name_From_Team(ClientTeamType team);
+
+/**
+ *  Helpful functions that hide the casts.
+ */
+bool Add_Client_Node_Tag(ClientNodeNameType *node);
+bool Remove_Client_Node_Tag(ClientNodeNameType *node);
+ClientNodeNameType *Get_Client_Node_Tag(int index);
+
+void Draw_Observer_Overlay();
+
+}; // namespace Client

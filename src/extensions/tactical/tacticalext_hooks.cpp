@@ -40,6 +40,9 @@
 #include "scenario.h"
 #include "session.h"
 #include "colorscheme.h"
+#include "house.h"
+#include "housetype.h"
+#include "utracker.h"
 #include "voc.h"
 #include "laserdraw.h"
 #include "ebolt.h"
@@ -47,6 +50,9 @@
 #include "vinifera_globals.h"
 #include "vinifera_util.h"
 #include "vinifera_gitinfo.h"
+#include "client_functions.h"
+#include "client_globals.h"
+#include "houseext.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <timeapi.h>
@@ -436,6 +442,28 @@ static void Tactical_Draw_FrameStep_Overlay()
  * 
  *  @author: CCHyper
  */
+static void Tactical_Draw_Client_Overlay()
+{
+    if (!Client::GameSettings.Players.Count()) {
+        return;
+    }
+
+    /**
+     *  Draw the observer overlay if the local player is an observer.
+     */
+    HouseClassExtension *houseext;
+    houseext = HouseClassExtensions.find(PlayerPtr);
+    if (houseext && houseext->IsObserver) {
+        Client::Draw_Observer_Overlay();
+    }
+}
+
+
+/**
+ *  Draw the overlay information text if set.
+ * 
+ *  @author: CCHyper
+ */
 static void Tactical_Draw_Information_Text()
 {
     RGBClass rgb_black(0,0,0);
@@ -607,6 +635,13 @@ DECLARE_PATCH(_Tactical_Render_Overlay_Patch)
         if (Vinifera_Developer_FrameStep) {
             Tactical_Draw_FrameStep_Overlay();
         }
+    }
+
+    /**
+     *  If the client mode is active, draw any required overlays.
+     */
+    if (Client::IsActive) {
+        Tactical_Draw_Client_Overlay();
     }
 
 #ifndef NDEBUG
