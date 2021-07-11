@@ -8,7 +8,7 @@
  *
  *  @authors       CCHyper
  *
- *  @brief         Vinifera global values.
+ *  @brief         Vinifera defines and constants.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -28,33 +28,36 @@
 #pragma once
 
 #include "always.h"
-#include "vector.h"
+#include "tibsun_defines.h"
 
 
-class VesselClass;
-class VesselTypeClass;
+typedef enum VesselType
+{
+    VESSEL_NONE = -1,
+    VESSEL_FIRST = 0
+
+} VesselType;
+DEFINE_ENUMERATION_OPERATORS(VesselType);
 
 
-extern bool Vinifera_DeveloperMode;
+typedef enum NewRTTIType
+{
+    /**
+     *  This offsets the new RTTIType enum so they are correctly numbered.
+     */
+    NEW_RTTI_PAD = RTTI_VEINHOLEMONSTER, // The last RTTIType
 
-extern char Vinifera_DebugDirectory[PATH_MAX];
+    /**
+     *  Add new TActionTypes from here, do not reorder these!
+     */
 
+    RTTI_VESSEL,
+    RTTI_VESSELTYPE,
 
-/**
- *  Developer mode globals.
- */
-extern bool Vinifera_Developer_InstantBuild;
-extern bool Vinifera_Developer_AIInstantBuild;
-extern bool Vinifera_Developer_BuildCheat;
-extern bool Vinifera_Developer_Unshroud;
-extern bool Vinifera_Developer_ShowCursorPosition;
-extern bool Vinifera_Developer_FrameStep;
-extern int Vinifera_Developer_FrameStepCount;
-extern bool Vinifera_Developer_AIControl;
+    /**
+     *  The new total TActionType count.
+     */
+    NEW_RTTI_COUNT
 
-
-/**
- *  Global vectors and heaps.
- */
-extern DynamicVectorClass<VesselClass *> Vessels;
-extern DynamicVectorClass<VesselTypeClass *> VesselTypes;
+} NewRTTIType;
+DEFINE_ENUMERATION_OPERATORS(NewRTTIType);
