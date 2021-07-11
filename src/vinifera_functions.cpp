@@ -31,6 +31,7 @@
 #include "cncnet4.h"
 #include "cncnet4_globals.h"
 #include "cncnet5_globals.h"
+#include "ccfile.h"
 #include "debughandler.h"
 #include <string>
 
@@ -42,51 +43,51 @@
  */
 bool Vinifera_Parse_Command_Line(int argc, char *argv[])
 {
-	if (argc > 1) {
-		DEBUG_INFO("Parsing command line arguments...\n");
-	}
+    if (argc > 1) {
+        DEBUG_INFO("Parsing command line arguments...\n");
+    }
 
-	/**
-	 *  Iterate over all command line params.
-	 */
-	for (int index = 1; index < argc; index++) {
+    /**
+     *  Iterate over all command line params.
+     */
+    for (int index = 1; index < argc; index++) {
 
-		char arg_string[512];
+        char arg_string[512];
 
-		char *src = argv[index];
-		char *dest = arg_string; 
-		for (int i= 0; i < std::strlen(argv[index]); ++i) {
-			if (*src == '\"') {
-				src++;
-			} else {
-				*dest++ = *src++;
-			}
-		}
-		*dest++ = '\0';
+        char *src = argv[index];
+        char *dest = arg_string; 
+        for (int i= 0; i < std::strlen(argv[index]); ++i) {
+            if (*src == '\"') {
+                src++;
+            } else {
+                *dest++ = *src++;
+            }
+        }
+        *dest++ = '\0';
 
-		char *string = arg_string; // Pointer to current argument.
-		strupr(string);
+        char *string = arg_string; // Pointer to current argument.
+        strupr(string);
 
-		/**
-		 *  Add all new command line params here.
-		 */
+        /**
+         *  Add all new command line params here.
+         */
 
-		/**
-		 *  Mod developer mode.
-		 */
-		if (stricmp(string, "-DEVELOPER") == 0) {
-			DEBUG_INFO("  - Developer mode enabled.\n");
-			Vinifera_DeveloperMode = true;
-			continue;
-		}
+        /**
+         *  Mod developer mode.
+         */
+        if (stricmp(string, "-DEVELOPER") == 0) {
+            DEBUG_INFO("  - Developer mode enabled.\n");
+            Vinifera_DeveloperMode = true;
+            continue;
+        }
 
-	}
+    }
 
-	if (argc > 1) {
-		DEBUG_INFO("Finished parsing command line arguments.\n");
-	}
+    if (argc > 1) {
+        DEBUG_INFO("Finished parsing command line arguments.\n");
+    }
 
-	return true;
+    return true;
 }
 
 
@@ -98,23 +99,23 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
  */
 bool Vinifera_Startup()
 {
-	/**
-	 *  Initialise the CnCNet4 system.
-	 */
-	if (!CnCNet4::Init()) {
-		CnCNet4::IsEnabled = false;
-		DEBUG_WARNING("Failed to initialise CnCNet4, continuing without CnCNet4 support!\n");
-	}
+    /**
+     *  Initialise the CnCNet4 system.
+     */
+    if (!CnCNet4::Init()) {
+        CnCNet4::IsEnabled = false;
+        DEBUG_WARNING("Failed to initialise CnCNet4, continuing without CnCNet4 support!\n");
+    }
 
-	/**
-	 *  Disable CnCNet4 if CnCNet5 is active, they can not co-exist.
-	 */
-	if (CnCNet4::IsEnabled && CnCNet5::IsActive) {
-		CnCNet4::Shutdown();
-		CnCNet4::IsEnabled = false;
-	}
+    /**
+     *  Disable CnCNet4 if CnCNet5 is active, they can not co-exist.
+     */
+    if (CnCNet4::IsEnabled && CnCNet5::IsActive) {
+        CnCNet4::Shutdown();
+        CnCNet4::IsEnabled = false;
+    }
 
-	return true;
+    return true;
 }
 
 
@@ -126,7 +127,55 @@ bool Vinifera_Startup()
  */
 bool Vinifera_Shutdown()
 {
-	DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
+    DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 
-	return true;
+    return true;
+}
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+bool Vinifera_Pre_Main_Game()
+{
+    char *paths = new char [PATH_MAX * 100];
+
+    if (CCFileClass::Is_There_Search_Drives()) {
+        DEBUG_INFO("Current search path: \"%s\"\n", CCFileClass::RawPath);
+        std::strcat(paths, CCFileClass::RawPath);
+    }
+
+    /**
+     *  Current directory.
+     */
+    std::strcat(paths, ".;");
+
+    /**
+     *  CD paths.
+     */
+    std::strcat(paths, "CD1;");
+    std::strcat(paths, "TS1;");
+    std::strcat(paths, "CD2;");
+    std::strcat(paths, "TS2;");
+    std::strcat(paths, "CD3;");
+    std::strcat(paths, "TS3;");
+
+    /**
+     *  Add various paths that can be utilised by mods and external clients.
+     */
+    std::strcat(paths, "INI;");
+    std::strcat(paths, "MIX;");
+    std::strcat(paths, "Maps;");
+    std::strcat(paths, "Maps\\Missions;");
+    std::strcat(paths, "Maps\\Multiplayer;");
+
+    CDFileClass::Set_Search_Drives(paths);
+
+    DEBUG_INFO("New search path: \"%s\"\n", paths);
+
+    delete [] paths;
+
+    return true;
 }

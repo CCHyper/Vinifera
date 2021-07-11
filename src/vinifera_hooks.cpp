@@ -161,6 +161,38 @@ DECLARE_PATCH(_WinMain_Vinifera_Startup)
 
 
 /**
+ *  Patch in the main Vinifera startup function.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_WinMain_Pre_Main_Game)
+{
+    _asm { cmp esi, ebx }
+    _asm { jnz pre_main_game }
+
+    // delete file;
+    _asm { mov eax, [esi] }
+    _asm { push edi }
+    _asm { mov ecx, esi }
+    _asm { call dword ptr [eax] }
+
+pre_main_game:
+    if (Vinifera_Pre_Main_Game()) {
+        JMP_REG(edx, 0x00601989);
+    }
+
+    /**
+     *  Something went wrong!
+     */
+
+    DEBUG_ERROR("Failed to initialise Vinfiera pre-game systems!\n");
+
+    _asm { mov esi, EXIT_FAILURE }
+    JMP(0x00601A6B);
+}
+
+
+/**
  *  Patch in the main Vinifera shutdown function.
  * 
  *  @author: CCHyper
@@ -265,6 +297,7 @@ void Vinifera_Hooks()
      */
     Patch_Jump(0x00601070, &_WinMain_Parse_Command_Line);
     Patch_Jump(0x005FF81C, &_WinMain_Vinifera_Startup);
+    Patch_Jump(0x0060197E, &_WinMain_Pre_Main_Game);
     Patch_Jump(0x00602474, &_Game_Shutdown_Vinifera_Shutdown);
 
     /**

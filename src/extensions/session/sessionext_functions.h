@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SESSIONEXT_HOOKS.CPP
+ *  @file          SESSIONEXT_FUNCTIONS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for the extended SessionClass.
+ *  @brief         Contains the supporting functions for the extended SessionClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,48 +25,10 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "sessionext_hooks.h"
-#include "sessionext_init.h"
-#include "sessionext_functions.h"
-#include "sessionext.h"
-#include "session.h"
-#include "fatal.h"
-#include "debughandler.h"
-#include "asserthandler.h"
+#pragma once
 
 
-/**
- *  A fake class for implementing new member functions which allow
- *  access to the "this" pointer of the intended class.
- * 
- *  @note: This must not contain a constructor or deconstructor!
- *  @note: All functions must be prefixed with "_" to prevent accidental virtualization.
- */
-class SessionClassFake final : public SessionClass
-{
-    public:
-        void _Read_Scenario_Descriptions();
-};
+class SessionClass;
 
 
-/**
- *  Implementation of Read_Scenario_Descriptions() for SessionClass.
- */
-void SessionClassFake::_Read_Scenario_Descriptions()
-{
-    Session_Read_Scenario_Descriptions((SessionClass *)this);
-}
-
-
-/**
- *  Main function for patching the hooks.
- */
-void SessionClassExtension_Hooks()
-{
-    /**
-     *  Initialises the extended class.
-     */
-    SessionClassExtension_Init();
-
-    Patch_Jump(0x005EE7D0, &SessionClassFake::_Read_Scenario_Descriptions);
-}
+void Session_Read_Scenario_Descriptions(SessionClass *session);
