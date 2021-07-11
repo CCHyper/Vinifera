@@ -64,6 +64,8 @@
 //#include "tagtypeext.h"
 //#include "triggertypeext.h"
 
+#include "terrainext.h"
+
 
 /**
  *  Constant of the current build version number. This number should be
@@ -108,6 +110,8 @@ unsigned ViniferaSaveGameVersion =
             //+ sizeof(ScriptTypeClassExtension)
             //+ sizeof(TagTypeClassExtension)
             //+ sizeof(TriggerTypeClassExtension)
+
+            + sizeof(TerrainClassExtension)
 ;
 
 
@@ -303,6 +307,8 @@ DEFINE_EXTENSION_SAVE(TiberiumClassExtension, TiberiumClassExtensions);
 //DEFINE_EXTENSION_SAVE(TagTypeClassExtension, TagTypeClassExtensions);
 //DEFINE_EXTENSION_SAVE(TriggerTypeClassExtension, TriggerTypeClassExtensions);
 
+DEFINE_EXTENSION_SAVE(TerrainClassExtension, TerrainClassExtensions);
+
 
 DEFINE_EXTENSION_LOAD(ObjectTypeClassExtension, ObjectTypeClassExtensions);
 DEFINE_EXTENSION_LOAD(TechnoTypeClassExtension, TechnoTypeClassExtensions);
@@ -331,6 +337,8 @@ DEFINE_EXTENSION_LOAD(TiberiumClassExtension, TiberiumClassExtensions);
 //DEFINE_EXTENSION_LOAD(ScriptTypeClassExtension, ScriptTypeClassExtensions);
 //DEFINE_EXTENSION_LOAD(TagTypeClassExtension, TagTypeClassExtensions);
 //DEFINE_EXTENSION_LOAD(TriggerTypeClassExtension, TriggerTypeClassExtensions);
+
+DEFINE_EXTENSION_LOAD(TerrainClassExtension, TerrainClassExtensions);
 
 
 /**
@@ -531,6 +539,12 @@ bool Vinifera_Put_All(IStream *pStm)
 //        DEBUG_INFO("\t***** FAILED!\n");
 //        return false;
 //    }
+
+    DEBUG_INFO("Saving TerrainClassExtension\n");
+    if (!Vinifera_Save_TerrainClassExtension(pStm)) {
+        DEBUG_INFO("\t***** FAILED!\n");
+        return false;
+    }
 
     /**
      *  Save global data and values here.
@@ -761,6 +775,12 @@ bool Vinifera_Load_All(IStream *pStm)
 //        DEBUG_INFO("\t***** FAILED!\n");
 //        return false;
 //    }
+
+    DEBUG_INFO("Loading TerrainClassExtension\n");
+    if (!Vinifera_Load_TerrainClassExtension(pStm)) {
+        DEBUG_INFO("\t***** FAILED!\n");
+        return false;
+    }
 
     /**
      *  Load global data and values here.
