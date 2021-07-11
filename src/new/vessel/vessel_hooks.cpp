@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          VESSEL_HOOKS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         Contains the hooks for the new VesselClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,34 +25,69 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#include "vessel_hooks.h"
+#include "tibsun_functions.h"
+#include "unit.h"
+#include "vessel.h"
+#include "fatal.h"
+#include "debughandler.h"
+#include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
+
+
+// TODO: 005B560A
+// TODO: 005B5FAD
+// TODO: 005D4882
+// TODO: 005D57B0
+// TODO: 0060A1BB
+// TODO: 
+
 
 /**
- *  Include the hook headers here.
+ *  blah
+ * 
+ *  @author: CCHyper
  */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "vessel_hooks.h"
-#include "vesseltype_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-
-
-void Setup_Hooks()
+DECLARE_PATCH(_Read_Scenario_INI_Intercept_Patch)
 {
-    Vinifera_Memory_Hooks();
+    GET_REGISTER_STATIC(CCINIClass *, ini, ebp);
 
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Extension_Hooks();
+    UnitClass::Read_INI(*ini);
 
-    VesselClass_Hooks();
-    VesselTypeClass_Hooks();
+    Call_Back();
 
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
+    VesselClass::Read_INI(*ini);
+
+    Call_Back();
+
+    JMP(0x005DDB35);
+}
+
+
+/**
+ *  blah
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Write_Scenario_INI_Intercept_Patch)
+{
+    LEA_STACK_STATIC(CCINIClass *, ini, esp, 0x0C);
+
+    UnitClass::Write_INI(*ini);
+
+    VesselClass::Write_INI(*ini);
+
+    JMP(0x005DE14A);
+}
+
+
+/**
+ *  Main function for patching the hooks.
+ */
+void VesselClass_Hooks()
+{
+    Patch_Jump(0x005DDB29, &_Read_Scenario_INI_Intercept_Patch);
+    Patch_Jump(0x005DE141, &_Write_Scenario_INI_Intercept_Patch);
 }

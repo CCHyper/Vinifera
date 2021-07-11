@@ -29,7 +29,7 @@
 
 #include "extension.h"
 #include "container.h"
-
+#include "typelist.h"
 #include "noinit.h"
 #include "tpoint.h"
 
@@ -54,6 +54,7 @@ class RulesClassExtension final : public Extension<RulesClass>
 
         void Process(CCINIClass &ini);
         void Initialize(CCINIClass &ini);
+        void Objects(CCINIClass &ini);
 
         bool General(CCINIClass &ini);
         bool MPlayer(CCINIClass &ini);
@@ -99,6 +100,11 @@ class RulesClassExtension final : public Extension<RulesClass>
          *  Can players build their own structures adjacent to structures owned by their allies?
          */
         bool IsBuildOffAlly;
+
+        /**
+         *  
+         */
+        TypeList<BuildingTypeClass *> BuildShipyard;
 };
 
 

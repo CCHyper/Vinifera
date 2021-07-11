@@ -42,6 +42,8 @@
 #include "scenarioext.h"
 #include "tacticalext.h"
 #include "tclassfactory.h"
+#include "vessel.h"
+#include "vesseltype.h"
 #include "testlocomotion.h"
 #include "debughandler.h"
 #include <string>
@@ -372,6 +374,12 @@ int Vinifera_Post_Init_Game(int argc, char *argv[])
 bool Vinifera_Register_Com_Objects()
 {
     DEBUG_INFO("Registering new com objects...\n");
+
+    DEBUG_INFO("  VesselClass\n");
+    REGISTER_CLASS(VesselClass);
+
+    DEBUG_INFO("  VesselTypeClass\n");
+    REGISTER_CLASS(VesselTypeClass);
 
     DEBUG_INFO("  TestLocomotionClass\n");
     REGISTER_CLASS(TestLocomotionClass);

@@ -31,6 +31,7 @@
 #include "rules.h"
 #include "tiberium.h"
 #include "weapontype.h"
+#include "vesseltype.h"
 #include "tibsun_globals.h"
 #include "session.h"
 #include "sessionext.h"
@@ -64,6 +65,7 @@ class RulesClassFake final : public RulesClass
         void _Process(CCINIClass &ini);
 
         bool Weapons(CCINIClass &ini);
+        bool Ships(CCINIClass &ini);
 };
 
 
@@ -107,6 +109,46 @@ bool RulesClassFake::Weapons(CCINIClass &ini)
 
 
 /**
+ *  Fetch all the vessel characteristic values.
+ * 
+ *  @author: CCHyper
+ */
+bool RulesClassFake::Ships(CCINIClass &ini)
+{
+    static const char * const SHIPTYPES = "ShipTypes";
+
+    char buf[128];
+    const VesselTypeClass *vesseltype;
+
+    int counter = ini.Entry_Count(SHIPTYPES);
+    for (int index = 0; index < counter; ++index) {
+        const char *entry = ini.Get_Entry(SHIPTYPES, index);
+
+        /**
+         *  Get a weapon entry.
+         */
+        if (ini.Get_String(SHIPTYPES, entry, buf, sizeof(buf))) {
+
+            /**
+             *  Find or create a vessel of the name specified.
+             */
+            vesseltype = VesselTypeClass::Find_Or_Make(buf);
+            if (vesseltype) {
+#ifndef NDEBUG
+                DEV_DEBUG_INFO("Rules: Found VesselType \"%s\".\n", buf);
+#endif
+            } else {
+                DEV_DEBUG_WARNING("Rules: Error processing VesselType \"%s\"!\n", buf);
+            }
+        }
+
+    }
+
+    return counter > 0;
+}
+
+
+/**
  *  Fetch the bulk of the rule data from the control file.
  * 
  *  @author: CCHyper
@@ -133,6 +175,7 @@ void RulesClassFake::_Process(CCINIClass &ini)
     Terrains(ini);
     Buildings(ini);
     Vehicles(ini);
+    Ships(ini);                 // Added VesselTypes.
     Aircraft(ini);
     Infantry(ini);
     Animations(ini);

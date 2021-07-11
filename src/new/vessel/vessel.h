@@ -1,0 +1,151 @@
+/*******************************************************************************
+/*                     O P E N  S O U R C E  --  T S + +                      **
+/*******************************************************************************
+ *
+ *  @project       TS++
+ *
+ *  @file          BUILDING.H
+ *
+ *  @authors       CCHyper, tomsons26
+ *
+ *  @brief         Unit game object class.
+ *
+ *  @license       TS++ is free software: you can redistribute it and/or
+ *                 modify it under the terms of the GNU General Public License
+ *                 as published by the Free Software Foundation, either version
+ *                 3 of the License, or (at your option) any later version.
+ *
+ *                 TS++ is distributed in the hope that it will be
+ *                 useful, but WITHOUT ANY WARRANTY; without even the implied
+ *                 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *                 PURPOSE. See the GNU General Public License for more details.
+ *
+ *                 You should have received a copy of the GNU General Public
+ *                 License along with this program.
+ *                 If not, see <http://www.gnu.org/licenses/>.
+ *
+ ******************************************************************************/
+#pragma once
+
+#include "foot.h"
+#include "tibsun_defines.h"
+#include "vinifera_defines.h"
+
+
+class VesselTypeClass;
+
+
+class DECLSPEC_UUID(CLSID_VESSEL)
+VesselClass : public FootClass
+{
+    public:
+        /**
+         *  IPersist
+         */
+        IFACEMETHOD(GetClassID)(CLSID *pClassID);
+
+        /**
+         *  IPersistStream
+         */
+        IFACEMETHOD(Load)(IStream *pStm);
+        IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
+
+    public:
+        VesselClass(const VesselTypeClass *classof = nullptr, HouseClass *house = nullptr);
+        VesselClass(const NoInitClass &noinit);
+        virtual ~VesselClass();
+
+        /**
+         *  AbstractClass
+         */
+        virtual void Detach(TARGET target, bool all = true) override;
+        virtual RTTIType Kind_Of() const override;
+        virtual int Size_Of(bool firestorm = false) const override;
+        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+        virtual void AI() override;
+
+        /**
+         *  ObjectClass
+         */
+//        virtual ActionType What_Action(const ObjectClass *object, bool disallow_force = false) override;
+//        virtual ActionType What_Action(Cell &cell, bool check_fog = false, bool disallow_force = false) const override;
+//        virtual bool entry_80() const override;
+        virtual ObjectTypeClass *const Class_Of() const override;
+//        virtual const char *Full_Name() const override;
+        virtual bool Limbo() override;
+        virtual bool Unlimbo(Coordinate &coord, DirType dir = DIR_N) override;
+//        virtual void Record_The_Kill(const ObjectClass *source) override;
+//        virtual void Set_Occupy_Bit(Coordinate &coord) override;
+//        virtual void Clear_Occupy_Bit(Coordinate &coord) override;
+//        virtual bool Render(Rect &rect, bool force = false, bool a3 = false) override;
+//        virtual void Draw_It(Point2D &point, Rect &bounds) const override;
+//        virtual bool Active_Click_With(ActionType action, ObjectClass *target, bool a3 = false) override;
+//        virtual bool Active_Click_With(ActionType action, Cell &cell, bool a3 = false) override;
+//        virtual ResultType Take_Damage(int &damage, int distance, const WarheadTypeClass *warhead, const ObjectClass *source, bool forced = false, bool a6 = false) override;
+//        virtual void Scatter(Coordinate &coord = Coordinate{-1, -1, -1}, bool forced = false, bool nokidding = false) override;
+//        virtual void Per_Cell_Process(PCPType why) override;
+//        virtual RadioMessageType Receive_Message(RadioClass *from, RadioMessageType message, long &param) override;
+//        virtual MoveType Can_Enter_Cell(const CellClass *cell, FacingType facing = FACING_NONE, int cell_level = -1, const CellClass *a4 = nullptr, bool a5 = false) override;
+
+        /**
+         *  MissionClass
+         */
+//        virtual bool Ready_To_Commence() const override;
+//        virtual int Mission_Attack() override;
+//        virtual int Mission_Guard() override;
+//        virtual int Mission_Guard_Area() override;
+//        virtual int Mission_Harvest() override;
+//        virtual int Mission_Hunt() override;
+//        virtual int Mission_Move() override;
+//        virtual int Mission_Unload() override;
+//        virtual int Mission_Repair() override;
+//        virtual int Mission_Patrol() override;
+
+        /**
+         *  TechnoClass
+         */
+//        virtual bool entry_238() const override;
+//        virtual DirStruct Turret_Facing() const override;
+//        virtual double Tiberium_Load() const override;
+//        virtual double Weed_Load() const override;
+//        virtual int Pip_Count() const override;
+//        virtual FacingType Desired_Load_Dir(const ObjectClass *object, Cell &cell) const override;
+//        virtual DirStruct Fire_Direction() const override;
+//        virtual InfantryTypeClass *const Crew_Type() const override;
+//        virtual bool entry_2A4() const override;
+//        virtual int Get_Max_Speed() const override;
+//        virtual FireErrorType Can_Fire(const TechnoClass *object, WeaponSlotType weapon = WEAPON_SLOT_PRIMARY) const override;
+//        virtual int Greatest_Threat(ThreatType method, Coordinate &coord, bool a3 = false) const override;
+//        virtual const BulletClass *Fire_At(TARGET target, WeaponSlotType weapon = WEAPON_SLOT_PRIMARY) const override;
+//        virtual bool Captured(HouseClass *house = nullptr) override;
+//        virtual void Assign_Destination(const TARGET target, bool a2 = true) const override;
+//        virtual bool Enter_Idle_Mode(bool inital = false, bool a2 = false) const override;
+
+        /**
+         *  FootClass
+         */
+//        virtual bool entry_370() override;
+//        virtual void Overrun_Square(Cell &cell, bool threaten) override;
+//        virtual void Approach_Target() override;
+
+        // TODO: UnitClass equals.
+
+        void Reload_AI();
+        void Rotation_AI();
+        void Combat_AI();
+        void Repair_AI();
+        bool Edge_Of_World_AI();
+        void Tunnel_AI();
+
+        static void Read_INI(CCINIClass &ini);
+        static void Write_INI(CCINIClass &ini);
+
+        static const char *INI_Name() { return "Ships"; }
+
+    public:
+        /**
+         *  This points to the controlling static characteristic data associated
+         *  with this vessel.
+         */
+        const VesselTypeClass *Class;
+};

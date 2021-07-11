@@ -29,10 +29,16 @@
 
 #include "extension.h"
 #include "container.h"
+#include "typelist.h"
+#include "counter.h"
+#include "vinifera_defines.h"
 
 
 class HouseClass;
 class CCINIClass;
+class VesselTypeClass;
+class UnitTrackerClass;
+class FactoryClass;
 
 
 class HouseClassExtension final : public Extension<HouseClass>
@@ -49,8 +55,64 @@ class HouseClassExtension final : public Extension<HouseClass>
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
-    public:
+        int AI_Vessel();
 
+        VesselTypeClass *Get_First_Ownable(TypeList<VesselTypeClass *> &list) const;
+
+    public:
+        /**
+         *  This is a record of the last vessel that was built.
+         */
+        VesselType JustBuiltVessel;
+
+        /**
+         *  This is the running count of the number of vessels owned by this house
+         *  and is used to keep track of ownership limits.
+         */
+        unsigned CurVessels;
+
+        /**
+         *  The total number of units built by this house.
+         */
+        UnitTrackerClass *VesselTotals;
+
+        /**
+         *  Total number of vessels destroyed by this house.
+         */
+        UnitTrackerClass *DestroyedVessels;
+
+        /**
+         *  Records the number of vessel factories active. This value is
+         *  used to regulate the speed of production.
+         */
+        int VesselFactories;
+
+        /**
+         *  For human controlled houses, only one type of vessel can be produced
+         *  at any one instant. This factory object controls this production.
+         */
+        FactoryClass *VesselFactory;
+
+        /**
+         *  Tracks number of each vessel type owned by this house. Even if the
+         *  vessel is in construction, it will be reflected in this total.
+         */
+        TCounterClass<VesselType> VQuantity;
+        TCounterClass<VesselType> ActiveVQuantity;
+        TCounterClass<VesselType> FactoryVQuantity;
+
+        /**
+         *  This elaborates the suggested vessel to construct. When the specified
+         *  object is constructed, then this value will be reset to nill state.
+         *  The expert system decides what should be produced, and then records the
+         *  recommendation in this variable.
+         */
+        VesselType BuildVessel;
+
+        /**
+         *  
+         */
+        int RatioTeamVessels;
 };
 
 

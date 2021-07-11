@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          VESSELTYPE_HOOKS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         Contains the hooks for the new VesselTypeClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,34 +25,58 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#include "vesseltype_hooks.h"
+#include "unittype.h"
+#include "vesseltype.h"
+#include "fatal.h"
+#include "debughandler.h"
+#include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
+
+
+// TODO: 004114D7
+// TODO: 0044BB52
+// TODO: 0044C9B8
+// TODO: 00492308
+// TODO: 0044962D
+// TODO: 004631C7
+// TODO: 005B6DFD
+// TODO: 005D485A
+// TODO: 005D5836
+
+// RTTI checks
+// 0058815D
+// 0042EDB4
+// 00439D1C
+// 004C1800
+// 004CB798
+// 00587DDC
+// 0058853F
+// 00616D1A
+// 004CA14D
+
 
 /**
- *  Include the hook headers here.
+ *  blah
+ * 
+ *  @author: CCHyper
  */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "vessel_hooks.h"
-#include "vesseltype_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-
-
-void Setup_Hooks()
+DECLARE_PATCH(_One_Time_Intercept_Patch)
 {
-    Vinifera_Memory_Hooks();
+    UnitTypeClass::One_Time();
 
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Extension_Hooks();
+    VesselTypeClass::One_Time();
 
-    VesselClass_Hooks();
-    VesselTypeClass_Hooks();
+    JMP(0x004E486F);
+}
 
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
+
+/**
+ *  Main function for patching the hooks.
+ */
+void VesselTypeClass_Hooks()
+{
+    Patch_Jump(0x004E486A, &_One_Time_Intercept_Patch);
 }

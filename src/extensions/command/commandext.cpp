@@ -30,6 +30,7 @@
 #include "tibsun_globals.h"
 #include "tibsun_util.h"
 #include "vinifera_globals.h"
+#include "vinifera_defines.h"
 #include "vinifera_util.h"
 #include "iomap.h"
 #include "tactical.h"
@@ -51,6 +52,8 @@
 #include "buildingtype.h"
 #include "aircraft.h"
 #include "aircrafttype.h"
+#include "vessel.h"
+#include "vesseltype.h"
 #include "weapontype.h"
 #include "warheadtype.h"
 #include "session.h"
@@ -1657,7 +1660,7 @@ bool SpawnAllCommandClass::Process()
     /**
      *  Attempt to spawn all ownable objects for the player house.
      */
-
+     #if 0
     for (BuildingType index = BUILDING_FIRST; index < BuildingTypes.Count(); ++index) {
         BuildingTypeClass const & building_type = BuildingTypeClass::As_Reference(index);
         if (building_type.Get_Ownable() /*&& building_type.Level != -1*/) {
@@ -1691,7 +1694,27 @@ bool SpawnAllCommandClass::Process()
             }
         }
     }
+    #endif
 
+    for (VesselType index = VESSEL_FIRST; index < VesselTypes.Count(); ++index) {
+        VesselTypeClass const & vessel_type = VesselTypeClass::As_Reference(index);
+        if (vessel_type.Get_Ownable() /*&& unit_type.Level != -1*/) {
+            VesselClass * vessel = (VesselClass *)vessel_type.Create_One_Of(PlayerPtr);
+            if (vessel) {
+
+                attempt = origin;
+
+                while (attempt.Y < map_cell_bottom) {
+                    if (Try_Unlimbo(vessel, attempt)) {
+                        DEBUG_INFO("VesselType %s spawned at %d,%d.\n", vessel_type.Name(), attempt.X, attempt.Y);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    #if 0
     for (InfantryType index = INFANTRY_FIRST; index < InfantryTypes.Count(); ++index) {
         InfantryTypeClass const & infantry_type = InfantryTypeClass::As_Reference(index);
         if (infantry_type.Get_Ownable() /*&& infantry_type.Level != -1*/) {
@@ -1730,6 +1753,7 @@ bool SpawnAllCommandClass::Process()
             }
         }
     }
+    #endif
 
     return true;
 }

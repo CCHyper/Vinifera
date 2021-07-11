@@ -26,6 +26,8 @@
  *
  ******************************************************************************/
 #include "rulesext.h"
+#include "vinifera_globals.h"
+#include "vesseltype.h"
 #include "ccini.h"
 #include "rules.h"
 #include "asserthandler.h"
@@ -45,7 +47,8 @@ RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
     Extension(this_ptr),
     IsMPAutoDeployMCV(false),
     IsMPPrePlacedConYards(false),
-    IsBuildOffAlly(true)
+    IsBuildOffAlly(true),
+    BuildShipyard()
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -111,7 +114,15 @@ HRESULT RulesClassExtension::Load(IStream *pStm)
         return E_FAIL;
     }
 
+    BuildShipyard.Clear();
+
     new (this) RulesClassExtension(NoInitClass());
+
+    BuildShipyard.Load(pStm);
+
+    for (int i = 0; i < BuildShipyard.Count(); ++i) {
+        SwizzleManager.Swizzle((void **)&BuildShipyard[i]);
+    }
 
     SwizzleManager.Here_I_Am(id, this);
 
@@ -133,6 +144,8 @@ HRESULT RulesClassExtension::Save(IStream *pStm, BOOL fClearDirty)
     if (FAILED(hr)) {
         return hr;
     }
+
+    BuildShipyard.Save(pStm);
 
     return hr;
 }
@@ -178,6 +191,7 @@ void RulesClassExtension::Compute_CRC(WWCRCEngine &crc) const
     crc(IsMPAutoDeployMCV);
     crc(IsMPPrePlacedConYards);
     crc(IsBuildOffAlly);
+    crc(BuildShipyard.Count());
 }
 
 
@@ -193,6 +207,8 @@ void RulesClassExtension::Process(CCINIClass &ini)
 
     General(ini);
     MPlayer(ini);
+
+    Objects(ini);
 }
 
 
@@ -208,6 +224,25 @@ void RulesClassExtension::Initialize(CCINIClass &ini)
 
 }
 
+ 
+/**
+ *  Fetch all the object characteristic values.
+ *  
+ *  @author: CCHyper
+ */
+void RulesClassExtension::Objects(CCINIClass &ini)
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("RulesClassExtension::Objects - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    /**
+     *  Fetch the game object values from the rules file.
+     */
+    for (int index = 0; index < VesselTypes.Count(); ++index) {
+        VesselTypes[index]->Read_INI(ini);
+    }
+}
+
 
 /**
  *  Process the general main game rules.
@@ -221,6 +256,8 @@ bool RulesClassExtension::General(CCINIClass &ini)
     if (!ini.Is_Present(GENERAL)) {
         return false;
     }
+
+    BuildShipyard = ini.Get_Buildings(GENERAL, "BuildShipyard", BuildShipyard);
 
     return true;
 }
