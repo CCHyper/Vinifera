@@ -29,10 +29,12 @@
 
 #include "extension.h"
 #include "container.h"
+#include "typelist.h"
 
 
 class CCINIClass;
 class RulesClass;
+class UnitTypeClass;
 
 
 class RulesClassExtension final : public Extension<RulesClass>
@@ -52,8 +54,14 @@ class RulesClassExtension final : public Extension<RulesClass>
         void Process(CCINIClass &ini);
         void Initialize(CCINIClass &ini);
 
-    public:
+    private:
+        bool General(CCINIClass &ini);
 
+    public:
+        /**
+         *  
+         */
+        TypeList<UnitTypeClass *> BaseUnit;
 };
 
 

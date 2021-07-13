@@ -27,15 +27,86 @@
  ******************************************************************************/
 #include "houseext_hooks.h"
 #include "vinifera_globals.h"
+#include "tibsun_globals.h"
 #include "house.h"
 #include "housetype.h"
 #include "technotype.h"
+#include "unittype.h"
+#include "rules.h"
+#include "rulesext.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  #issue-177
+ * 
+ *  Allow the game to check BaseUnit for all pertinent entries for "Short Game".
+ * 
+ *  #NOTE: The code before this patch already checks if the house has
+ *         any buildings first.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_HouseClass_AI_Short_Game_BaseUnit_Patch)
+{
+    GET_REGISTER_STATIC(HouseClass *, this_ptr, esi);
+    static UnitTypeClass *unittype;
+    static UnitType unit;
+    static int count;
+
+    /**
+     *  Fetch the extended rules class instance and make sure value entries
+     *  have been loaded.
+     */
+    if (RulesExtension && RulesExtension->BaseUnit.Count() > 0) {
+
+        /**
+         *  Fetch the first buildable base unit from the new base unit entry
+         *  and get the current count of that unit that this house owns.
+         */
+        unittype = this_ptr->Get_First_Ownable(RulesExtension->BaseUnit);
+        if (unittype) {
+            unit = (UnitType)unittype->Get_Heap_ID();
+            count = this_ptr->UQuantity.Count_Of(unit);
+        }
+
+    /**
+     *  Fallback to the original code.
+     */
+    } else {
+
+        /**
+         *  Get the current count of the base unit that this house owns.
+         */
+        unit = (UnitType)unittype->Get_Heap_ID();
+        count = this_ptr->UQuantity.Count_Of(unit);
+
+    }
+
+    /**
+     *  If no ownable base units were found, blow up the house.
+     */
+    if (!count) {
+        goto blowup_house;
+    }
+
+    /**
+     *  
+     */
+continue_function:
+    JMP_REG(eax, 0x004BCF6E);
+
+    /**
+     *  Blows up the house, marking the house as defeated.
+     */
+blowup_house:
+    JMP_REG(ecx, 0x004BCF60);
+}
 
 
 /**
@@ -91,5 +162,6 @@ return_true:
  */
 void HouseClassExtension_Hooks()
 {
-	Patch_Jump(0x004BBD26, &_HouseClass_Can_Build_BuildCheat_Patch);
+    Patch_Jump(0x004BBD26, &_HouseClass_Can_Build_BuildCheat_Patch);
+    Patch_Jump(0x004BCEE7, &_HouseClass_AI_Short_Game_BaseUnit_Patch);
 }

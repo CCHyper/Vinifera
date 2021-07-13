@@ -27,6 +27,8 @@
  ******************************************************************************/
 #include "rulesext.h"
 #include "rules.h"
+#include "ccini.h"
+#include "noinit.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -40,7 +42,9 @@ RulesClassExtension *RulesExtension = nullptr;
  *  @author: CCHyper
  */
 RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+
+    BaseUnit()
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -56,7 +60,9 @@ RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
  *  @author: CCHyper
  */
 RulesClassExtension::RulesClassExtension(const NoInitClass &noinit) :
-    Extension(noinit)
+    Extension(noinit),
+
+    BaseUnit(noinit)
 {
     IsInitialized = false;
 }
@@ -71,6 +77,8 @@ RulesClassExtension::~RulesClassExtension()
 {
     //DEV_DEBUG_TRACE("RulesClassExtension deconstructor - 0x%08X\n", (uintptr_t)(ThisPtr));
     //DEV_DEBUG_WARNING("RulesClassExtension deconstructor - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    BaseUnit.Clear();
 
     IsInitialized = false;
 }
@@ -93,6 +101,20 @@ HRESULT RulesClassExtension::Load(IStream *pStm)
 
     new (this) RulesClassExtension(NoInitClass());
 
+    int count;
+
+    /**
+     *  Clear vector lists.
+     */
+    BaseUnit.Clear();
+
+    pStm->Read(&count, sizeof(count), nullptr);
+    for (int i = 0; i < count; ++i) {
+        UnitTypeClass *ptr;
+        pStm->Read(&ptr, sizeof(ptr), nullptr);
+        BaseUnit.Add(ptr);
+    }
+
     return hr;
 }
 
@@ -110,6 +132,14 @@ HRESULT RulesClassExtension::Save(IStream *pStm, BOOL fClearDirty)
     HRESULT hr = Extension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
+    }
+
+    int count;
+
+    count = BaseUnit.Count();
+    pStm->Write(&count, sizeof(count), nullptr);
+    for (int i = 0; i < count; ++i) {
+        pStm->Write(&BaseUnit[i], sizeof(UnitTypeClass *), nullptr);
     }
 
     return hr;
@@ -166,6 +196,7 @@ void RulesClassExtension::Process(CCINIClass &ini)
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(ThisPtr));
 
+    General(ini);
 }
 
 
@@ -180,3 +211,28 @@ void RulesClassExtension::Initialize(CCINIClass &ini)
     //DEV_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(ThisPtr));
 
 }
+
+
+/**
+ *  Process the general main game rules.
+ *  
+ *  @author: CCHyper
+ */
+bool RulesClassExtension::General(CCINIClass &ini)
+{
+    static char const * const GENERAL = "General";
+
+    if (!ini.Is_Present(GENERAL)) {
+        return false;
+    }
+
+    /**
+     *  Reload the BaseUnit entry and store the value in the new class extension.
+     *  This allows us to expand the original BaseUnit logic without impacting
+     *  the original behaviour of BaseUnit.
+     */
+    BaseUnit = ini.Get_Units(GENERAL, "BaseUnit", BaseUnit);
+
+    return true;
+}
+
