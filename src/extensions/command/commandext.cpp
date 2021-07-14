@@ -63,6 +63,8 @@
 #include "wwcrc.h"
 #include "filepcx.h"
 #include "filepng.h"
+#include "mapedit.h"
+#include "mapedit_functions.h"
 #include "fatal.h"
 #include "minidump.h"
 #include "winutil.h"
@@ -75,6 +77,7 @@
  *  Handy defines for handling any adjustments.
  */
 #define CATEGORY_DEVELOPER "Developer"
+#define CATEGORY_EDITOR "Scenario Editor"
 
 
 /**
