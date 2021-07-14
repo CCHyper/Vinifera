@@ -102,6 +102,8 @@
 
 #include "skirmishdlg_hooks.h"
 
+#include "mapedit_hooks.h"
+
 #include "hooker.h"
 #include "hooker_macros.h"
 
@@ -194,4 +196,6 @@ void Extension_Hooks()
      *  Dialogs and associated code.
      */
     SkirmishDialog_Hooks();
+
+    MapEditor_Hooks();
 }

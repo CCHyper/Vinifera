@@ -400,6 +400,44 @@ static void Process_Vinifera_Hotkeys()
             HotkeyIndex.Add_Index(key, cmdptr);
         }
     }
+
+    if (Vinifera_DeveloperMode) {
+        if (!ini.Is_Present("Hotkey", "ToggleScenarioEditor")) {
+            cmdptr = CommandClass::From_Name("ToggleScenarioEditor");
+            if (cmdptr) {
+                key = reinterpret_cast<ViniferaCommandClass *>(cmdptr)->Default_Key();
+                HotkeyIndex.Add_Index(key, cmdptr);
+            }
+        }
+        if (!ini.Is_Present("Hotkey", "EditorToggleMarbleMadness")) {
+            cmdptr = CommandClass::From_Name("ToggleScenarioEditor");
+            if (cmdptr) {
+                key = reinterpret_cast<ViniferaCommandClass *>(cmdptr)->Default_Key();
+                HotkeyIndex.Add_Index(key, cmdptr);
+            }
+        }
+        if (!ini.Is_Present("Hotkey", "EditorRaiseCell")) {
+            cmdptr = CommandClass::From_Name("ToggleScenarioEditor");
+            if (cmdptr) {
+                key = reinterpret_cast<ViniferaCommandClass *>(cmdptr)->Default_Key();
+                HotkeyIndex.Add_Index(key, cmdptr);
+            }
+        }
+        if (!ini.Is_Present("Hotkey", "EditorLowerCell")) {
+            cmdptr = CommandClass::From_Name("ToggleScenarioEditor");
+            if (cmdptr) {
+                key = reinterpret_cast<ViniferaCommandClass *>(cmdptr)->Default_Key();
+                HotkeyIndex.Add_Index(key, cmdptr);
+            }
+        }
+        if (!ini.Is_Present("Hotkey", "EditorEnterPlacement")) {
+            cmdptr = CommandClass::From_Name("EditorEnterPlacement");
+            if (cmdptr) {
+                key = reinterpret_cast<ViniferaCommandClass *>(cmdptr)->Default_Key();
+                HotkeyIndex.Add_Index(key, cmdptr);
+            }
+        }
+    }
 }
 
 /**

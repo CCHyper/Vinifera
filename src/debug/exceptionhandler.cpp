@@ -39,6 +39,7 @@
 #include "textfile.h"
 #include "debughlp.h"
 #include "wwmouse.h"
+#include "mapedit.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include "resource.h"
@@ -656,6 +657,20 @@ static INT_PTR CALLBACK Exception_Dialog_Proc(HWND hDlg, UINT uMsg, WPARAM wPara
             switch (wParam) {
                 case 1149: // Emergency save button
                     if (Debug_Map) {
+
+                        /**
+                         *  Save scenario.
+                         */
+                        if (MapEditClass::Save_Scenario(true)) {
+                            MessageBox(hDlg,
+                                "Scenario saved successfully!",
+                                "Tiberian Sun",  MB_OK|MB_ICONEXCLAMATION);
+                        } else {
+                            MessageBox(hDlg,
+                                "Failed to emergency save scenario, sorry!",
+                                "Tiberian Sun",  MB_OK|MB_ICONEXCLAMATION);
+                        }
+
                         EndDialog(hDlg, 1149);
                         result = TRUE;
                     } else {

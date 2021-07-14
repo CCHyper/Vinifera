@@ -41,10 +41,18 @@
 #include "session.h"
 #include "colorscheme.h"
 #include "voc.h"
+#include "iomap.h"
+#include "cell.h"
+#include "tag.h"
+#include "tagtype.h"
+#include "object.h"
+#include "foot.h"
+#include "waypoint.h"
 #include "fatal.h"
 #include "vinifera_globals.h"
 #include "vinifera_util.h"
 #include "vinifera_gitinfo.h"
+#include "mapedit.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <timeapi.h>
@@ -409,6 +417,777 @@ static void Tactical_Draw_FrameStep_Overlay()
 }
 
 
+static void Tactical_Editor_Draw_Occupiers()
+{
+    unsigned color_white = DSurface::RGBA_To_Pixel(255, 255, 255);
+
+    ColorScheme *text_color = ColorScheme::As_Pointer("White");
+}
+
+
+static void Tactical_Editor_Draw_CellTags()
+{
+    unsigned color_dark_blue = DSurface::RGBA_To_Pixel(0, 0, 128);
+    unsigned color_dark_red = DSurface::RGBA_To_Pixel(128, 0, 0);
+    unsigned color_white = DSurface::RGBA_To_Pixel(255, 255, 255);
+
+    ColorScheme *text_color = ColorScheme::As_Pointer("White");
+
+    /**
+     *  Reset the cell iterator.
+     */
+    Map.Iterator_Reset();
+
+    /**
+     *  Iterate over all the map cells.
+     */
+    for (CellClass *cell = Map.Iterator_Next_Cell(); cell != nullptr; cell = Map.Iterator_Next_Cell()) {
+
+        Rect cellrect = cell->Get_Rect();
+
+        /**
+         *  Determine if the cell draw rect is within the viewport.
+         */
+        Rect intersect = Intersect(cellrect, TacticalRect);
+        if (intersect.Is_Valid()) {
+
+            /**
+             *  Get the center point of the cell.
+             */
+            Point2D cell_center;
+            //cell_center.X = cellrect.X + CELL_PIXEL_W/2;
+            //cell_center.Y = cellrect.Y + CELL_PIXEL_H/2;
+            cell_center.X = cellrect.X + cellrect.Width/2;
+            cell_center.Y = cellrect.Y + cellrect.Height/2;
+
+            /**
+             *  Draw the cell tag marker.
+             */
+            if (cell->CellTag) {
+
+                const char *string = cell->CellTag->Class_Of()->Full_Name();
+
+                /**
+                 *  Fetch the text occupy rect.
+                 */
+                Rect text_rect;
+                EditorFont->String_Pixel_Rect(string, &text_rect);
+
+                /**
+                 *  Move into position.
+                 */
+                text_rect.X = cell_center.X;
+                text_rect.Y = (cell_center.Y-text_rect.Height)-33;
+                text_rect.Width += 4;
+                text_rect.Height += 2;
+
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, color_dark_red);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print(string,
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1), text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW));
+
+            } else {
+
+                /**
+                 *  This is a workaround for objects on the high bridges, which use the alternative occupier ptr.
+                 */
+                ObjectClass *occupier = cell->OccupierPtr;
+                if (cell->field_74) {
+                    occupier = cell->field_74;
+                }
+
+                /**
+                 *  If the cell has an occupier, draw its attached tag marker.
+                 */
+                if (occupier && occupier->Tag) {
+
+                    const char *string = occupier->Tag->Class_Of()->Full_Name();
+
+#if 0
+                    /**
+                     *  Fixup the position based on its current coord (as infantry have sub cell locations).
+                     */
+                    if (occupier->What_Am_I() == RTTI_INFANTRY) { 
+                        Rect object_rect = occupier->entry_118();
+                        cell_center.X = object_rect.X + object_rect.Width/2;
+                        cell_center.Y = object_rect.Y + object_rect.Height/2;
+                    }
+#endif
+
+                    /**
+                     *  Fetch the text occupy rect.
+                     */
+                    Rect text_rect;
+                    EditorFont->String_Pixel_Rect(string, &text_rect);
+
+                    /**
+                     *  Move into position.
+                     */
+                    text_rect.X = cell_center.X+10;
+                    text_rect.Y = (cell_center.Y-text_rect.Height)-33;
+                    text_rect.Width += 4;
+                    text_rect.Height += 2;
+
+                    /**
+                     *  Draw the arrow.
+                     */
+                    TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                    TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                    TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, cell_center.Y-11), color_white);
+                    TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y-11), Point2D(cell_center.X+11, cell_center.Y-22), color_white);
+                    TempSurface->Draw_Line(Point2D(cell_center.X+10, cell_center.Y- 22), Point2D(cell_center.X+10, text_rect.Y), color_white);
+
+                    /**
+                     *  Draw the text tooltip.
+                     */
+                    TempSurface->Fill_Rect(text_rect, color_dark_blue);
+                    TempSurface->Draw_Rect(text_rect, color_white);
+                    Fancy_Text_Print(string,
+                        TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1), text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW));
+                }
+
+            }
+
+        }
+    }
+}
+
+
+static void Tactical_Editor_Draw_Waypoints()
+{
+    unsigned color_dark_green = DSurface::RGBA_To_Pixel(0, 128, 0);
+    unsigned color_white = DSurface::RGBA_To_Pixel(255, 255, 255);
+    unsigned color_black = DSurface::RGBA_To_Pixel(0, 0, 0);
+
+    ColorScheme *text_color = ColorScheme::As_Pointer("White");
+
+    /**
+     *  Reset the cell iterator.
+     */
+    Map.Iterator_Reset();
+
+    /**
+      *  Draw the waypoint markers.
+    */
+    for (int index = 0; index < WAYPT_COUNT; ++index) {
+
+        /**
+         *  Fetch cell pointer for this waypoint if it exits.
+         */
+        CellClass *cell = Scen->Get_Waypoint_Cell(index);
+        if (cell->IsWaypoint) {
+
+            Rect cellrect = cell->Get_Rect();
+
+            /**
+             *  Get the center point of the cell.
+             */
+            Point2D cell_center;
+            //cell_center.X = cellrect.X + CELL_PIXEL_W/2;
+            //cell_center.Y = cellrect.Y + CELL_PIXEL_H/2;
+            cell_center.X = cellrect.X + cellrect.Width/2;
+            cell_center.Y = cellrect.Y + cellrect.Height/2;
+
+            /**
+             *  Determine if the cell draw rect is within the viewport.
+             */
+            Rect intersect = Intersect(cellrect, TacticalRect);
+            if (intersect.Is_Valid()) {
+
+                const char *string = Waypoint_As_String(index);
+
+                /**
+                 *  Fetch the text occupy rect.
+                 */
+                Rect text_rect;
+                EditorFont->String_Pixel_Rect(string, &text_rect);
+
+                /**
+                 *  Move into position.
+                 */
+                text_rect.X = cell_center.X;
+                text_rect.Y = (cell_center.Y-text_rect.Height)-21;
+                text_rect.Width += 4;
+                text_rect.Height += 2;
+
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                unsigned rect_color = color_black;
+
+                /**
+                 *  Give special waypoints a different colour.
+                 */
+                if (index == WAYPT_HOME || index == WAYPT_REINF || index == WAYPT_SPECIAL) {
+                    rect_color = color_dark_green;
+                }
+
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print(string,
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1), text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW));
+            }
+        }
+    }
+}
+
+
+static void Tactical_Editor_Draw_Current_Cell()
+{
+    unsigned color_yellow = DSurface::RGBA_To_Pixel(255, 255, 0);
+
+    ColorScheme *text_color = ColorScheme::As_Pointer("White");
+
+    unsigned r;
+    unsigned g;
+    unsigned b;
+    unsigned w;
+    unsigned x;
+
+    /**
+     *  Colours taken from CELLSEL.SHP, each entry matches a cell level.
+     */
+    static unsigned _CellLevelColors[16];
+    static bool _onetime = false;
+
+    if (!_onetime) {
+        _CellLevelColors[0] = DSurface::RGBA_To_Pixel(255, 255, 255);  // 0
+        _CellLevelColors[1] = DSurface::RGBA_To_Pixel(170, 0, 170);    // 1
+        _CellLevelColors[2] = DSurface::RGBA_To_Pixel(0, 170, 170);    // 2
+        _CellLevelColors[3] = DSurface::RGBA_To_Pixel(0, 170, 0);      // 3
+        _CellLevelColors[4] = DSurface::RGBA_To_Pixel(89, 255, 85);    // 4
+        _CellLevelColors[5] = DSurface::RGBA_To_Pixel(255, 255, 85);   // 5
+        _CellLevelColors[6] = DSurface::RGBA_To_Pixel(255, 85, 85);    // 6
+        _CellLevelColors[7] = DSurface::RGBA_To_Pixel(170, 85, 0);     // 7
+        _CellLevelColors[8] = DSurface::RGBA_To_Pixel(170, 0, 0);      // 8
+        _CellLevelColors[9] = DSurface::RGBA_To_Pixel(85, 255, 255);   // 9
+        _CellLevelColors[10] = DSurface::RGBA_To_Pixel(80, 80, 255);   // 10
+        _CellLevelColors[11] = DSurface::RGBA_To_Pixel(0, 0, 170);     // 11
+        _CellLevelColors[12] = DSurface::RGBA_To_Pixel(0, 0, 0);       // 12
+        _CellLevelColors[13] = DSurface::RGBA_To_Pixel(85, 85, 85);    // 13
+        _CellLevelColors[14] = DSurface::RGBA_To_Pixel(170, 170, 170); // 14
+        _CellLevelColors[15] = DSurface::RGBA_To_Pixel(255, 255, 255); // 15
+
+        r = DSurface::RGBA_To_Pixel(255, 0, 0);
+        g = DSurface::RGBA_To_Pixel(0, 255, 0);
+        b = DSurface::RGBA_To_Pixel(0, 0, 255);
+        w = DSurface::RGBA_To_Pixel(255, 255, 255);
+        x = DSurface::RGBA_To_Pixel(255, 255, 0);
+    }
+
+    if (!MapEditClass::CurrentCell) {
+        return;
+    }
+
+    CellClass *cellptr = &Map[MapEditClass::CurrentCell];
+    if (!cellptr) {
+        return;
+    }
+
+    Rect cellrect = cellptr->Get_Rect();
+
+    /**
+     *  Get the center point of the cell.
+     */
+    Point2D cell_center;
+    //cell_center.X = cellrect.X + CELL_PIXEL_W/2;
+    //cell_center.Y = cellrect.Y + CELL_PIXEL_H/2;
+    cell_center.X = cellrect.X + cellrect.Width/2;
+    cell_center.Y = cellrect.Y + cellrect.Height/2;
+
+    /**
+     *  Determine if the cell draw rect is within the viewport.
+     */
+    Rect intersect = Intersect(cellrect, TacticalRect);
+    if (!intersect.Is_Valid()) {
+        return;
+    }
+
+
+    /**
+     *  Fetch the highlight color based on cell height.
+     */
+    unsigned color = _CellLevelColors[cellptr->Level];
+
+    /**
+     *  Draw the cell selection.
+     */
+    switch (cellptr->field_94) {
+    
+        default:
+            break;
+    
+        /**
+         *  No ramp is a flat tile.
+         */
+        case RAMP_NONE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, CELL_PIXEL_H/2),              Point2D(CELL_PIXEL_H, 0),                color);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), color);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, CELL_PIXEL_H),     color);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H),     Point2D(0, (CELL_PIXEL_H/2)),            color);
+            break;
+    
+        case RAMP_WEST:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),            Point2D(CELL_PIXEL_H, 0),                color);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                Point2D(CELL_PIXEL_W, 0),                color);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),                Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)), color);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)), Point2D(0, (CELL_PIXEL_H/2)),            color);
+            break;
+    
+        case RAMP_NORTH:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                           Point2D(CELL_PIXEL_H, 0),                r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, 12),               b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)), Point2D(0, 0),                           w);
+            break;
+    
+        case RAMP_EAST:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                            Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  Point2D(CELL_PIXEL_H, CELL_PIXEL_H),      b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H),      Point2D(0, 0),                            w);
+            break;
+    
+        case RAMP_SOUTH:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, 0),                 g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),                 Point2D(CELL_PIXEL_H, CELL_PIXEL_H),      b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H),      Point2D(0, (CELL_PIXEL_H/2)),             w);
+            break;
+    
+        case RAMP_CORNER_NW:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),            Point2D(CELL_PIXEL_H, 0),                r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), Point2D(0, (CELL_PIXEL_H/2)),            b);
+            break;
+    
+        case RAMP_CORNER_NE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                           Point2D(CELL_PIXEL_H, 0),                r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, CELL_PIXEL_H),     b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H),     Point2D(0, 0),                           w);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                Point2D(CELL_PIXEL_H, CELL_PIXEL_H),     x);
+            break;
+    
+        case RAMP_CORNER_SE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  Point2D(CELL_PIXEL_H, CELL_PIXEL_H),      b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H),      Point2D(0, (CELL_PIXEL_H/2)),             w);
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  x);
+            break;
+    
+        case RAMP_CORNER_SW:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),        Point2D(CELL_PIXEL_H, 0),            r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),            Point2D(CELL_PIXEL_W, 0),            g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),            Point2D(CELL_PIXEL_H, CELL_PIXEL_H), b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H), Point2D(0, (CELL_PIXEL_H/2)),        w);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),            Point2D(CELL_PIXEL_H, CELL_PIXEL_H), x);
+            break;
+    
+        case RAMP_MID_NW:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                           Point2D(CELL_PIXEL_W, 0),                r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),                Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)), Point2D(0, 0),                           b);
+            break;
+    
+        case RAMP_MID_NE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                            Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  Point2D(0, 0),                            w);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  x);
+            break;
+    
+        case RAMP_MID_SE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)),  r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)),  Point2D(CELL_PIXEL_W, 0),                  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),                  Point2D(CELL_PIXEL_H, CELL_PIXEL_H),       b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H),       Point2D(0, 0),                             w);
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                             Point2D(CELL_PIXEL_W, 0),                  x);
+            break;
+    
+        case RAMP_MID_SW:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, 0),                 g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),                 Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  Point2D(0, (CELL_PIXEL_H/2)),             w);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  x);
+            break;
+    
+        case RAMP_STEEP_SE:
+            /**
+             *  PLACEHOLDER:
+             *  This tile is normally only 3 pixels graphically.
+             */
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),               Point2D(CELL_PIXEL_H, 0),                r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),                   Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)-1),  Point2D(CELL_PIXEL_H, (CELL_PIXEL_H-1)), b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H-1)),    Point2D(0, (CELL_PIXEL_H/2)-1),          w);
+            break;
+    
+        case RAMP_STEEP_SW:
+            TempSurface->Draw_Line(cellrect, Point2D(0, -(CELL_PIXEL_H/2)),            Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  Point2D(0, -(CELL_PIXEL_H/2)),            w);
+            break;
+    
+        case RAMP_STEEP_NW:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                                      Point2D(CELL_PIXEL_H, 0 - CELL_PIXEL_H),            r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0 - CELL_PIXEL_H),            Point2D(CELL_PIXEL_W, 0),                           g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),                           Point2D(CELL_PIXEL_H, CELL_PIXEL_W - CELL_PIXEL_H), b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_W - CELL_PIXEL_H), Point2D(0, 0),                                      w);
+            break;
+    
+        case RAMP_STEEP_NE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, -(CELL_PIXEL_H/2)), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  Point2D(0, (CELL_PIXEL_H/2)),             w);
+            break;
+    
+        case RAMP_DOUBLE_UP_SW_NE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                       Point2D(CELL_PIXEL_W, 0),            r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),            Point2D(CELL_PIXEL_H, CELL_PIXEL_H), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H), Point2D(0, 0),                       b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, 0),            Point2D(CELL_PIXEL_H, CELL_PIXEL_H), w);
+            break;
+    
+        case RAMP_DOUBLE_DOWN_SW_NE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  Point2D(0, (CELL_PIXEL_H/2)),             b);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_H, (CELL_PIXEL_H/2)),  w);
+            break;
+    
+        case RAMP_DOUBLE_UP_NW_SE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, 0),                       Point2D(CELL_PIXEL_W, 0),            r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, 0),            Point2D(CELL_PIXEL_H, CELL_PIXEL_H), g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, CELL_PIXEL_H), Point2D(0, 0),                       b);
+            break;
+    
+        case RAMP_DOUBLE_DOWN_NW_SE:
+            TempSurface->Draw_Line(cellrect, Point2D(0, (CELL_PIXEL_H/2)),             Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), r);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_H, -(CELL_PIXEL_H/2)), Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  g);
+            TempSurface->Draw_Line(cellrect, Point2D(CELL_PIXEL_W, (CELL_PIXEL_H/2)),  Point2D(0, (CELL_PIXEL_H/2)),             b);
+            break;
+    
+    };
+}
+
+
+static void Tactical_Editor_Draw_Text()
+{
+    RGBClass rgb_black(0,0,0);
+    unsigned color_black = DSurface::RGBA_To_Pixel(0, 0, 0);
+    ColorScheme *text_color = ColorScheme::As_Pointer("White");
+
+    Rect text_rect;
+    Rect fill_rect;
+
+    char buffer[128];
+
+{
+    std::snprintf(buffer, sizeof(buffer), "Tiberium = %d", Map.TotalValue);
+
+    /**
+     *  Fetch the text occupy area.
+     */
+    GradFont6Ptr->String_Pixel_Rect(buffer, &text_rect);
+
+    /**
+     *  Fill the background area.
+     */
+    fill_rect.X = TacticalRect.X;
+    fill_rect.Y = TacticalRect.Y;
+    fill_rect.Width = text_rect.Width+4;
+    fill_rect.Height = 16;
+    CompositeSurface->Fill_Rect(fill_rect, color_black);
+
+    /**
+     *  Move rects into position.
+     */
+    text_rect.X = TacticalRect.X;
+    text_rect.Y = fill_rect.Y;
+    text_rect.Width += 2;
+    text_rect.Height += 3;
+
+    /**
+     *  Display the total value of all Tiberium on the map.
+     */
+    Fancy_Text_Print(buffer, CompositeSurface, &CompositeSurface->Get_Rect(),
+        &Point2D(text_rect.X, text_rect.Y), text_color, COLOR_BLACK, TextPrintType(TPF_6PT_GRAD|TPF_NOSHADOW));
+}
+
+{
+    std::snprintf(buffer, sizeof(buffer), "Percent = %d", Scen->Percent);
+
+    /**
+     * Fetch the text occupy area.
+     */
+    GradFont6Ptr->String_Pixel_Rect(buffer, &text_rect);
+
+    /**
+     *  Fill the background area.
+     */
+    fill_rect.X = TacticalRect.X+TacticalRect.Width-text_rect.Width   -160   -2;
+    fill_rect.Y = TacticalRect.Y;
+    fill_rect.Width = text_rect.Width+4;
+    fill_rect.Height = 16;
+    CompositeSurface->Fill_Rect(fill_rect, color_black);
+
+    /**
+     *  Move rects into position.
+     */
+    text_rect.X = TacticalRect.X+TacticalRect.Width-text_rect.Width   -160   -1;
+    text_rect.Y = fill_rect.Y;
+    text_rect.Width += 2;
+    text_rect.Height += 3;
+
+    /**
+     *  Display the total value of all Tiberium on the map.
+     */
+    Fancy_Text_Print(buffer, CompositeSurface, &CompositeSurface->Get_Rect(),
+        &Point2D(text_rect.X, text_rect.Y), text_color, COLOR_BLACK, TextPrintType(TPF_6PT_GRAD|TPF_NOSHADOW));
+}
+
+
+
+    /*
+    **    Update the text labels
+    */
+    if (CurrentObjects.Count()) {
+
+#if 0
+        /*
+        **    Display the object's name & ID
+        */
+        label = Text_String(CurrentObjects.Fetch_Head()->Full_Name());
+        sprintf(buf, "%s (%d)", label, CurrentObjects.Fetch_Head()->As_Target());
+
+        /*
+        **    print the label
+        */
+        Fancy_Text_Print(buf, 160, 0,
+            &ColorRemaps[PCOLOR_BROWN], TBLACK,
+            TPF_CENTER | TPF_NOSHADOW | TPF_EFNT);
+#endif
+    }
+
+}
+
+
+static void Tactical_Editor_Draw_Help()
+{
+    RGBClass rgb_black(0,0,0);
+    unsigned color_black = DSurface::RGBA_To_Pixel(0, 0, 0);
+    unsigned color_red = DSurface::RGBA_To_Pixel(255, 0, 0);
+    unsigned color_green = DSurface::RGBA_To_Pixel(0, 255, 0);
+    unsigned color_blue = DSurface::RGBA_To_Pixel(0, 0, 255);
+    ColorScheme *text_color = ColorScheme::As_Pointer("White");
+
+    Rect text_rect;
+    Rect fill_rect;
+
+    char buffer[128];
+
+    Rect help_background_rect(32, 32, 350, 350);
+    Point2D help_text_pos(help_background_rect.X+4, help_background_rect.Y+4);
+    TextPrintType help_style = TextPrintType(TPF_8POINT|TPF_DROPSHADOW);
+
+
+
+
+
+
+
+
+
+
+
+
+    Point2D screen_center(CompositeSurface->Width/2, CompositeSurface->Height/2);
+    Rect comp_rect = CompositeSurface->Get_Rect();
+    
+    // works
+    //CompositeSurface->Draw_Triangle(comp_rect,
+    //    Point2D(500,100), Point2D(700,150), Point2D(175,250), color_black);
+    
+    // 
+    CompositeSurface->Fill_Triangle(comp_rect,
+        Point2D(500,100), Point2D(700,100), Point2D(600,250), color_black);
+    CompositeSurface->Draw_Circle(Point2D(500,100), 15, comp_rect, color_red);
+    CompositeSurface->Draw_Circle(Point2D(700,100), 15, comp_rect, color_green);
+    CompositeSurface->Draw_Circle(Point2D(600,250), 15, comp_rect, color_blue);
+
+    CompositeSurface->Fill_Triangle(comp_rect,
+        Point2D(500,500), Point2D(700,500), Point2D(600,450), color_black);
+    CompositeSurface->Draw_Circle(Point2D(500,500), 15, comp_rect, color_red);
+    CompositeSurface->Draw_Circle(Point2D(700,500), 15, comp_rect, color_green);
+    CompositeSurface->Draw_Circle(Point2D(600,450), 15, comp_rect, color_blue);
+
+    // doesnt work
+    //CompositeSurface->Fill_Triangle_Trans(comp_rect,
+    //    Point2D(500,100), Point2D(700,150), Point2D(175,250), color_black, 50);
+    
+    // works
+    //CompositeSurface->Draw_Quad(comp_rect,
+    //    Point2D(500,100), Point2D(700,150),
+    //    Point2D(750,200), Point2D(600,300),
+    //    color_black);
+    
+    // doesnt work
+    //CompositeSurface->Fill_Quad(comp_rect,
+    //    Point2D(500,100), Point2D(700,150),
+    //    Point2D(750,200), Point2D(600,300),
+    //    color_black);
+
+    // 
+    //CompositeSurface->Fill_Quad_Trans();
+
+    // works
+    //CompositeSurface->Draw_Circle(screen_center,
+    //    75, comp_rect, color_black);
+    
+    // works
+    //CompositeSurface->Fill_Circle(screen_center,
+    //    75, comp_rect, color_black);
+
+    // doesnt work
+    //CompositeSurface->Fill_Circle_Trans(screen_center,
+    //    75, comp_rect, color_black, 50);
+    
+    // doesnt work
+    //RGBClass rnd_rgb(Random_Pick(0,255),Random_Pick(0,255),Random_Pick(0,255));
+    //CompositeSurface->Put_Pixel_Trans(Point2D(500,500), rnd_rgb, Random_Pick(25,100));
+
+
+
+
+
+
+
+
+
+
+    
+    /**
+     *  Fetch the text occupy area.
+     */
+    Font_Ptr(help_style)->String_Pixel_Rect("X", &text_rect);
+    
+    /**
+     *  Draw the background rect.
+     */
+    CompositeSurface->Fill_Rect_Trans(help_background_rect, rgb_black, 50);
+    
+    /**
+     *  Draw the key descriptions.
+     */
+    Fancy_Text_Print("Scenario Editor Shortcuts:", CompositeSurface, &CompositeSurface->Get_Rect(),
+        &help_text_pos, text_color, COLOR_TBLACK, help_style,
+        "Toggle the help text display.");
+    
+    help_text_pos.Y += text_rect.Height*2;
+    
+    /**
+     *  Draw the key descriptions.
+     */
+    Fancy_Text_Print("F1       : %s", CompositeSurface, &CompositeSurface->Get_Rect(),
+        &help_text_pos, text_color, COLOR_TBLACK, help_style,
+        "Toggle the help text display.");
+    
+    //help_text_pos.Y += text_rect.Height+2;
+    //Fancy_Text_Print("F2       : %s", CompositeSurface, &CompositeSurface->Get_Rect(),
+    //    &help_text_pos, text_color, COLOR_TBLACK, help_style,
+    //    ".");
+    
+    help_text_pos.Y += text_rect.Height+2;
+    Fancy_Text_Print("F3       : %s", CompositeSurface, &CompositeSurface->Get_Rect(),
+        &help_text_pos, text_color, COLOR_TBLACK, help_style,
+        "Toggle cell occupier display.");
+    
+    help_text_pos.Y += text_rect.Height+2;
+    Fancy_Text_Print("F4       : %s", CompositeSurface, &CompositeSurface->Get_Rect(),
+        &help_text_pos, text_color, COLOR_TBLACK, help_style,
+        "Toggle cell waypoint display.");
+    
+    help_text_pos.Y += text_rect.Height+2;
+    Fancy_Text_Print("F5       : %s", CompositeSurface, &CompositeSurface->Get_Rect(),
+        &help_text_pos, text_color, COLOR_TBLACK, help_style,
+        "Toggle cell tag display.");
+    
+    help_text_pos.Y += text_rect.Height+2;
+    Fancy_Text_Print("F6       : %s", CompositeSurface, &CompositeSurface->Get_Rect(),
+        &help_text_pos, text_color, COLOR_TBLACK, help_style,
+        "Toggle passable/impassable display.");
+    
+    help_text_pos.Y += text_rect.Height+2;
+    Fancy_Text_Print("ESC      : %s", CompositeSurface, &CompositeSurface->Get_Rect(),
+        &help_text_pos, text_color, COLOR_TBLACK, help_style,
+        "Exit placement mode or exit to desktop.");
+    
+    help_text_pos.Y += text_rect.Height+2;
+    Fancy_Text_Print("DELETE   : %s", CompositeSurface, &CompositeSurface->Get_Rect(),
+        &help_text_pos, text_color, COLOR_TBLACK, help_style,
+        "Delete currently-selected object.");
+    
+    help_text_pos.Y += text_rect.Height+2;
+    Fancy_Text_Print("M        : %s", CompositeSurface, &CompositeSurface->Get_Rect(),
+        &help_text_pos, text_color, COLOR_TBLACK, help_style,
+        "Toggle \"marble madness\" mode.");
+}
+
+
+/**
+ *  Draw any overlay for the scenario editor.
+ *  
+ *  @author: CCHyper
+ */
+static void Tactical_Editor_Draw_Overlay()
+{
+    if (MapEditClass::IsShowOccupiers) {
+        Tactical_Editor_Draw_Occupiers();
+    }
+    if (MapEditClass::IsShowCellTags) {
+        Tactical_Editor_Draw_CellTags();
+    }
+    if (MapEditClass::IsShowWaypoints) {
+        Tactical_Editor_Draw_Waypoints();
+    }
+    if (MapEditClass::CurrentCell) {
+        Tactical_Editor_Draw_Current_Cell();
+    }
+
+    /**
+     *  Draw the help overlay if enabled.
+     */
+    if (MapEditClass::IsShowHelp) {
+        Tactical_Editor_Draw_Help();
+    }
+
+    Tactical_Editor_Draw_Text();
+}
+
+
 /**
  *  Draw the overlay information text if set.
  * 
@@ -550,6 +1329,13 @@ DECLARE_PATCH(_Tactical_Render_Patch)
     GET_REGISTER_STATIC(Tactical *, this_ptr, ebp);
 
     /**
+     *  If the scenario editor mode is active, draw overlays.
+     */
+    if (Debug_Map) {
+        Tactical_Editor_Draw_Overlay();
+    }
+
+    /**
      *  If the developer mode is active, draw the developer overlay.
      */
     if (Vinifera_DeveloperMode) {
@@ -558,6 +1344,7 @@ DECLARE_PATCH(_Tactical_Render_Patch)
         if (Vinifera_Developer_FrameStep) {
             Tactical_Draw_FrameStep_Overlay();
         }
+
     }
 
 #ifndef NDEBUG

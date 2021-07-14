@@ -31,6 +31,7 @@
 #include "cncnet4.h"
 #include "cncnet4_globals.h"
 #include "cncnet5_globals.h"
+#include "tibsun_globals.h"
 #include "rulesext.h"
 #include "ccfile.h"
 #include "cd.h"
@@ -82,6 +83,28 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
         if (stricmp(string, "-DEVELOPER") == 0) {
             DEBUG_INFO("  - Developer mode enabled.\n");
             Vinifera_DeveloperMode = true;
+            continue;
+        }
+
+        /**
+         *  Scenario editor mode.
+         */
+        if (stricmp(string, "-EDITOR") == 0) {
+            DEBUG_INFO("  - Scenario editor mode enabled.\n");
+            Debug_Map = true;
+            continue;
+        }
+
+        /**
+         *  Set the scenario name to load into the editor.
+         */
+        if (std::strstr(string, "-SCENARIO")) {
+            char *str = std::strstr(string, "=");
+            if (str) {
+                std::strncpy(Debug_ScenarioFilename, &str[1], 128);
+                Debug_ScenarioFilenameSet = true;
+                DEBUG_INFO("  - Editor scenario \"%s\".\n", Debug_ScenarioFilename);
+            }
             continue;
         }
 
@@ -193,6 +216,31 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
      */
     if (menu_skip) {
         Vinifera_SkipStartupMovies = true;
+    }
+
+    /**
+     *  
+     */
+    if (Debug_Map) {
+
+        Vinifera_SkipStartupMovies = true;
+        Vinifera_DeveloperMode = true;
+        Debug_Unshroud = true;
+
+        /**
+         *  
+         */
+        if (!Debug_ScenarioFilenameSet) {
+            std::strncpy(Debug_ScenarioFilename, "GDI1A.MAP", 128);
+            Debug_ScenarioFilenameSet = true;
+            DEBUG_INFO("  - Editor scenario \"%s\".\n", Debug_ScenarioFilename);
+        }
+
+        if (!Debug_ScenarioFilenameSet) {
+            Debug_Map = false;
+            Debug_Unshroud = false;
+            Vinifera_DeveloperMode = false;
+        }
     }
 
     return true;
