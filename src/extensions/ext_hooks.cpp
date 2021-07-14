@@ -111,6 +111,8 @@
 
 #include "cciniext_hooks.h"
 
+#include "theatertype_hooks.h"
+
 #include "fetchres_hooks.h"
 
 #include "skirmishdlg_hooks.h"
@@ -215,6 +217,8 @@ void Extension_Hooks()
     MultiMissionExtension_Hooks();
 
     CCINIClassExtension_Hooks();
+
+    TheaterTypeClassExtension_Hooks();
 
     FetchRes_Hooks();
 
