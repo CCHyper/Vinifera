@@ -29,6 +29,7 @@
 
 #include "extension.h"
 #include "container.h"
+#include "tpoint.h"
 
 
 class BuildingTypeClass;
@@ -61,6 +62,13 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
          *  This is the sound effect to play when the animation of the gate is lowering.
          */
         VocType GateDownSound;
+
+        /**
+         *  ?
+         */
+        TPoint3D<int> FreeUnitCoordinate;
+        FacingType FreeUnitDir;
+        MissionType FreeUnitMission;
 };
 
 

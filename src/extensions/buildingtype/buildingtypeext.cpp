@@ -29,6 +29,7 @@
 #include "buildingtype.h"
 #include "tibsun_defines.h"
 #include "ccini.h"
+#include "mission.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -48,7 +49,10 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(BuildingTypeClass *this_p
     Extension(this_ptr),
 
     GateUpSound(VOC_NONE),
-    GateDownSound(VOC_NONE)
+    GateDownSound(VOC_NONE),
+    FreeUnitCoordinate(0,0,0),
+    FreeUnitDir(FACING_W),
+    FreeUnitMission(MISSION_GUARD)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("BuildingTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -179,13 +183,19 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
         return false;
     }
 
-    /**
-     *  #issue-65
-     * 
-     *  Gate lowering and rising sound overrides for buildings.
-     */
     GateUpSound = ini.Get_VocType(ini_name, "GateUpSound", GateUpSound);
     GateDownSound = ini.Get_VocType(ini_name, "GateDownSound", GateDownSound);
+
+    FreeUnitCoordinate = ini.Get_Point(ini_name, "FreeUnitCoord", FreeUnitCoordinate);
+    FreeUnitDir = std::clamp((FacingType)ini.Get_Int(ini_name, "FreeUnitDir", FreeUnitDir), FACING_FIRST, FACING_COUNT-1);
+    
+    char mission_buffer[32];
+    ini.Get_String(ini_name, "FreeUnitMission", mission_buffer, sizeof(mission_buffer));
+
+    MissionType mission = MissionClass::Mission_From_Name(mission_buffer);
+    if (mission != MISSION_NONE) {
+        FreeUnitMission = mission;
+    }
     
     return true;
 }

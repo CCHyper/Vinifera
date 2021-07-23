@@ -31,6 +31,7 @@
 #include "building.h"
 #include "buildingtype.h"
 #include "buildingtypeext.h"
+#include "buildingext_functions.h"
 #include "technotype.h"
 #include "technotypeext.h"
 #include "dsurface.h"
@@ -45,6 +46,29 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  #issue-509
+ * 
+ *  
+ * 
+ *  @note: This patch completly replaces the "free unit" logic in
+ *         Grand_Opening() with our own!
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_Grand_Opening_FreeUnit_Patch)
+{
+    GET_REGISTER_STATIC(BuildingClass *, this_ptr, esi);
+
+    /**
+     *  This call
+     */
+    Building_FreeUnit(this_ptr);
+
+    JMP_REG(ecx, 0x0042E909);
+}
 
 
 /**
@@ -273,4 +297,5 @@ void BuildingClassExtension_Hooks()
     Patch_Jump(0x0042B250, &_BuildingClass_Explode_ShakeScreen_Division_BugFix_Patch);
     Patch_Jump(0x00433BB5, &_BuildingClass_Mission_Open_Gate_Open_Sound_Patch);
     Patch_Jump(0x00433C6F, &_BuildingClass_Mission_Open_Gate_Close_Sound_Patch);
+    Patch_Jump(0x0042E56F, &_BuildingClass_Grand_Opening_FreeUnit_Patch);
 }
