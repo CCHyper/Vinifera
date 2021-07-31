@@ -139,8 +139,8 @@ void Init_Vinifera_Commands()
     //cmdptr = new PNGScreenCaptureCommandClass;
     //Commands.Add(cmdptr);
 
-    cmdptr = new ManualPlaceCommandClass;
-    Commands.Add(cmdptr);
+    //cmdptr = new ManualPlaceCommandClass;
+    //Commands.Add(cmdptr);
 
     cmdptr = new PrevThemeCommandClass;
     Commands.Add(cmdptr);
@@ -148,138 +148,138 @@ void Init_Vinifera_Commands()
     cmdptr = new NextThemeCommandClass;
     Commands.Add(cmdptr);
 
-    cmdptr = new ScrollNECommandClass;
-    Commands.Add(cmdptr);
-
-    cmdptr = new ScrollSECommandClass;
-    Commands.Add(cmdptr);
-
-    cmdptr = new ScrollSWCommandClass;
-    Commands.Add(cmdptr);
-
-    cmdptr = new ScrollNWCommandClass;
-    Commands.Add(cmdptr);
+    //cmdptr = new ScrollNECommandClass;
+    //Commands.Add(cmdptr);
+    //
+    //cmdptr = new ScrollSECommandClass;
+    //Commands.Add(cmdptr);
+    //
+    //cmdptr = new ScrollSWCommandClass;
+    //Commands.Add(cmdptr);
+    //
+    //cmdptr = new ScrollNWCommandClass;
+    //Commands.Add(cmdptr);
 
     /**
      *  Next, initialised any new commands here if the developer mode is enabled.
      */
-    if (Vinifera_DeveloperMode) {
-        DEBUG_INFO("Initialising developer commands.\n");
-
-        cmdptr = new MemoryDumpCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new DumpHeapCRCCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new InstantBuildCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new AIInstantBuildCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new ForceWinCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new ForceLoseCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new ForceDieCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new CaptureObjectCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new SpecialWeaponsCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new FreeMoneyCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new LightningBoltCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new IonBlastCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new ExplosionCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new SuperExplosionCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new BailOutCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new IonStormCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new MapSnapshotCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new DeleteObjectCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new SpawnAllCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new DamageCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new ToggleEliteCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new BuildCheatCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new ToggleShroudCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new HealCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new ToggleInertCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new DumpAIBaseNodesCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new ToggleBerzerkCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new EncroachShadowCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new EncroachFogCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new ToggleAllianceCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new AddPowerCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new PlaceCrateCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new CursorPositionCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new ToggleFrameStepCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new Step1FrameCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new Step5FramesCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new Step10FramesCommandClass;
-        Commands.Add(cmdptr);
-
-        cmdptr = new ToggleAIControlCommandClass;
-        Commands.Add(cmdptr);
-    }
+    //if (Vinifera_DeveloperMode) {
+    //    DEBUG_INFO("Initialising developer commands.\n");
+    //
+    //    cmdptr = new MemoryDumpCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new DumpHeapCRCCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new InstantBuildCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new AIInstantBuildCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new ForceWinCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new ForceLoseCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new ForceDieCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new CaptureObjectCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new SpecialWeaponsCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new FreeMoneyCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new LightningBoltCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new IonBlastCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new ExplosionCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new SuperExplosionCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new BailOutCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new IonStormCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new MapSnapshotCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new DeleteObjectCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new SpawnAllCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new DamageCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new ToggleEliteCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new BuildCheatCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new ToggleShroudCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new HealCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new ToggleInertCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new DumpAIBaseNodesCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new ToggleBerzerkCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new EncroachShadowCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new EncroachFogCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new ToggleAllianceCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new AddPowerCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new PlaceCrateCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new CursorPositionCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new ToggleFrameStepCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new Step1FrameCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new Step5FramesCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new Step10FramesCommandClass;
+    //    Commands.Add(cmdptr);
+    //
+    //    cmdptr = new ToggleAIControlCommandClass;
+    //    Commands.Add(cmdptr);
+    //}
 
 #ifndef NDEBUG
     /**
@@ -307,13 +307,13 @@ static void Process_Vinifera_Hotkeys()
 
     ini.Load(file, false);
 
-    if (!ini.Is_Present("Hotkey", "ManualPlace")) {
-        cmdptr = CommandClass::From_Name("ManualPlace");
-        if (cmdptr) {
-            key = reinterpret_cast<ViniferaCommandClass *>(cmdptr)->Default_Key();
-            HotkeyIndex.Add_Index(key, cmdptr);
-        }
-    }
+    //if (!ini.Is_Present("Hotkey", "ManualPlace")) {
+    //    cmdptr = CommandClass::From_Name("ManualPlace");
+    //    if (cmdptr) {
+    //        key = reinterpret_cast<ViniferaCommandClass *>(cmdptr)->Default_Key();
+    //        HotkeyIndex.Add_Index(key, cmdptr);
+    //    }
+    //}
 
     if (!ini.Is_Present("Hotkey", "PrevTheme")) {
         cmdptr = CommandClass::From_Name("PrevTheme");
@@ -365,11 +365,11 @@ void CommandExtension_Hooks()
     /**
      *  Replace ScreenCaptureCommandClass with PNGScreenCaptureCommandClass.
      */
-    Hook_Virtual(0x004EAAC0, PNGScreenCaptureCommandClass::Get_Name);
-    Hook_Virtual(0x004EAAE0, PNGScreenCaptureCommandClass::Get_UI_Name);
-    Hook_Virtual(0x004EAAD0, PNGScreenCaptureCommandClass::Get_Category);
-    Hook_Virtual(0x004EAAF0, PNGScreenCaptureCommandClass::Get_Description);
-    Hook_Virtual(0x004EAB00, PNGScreenCaptureCommandClass::Process);
+    //Hook_Virtual(0x004EAAC0, PNGScreenCaptureCommandClass::Get_Name);
+    //Hook_Virtual(0x004EAAE0, PNGScreenCaptureCommandClass::Get_UI_Name);
+    //Hook_Virtual(0x004EAAD0, PNGScreenCaptureCommandClass::Get_Category);
+    //Hook_Virtual(0x004EAAF0, PNGScreenCaptureCommandClass::Get_Description);
+    //Hook_Virtual(0x004EAB00, PNGScreenCaptureCommandClass::Process);
 
-    Patch_Jump(0x004E95C2, &_GuardCommandClass_Process_Harvesters_Set_Mission_Patch);
+    //Patch_Jump(0x004E95C2, &_GuardCommandClass_Process_Harvesters_Set_Mission_Patch);
 }

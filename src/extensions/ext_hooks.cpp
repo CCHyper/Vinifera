@@ -95,71 +95,71 @@ void Extension_Hooks()
     /**
      *  Hook the new save and load system in.
      */
-    SaveLoad_Hooks();
+    //SaveLoad_Hooks();
 
     /**
      *  Various functions.
      */
     DSAudioExtension_Hooks();
     GameInit_Hooks();
-    MainLoop_Hooks();
-    NewMenuExtension_Hooks();
+    //MainLoop_Hooks();
+    //NewMenuExtension_Hooks();
 
     /**
      *  All class extensions here.
      */
     TacticalExtension_Hooks();
-    ScenarioClassExtension_Hooks();
-    DisplayClassExtension_Hooks();
-    ToolTipManagerExtension_Hooks();
+    //ScenarioClassExtension_Hooks();
+    //DisplayClassExtension_Hooks();
+    //ToolTipManagerExtension_Hooks();
     CommandExtension_Hooks();
 
     /**
      *  All type class extensions here.
      */
-    ObjectTypeClassExtension_Hooks();
-    TechnoTypeClassExtension_Hooks();
-    BuildingTypeClassExtension_Hooks();
-    UnitTypeClassExtension_Hooks();
-    InfantryTypeClassExtension_Hooks();
-    AircraftTypeClassExtension_Hooks();
-    WarheadTypeClassExtension_Hooks();
-    WeaponTypeClassExtension_Hooks();
-    BulletTypeClassExtension_Hooks();
-    SuperWeaponTypeClassExtension_Hooks();
-    VoxelAnimTypeClassExtension_Hooks();
-    AnimTypeClassExtension_Hooks();
-    ParticleTypeClassExtension_Hooks();
-    ParticleSystemTypeClassExtension_Hooks();
-    IsometricTileTypeClassExtension_Hooks();
-    OverlayTypeClassExtension_Hooks();
-    SmudgeTypeClassExtension_Hooks();
-    TerrainTypeClassExtension_Hooks();
-    HouseTypeClassExtension_Hooks();
-    SideClassExtension_Hooks();
-    CampaignClassExtension_Hooks();
-    TiberiumClassExtension_Hooks();
+    //ObjectTypeClassExtension_Hooks();
+    //TechnoTypeClassExtension_Hooks();
+    //BuildingTypeClassExtension_Hooks();
+    //UnitTypeClassExtension_Hooks();
+    //InfantryTypeClassExtension_Hooks();
+    //AircraftTypeClassExtension_Hooks();
+    //WarheadTypeClassExtension_Hooks();
+    //WeaponTypeClassExtension_Hooks();
+    //BulletTypeClassExtension_Hooks();
+    //SuperWeaponTypeClassExtension_Hooks();
+    //VoxelAnimTypeClassExtension_Hooks();
+    //AnimTypeClassExtension_Hooks();
+    //ParticleTypeClassExtension_Hooks();
+    //ParticleSystemTypeClassExtension_Hooks();
+    //IsometricTileTypeClassExtension_Hooks();
+    //OverlayTypeClassExtension_Hooks();
+    //SmudgeTypeClassExtension_Hooks();
+    //TerrainTypeClassExtension_Hooks();
+    //HouseTypeClassExtension_Hooks();
+    //SideClassExtension_Hooks();
+    //CampaignClassExtension_Hooks();
+    //TiberiumClassExtension_Hooks();
     //TaskForceClassExtension_Hooks();
     //AITriggerTypeClassExtension_Hooks();
     //ScriptTypeClassExtension_Hooks();
     //TagTypeClassExtension_Hooks();
     //TriggerTypeClassExtension_Hooks();
 
-    TechnoClassExtension_Hooks();
-    UnitClassExtension_Hooks();
-    AircraftClassExtension_Hooks();
-    InfantryClassExtension_Hooks();
-    BuildingClassExtension_Hooks();
-    HouseClassExtension_Hooks();
-    TeamClassExtension_Hooks();
-    FactoryClassExtension_Hooks();
-    FootClassExtension_Hooks();
-    AnimClassExtension_Hooks();
+    //TechnoClassExtension_Hooks();
+    //UnitClassExtension_Hooks();
+    //AircraftClassExtension_Hooks();
+    //InfantryClassExtension_Hooks();
+    //BuildingClassExtension_Hooks();
+    //HouseClassExtension_Hooks();
+    //TeamClassExtension_Hooks();
+    //FactoryClassExtension_Hooks();
+    //FootClassExtension_Hooks();
+    //AnimClassExtension_Hooks();
 
-    DropshipExtension_Hooks();
+    //DropshipExtension_Hooks();
 
     /**
      *  Dialogs and associated code.
      */
-    SkirmishDialog_Hooks();
+    //SkirmishDialog_Hooks();
 }

@@ -186,12 +186,12 @@ void Setup_Hooks()
 
     CRT_Hooks();
     Debug_Hooks();
-    Vinifera_Hooks();
+    //Vinifera_Hooks();
     Extension_Hooks();
     BugFix_Hooks();
 
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
+    //CnCNet4_Hooks();
+    //CnCNet5_Hooks();
 
     HD_Audio_Patches();
 }

@@ -720,16 +720,16 @@ static void _AllowHiResModes_Default_Patch()
  */
 void BugFix_Hooks()
 {
-    _AllowHiResModes_Default_Patch();
+    //_AllowHiResModes_Default_Patch();
     _Intro_Movie_Patches();
-    _Show_Load_Game_On_Mission_Failure();
+    //_Show_Load_Game_On_Mission_Failure();
     _Dont_Stretch_Main_Menu_Video_Patch();
-    _MultiScore_Tally_Score_Fix_Loser_Typo_Patch();
+    //_MultiScore_Tally_Score_Fix_Loser_Typo_Patch();
     _Scale_Movies_By_Ratio_Patch();
-    _Dropship_Loadout_Show_Mouse_Patch();
-    _MultiMission_Constructor_MaxPlayers_Typo_Patch();
-    _OptionsClass_Constructor_IsScoreShuffle_Default_Patch();
-    _Scroll_Sidebar_InGame_Check_Patch();
-    _Set_Difficulty_On_Game_Restart_Patch();
-    _EndGameClass_Debug_Output_Patches();
+    //_Dropship_Loadout_Show_Mouse_Patch();
+    //_MultiMission_Constructor_MaxPlayers_Typo_Patch();
+    //_OptionsClass_Constructor_IsScoreShuffle_Default_Patch();
+    //_Scroll_Sidebar_InGame_Check_Patch();
+    //_Set_Difficulty_On_Game_Restart_Patch();
+    //_EndGameClass_Debug_Output_Patches();
 }
