@@ -32,6 +32,7 @@
 /**
  *  Extended classes here.
  */
+#include "dsaudioext_hooks.h"
 #include "initext_hooks.h"
 #include "mainloopext_hooks.h"
 #include "newmenuext_hooks.h"
@@ -99,6 +100,7 @@ void Extension_Hooks()
     /**
      *  Various functions.
      */
+    DSAudioExtension_Hooks();
     GameInit_Hooks();
     MainLoop_Hooks();
     NewMenuExtension_Hooks();
