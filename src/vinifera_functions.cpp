@@ -228,5 +228,92 @@ bool Vinifera_Shutdown()
  */
 int Vinifera_Init_Game(int argc, char *argv[])
 {
+    DWORD rc;
+    DynamicVectorClass<const char *> search_paths;
+
+    char *new_path = new char [_MAX_PATH * 100];
+    new_path[0] = '\0';
+
+    /**
+     *  
+     */
+    if (CD::IsFilesLocal) {
+        search_paths.Add(".");
+    }
+
+    /**
+     *  Add various local search drives to loading of files locally.
+     */
+    search_paths.Add("INI");
+    search_paths.Add("MIX");
+    search_paths.Add("SHP");
+    search_paths.Add("AUD");
+    search_paths.Add("PCX");
+    search_paths.Add("MAPS\\MULTIPLAYER");
+    search_paths.Add("MAPS\\MISSION");
+    search_paths.Add("MAPS");
+    search_paths.Add("MOVIES");
+    search_paths.Add("MUSIC");
+
+    /**
+     *  Load additional paths from the user environment vars.
+     * 
+     *  @note: Path must end in "\" otherwise this will fail.
+     */
+    char var_buff[PATH_MAX];
+    rc = GetEnvironmentVariable("TIBSUN_MOVIES", var_buff, sizeof(var_buff));
+    if (rc && rc < sizeof(var_buff)) {
+        DEV_DEBUG_INFO("Found TIBSUN_MOVIES EnvVar: \"%s\".\n", var_buff);
+        search_paths.Add(var_buff);
+    }
+    rc = GetEnvironmentVariable("TIBSUN_MUSIC", var_buff, sizeof(var_buff));
+    if (rc && rc < sizeof(var_buff)) {
+        DEV_DEBUG_INFO("Found TIBSUN_MUSIC EnvVar: \"%s\".\n", var_buff);
+        search_paths.Add(var_buff);
+    }
+
+    /**
+     *  Current path (perhaps set set with -CD) should go next.
+     */
+    if (CCFileClass::RawPath[0] != '\0') {
+        search_paths.Add(CCFileClass::RawPath);
+    }
+
+    /**
+     *  Add search drives for the CD contents.
+     */
+    search_paths.Add("TS1");
+    search_paths.Add("CD1");
+    search_paths.Add("GDI");
+    search_paths.Add("TS2");
+    search_paths.Add("CD2");
+    search_paths.Add("NOD");
+    search_paths.Add("TS3");
+    search_paths.Add("CD3");
+    search_paths.Add("FIRESTORM");
+
+    /**
+     *  Build the search path string.
+     */
+    for (int i = 0; i < search_paths.Count(); ++i) {
+        if (i != 0) std::strcat(new_path, ";");
+        std::strcat(new_path, search_paths[i]);
+    }
+
+    /**
+     *  Clear the current path ready to be set.
+     */
+    CCFileClass::Clear_Search_Drives();
+    CCFileClass::Reset_Raw_Path();
+
+    /**
+     *  Set the new search drive path.
+     */
+    CCFileClass::Set_Search_Drives(new_path);
+
+    delete [] new_path;
+
+    DEBUG_INFO("SearchPath: %s\n", CCFileClass::RawPath);
+
     return EXIT_SUCCESS;
 }
