@@ -373,6 +373,30 @@ files_local:
 }
 
 
+/**
+ *  #issue-513
+ * 
+ *  Patch to add check for CD::IsFilesLocal to make sure -CD really
+ *  was set by the user.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Init_CDROM_Access_Local_Files_Patch)
+{
+    _asm { add esp, 4 }
+
+    if (CCFileClass::Is_There_Search_Drives() && CD::IsFilesLocal) {
+        goto files_local;
+    }
+
+init_cdrom:
+    JMP(0x004E0471);
+
+files_local:
+    JMP(0x004E06F5);
+}
+
+
 static bool CCFile_Is_Available(const char *filename)
 {
     return CCFileClass(filename).Is_Available();
@@ -431,4 +455,5 @@ void GameInit_Hooks()
     Patch_Jump(0x004E0461, &_Init_CDROM_Access_Local_Files_Patch);
     Patch_Jump(0x004E3D20, &Vinifera_Init_Bootstrap_Mixfiles);
     Patch_Jump(0x004E4120, &Vinifera_Init_Secondary_Mixfiles);
+    Patch_Jump(0x004E0461, &_Init_CDROM_Access_Local_Files_Patch);
 }
