@@ -31,6 +31,8 @@
 #include "cncnet4.h"
 #include "cncnet4_globals.h"
 #include "cncnet5_globals.h"
+#include "ccfile.h"
+#include "cd.h"
 #include "debughandler.h"
 #include <string>
 
@@ -142,13 +144,12 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
             continue;
         }
 
-        /**
-         *  Exit the game after the dialog we skipped to has been canceled?
-         */
-        if (stricmp(string, "-EXIT_AFTER_SKIP") == 0) {
-            DEBUG_INFO("  - Skipping to Firestorm menu.\n");
-            Vinifera_ExitAfterSkip = true;
-            menu_skip = true;
+        /*
+        **  File search path override.
+        */
+        if (std::strstr(string, "-CD")) {
+            CCFileClass::Set_Search_Drives(&string[3]);
+            CD::IsFilesLocal = true;
             continue;
         }
 
