@@ -30,6 +30,7 @@
 
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "vinifera_globals.h"
 #include "wwmouse.h"
 #include "campaign.h"
 #include "scenario.h"
@@ -489,19 +490,42 @@ static bool Play_Intro_Movie(CampaignType campaign_id)
                  * 
                  *  Build the movies filename based on the current campaigns desired CD (see DiskID enum). 
                  */
-                char filename[12];
+                char filename[16];
                 std::snprintf(filename, sizeof(filename), "INTR%d.VQA", cd_num);
+
+                bool intr0_available = Vinifera_Is_Movie_Available(filename);
+                bool intro_side_available = false;
+
+                /**
+                 *  Check for variations of the Intro movie name.
+                 */
+                switch (cd_num) {
+                    case DISK_GDI:
+                        std::strncpy(filename, "INTRO_GDI.VQA", sizeof(filename));
+                        intro_side_available = Vinifera_Is_Movie_Available("INTRO_GDI.VQA");
+                        break;
+                    case DISK_NOD:
+                        std::strncpy(filename, "INTRO_NOD.VQA", sizeof(filename));
+                        intro_side_available = Vinifera_Is_Movie_Available("INTRO_NOD.VQA");
+                        break;
+                    default:
+                        break;
+                };
 
                 /**
                  *  Now play the movie if it is found, falling back to original behavior otherwise.
                  */
-                if (CCFileClass(filename).Is_Available()) {
+                if (intro_side_available) {
                     DEBUG_INFO("About to play %s.\n", filename);
-                    Play_Movie(filename);
+                    Vinifera_Play_Movie(filename);
+
+                } else if (intr0_available) {
+                    DEBUG_INFO("About to play %s.\n", filename);
+                    Vinifera_Play_Movie(filename);
 
                 } else {
                     DEBUG_INFO("About to play INTRO.VQA.\n");
-                    Play_Movie("INTRO.VQA");
+                    Vinifera_Play_Movie("INTRO.VQA");
                 }
 
                 return true;
@@ -546,65 +570,110 @@ read_scenario:
  */
 static void Play_Intro_SneakPeak_Movies()
 {
-    /**
-     *  Backup the current volume.
-     */
-    //int disk = CD::RequiredCD;
+    if (Vinifera_DeveloperMode && Movies.Count()) {
 
-    /**
-     *  Find out what movies are available locally.
-     */
-    bool intro_available = CCFileClass("INTRO.VQA").Is_Available();
-    bool intr0_available = CCFileClass("INTR0.VQA").Is_Available();
-    bool sizzle_available = CCFileClass("SIZZLE1.VQA").Is_Available();
-
-    bool movie_pair_available = (intro_available && sizzle_available) || (intr0_available && sizzle_available);
-
-    /**
-     *  If at least one of the movie pairs were found, we can go ahead and play
-     *  them, otherwise set the required disk to GDI and request it if not present.
-     */
-    if (movie_pair_available || (CD::Set_Required_CD(DISK_GDI), CD().Is_Available(DISK_GDI))) {
-        
         /**
-         *  Play the intro movie (GDI).
-         * 
-         *  If the renamed intro is found play that, otherwise falling back to original behavior.
+         *  
          */
-        if (intr0_available) {
-            DEBUG_INFO("About to play INTR0.VQA.\n");
-            Play_Movie("INTR0.VQA");
+
+        static int _counter = VQ_NONE;
+
+        /**
+         *  Holding down CTRL replays the last movie index.
+         */
+        if (!WWKeyboard->Down(KN_LCTRL) || !WWKeyboard->Down(KN_RCTRL)) {
+            ++_counter;
+        }
+
+        if (_counter <= VQ_NONE) {
+            _counter = VQ_FIRST;
+        }
+        if (_counter >= Movies.Count()) {
+            _counter = VQ_FIRST;
+        }
+
+        WWMouse->Hide_Mouse();
+
+        char moviename[32];
+        std::snprintf(moviename, sizeof(moviename), "%s.VQA", Movies[_counter]);
+        Vinifera_Play_Movie(moviename, THEME_NONE);
+
+        WWMouse->Show_Mouse();
+
+    } else {
+
+        /**
+         *  Backup the current volume.
+         */
+        //int disk = CD::RequiredCD;
+
+        /**
+         *  Find out what movies are available locally.
+         */
+        bool intro_available = Vinifera_Is_Movie_Available("INTRO.VQA");
+        bool intro_gdi_available = Vinifera_Is_Movie_Available("INTRO_GDI.VQA");
+        bool intro_nod_available = Vinifera_Is_Movie_Available("INTRO_NOD.VQA");
+        bool intr0_available = Vinifera_Is_Movie_Available("INTR0.VQA");
+        bool sizzle_available = Vinifera_Is_Movie_Available("SIZZLE1.VQA");
+
+        bool movie_pair_available = (intro_available && sizzle_available) || (intr0_available && sizzle_available) || (intro_gdi_available && sizzle_available);
+
+        /**
+         *  If at least one of the movie pairs were found, we can go ahead and play
+         *  them, otherwise set the required disk to GDI and request it if not present.
+         */
+        if (movie_pair_available || (CD::Set_Required_CD(DISK_GDI), CD().Is_Available(DISK_GDI))) {
+        
+            /**
+             *  Play the intro movie (GDI).
+             * 
+             *  If the renamed intro is found play that, otherwise falling back to original behavior.
+             */
+            if (intro_gdi_available) {
+                DEBUG_INFO("About to play INTRO_GDI.VQA.\n");
+                Vinifera_Play_Movie("INTRO_GDI.VQA");
+
+                /**
+                 *  Also attempt to play the NOD intro, just because its a nice improvement.
+                 */
+                DEBUG_INFO("About to play INTRO_NOD.VQA.\n");
+                Vinifera_Play_Movie("INTRO_NOD.VQA");
+
+            } else if (intr0_available) {
+                DEBUG_INFO("About to play INTR0.VQA.\n");
+                Vinifera_Play_Movie("INTR0.VQA");
+
+                /**
+                 *  Also attempt to play the NOD intro, just because its a nice improvement.
+                 */
+                DEBUG_INFO("About to play INTR1.VQA.\n");
+                Vinifera_Play_Movie("INTR1.VQA");
+
+            } else {
+        
+                DEBUG_INFO("About to play INTRO.VQA.\n");
+                Vinifera_Play_Movie("INTRO.VQA");
+            }
 
             /**
-             *  Also attempt to play the NOD intro, just because its a nice improvement.
+             *  Play the sizzle/showreel. This exists loosely on both disks, so we tell
+             *  the VQA playback to not use the normal mix file handler.
              */
-            DEBUG_INFO("About to play INTR1.VQA.\n");
-            Play_Movie("INTR1.VQA");
-    
+            VQA_Clear_Option(OPTION_USE_MIX_HANDLER);
+            DEBUG_INFO("About to play SIZZLE1.VQA.\n");
+            Vinifera_Play_Movie("SIZZLE1.VQA");
+            VQA_Set_Option(OPTION_USE_MIX_HANDLER);
+
         } else {
-        
-            DEBUG_INFO("About to play INTRO.VQA.\n");
-            Play_Movie("INTRO.VQA");
+            DEBUG_WARNING("Failed to find Intro and Sizzle movies!\n");
         }
 
         /**
-         *  Play the sizzle/showreel. This exists loosely on both disks, so we tell
-         *  the VQA playback to not use the normal mix file handler.
+         *  Restore the previous volume.
          */
-        VQA_Clear_Option(OPTION_USE_MIX_HANDLER);
-        DEBUG_INFO("About to play SIZZLE1.VQA.\n");
-        Play_Movie("SIZZLE1.VQA");
-        VQA_Set_Option(OPTION_USE_MIX_HANDLER);
-
-    } else {
-        DEBUG_WARNING("Failed to find Intro and Sizzle movies!\n");
+        //CD::Set_Required_CD(disk);
+        //CD().Force_Available(disk);
     }
-
-    /**
-     *  Restore the previous volume.
-     */
-    //CD::Set_Required_CD(disk);
-    //CD().Force_Available(disk);
 }
 
 DECLARE_PATCH(_Select_Game_Intro_SneakPeak_Movies_Patch)
