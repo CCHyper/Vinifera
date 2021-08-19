@@ -29,6 +29,7 @@
 #include "vinifera_const.h"
 #include "vinifera_globals.h"
 #include "vinifera_util.h"
+#include "vinifera_gitinfo.h"
 #include "tibsun_globals.h"
 #include "tibsun_functions.h"
 #include "language.h"
@@ -38,9 +39,10 @@
 #include "iomap.h"
 #include "theme.h"
 #include "dsaudio.h"
-#include "vinifera_gitinfo.h"
-#include "tspp_gitinfo.h"
+#include "optionsext.h"
+#include "renderer.h"
 #include "resource.h"
+#include "tspp_gitinfo.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <Windows.h>
@@ -57,6 +59,86 @@ extern HMODULE DLLInstance;
  */
 #define TS_MAINICON		    93
 #define TS_MAINCURSOR		104
+
+
+
+#define MONITOR_CENTER     0x0001        // center rect to monitor 
+#define MONITOR_CLIP       0x0000        // clip rect to monitor 
+#define MONITOR_WORKAREA   0x0002        // use monitor work area 
+#define MONITOR_AREA       0x0000        // use monitor entire area 
+
+
+/**
+ *  The most common problem apps have when running on a multimonitor system is
+ *  that they "clip" or "pin" windows based on the SM_CXSCREEN and SM_CYSCREEN 
+ *  system metrics. Because of app compatibility reasons these system metrics 
+ *  return the size of the primary monitor.
+ * 
+ *  This shows how you use the multi-monitor functions to do the same thing.
+ *  
+ *  Based on Windows sample code:
+ *  https://docs.microsoft.com/en-us/windows/win32/gdi/positioning-objects-on-a-multiple-display-setup
+ */
+static void ClipOrCenterRectToMonitor(LPRECT prc, UINT flags)
+{
+    HMONITOR hMonitor;
+    MONITORINFO mi;
+    RECT rc;
+    int w = prc->right  - prc->left;
+    int h = prc->bottom - prc->top;
+
+    // 
+    // get the nearest monitor to the passed rect. 
+    // 
+    hMonitor = MonitorFromRect(prc, MONITOR_DEFAULTTONEAREST);
+
+    // 
+    // get the work area or entire monitor rect. 
+    // 
+    mi.cbSize = sizeof(mi);
+    GetMonitorInfo(hMonitor, &mi);
+
+    if (flags & MONITOR_WORKAREA) {
+        rc = mi.rcWork;
+    } else {
+        rc = mi.rcMonitor;
+    }
+
+    // 
+    // center or clip the passed rect to the monitor rect 
+    // 
+    if (flags & MONITOR_CENTER) {
+        prc->left = rc.left + (rc.right  - rc.left - w) / 2;
+        prc->top = rc.top  + (rc.bottom - rc.top  - h) / 2;
+        prc->right = prc->left + w;
+        prc->bottom = prc->top  + h;
+
+    } else {
+        prc->left = std::max(rc.left, std::min(rc.right-w,  prc->left));
+        prc->top = std::max(rc.top, std::min(rc.bottom-h, prc->top));
+        prc->right = prc->left + w;
+        prc->bottom = prc->top  + h;
+    }
+}
+
+static void ClipOrCenterWindowToMonitor(HWND hwnd, UINT flags)
+{
+    RECT rc;
+    GetWindowRect(hwnd, &rc);
+    ClipOrCenterRectToMonitor(&rc, flags);
+    SetWindowPos(hwnd, NULL, rc.left, rc.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+
+static void Get_Windows_Version()
+{
+     OSVERSIONINFOEX info;
+     ZeroMemory(&info, sizeof(OSVERSIONINFOEX));
+     info.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+     GetVersionEx((LPOSVERSIONINFO)&info);//info requires typecasting
+
+     printf("Windows version: %u.%u\n", info.dwMajorVersion, info.dwMinorVersion);
+}
 
 
 /**
@@ -144,7 +226,7 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
     wc.hInstance      = (HINSTANCE)hInstance;
     wc.hIcon          = hIcon;
     wc.hCursor        = hCursor;
-    wc.hbrBackground  = nullptr;
+    wc.hbrBackground  = CreateSolidBrush(RGB(0,0,0));
     wc.lpszMenuName   = nullptr;
     wc.lpszClassName  = "Vinifera";
     wc.hIconSm        = (hSmIcon ? hSmIcon : hIcon);
@@ -175,11 +257,16 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
 
         DEBUG_INFO("Create_Main_Window() - Creating desktop window (%d x %d).\n", width, height);
 
+        bool borderless = false;
+        if (OptionsExtension) {
+//            borderless = OptionsExtension->BorderlessWindow;
+        }
+        
         hWnd = CreateWindowEx(
-            WS_EX_LEFT|WS_EX_TOPMOST,
+            WS_EX_LEFT/*|WS_EX_TOPMOST*/,   // Removed: Causes focus issues when debugging with MSVC.
             "Vinifera",
             Vinifera_Get_Window_Title(dwPid),
-            WS_SYSMENU|WS_MINIMIZEBOX|WS_CLIPCHILDREN|WS_CAPTION,
+            borderless ? WS_POPUP : WS_SYSMENU|WS_MINIMIZEBOX|WS_CLIPCHILDREN|WS_CAPTION,
             0, 0, 0, 0,
             nullptr,
             nullptr,
@@ -214,7 +301,7 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
         DEBUG_INFO("Create_Main_Window() - Creating fullscreen window.\n");
 
         hWnd = CreateWindowEx(
-            WS_EX_TOPMOST,
+            WS_EX_LEFT|WS_EX_TOPMOST,
             "Vinifera",
             Vinifera_Get_Window_Title(dwPid),
             WS_POPUP|WS_CLIPCHILDREN,
@@ -268,6 +355,11 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
      *  window in its thread.
      */
     GameInFocus = true;
+
+    /**
+     *  Set initial cursor clip.
+     */
+    Renderer::Set_Cursor_Clip();
 
     //DEV_DEBUG_INFO("Create_Main_Window(exit)\n");
 }

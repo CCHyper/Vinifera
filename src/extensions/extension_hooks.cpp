@@ -146,8 +146,14 @@
 #include "hooker_macros.h"
 
 
+#include "renderer_hooks.h"
 void Extension_Hooks()
 {
+    /**
+     *  Hook in the new renderer.
+     */
+    Renderer_Hooks();
+
     /**
      *  Abstract and stack class extensions here.
      */
