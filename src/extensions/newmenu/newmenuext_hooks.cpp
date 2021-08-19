@@ -240,5 +240,5 @@ set_dialog:
  */
 void NewMenuExtension_Hooks()
 {
-    Patch_Jump(0x004E8838, &_NewMenuClass_Process_SkipToMenus_Patch);
+    //Patch_Jump(0x004E8838, &_NewMenuClass_Process_SkipToMenus_Patch);
 }
