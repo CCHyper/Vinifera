@@ -49,6 +49,8 @@
 #include "extension.h"
 #include "theatertype.h"
 #include "uicontrol.h"
+#include "versionhelpers.h"
+#include "shellscalingapi.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <string>
@@ -590,6 +592,23 @@ bool Vinifera_Startup()
     CnCNet4::IsEnabled = false;
     //CnCNet5::IsActive = true; // Enable when new Client system is implemented.
 #endif
+
+    /**
+     *  Set the process to be be DPI aware.
+     */
+    if (Vinifera_MakeProcessDPIAware /*&& !IsProcessDPIAware()*/) {
+        bool dpi_aware = false;
+        if (IsWindows10OrGreater()) {
+            dpi_aware = SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);
+        } else if (IsWindowsVistaOrGreater()) {
+            dpi_aware = SUCCEEDED(SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE));
+        } else {
+            dpi_aware = SetProcessDPIAware();
+        }
+        if (dpi_aware) {
+            DEBUG_INFO("Process is now DPI aware.\n");
+        }
+    }
 
     return true;
 }

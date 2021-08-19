@@ -76,6 +76,12 @@ extern bool Vinifera_Developer_AIControl;
 
 
 /**
+ *  
+ */
+ extern bool Vinifera_MakeProcessDPIAware;
+
+
+/**
  *  Various globals.
  */
 extern bool Vinifera_SkipLogoMovies;

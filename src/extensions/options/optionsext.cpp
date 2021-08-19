@@ -30,6 +30,7 @@
 #include "tibsun_globals.h"
 #include "noinit.h"
 #include "options.h"
+#include "renderer.h"
 #include "ccini.h"
 #include "rawfile.h"
 #include "asserthandler.h"
@@ -166,7 +167,16 @@ void OptionsClassExtension::Load_Init_Settings()
 {
     //EXT_DEBUG_TRACE("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(This()));
     
+    static char const * const VIDEO = "Video";
+
     RawFileClass file("SUN.INI");
+    INIClass ini;
+
+    ini.Load(file);
+
+    Debug_Windowed = ini.Get_Bool(VIDEO, "Windowed", Debug_Windowed);
+    Renderer::BorderlessWindow = ini.Get_Bool(VIDEO, "BorderlessWindow", Renderer::BorderlessWindow);
+    Renderer::ClipCursorToWindow = ini.Get_Bool(VIDEO, "ClipCursorToWindow", Renderer::ClipCursorToWindow);
 }
 
 
@@ -179,7 +189,15 @@ void OptionsClassExtension::Save_Settings()
 {
     //EXT_DEBUG_TRACE("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(This()));
     
+    static char const * const VIDEO = "Video";
+    
     RawFileClass file("SUN.INI");
+
+    ConfigINI.Put_Bool(VIDEO, "Windowed", Debug_Windowed);
+    ConfigINI.Put_Bool(VIDEO, "BorderlessWindow", Renderer::BorderlessWindow);
+    ConfigINI.Put_Bool(VIDEO, "ClipCursorToWindow", Renderer::ClipCursorToWindow);
+
+    ConfigINI.Save(file, false);
 }
 
 
