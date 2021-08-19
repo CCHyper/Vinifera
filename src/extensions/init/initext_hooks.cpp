@@ -35,12 +35,22 @@
 #include "cd.h"
 #include "newmenu.h"
 #include "addon.h"
+#include "dsaudio.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  #issue-518
+ * 
+ *  Enable the caching of additional mix files to limit the loading
+ *  of large mix files during an active game session.
+ */
+#define CACHE_EXTRA_MIXFILES 1
 
 
 /**
@@ -73,6 +83,16 @@ static bool Vinifera_Init_Bootstrap_Mixfiles()
         mix = new MFCC("PATCH.MIX", &FastKey);
         ASSERT(mix);
         if (mix) {
+#ifdef CACHE_EXTRA_MIXFILES
+            /**
+             *  #issue-518 
+             * 
+             *  Enable the caching of additional mix files to improve performance.
+             *  
+             *  @author: CCHyper
+             */
+            mix->Cache();
+#endif
             DEBUG_INFO(" PATCH.MIX\n");
         }
     }
@@ -101,8 +121,21 @@ static bool Vinifera_Init_Bootstrap_Mixfiles()
             if (!mix) {
                 DEBUG_WARNING("Failed to load %s!\n", buffer);
             } else {
+#ifdef CACHE_EXTRA_MIXFILES
+                ExpansionMixFiles.Add(mix);
+                DEBUG_INFO(" %s (Cached)\n", mix->Filename);
+                /**
+                 *  #issue-518 
+                 * 
+                 *  Enable the caching of EXPAND mix files to improve performance.
+                 *  
+                 *  @author: CCHyper
+                 */
+                mix->Cache();
+#else
                 ExpansionMixFiles.Add(mix);
                 DEBUG_INFO(" %s\n", buffer);
+#endif
             }
         }
     }
@@ -310,6 +343,79 @@ files_local:
 }
 
 
+/**
+ *  #issue-518 
+ * 
+ *  Enable the caching of various game mix files to improve performance.
+ * 
+ *  @note: Original code returned false if caching failed.
+ *  
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Init_Bulk_Data_Cache_Mix_Files_Patch)
+{
+    /**
+     *  Stolen bytes/code.
+     */
+    _asm { sub esp, 0x29C }
+    _asm { push edi }
+
+#ifdef CACHE_EXTRA_MIXFILES
+
+    DEBUG_INFO("Caching additional mix files...\n");
+
+    //if (TibSunMix) DEBUG_INFO("  %s\n", TibSunMix->Filename); TibSunMix->Cache();
+
+    if (ConquerMix) DEBUG_INFO("  %s\n", ConquerMix->Filename); ConquerMix->Cache();
+    if (LocalMix) DEBUG_INFO("  %s\n", LocalMix->Filename); LocalMix->Cache();
+
+    if (MapsMix) DEBUG_INFO("  %s\n", MapsMix->Filename); MapsMix->Cache();
+    if (MultiMix) DEBUG_INFO("  %s\n", MultiMix->Filename); MultiMix->Cache();
+
+    if (Audio.Is_Available()) {
+        if (SoundsMix) DEBUG_INFO("  %s\n", SoundsMix->Filename); SoundsMix->Cache();
+        if (FSSoundsMix) DEBUG_INFO("  %s\n", FSSoundsMix->Filename); FSSoundsMix->Cache();
+        if (ScoreMix) DEBUG_INFO("  %s\n", ScoreMix->Filename); ScoreMix->Cache();
+        if (FSScoresMix) DEBUG_INFO("  %s\n", FSScoresMix->Filename); FSScoresMix->Cache();
+    }
+    
+    //if (MoviesMix) DEBUG_INFO("  %s\n", MoviesMix->Filename); MoviesMix->Cache();
+
+    DEBUG_INFO("Mix file caching complete!\n");
+
+#else
+
+    /**
+     *  Original code.
+     */
+
+    //if (!ConquerMix) {
+    //    goto return_false;
+    //}
+    if (ConquerMix) {
+        ConquerMix->Cache();
+    }
+
+    if (Audio.Is_Available()) {
+        if (SoundsMix) {
+            SoundsMix->Cache();
+        }
+        if (FSSoundsMix) {
+            FSSoundsMix->Cache();
+        }
+    }
+
+#endif
+
+continue_function:
+    _asm { xor edi, edi }   // Set EDI to expected state.
+    JMP(0x004E465F);
+
+return_false:
+    JMP(0x004E49B7);
+}
+
+
 static bool CCFile_Is_Available(const char *filename)
 {
     return CCFileClass(filename).Is_Available();
@@ -368,4 +474,5 @@ void GameInit_Hooks()
     Patch_Jump(0x004E3D20, &Vinifera_Init_Bootstrap_Mixfiles);
     Patch_Jump(0x004E4120, &Vinifera_Init_Secondary_Mixfiles);
     Patch_Jump(0x004E0461, &_Init_CDROM_Access_Local_Files_Patch);
+    Patch_Jump(0x004E45F0, &_Init_Bulk_Data_Cache_Mix_Files_Patch);
 }
