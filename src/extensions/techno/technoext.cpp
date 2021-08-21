@@ -44,7 +44,11 @@ ExtensionMap<TechnoClass, TechnoClassExtension> TechnoClassExtensions;
  *  @author: CCHyper
  */
 TechnoClassExtension::TechnoClassExtension(TechnoClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+
+    IronCurtainCountDown(),
+    IronCurtainTintTimer(),
+    IronCurtainTintStage(10)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TechnoClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -60,7 +64,10 @@ TechnoClassExtension::TechnoClassExtension(TechnoClass *this_ptr) :
  *  @author: CCHyper
  */
 TechnoClassExtension::TechnoClassExtension(const NoInitClass &noinit) :
-    Extension(noinit)
+    Extension(noinit),
+
+    IronCurtainCountDown(noinit),
+    IronCurtainTintTimer(noinit)
 {
     IsInitialized = false;
 }
@@ -155,4 +162,7 @@ void TechnoClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TechnoClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    crc(IronCurtainCountDown);
+    crc(IronCurtainTintTimer);
 }

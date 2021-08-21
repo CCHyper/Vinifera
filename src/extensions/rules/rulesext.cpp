@@ -42,7 +42,11 @@ RulesClassExtension *RulesExtension = nullptr;
  *  @author: CCHyper
  */
 RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+
+    IronCurtainColor{0,0,0},
+    IronCurtainDuration(0),
+    IronCurtainInvokeAnim(nullptr)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -73,6 +77,8 @@ RulesClassExtension::~RulesClassExtension()
 {
     //DEV_DEBUG_TRACE("RulesClassExtension deconstructor - 0x%08X\n", (uintptr_t)(ThisPtr));
     //DEV_DEBUG_WARNING("RulesClassExtension deconstructor - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    IronCurtainInvokeAnim = nullptr;
 
     IsInitialized = false;
 }
@@ -200,6 +206,8 @@ bool RulesClassExtension::General(CCINIClass &ini)
         return false;
     }
 
+    IronCurtainInvokeAnim = ini.Get_Anim(GENERAL, "IronCurtainInvokeAnim", IronCurtainInvokeAnim);
+
     return true;
 }
 
@@ -215,6 +223,11 @@ bool RulesClassExtension::CombatDamage(CCINIClass &ini)
 
 	if (!ini.Is_Present(COMBATDAMAGE)) {
         return false;
+    }
+
+    IronCurtainDuration = ini.Get_Int(COMBATDAMAGE, "IronCurtainDuration", IronCurtainDuration);
+    if (IronCurtainDuration < 0) {
+        IronCurtainDuration = 0;
     }
 
     return true;
@@ -233,6 +246,8 @@ bool RulesClassExtension::AudioVisual(CCINIClass &ini)
 	if (!ini.Is_Present(AUDIOVISUAL)) {
         return false;
     }
+
+    IronCurtainColor = ini.Get_RGB(AUDIOVISUAL, "IronCurtainColor", IronCurtainColor);
 
     return true;
 }

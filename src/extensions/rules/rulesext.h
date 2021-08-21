@@ -31,9 +31,12 @@
 #include "container.h"
 #include "noinit.h"
 
+#include "tibsun_defines.h"
+
 
 class RulesClass;
 class CCINIClass;
+class AnimTypeClass;
 
 
 class RulesClassExtension final : public Extension<RulesClass>
@@ -59,6 +62,20 @@ class RulesClassExtension final : public Extension<RulesClass>
         bool AudioVisual(CCINIClass &ini);
 
     public:
+        /**
+         *  The color that objects are shaded with when the iron curtained is applied.
+         */
+        RGBStruct IronCurtainColor;
+
+        /**
+         *  The duration (in frames) for the iron curtain effect.
+         */
+        int IronCurtainDuration;
+
+        /**
+         *  The animation that is played cell when the iron curtain super weapon is fired.
+         */
+        const AnimTypeClass *IronCurtainInvokeAnim;
 };
 
 
