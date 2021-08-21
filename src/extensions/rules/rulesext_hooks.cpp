@@ -25,7 +25,9 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "buildingext_hooks.h"
+#include "rulesext_hooks.h"
+#include "rulesext_init.h"
+#include "rulesext.h"
 #include "rules.h"
 #include "tiberium.h"
 #include "weapontype.h"
@@ -140,6 +142,13 @@ void RulesClassFake::_Process(CCINIClass &ini)
     AudioVisual(ini);
     SpecialWeapons(ini);
     TiberiumClass::Process(ini);
+
+    /**
+     *  Read the extended RulesClass data.
+     */
+    if (RulesExtension) {
+        RulesExtension->Process(ini);
+    }
 }
 
 
@@ -148,5 +157,10 @@ void RulesClassFake::_Process(CCINIClass &ini)
  */
 void RulesClassExtension_Hooks()
 {
+    /**
+     *  Initialises the extended class.
+     */
+    RulesClassExtension_Init();
+
     Patch_Jump(0x005C6710, &RulesClassFake::_Process);
 }
