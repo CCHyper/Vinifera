@@ -208,6 +208,82 @@ class ScrollNWCommandClass : public ViniferaCommandClass
 
 
 /**
+ *  Remapable representation of the force-move hotkey.
+ */
+class ForceMoveCommandClass : public ViniferaCommandClass
+{
+    public:
+        ForceMoveCommandClass() : ViniferaCommandClass() { IsDeveloper = false; }
+        virtual ~ForceMoveCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+        virtual KeyNumType Default_Key() const override { return KeyNumType(KN_ALT_BIT); }
+};
+
+
+/**
+ *  Remapable representation of the force-attack hotkey.
+ */
+class ForceAttackCommandClass : public ViniferaCommandClass
+{
+    public:
+        ForceAttackCommandClass() : ViniferaCommandClass() { IsDeveloper = false; }
+        virtual ~ForceAttackCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+        virtual KeyNumType Default_Key() const override { return KeyNumType(KN_CTRL_BIT); }
+};
+
+
+/**
+ *  Remapable representation of the select hotkey.
+ */
+class SelectCommandClass : public ViniferaCommandClass
+{
+    public:
+        SelectCommandClass() : ViniferaCommandClass() { IsDeveloper = false; }
+        virtual ~SelectCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+        virtual KeyNumType Default_Key() const override { return KeyNumType(KN_SHIFT_BIT); }
+};
+
+
+/**
+ *  Remapable representation of the queue-move hotkey.
+ */
+class QueueMoveCommandClass : public ViniferaCommandClass
+{
+    public:
+        QueueMoveCommandClass() : ViniferaCommandClass() { IsDeveloper = false; }
+        virtual ~QueueMoveCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+        virtual KeyNumType Default_Key() const override { return KeyNumType(KN_Q); }
+};
+
+
+/**
  *  Produces a memory dump on request.
  */
 class MemoryDumpCommandClass : public ViniferaCommandClass

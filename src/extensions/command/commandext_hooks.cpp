@@ -160,6 +160,18 @@ void Init_Vinifera_Commands()
     cmdptr = new ScrollNWCommandClass;
     Commands.Add(cmdptr);
 
+    cmdptr = new ForceMoveCommandClass;
+    Commands.Add(cmdptr);
+
+    cmdptr = new ForceAttackCommandClass;
+    Commands.Add(cmdptr);
+
+    cmdptr = new SelectCommandClass;
+    Commands.Add(cmdptr);
+
+    cmdptr = new QueueMoveCommandClass;
+    Commands.Add(cmdptr);
+
     /**
      *  Next, initialised any new commands here if the developer mode is enabled.
      */
@@ -325,6 +337,22 @@ static void Process_Vinifera_Hotkeys()
 
     if (!ini.Is_Present("Hotkey", "NextTheme")) {
         cmdptr = CommandClass::From_Name("NextTheme");
+        if (cmdptr) {
+            key = reinterpret_cast<ViniferaCommandClass *>(cmdptr)->Default_Key();
+            HotkeyIndex.Add_Index(key, cmdptr);
+        }
+    }
+
+    if (!ini.Is_Present("Hotkey", "ChatToAll")) {
+        cmdptr = CommandClass::From_Name("ChatToAll");
+        if (cmdptr) {
+            key = reinterpret_cast<ViniferaCommandClass *>(cmdptr)->Default_Key();
+            HotkeyIndex.Add_Index(key, cmdptr);
+        }
+    }
+
+    if (!ini.Is_Present("Hotkey", "ChatToAllies")) {
+        cmdptr = CommandClass::From_Name("ChatToAllies");
         if (cmdptr) {
             key = reinterpret_cast<ViniferaCommandClass *>(cmdptr)->Default_Key();
             HotkeyIndex.Add_Index(key, cmdptr);

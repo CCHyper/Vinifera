@@ -487,6 +487,130 @@ bool ScrollNWCommandClass::Process()
 
 
 /**
+ *  Remapable representation of the force-move hotkey. Process() should be empty!
+ * 
+ *  @author: CCHyper
+ */
+const char *ForceMoveCommandClass::Get_Name() const
+{
+    return "ForceMove";
+}
+
+const char *ForceMoveCommandClass::Get_UI_Name() const
+{
+    return "Force Move";
+}
+
+const char *ForceMoveCommandClass::Get_Category() const
+{
+    return Text_String(TXT_INTERFACE);
+}
+
+const char *ForceMoveCommandClass::Get_Description() const
+{
+    return "Force Move.";
+}
+
+bool ForceMoveCommandClass::Process()
+{
+    return true;
+}
+
+
+/**
+ *  Remapable representation of the force-attack hotkey. Process() should be empty!
+ * 
+ *  @author: CCHyper
+ */
+const char *ForceAttackCommandClass::Get_Name() const
+{
+    return "ForceAttack";
+}
+
+const char *ForceAttackCommandClass::Get_UI_Name() const
+{
+    return "Force Attack";
+}
+
+const char *ForceAttackCommandClass::Get_Category() const
+{
+    return Text_String(TXT_INTERFACE);
+}
+
+const char *ForceAttackCommandClass::Get_Description() const
+{
+    return "Force Attack.";
+}
+
+bool ForceAttackCommandClass::Process()
+{
+    return true;
+}
+
+
+/**
+ *  Remapable representation of the select hotkey. Process() should be empty!
+ * 
+ *  @author: CCHyper
+ */
+const char *SelectCommandClass::Get_Name() const
+{
+    return "Select";
+}
+
+const char *SelectCommandClass::Get_UI_Name() const
+{
+    return "Select";
+}
+
+const char *SelectCommandClass::Get_Category() const
+{
+    return Text_String(TXT_INTERFACE);
+}
+
+const char *SelectCommandClass::Get_Description() const
+{
+    return "Select.";
+}
+
+bool SelectCommandClass::Process()
+{
+    return true;
+}
+
+
+/**
+ *  Remapable representation of the queue-move. Process() should be empty!
+ * 
+ *  @author: CCHyper
+ */
+const char *QueueMoveCommandClass::Get_Name() const
+{
+    return "QueueMove";
+}
+
+const char *QueueMoveCommandClass::Get_UI_Name() const
+{
+    return "Queue Move";
+}
+
+const char *QueueMoveCommandClass::Get_Category() const
+{
+    return Text_String(TXT_INTERFACE);
+}
+
+const char *QueueMoveCommandClass::Get_Description() const
+{
+    return "Queue Move.";
+}
+
+bool QueueMoveCommandClass::Process()
+{
+    return true;
+}
+
+
+/**
  *  Produces a memory dump on request.
  * 
  *  @author: CCHyper
