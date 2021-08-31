@@ -72,12 +72,6 @@
 
 
 /**
- *  Handy defines for handling any adjustments.
- */
-#define CATEGORY_DEVELOPER "Developer"
-
-
-/**
  *  #issue-167
  * 
  *  Writes a PNG screenshot of the current screen buffer.
@@ -86,22 +80,22 @@
  */
 const char *PNGScreenCaptureCommandClass::Get_Name() const
 {
-    return "ScreenCapture";
+    return TEXT_SCRNCAP_INI;
 }
 
 const char *PNGScreenCaptureCommandClass::Get_UI_Name() const
 {
-    return "Screen Capture";
+    return TEXT_SCRNCAP;
 }
 
 const char *PNGScreenCaptureCommandClass::Get_Category() const
 {
-    return "Interface";
+    return Text_String(TXT_INTERFACE);
 }
 
 const char *PNGScreenCaptureCommandClass::Get_Description() const
 {
-    return "Takes a snapshot of the game screen (Saved as 'SCRN_<date-time>.PNG.)";
+    return TEXT_SCRNCAP_DESC;
 }
 
 bool PNGScreenCaptureCommandClass::Process()
@@ -212,12 +206,12 @@ bool PNGScreenCaptureCommandClass::Process()
  */
 const char *ManualPlaceCommandClass::Get_Name() const
 {
-    return "ManualPlace";
+    return TEXT_PLACEBLD_INI;
 }
 
 const char *ManualPlaceCommandClass::Get_UI_Name() const
 {
-    return "Place Building";
+    return TEXT_PLACEBLD;
 }
 
 const char *ManualPlaceCommandClass::Get_Category() const
@@ -227,7 +221,7 @@ const char *ManualPlaceCommandClass::Get_Category() const
 
 const char *ManualPlaceCommandClass::Get_Description() const
 {
-    return "Enter the manual placement mode when a building is complete and pending on the sidebar.";
+    return TEXT_PLACEBLD_DESC;
 }
 
 bool ManualPlaceCommandClass::Process()
@@ -534,7 +528,7 @@ const char *MemoryDumpCommandClass::Get_UI_Name() const
 
 const char *MemoryDumpCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *MemoryDumpCommandClass::Get_Description() const
@@ -577,7 +571,7 @@ const char *DumpHeapCRCCommandClass::Get_UI_Name() const
 
 const char *DumpHeapCRCCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *DumpHeapCRCCommandClass::Get_Description() const
@@ -675,7 +669,7 @@ const char *InstantBuildCommandClass::Get_UI_Name() const
 
 const char *InstantBuildCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *InstantBuildCommandClass::Get_Description() const
@@ -714,7 +708,7 @@ const char *AIInstantBuildCommandClass::Get_UI_Name() const
 
 const char *AIInstantBuildCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *AIInstantBuildCommandClass::Get_Description() const
@@ -751,7 +745,7 @@ const char *ForceWinCommandClass::Get_UI_Name() const
 
 const char *ForceWinCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *ForceWinCommandClass::Get_Description() const
@@ -789,7 +783,7 @@ const char *ForceLoseCommandClass::Get_UI_Name() const
 
 const char *ForceLoseCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *ForceLoseCommandClass::Get_Description() const
@@ -827,7 +821,7 @@ const char *ForceDieCommandClass::Get_UI_Name() const
 
 const char *ForceDieCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *ForceDieCommandClass::Get_Description() const
@@ -865,7 +859,7 @@ const char *CaptureObjectCommandClass::Get_UI_Name() const
 
 const char *CaptureObjectCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *CaptureObjectCommandClass::Get_Description() const
@@ -922,7 +916,7 @@ const char *SpecialWeaponsCommandClass::Get_UI_Name() const
 
 const char *SpecialWeaponsCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *SpecialWeaponsCommandClass::Get_Description() const
@@ -973,7 +967,7 @@ const char *FreeMoneyCommandClass::Get_UI_Name() const
 
 const char *FreeMoneyCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *FreeMoneyCommandClass::Get_Description() const
@@ -1013,7 +1007,7 @@ const char *LightningBoltCommandClass::Get_UI_Name() const
 
 const char *LightningBoltCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *LightningBoltCommandClass::Get_Description() const
@@ -1052,7 +1046,7 @@ const char *IonBlastCommandClass::Get_UI_Name() const
 
 const char *IonBlastCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *IonBlastCommandClass::Get_Description() const
@@ -1092,7 +1086,7 @@ const char *ExplosionCommandClass::Get_UI_Name() const
 
 const char *ExplosionCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *ExplosionCommandClass::Get_Description() const
@@ -1160,7 +1154,7 @@ const char *SuperExplosionCommandClass::Get_UI_Name() const
 
 const char *SuperExplosionCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *SuperExplosionCommandClass::Get_Description() const
@@ -1228,7 +1222,7 @@ const char *BailOutCommandClass::Get_UI_Name() const
 
 const char *BailOutCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *BailOutCommandClass::Get_Description() const
@@ -1266,7 +1260,7 @@ const char *IonStormCommandClass::Get_UI_Name() const
 
 const char *IonStormCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *IonStormCommandClass::Get_Description() const
@@ -1307,7 +1301,7 @@ const char *MapSnapshotCommandClass::Get_UI_Name() const
 
 const char *MapSnapshotCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *MapSnapshotCommandClass::Get_Description() const
@@ -1364,7 +1358,7 @@ const char *DeleteObjectCommandClass::Get_UI_Name() const
 
 const char *DeleteObjectCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *DeleteObjectCommandClass::Get_Description() const
@@ -1419,7 +1413,7 @@ const char *SpawnAllCommandClass::Get_UI_Name() const
 
 const char *SpawnAllCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *SpawnAllCommandClass::Get_Description() const
@@ -1596,7 +1590,7 @@ const char *DamageCommandClass::Get_UI_Name() const
 
 const char *DamageCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *DamageCommandClass::Get_Description() const
@@ -1645,7 +1639,7 @@ const char *ToggleEliteCommandClass::Get_UI_Name() const
 
 const char *ToggleEliteCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *ToggleEliteCommandClass::Get_Description() const
@@ -1722,7 +1716,7 @@ const char *BuildCheatCommandClass::Get_UI_Name() const
 
 const char *BuildCheatCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *BuildCheatCommandClass::Get_Description() const
@@ -1784,7 +1778,7 @@ const char *ToggleShroudCommandClass::Get_UI_Name() const
 
 const char *ToggleShroudCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *ToggleShroudCommandClass::Get_Description() const
@@ -1840,7 +1834,7 @@ const char *HealCommandClass::Get_UI_Name() const
 
 const char *HealCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *HealCommandClass::Get_Description() const
@@ -1885,7 +1879,7 @@ const char *ToggleInertCommandClass::Get_UI_Name() const
 
 const char *ToggleInertCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *ToggleInertCommandClass::Get_Description() const
@@ -1926,7 +1920,7 @@ const char *DumpAIBaseNodesCommandClass::Get_UI_Name() const
 
 const char *DumpAIBaseNodesCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *DumpAIBaseNodesCommandClass::Get_Description() const
@@ -2002,7 +1996,7 @@ const char *ToggleBerzerkCommandClass::Get_UI_Name() const
 
 const char *ToggleBerzerkCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *ToggleBerzerkCommandClass::Get_Description() const
@@ -2050,7 +2044,7 @@ const char *EncroachShadowCommandClass::Get_UI_Name() const
 
 const char *EncroachShadowCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *EncroachShadowCommandClass::Get_Description() const
@@ -2089,7 +2083,7 @@ const char *EncroachFogCommandClass::Get_UI_Name() const
 
 const char *EncroachFogCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *EncroachFogCommandClass::Get_Description() const
@@ -2128,7 +2122,7 @@ const char *ToggleAllianceCommandClass::Get_UI_Name() const
 
 const char *ToggleAllianceCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *ToggleAllianceCommandClass::Get_Description() const
@@ -2184,7 +2178,7 @@ const char *AddPowerCommandClass::Get_UI_Name() const
 
 const char *AddPowerCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *AddPowerCommandClass::Get_Description() const
@@ -2226,7 +2220,7 @@ const char *PlaceCrateCommandClass::Get_UI_Name() const
 
 const char *PlaceCrateCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *PlaceCrateCommandClass::Get_Description() const
@@ -2284,7 +2278,7 @@ const char *CursorPositionCommandClass::Get_UI_Name() const
 
 const char *CursorPositionCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *CursorPositionCommandClass::Get_Description() const
@@ -2324,7 +2318,7 @@ const char *ToggleFrameStepCommandClass::Get_UI_Name() const
 
 const char *ToggleFrameStepCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *ToggleFrameStepCommandClass::Get_Description() const
@@ -2365,7 +2359,7 @@ const char *Step1FrameCommandClass::Get_UI_Name() const
 
 const char *Step1FrameCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *Step1FrameCommandClass::Get_Description() const
@@ -2406,7 +2400,7 @@ const char *Step5FramesCommandClass::Get_UI_Name() const
 
 const char *Step5FramesCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *Step5FramesCommandClass::Get_Description() const
@@ -2447,7 +2441,7 @@ const char *Step10FramesCommandClass::Get_UI_Name() const
 
 const char *Step10FramesCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *Step10FramesCommandClass::Get_Description() const
@@ -2488,7 +2482,7 @@ const char *ToggleAIControlCommandClass::Get_UI_Name() const
 
 const char *ToggleAIControlCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return TEXT_DEVELOPER;
 }
 
 const char *ToggleAIControlCommandClass::Get_Description() const
