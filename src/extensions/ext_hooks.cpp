@@ -100,8 +100,119 @@
 #include "hooker_macros.h"
 
 
+
+
+
+#if 0
+    GET_REGISTER_STATIC(BlitTransXlatAlphaZRead *, this_ptr, ebp);
+    GET_REGISTER_STATIC(unsigned, src_pixel, eax);
+    GET_REGISTER_STATIC(short *, alpha_buff, ebp);
+    GET_REGISTER_STATIC(short *, alpha_ptr, esi);
+
+    static unsigned tint_color;
+    static unsigned pixel;
+
+    tint_color = DSurface::RGBA_To_Pixel(63, 0, 0);
+
+    static short *buff;
+    static short alpha_pixel;
+    buff = this_ptr->Buffer;
+    alpha_pixel = alpha_buff[*alpha_ptr];
+    pixel = buff[src_pixel | alpha_pixel];
+
+    if (tint_color) {
+        pixel |= tint_color;
+    }
+
+    _asm { mov ecx, pixel }
+
+    JMP_REG(ecx, 0x00469AD9);
+#endif
+
+#include "blitter.h"
+#include "rgb.h"
+class BlitTransXlatAlphaZRead : public Blitter
+{
+    public:
+        short *Buffer;
+        short *Alpha;
+};
+DECLARE_PATCH(_BlitTransXlatAlphaZRead_Copy_Tint_Patch)
+{
+    _asm { 
+        mov ax, [eax+ebx*2]
+        mov bp, 1111100000000000b   ; red
+        test bp, bp
+        jz set_pixel
+
+        or bp, ax     ; OR pixel and tint
+
+set_pixel:
+        mov [edi], ax
+    }
+    JMP_REG(ebp, 0x0046912C);
+}
+
+DECLARE_PATCH(_BlitTransXlatAlphaZReadWrite_Copy_Tint_Patch)
+{
+    _asm { 
+        mov cx, [eax+ecx*2]
+        mov ax, 1111100000000000b   ; red
+        test ax, ax
+        jz set_pixel
+
+        or cx, ax     ; OR pixel and tint
+
+set_pixel:
+        mov [edi], cx
+    }
+    JMP_REG(ecx, 0x00469AD9);
+}
+
+DECLARE_PATCH(_RLEBlitTransXlatAlphaZReadWrite_Copy_Tint_Patch)
+{
+    _asm { 
+        mov dx, [edx+esi*2]
+        mov esi, [esp+28h]
+        mov cx, 1111100000000000b   ; red
+        test cx, cx
+        jz set_pixel
+
+        or dx, cx     ; OR pixel and tint
+
+set_pixel:
+        mov [ebp-2], dx
+    }
+    JMP_REG(ecx, 0x0046C7E6);
+}
+
+DECLARE_PATCH(_RLEBlitTransXlatAlphaZRead_Copy_Tint_Patch)
+{
+    _asm { 
+        mov dx, [ecx+edx*2]
+        mov cx, 1111100000000000b   ; red
+        test cx, cx
+        jz set_pixel
+
+        or dx, cx     ; OR pixel and tint
+
+set_pixel:
+        mov ecx, [esp+1Ch]
+        mov [ebp-2], dx
+    }
+    JMP_REG(edx, 0x0046BA28);
+}
+
+
+
+
 void Extension_Hooks()
 {
+    Patch_Jump(0x00469125, &_BlitTransXlatAlphaZRead_Copy_Tint_Patch);
+    Patch_Jump(0x00469AD2, &_BlitTransXlatAlphaZReadWrite_Copy_Tint_Patch);
+    Patch_Jump(0x0046C7DA, &_RLEBlitTransXlatAlphaZReadWrite_Copy_Tint_Patch);
+    Patch_Jump(0x0046BA1C, &_RLEBlitTransXlatAlphaZRead_Copy_Tint_Patch);
+
     /**
      *  Hook the new save and load system in.
      */
