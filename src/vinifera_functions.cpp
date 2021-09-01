@@ -31,6 +31,8 @@
 #include "cncnet4.h"
 #include "cncnet4_globals.h"
 #include "cncnet5_globals.h"
+#include "ccfile.h"
+#include "ccini.h"
 #include "debughandler.h"
 #include <string>
 
@@ -227,5 +229,41 @@ bool Vinifera_Shutdown()
  */
 int Vinifera_Init_Game(int argc, char *argv[])
 {
+    if (CCFileClass("UI.INI").Is_Available()) {
+
+        CCFileClass file("UI.INI");
+        CCINIClass ini;
+
+        ini.Load(file, false);
+
+        if (!ini.Is_Loaded()) {
+            return false;
+        }
+
+        if (!ini.Is_Present("Dialog")) {
+            return false;
+        }
+
+#if 0
+        dword_809218, edi
+        dword_809250, 28h
+        dword_808B6C, 7Fh
+
+        RGBStruct text_color = ini.Get_RGB("Dialog", "TextColor", );
+        StyleMgrClass::TextColor = DSurface::RGBA_To_Pixel(text_color.R, text_color.G, text_color.B);
+
+        dword_808B68, 109010h
+        dword_809248, 909090h
+
+        RGBStruct outline_color = ini.Get_RGB("Dialog", "OutlineColor", );
+        StyleMgrClass::OutlineColor = DSurface::RGBA_To_Pixel(text_color.R, text_color.G, text_color.B);
+
+        dword_809230, 615022h
+        dword_8093A4, 221B0Bh
+        dword_808E30, 443716h
+#endif
+        
+    }
+
     return EXIT_SUCCESS;
 }

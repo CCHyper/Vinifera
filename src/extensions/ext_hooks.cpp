@@ -94,6 +94,7 @@
 
 #include "cciniext_hooks.h"
 
+#include "ownrdrawext_hooks.h"
 #include "skirmishdlg_hooks.h"
 
 #include "hooker.h"
@@ -181,5 +182,6 @@ void Extension_Hooks()
     /**
      *  Dialogs and associated code.
      */
+    OwnerDrawExtension_Hooks();
     SkirmishDialog_Hooks();
 }
