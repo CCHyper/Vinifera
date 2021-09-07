@@ -27,12 +27,41 @@
  ******************************************************************************/
 #include "objectext_hooks.h"
 #include "objectext_init.h"
+#include "objectext.h"
+#include "object.h"
+#include "objecttype.h"
+#include "objecttypeext.h"
+#include "linetrail.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+DECLARE_PATCH(_ObjectClass_Unlimbo_Create_Line_Trail_Patch)
+{
+    GET_REGISTER_STATIC(ObjectClass *, this_ptr, esi);
+    static ObjectClassExtension *objectext;
+
+    objectext = ObjectClassExtensions.find(this_ptr);
+
+    /**
+     *  
+     */
+    if (objectext) {
+        objectext->Create_Line_Trails();
+    }
+
+    _asm { mov al, 1 }
+    _asm { pop edi }
+    _asm { pop esi }
+    _asm { pop ebp }
+    _asm { pop ebx }
+    _asm { add esp, 0x34 }
+    _asm { ret 8 }
+}
 
 
 /**
@@ -44,4 +73,6 @@ void ObjectClassExtension_Hooks()
      *  Initialises the extended class.
      */
     ObjectClassExtension_Init();
+
+    Patch_Jump(0x00585ECB, &_ObjectClass_Unlimbo_Create_Line_Trail_Patch);
 }

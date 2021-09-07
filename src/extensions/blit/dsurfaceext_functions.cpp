@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OBJECTEXT.H
+ *  @file          DSURFACEEXT_FUNCTIONS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Extended ObjectClass class.
+ *  @brief         Contains the supporting functions for the extended DSurface class.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,41 +25,20 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#pragma once
-
-#include "extension.h"
-#include "container.h"
-
-
-class ObjectClass;
-class CCINIClass;
-class LineTrailClass;
+#include "dsurfaceext_functions.h"
+#include "dsurface.h"
+#include "rect.h"
+#include "point.h"
+#include "rgb.h"
+#include "debughandler.h"
+#include "asserthandler.h"
 
 
-class ObjectClassExtension final : public Extension<ObjectClass>
+/**
+ *  
+ * 
+ *  @author: CCHyper, tomsons26
+ */
+void DSurface_Draw_Pixel_Trail(DSurface *this_ptr, Rect &area, Point2D &start, Point2D &end, RGBClass &color, int a6, int a7, int a8)
 {
-    public:
-        ObjectClassExtension(ObjectClass *this_ptr);
-        ObjectClassExtension(const NoInitClass &noinit);
-        ~ObjectClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        virtual void Detach_All(bool all = false);
-
-        bool Create_Line_Trails();
-
-    public:
-        /**
-         *  
-         */
-        DynamicVectorClass<LineTrailClass *> AttachedLineTrails;
-};
-
-
-extern ExtensionMap<ObjectClass, ObjectClassExtension> ObjectClassExtensions;
+}

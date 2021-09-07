@@ -39,6 +39,7 @@
 #include "session.h"
 #include "scenario.h"
 #include "ebolt.h"
+#include "linetrail.h"
 #include "house.h"
 #include "housetype.h"
 #include "super.h"
@@ -537,6 +538,10 @@ void TacticalMapExtension::Render_Post()
     /**
      *  Draw any new post effects here.
      */
+    //DEV_DEBUG_INFO("Before LineTrailClass::Draw_All\n");
+    LineTrailClass::Draw_All();
+    //DEV_DEBUG_INFO("After LineTrailClass::Draw_All\n");
+
     //DEV_DEBUG_INFO("Before EBoltClass::Draw_All\n");
     EBoltClass::Draw_All();
     //DEV_DEBUG_INFO("After EBoltClass::Draw_All\n");

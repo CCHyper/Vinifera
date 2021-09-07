@@ -29,6 +29,9 @@
 
 #include "extension.h"
 #include "container.h"
+#include "linetrail.h"
+#include "vector.h"
+#include "rgb.h"
 
 
 class ObjectTypeClass;
@@ -52,7 +55,20 @@ class ObjectTypeClassExtension final : public Extension<ObjectTypeClass>
         bool Read_INI(CCINIClass &ini);
 
     public:
+        /**
+         *  When this flag is set to yes, the game will draw a line following the path of this object. 
+         */
+        bool IsUseLineTrail;
 
+        /**
+         *  
+         */
+        int LineTrailCount;
+
+        /**
+         *  
+         */
+        DynamicVectorClass<LineTrailClass::LineTrailControlStruct *> LineTrailTypes;
 };
 
 

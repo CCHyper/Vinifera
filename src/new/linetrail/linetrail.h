@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OBJECTEXT.H
+ *  @file          LINETRAIL.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended ObjectClass class.
+ *  @brief         Graphical line trails for Objects.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,39 +27,71 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
+#include "always.h"
+#include "tpoint.h"
+#include "rgb.h"
 
 
-class ObjectClass;
-class CCINIClass;
-class LineTrailClass;
+/**
+ *  This structure defines the control of each line trail [only used for ini loading].
+ */
+typedef struct LineTrailControlStruct
+{
+    /**
+     *  The colour of the line trail.
+     */
+    RGBClass Color;
+
+    /**
+     *  The decrement (fadeout) of the line trail applied every frame. 
+     */
+    int ColorDecrement;
+
+    /**
+     *  
+     */
+    TPoint2D<int> Position;
+
+} LineTrailControlStruct;
 
 
-class ObjectClassExtension final : public Extension<ObjectClass>
+class LineTrailClass
 {
     public:
-        ObjectClassExtension(ObjectClass *this_ptr);
-        ObjectClassExtension(const NoInitClass &noinit);
-        ~ObjectClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        virtual void Detach_All(bool all = false);
-
-        bool Create_Line_Trails();
+        enum {
+            // Maximum line trails per object.
+            MAX_LINE_TRAILS = 16
+        };
 
     public:
+        LineTrailClass(RGBClass &color, int dec, TPoint2D<int> &pos);
+        ~LineTrailClass();
+
+        //void Set_Color(RGBClass &color);
+        //void Set_Color_Decrement(int dec);
+
+        static void Draw_All();
+        static void Clear_All();
+
+    private:
+        void Draw_It();
+        void Update();
+        bool Is_Something() const;
+
+    private:
+
         /**
-         *  
+         *  The colour of the line trail.
          */
-        DynamicVectorClass<LineTrailClass *> AttachedLineTrails;
+        RGBClass Color;
+
+        /**
+         *  current coord?
+         */
+        Coordinate Coord;
+
+        /**
+         *  ?
+         */
+        int Decrement;
 };
-
-
-extern ExtensionMap<ObjectClass, ObjectClassExtension> ObjectClassExtensions;

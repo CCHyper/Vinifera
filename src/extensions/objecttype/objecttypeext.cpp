@@ -44,7 +44,10 @@ ExtensionMap<ObjectTypeClass, ObjectTypeClassExtension> ObjectTypeClassExtension
  *  @author: CCHyper
  */
 ObjectTypeClassExtension::ObjectTypeClassExtension(ObjectTypeClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    IsUseLineTrail(false),
+    LineTrailCount(0),
+    LineTrailTypes()
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("ObjectTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -116,6 +119,8 @@ HRESULT ObjectTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
         return hr;
     }
 
+	// TODO
+
     return hr;
 }
 
@@ -155,6 +160,8 @@ void ObjectTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("ObjectTypeClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    crc(LineTrailTypes.Count());
 }
 
 
@@ -174,6 +181,27 @@ bool ObjectTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
-    
+
+    IsUseLineTrail = ini.Get_Bool(ini_name, "UseLineTrail", IsUseLineTrail);
+    LineTrailCount = ini.Get_Int_Clamp(ini_name, "LineTrailCount", 0, LineTrailClass::MAX_LINE_TRAILS, LineTrailCount);
+
+    for (int i = 0; i < LineTrailCount; ++i) {
+
+        char buffer[128];
+
+        LineTrailControlStruct line;
+
+        std::snprintf(buffer, sizeof(buffer), "LineTrail%dColor", i);
+        line.Color = (const RGBClass)ini.Get_RGB(ini_name, buffer, RGBStruct{128,128,128});
+
+        std::snprintf(buffer, sizeof(buffer), "LineTrail%dColorDecrement", i);
+        line.ColorDecrement = ini.Get_Int(ini_name, buffer, 16);
+
+        std::snprintf(buffer, sizeof(buffer), "LineTrail%dXY", i);
+        line.OffsetXY = ini.Get_Point(ini_name, buffer, TPoint2D<int>(0,0));
+
+        LineTrailTypes.Add(&line);
+    }
+
     return true;
 }

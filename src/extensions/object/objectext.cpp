@@ -27,6 +27,8 @@
  ******************************************************************************/
 #include "objectext.h"
 #include "object.h"
+#include "objecttype.h"
+#include "objecttypeext.h"
 #include "ccini.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -44,7 +46,8 @@ ExtensionMap<ObjectClass, ObjectClassExtension> ObjectClassExtensions;
  *  @author: CCHyper
  */
 ObjectClassExtension::ObjectClassExtension(ObjectClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    AttachedLineTrails()
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("ObjectClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -76,6 +79,8 @@ ObjectClassExtension::~ObjectClassExtension()
     //DEV_DEBUG_TRACE("ObjectClassExtension deconstructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
     //DEV_DEBUG_WARNING("ObjectClassExtension deconstructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
+    AttachedLineTrails.Clear();
+
     IsInitialized = false;
 }
 
@@ -95,7 +100,11 @@ HRESULT ObjectClassExtension::Load(IStream *pStm)
         return E_FAIL;
     }
 
+    AttachedLineTrails.Clear();
+
     new (this) ObjectClassExtension(NoInitClass());
+
+    SWIZZLE_REQUEST_POINTER_REMAP_LIST("AttachedLineTrails", AttachedLineTrails);
     
     return hr;
 }
@@ -167,4 +176,44 @@ void ObjectClassExtension::Detach_All(bool all)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("ObjectClassExtension::Detach_All - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    AttachedLineTrails.Clear();
+}
+
+
+/**
+ *  
+ *  
+ *  @author: CCHyper
+ */
+bool ObjectClassExtension::Create_Line_Trails()
+{
+    ASSERT(ThisPtr != nullptr);
+    //DEV_DEBUG_TRACE("ObjectClassExtension::Create_Line_Trails - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    auto objecttypeext = ObjectTypeClassExtensions.find(ThisPtr->Class_Of());
+
+    if (objecttypeext && objecttypeext->IsUseLineTrail) {
+
+        for (int i = 0; i < objecttypeext->LineTrailTypes.Count(); ++i) {
+
+            LineTrailControlStruct *linetrailtype = objecttypeext->LineTrailTypes[i];
+
+            LineTrailClass *linetrail = new LineTrailClass(linetrailtype->Color,
+                                                           linetrailtype->ColorDecrement,
+                                                           linetrailtype->Position);
+            if (linetrail) {
+
+                LineTrailControlStruct *linetrailtype = objecttypeext->LineTrailTypes[i];
+
+                linetrail->Set_Color(linetrailtype->Color);
+                linetrail->Set_Color_Decrement(linetrailtype->ColorDecrement);
+
+                AttachedLineTrails.Add(linetrail);
+            }
+
+        }
+
+    }
+
 }

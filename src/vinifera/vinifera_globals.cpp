@@ -65,6 +65,7 @@ DynamicVectorClass<MFCC *> ViniferaMapsMixes;
 DynamicVectorClass<MFCC *> ViniferaMoviesMixes;
 
 DynamicVectorClass<EBoltClass *> EBolts;
+DynamicVectorClass<LineTrailClass *> LineTrails;
 DynamicVectorClass<TheaterTypeClass *> TheaterTypes;
 
 MFCC *GenericMix = nullptr;
