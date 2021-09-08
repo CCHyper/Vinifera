@@ -55,7 +55,8 @@ WeaponTypeClassExtension::WeaponTypeClassExtension(WeaponTypeClass *this_ptr) :
     ElectricBoltSegmentCount(EBOLT_DEFAULT_LINE_SEGEMENTS),
     ElectricBoltLifetime(EBOLT_DEFAULT_LIFETIME),
     ElectricBoltIterationCount(EBOLT_DEFAULT_INTERATIONS),
-    ElectricBoltDeviation(EBOLT_DEFAULT_DEVIATION)
+    ElectricBoltDeviation(EBOLT_DEFAULT_DEVIATION),
+    IsLegacyElectricBolt(false)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("WeaponTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -168,6 +169,7 @@ void WeaponTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
     //EXT_DEBUG_TRACE("WeaponTypeClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
     crc(IsElectricBolt);
+    crc(IsLegacyElectricBolt);
 }
 
 
@@ -201,7 +203,8 @@ bool WeaponTypeClassExtension::Read_INI(CCINIClass &ini)
     ElectricBoltDeviation = ini.Get_Float(ini_name, "EBoltDeviation", ElectricBoltDeviation);
     //ElectricBoltSourceBoltParticleSys = ini.Get_ParticleSys(ini_name, "EBoltSourceParticleSys", ElectricBoltSourceBoltParticleSys);
     //ElectricBoltTargetBoltParticleSys = ini.Get_ParticleSys(ini_name, "EBoltTargetBoltParticleSys", ElectricBoltTargetBoltParticleSys);
-    
+
+    IsLegacyElectricBolt = ini.Get_Bool(ini_name, "IsLegacyElectricBolt", IsLegacyElectricBolt);
 
     return true;
 }

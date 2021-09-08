@@ -99,6 +99,11 @@ class WeaponTypeClassExtension final : public Extension<WeaponTypeClass>
          */
         //ParticleSystemClass *ElectricBoltSourceBoltParticleSys;
         //ParticleSystemClass *ElectricBoltTargetBoltParticleSys;
+
+        /**
+         *  Is this a legacy style electric bolt weapon (Uses custom shape drawing)?
+         */
+        bool IsLegacyElectricBolt;
 };
 
 

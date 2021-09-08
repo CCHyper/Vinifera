@@ -119,6 +119,16 @@ DECLARE_PATCH(_TechnoClass_Fire_At_Electric_Bolt_Patch)
         }
     }
 
+    /**
+     *  Spawn the legacy electric bolt.
+     */
+    weapontypeext = WeaponTypeClassExtensions.find(weapon);
+    if (weapontypeext) {
+        if (weapontypeext->IsLegacyElectricBolt) {
+            TechnoClassExtension_Legacy_Electric_Bolt(this_ptr, target);
+        }
+    }
+
     JMP_REG(edx, 0x006312D7);
 }
 

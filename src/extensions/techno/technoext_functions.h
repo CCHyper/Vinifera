@@ -37,3 +37,5 @@ class EBoltClass;
 
 EBoltClass *TechnoClassExtension_Electric_Zap(TechnoClass *this_ptr, TARGET target, int which, const WeaponTypeClass *weapontype, Coordinate &source_coord);
 EBoltClass *TechnoClassExtension_Electric_Bolt(TechnoClass *this_ptr, TARGET target);
+
+bool TechnoClassExtension_Legacy_Electric_Zap(TechnoClass *this_ptr, TARGET target, int which, const WeaponTypeClass *weapontype, Coordinate &source_coord);
