@@ -27,7 +27,11 @@
  ******************************************************************************/
 #include "vinifera_functions.h"
 #include "vinifera_globals.h"
+#include "vinifera_util.h"
 #include "vinifera_newdel.h"
+#include "tibsun_globals.h"
+#include "wwkeyboard.h"
+#include "command.h"
 #include "cncnet4.h"
 #include "cncnet4_globals.h"
 #include "cncnet5_globals.h"
@@ -216,4 +220,43 @@ bool Vinifera_Shutdown()
     DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 
     return true;
+}
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+void Vinifera_Message_Handler(HWND hWnd, UINT uMsg, UINT wParam, LONG lParam)
+{
+    static bool _taking_screenshot = false;
+
+    KeyNumType input = (KeyNumType)WWKeyboard->Get();
+    KeyNumType cmd_key = Get_Command_Key_From_Name("ScreenCapture");
+    if (((input) & (~KN_RLSE_BIT)) == cmd_key) {
+
+        /**
+         *  If we are currently playing a scenario, no need to execute this command.
+         */
+        if (bool_007E4040 || bool_007E48FC) {
+
+            /**
+             *  Are we currently executing a scroll command? This is required because
+             *  the Main_Window_Procedure function runs at a Windows level.
+             */
+            if (_taking_screenshot) {
+
+                _taking_screenshot = true;
+
+                /**
+                 *  Execute the screenshot command.
+                 */
+                CommandClass::Activate_From_Name("ScreenCapture");
+
+                _taking_screenshot = false;
+            }
+        }
+
+    }
 }

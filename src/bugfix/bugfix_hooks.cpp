@@ -46,11 +46,39 @@
 #include "dropship.h"
 #include "msgbox.h"
 #include "command.h"
+#include "wwkeyboard.h"
 #include "loadoptions.h"
 #include "debughandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+
+
+extern void Vinifera_Message_Handler(HWND, UINT, UINT, LONG);
+/**
+ *  
+ */
+DECLARE_PATCH(_s)
+{
+    GET_REGISTER_STATIC(HWND, hWnd, ebp);
+    GET_STACK_STATIC(UINT, lParam, esp, 0x18);
+    GET_STACK_STATIC(UINT, wParam, esp, 0x14);
+
+    WWKeyboard->Message_Handler(hWnd, uMsg, lParam, wParam);
+
+    Vinifera_Message_Handler(hWnd, lParam, wParam);
+
+    JMP(0x00685FA0)
+}
+
+static void _()
+{
+    Patch_Jump(0x00685FA0, &_s);
+}
+
+
 
 
 /**

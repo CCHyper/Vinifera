@@ -33,3 +33,4 @@
 bool Vinifera_Parse_Command_Line(int argc, char *argv[]);
 bool Vinifera_Startup();
 bool Vinifera_Shutdown();
+void Vinifera_Message_Handler(HWND hWnd, UINT uMsg, UINT wParam, LONG lParam);
