@@ -51,6 +51,15 @@ class LaserDrawClassExtension final : public Extension<LaserDrawClass>
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
     public:
+        /**
+         *  
+         */
+        TechnoClass *Source;
+
+        /**
+         *  
+         */
+        int Thickness;
 };
 
 

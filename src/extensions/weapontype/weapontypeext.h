@@ -52,6 +52,35 @@ class WeaponTypeClassExtension final : public Extension<WeaponTypeClass>
         bool Read_INI(CCINIClass &ini);
 
     public:
+        /**
+         *  
+         */
+        int LaserThickness;
+
+        /**
+         *  
+         */
+        bool IsLaserFades;
+
+        /**
+         *  
+         */
+        bool IsLaserBlinks;
+
+        /**
+         *  
+         */
+        float LaserStartIntensity;
+
+        /**
+         *  
+         */
+        float LaserFinishIntensity;
+
+        /**
+         *  
+         */
+        bool IsLightningBolt;
 };
 
 

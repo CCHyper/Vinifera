@@ -44,7 +44,9 @@ ExtensionMap<LaserDrawClass, LaserDrawClassExtension> LaserDrawClassExtensions;
  *  @author: CCHyper
  */
 LaserDrawClassExtension::LaserDrawClassExtension(LaserDrawClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    Source(nullptr),
+    Thickness(1)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("LaserDrawClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));

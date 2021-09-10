@@ -33,12 +33,16 @@
 #include "technotypeext.h"
 #include "tibsun_inline.h"
 #include "weapontype.h"
+#include "weapontypeext.h"
 #include "warheadtype.h"
 #include "warheadtypeext.h"
 #include "house.h"
 #include "housetype.h"
 #include "rules.h"
 #include "voc.h"
+#include "laserdraw.h"
+#include "laserdrawext.h"
+#include "particlesys.h"
 #include "fatal.h"
 #include "vinifera_util.h"
 #include "asserthandler.h"
@@ -46,6 +50,192 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+
+
+// https://github.com/Phobos-developers/Phobos/blob/ccd8954cf23720a79faeb5c6099b911967dd29b7/src/Misc/Hooks.LaserDraw.cpp
+
+
+/**
+ *  Creates a new laser draw object.
+ *  
+ *  @author: CCHyper
+ */
+static void New_LaserDrawClass_Object(TechnoClass *this_ptr, Coordinate &start_coord, Coordinate &end_coord, int z_adjust, WeaponTypeClass *weapon)
+{
+    if (!this_ptr || !weapon) {
+        return;
+    }
+
+    LaserDrawClassExtension *laserdrawext;
+    WeaponTypeClassExtension *weapontypeext;
+
+    LaserDrawClass *laserdraw = nullptr;
+
+    bool lightning_bolt = false;
+
+    bool blinks = false;
+    bool fades = true;
+    float start_intensity = 0.0f;
+    float end_intensity = 1.0f;
+    bool a9 = true;             // TODO, what is this?
+
+
+
+    //
+    // TODO, investigate why the lasers look different (darker?) with this patch.
+    //
+
+
+
+    /**
+     *  Fetch the laser overrides from the weapon.
+     */
+    weapontypeext = WeaponTypeClassExtensions.find(weapon);
+    if (weapontypeext) {
+        lightning_bolt = weapontypeext->IsLightningBolt;
+        blinks = weapontypeext->IsLaserBlinks;
+        fades = weapontypeext->IsLaserFades;
+        start_intensity = weapontypeext->LaserStartIntensity;
+        end_intensity = weapontypeext->LaserFinishIntensity;
+    }
+
+
+    /**
+     *  Create the lightning bolt laser object.
+     */
+    if (lightning_bolt) {
+
+        for (int i = 0; i < 200; ++i) {
+
+
+            ? += Random_Pick(-128, 128);
+            ? += Random_Pick(-128, 128);
+            ? = Random_Pick(0, 3 * ?) + ?;
+
+
+            laserdraw = new LaserDrawClass(
+                start_coord,
+                end_coord,
+                z_adjust,
+                a9,
+                weapon->LaserInnerColor,
+                weapon->LaserOuterColor,
+                weapon->LaserOuterSpread,
+                weapon->LaserDuration,
+                blinks,
+                fades,
+                start_intensity,
+                end_intensity);
+
+
+            laserdrawext = LaserDrawClassExtensions.find(laserdraw);
+
+            //weapontypeext = WeaponTypeClassExtensions.find(weapon);
+            if (weapontypeext) {
+
+                /**
+                 *  Fetch extended laser overrides from the weapon.
+                 */
+                laserdrawext = LaserDrawClassExtensions.find(laserdraw);
+                if (laserdrawext) {
+                    laserdrawext->Thickness = weapontypeext->LaserThickness;
+                }
+            }
+
+            /**
+             *  Store extended laserdraw properties.
+             */
+            if (laserdrawext) {
+                laserdrawext->Source = this_ptr;
+            }
+
+
+
+        }
+
+        /**
+         *  Spawn a spark particle at the destination of the lightning bolt.
+         */
+        ParticleSystemClass *particlesys = new ParticleSystemClass(Rule->DefaultSparkSystem, end_coord);
+        ASSERT(particlesys != nullptr);
+
+
+    /**
+     *  Create the standard laser object.
+     */
+    } else {
+    
+        laserdraw = new LaserDrawClass(
+            start_coord,
+            end_coord,
+            z_adjust,
+            a9,
+            weapon->LaserInnerColor,
+            weapon->LaserOuterColor,
+            weapon->LaserOuterSpread,
+            weapon->LaserDuration,
+            blinks,
+            fades,
+            start_intensity,
+            end_intensity);
+
+        ASSERT(laserdraw != nullptr);
+
+        laserdrawext = LaserDrawClassExtensions.find(laserdraw);
+
+        //weapontypeext = WeaponTypeClassExtensions.find(weapon);
+        if (weapontypeext) {
+
+            /**
+             *  Fetch extended laser overrides from the weapon.
+             */
+            laserdrawext = LaserDrawClassExtensions.find(laserdraw);
+            if (laserdrawext) {
+                laserdrawext->Thickness = weapontypeext->LaserThickness;
+            }
+        }
+
+        /**
+         *  Store extended laserdraw properties.
+         */
+        if (laserdrawext) {
+            laserdrawext->Source = this_ptr;
+        }
+    
+    }
+}
+
+
+/**
+ *  #issue-
+ * 
+ *  Patch to intercept and replace the creation of a LaserDraw object when
+ *  a unit fires a laser weapon. This allows us to fully customise the creation
+ *  and properties of the object.
+ *  
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_TechnoClass_Laser_Zap_Customise_Patch)
+{
+    GET_REGISTER_STATIC(TechnoClass *, this_ptr, edi);
+    GET_REGISTER_STATIC(WeaponTypeClass *, weapon, esi);
+    LEA_STACK_STATIC(Coordinate *, from_coord, esp, 0x24);
+    LEA_STACK_STATIC(Coordinate *, to_coord, esp, 0x30);
+    GET_REGISTER_STATIC(int, z_adjust, ebx);
+
+    /**
+     *  Create a new laser object.
+     */
+    New_LaserDrawClass_Object(this_ptr, *from_coord, *to_coord, z_adjust, weapon);
+
+    JMP(0x006301C7);
+}
+
+
+
+
 
 
 /**
@@ -338,4 +528,5 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x0062F6B7, &_TechnoClass_Is_Ready_To_Uncloak_Cloak_Stop_BugFix_Patch);
     Patch_Jump(0x0062E6F0, &_TechnoClass_Null_House_Warning_Patch);
     Patch_Jump(0x006328DE, &_TechnoClass_Take_Damage_IsAffectsAllies_Patch);
+    Patch_Jump(0x0063012B, &_TechnoClass_Laser_Zap_Customise_Patch);
 }

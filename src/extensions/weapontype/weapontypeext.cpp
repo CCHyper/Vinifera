@@ -44,7 +44,12 @@ ExtensionMap<WeaponTypeClass, WeaponTypeClassExtension> WeaponTypeClassExtension
  *  @author: CCHyper
  */
 WeaponTypeClassExtension::WeaponTypeClassExtension(WeaponTypeClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    LaserThickness(1),
+    IsLaserFades(true),
+    IsLaserBlinks(false),
+    LaserStartIntensity(1.0f),
+    LaserFinishIntensity(0.5f)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("WeaponTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -155,6 +160,12 @@ void WeaponTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("WeaponTypeClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    crc(LaserThickness);
+    crc(IsLaserFades);
+    crc(IsLaserBlinks);
+    crc(LaserStartIntensity);
+    crc(LaserFinishIntensity);
 }
 
 
@@ -174,6 +185,12 @@ bool WeaponTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
+
+    LaserThickness = ini.Get_Int(ini_name, "LaserThickness", LaserThickness);
+    IsLaserFades = ini.Get_Bool(ini_name, "LaserFades", IsLaserFades);
+    IsLaserBlinks = ini.Get_Bool(ini_name, "LaserBlinks", IsLaserBlinks);
+    LaserStartIntensity = ini.Get_Float(ini_name, "LaserStartIntensity", LaserStartIntensity);
+    LaserFinishIntensity = ini.Get_Float(ini_name, "LaserFinishIntensity", LaserFinishIntensity);
     
     return true;
 }
