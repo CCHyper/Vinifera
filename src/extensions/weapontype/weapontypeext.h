@@ -87,6 +87,11 @@ class WeaponTypeClassExtension final : public Extension<WeaponTypeClass>
         bool SonicBeamIsClear;
 
         /**
+         *  Is this sonic beam reversed so it starts from the target towards the firing unit instead?
+         */
+        bool SonicBeamIsReversed;
+
+        /**
          *  The alpha blending of the sonic beam.
          */
         double SonicBeamAlpha;

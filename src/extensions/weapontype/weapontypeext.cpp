@@ -46,6 +46,8 @@ ExtensionMap<WeaponTypeClass, WeaponTypeClassExtension> WeaponTypeClassExtension
 WeaponTypeClassExtension::WeaponTypeClassExtension(WeaponTypeClass *this_ptr) :
     Extension(this_ptr),
     SonicBeamColor{0,0,0},
+    SonicBeamIsClear(false),
+    SonicBeamIsReversed(false),
     SonicBeamAlpha(0.5),
     SonicBeamDuration(0.125),
     SonicBeamAmplitude(12.0),
@@ -203,6 +205,7 @@ bool WeaponTypeClassExtension::Read_INI(CCINIClass &ini)
     }
 
     SonicBeamIsClear = ini.Get_Bool(ini_name, "SonicBeamIsClear", SonicBeamIsClear);
+    SonicBeamIsReversed = ini.Get_Bool(ini_name, "SonicBeamIsReversed", SonicBeamIsReversed);
     SonicBeamAlpha = ini.Get_Float_Clamp(ini_name, "SonicBeamAlpha", 0.0, 1.0, SonicBeamAlpha);
     SonicBeamDuration = ini.Get_Float(ini_name, "SonicBeamDuration", SonicBeamDuration);
     SonicBeamAmplitude = ini.Get_Float(ini_name, "SonicBeamAmplitude", SonicBeamAmplitude);

@@ -62,6 +62,17 @@ class WaveClassFake : public WaveClass
             }
         }
 
+        void Wave_AI_Intercept()
+        {
+            WaveClassExtension *waveext;
+            waveext = WaveClassExtensions.find(this);
+            if (waveext) {
+                waveext->Wave_AI();
+            } else {
+                func_672AA0();
+            }
+        }
+
         bool Generate_Tables_Intercept()
         {
             WaveClassExtension *waveext;

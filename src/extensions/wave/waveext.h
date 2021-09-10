@@ -51,6 +51,7 @@ class WaveClassExtension final : public Extension<WaveClass>
         void Init();
 
         void Draw_Sonic_Beam_Pixel(int a1, int a2, int a3, unsigned short *buffer);
+        void Wave_AI();
 
         bool Calculate_Sonic_Beam_Tables();
 
@@ -60,11 +61,16 @@ class WaveClassExtension final : public Extension<WaveClass>
          */
         WeaponTypeClass *WeaponTypePtr;
 
+        // TODO: Need naming
+        bool field_CD;
+        int field_D4;
+
         /**
          *  The following are copied from WeaponTypeExtension on creation.
          */
         RGBStruct SonicBeamColor;
         bool SonicBeamIsClear;
+        bool SonicBeamIsReversed;
         double SonicBeamAlpha;
         double SonicBeamDuration;
         double SonicBeamAmplitude;

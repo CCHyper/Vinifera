@@ -29,6 +29,8 @@
 #include "wave.h"
 #include "weapontypeext.h"
 #include "weapontype.h"
+#include "tibsun_inline.h"
+#include "foot.h"
 #include "wwcrc.h"
 #include "wwmath.h"
 #include "asserthandler.h"
@@ -67,6 +69,9 @@ WaveClassExtension::WaveClassExtension(WaveClass *this_ptr) :
     SonicBeamStartPinRight(-30.0, 100.0, 0.0),
     SonicBeamEndPinLeft(30.0, -100.0, 0.0),
     SonicBeamEndPinRight(30.0, 100.0, 0.0),
+    field_CD(false),         
+    field_D4(0),
+    SonicBeamReversed(false),
     SonicBeamTablesCalculated(false),
     SonicBeamSineTable(),
     SonicBeamSurfacePatternTable(),
@@ -401,4 +406,170 @@ void WaveClassExtension::Draw_Sonic_Beam_Pixel(int a1, int a2, int a3, unsigned 
     g = std::min<int>(g, 255);
     b = std::min<int>(b, 255);
     *buffer = DSurface::RGBA_To_Pixel(r, g, b);
+}
+
+
+/**
+ *  Re-implementation of Wave_AI() for WaveClassExtension.
+ * 
+ *  @authors: tomsons26, CCHyper
+ */
+void WaveClassExtension::Wave_AI()
+{
+    ASSERT(ThisPtr != nullptr);
+    //DEV_DEBUG_TRACE("WaveClassExtension::Wave_AI - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    //#define WAVE_MAG_BEAM 3
+
+    static double dbl_B45D80 = WWMath::Sqrt((WWMath::Pow(256.0, 2.0) * 2));
+
+    //
+    // TODO: Need to confirm the TS code compared to YR changes so we can make the
+    //       dolphin wave optional.
+    //
+
+#if 0
+    if (ThisPtr->field_D8 - ThisPtr->field_E0 > 0.1 /*&& ThisPtr->Type == WAVE_SONIC*/) {
+        field_CD = true;
+    }
+    if (ThisPtr->SonicEC == (unsigned int)(1.0 / 0.05) && ThisPtr->Type == WAVE_MAG_BEAM) {
+        ThisPtr->SonicEC = 64;
+        ++field_D4;
+    }
+#else
+    if (ThisPtr->field_D8 - ThisPtr->field_E0 > 0.1 && !SonicBeamReversed) {
+        field_CD = true;
+    }
+    if (ThisPtr->SonicEC == (unsigned int)(1.0 / 0.05) && SonicBeamReversed) {
+        ThisPtr->SonicEC = 64;
+        ++field_D4;
+    }
+#endif
+
+    TechnoClass *object_techno = (TechnoClass *)ThisPtr->xObject;
+    TechnoClass *target_techno = (TechnoClass *)ThisPtr->xTarget;
+
+    if (!target_techno || !ThisPtr->xObject || ThisPtr->SonicEC == (unsigned int)(signed __int64)(1.0 / 0.05) || object_techno->TarCom != target_techno) {
+        ThisPtr->field_CC = false;
+        field_CD = true;
+    }
+
+#if 0
+    if (ThisPtr->Type == WAVE_MAG_BEAM) {
+        ThisPtr->field_CC = false;
+        field_CD = true;
+    } else {
+        if (dbl_B45D80 * 6.0 < (double)Distance(object_techno->Coord, target_techno->entry_5C())) {
+            ThisPtr->field_CC = false;
+            field_CD = true;
+        }
+    }
+#else
+    if (SonicBeamReversed) {
+        ThisPtr->field_CC = false;
+        field_CD = true;
+    } else {
+        if (dbl_B45D80 * 6.0 < (double)Distance(object_techno->Coord, target_techno->entry_5C())) {
+            ThisPtr->field_CC = false;
+            field_CD = true;
+        }
+    }
+#endif
+
+    if (ThisPtr->field_CC) {
+#if 0
+        if (ThisPtr->Type == WAVE_MAG_BEAM) {
+            if (target_techno && target_techno->Kind_Of() == RTTI_UNIT) {
+                //WaveClass::Init_Magnetic(target_techno->entry_5C(), object_techno->Fire_Coord());
+            } else {
+                //WaveClass::Init_Magnetic(object_techno->Fire_Coord(), target_techno->entry_5C());
+            }
+        } else {
+            ThisPtr->func_672160(object_techno->Fire_Coord(), target_techno->entry_5C());
+        }
+#else
+        if (SonicBeamReversed && target_techno && target_techno->Kind_Of() == RTTI_UNIT) {
+            ThisPtr->func_672160(target_techno->entry_5C(), object_techno->Fire_Coord());
+
+        } else {
+            ThisPtr->func_672160(object_techno->Fire_Coord(), target_techno->entry_5C());
+        }
+#endif
+    }
+
+    double v23 = ThisPtr->field_D8;
+    //if (ThisPtr->Type == WAVE_MAG_BEAM) {
+    if (SonicBeamReversed) {
+        if (v23 < 1.0 && ThisPtr->field_CC) {
+            ThisPtr->field_D8 = ThisPtr->field_D8 + 0.05;
+            if (ThisPtr->field_D8 > 0.98) {
+                ThisPtr->field_D8 = 1.0;
+            }
+            double v25 = ThisPtr->field_D8;
+            Point2D *v27 = ThisPtr->field_E8.Points;
+
+            v27[0].X = (signed __int64)((double)ThisPtr->field_7C.X * v25 + (double)ThisPtr->field_8C.X * (1.0 - v25));
+            v27[0].Y = (signed __int64)((double)ThisPtr->field_7C.Y * v25 + (double)ThisPtr->field_8C.Y * (1.0 - v25));
+
+            v27[1].X = (signed __int64)((double)ThisPtr->field_84.X * v25 + (double)ThisPtr->field_94.X * (1.0 - v25));
+            v27[1].Y = (signed __int64)((double)ThisPtr->field_84.Y * v25 + (double)ThisPtr->field_94.Y * (1.0 - v25));
+        }
+
+        if (field_CD && 0.05 * 0.5 + ThisPtr->field_D8 >= ThisPtr->field_E0) {
+            ThisPtr->field_E0 = ThisPtr->field_E0 + 0.05;
+            if (ThisPtr->field_D8 <= ThisPtr->field_E0) {
+                //ida misses this
+                ThisPtr->entry_E4();
+                return;
+            }
+
+            Point2D *target_techno5 = ThisPtr->field_E8.Points;
+            double target_techno6 = ThisPtr->field_E0;
+
+            target_techno5[2].X = (signed __int64)((double)ThisPtr->field_84.X * target_techno6 + (double)ThisPtr->field_94.X * (1.0 - target_techno6));
+            target_techno5[2].Y = (signed __int64)((double)ThisPtr->field_84.Y * target_techno6 + (double)ThisPtr->field_94.Y * (1.0 - target_techno6));
+
+            target_techno5[3].X = (signed __int64)((double)ThisPtr->field_7C.X * target_techno6 + (double)ThisPtr->field_8C.X * (1.0 - target_techno6));
+            target_techno5[3].Y = (signed __int64)((double)ThisPtr->field_7C.Y * target_techno6 + (double)ThisPtr->field_8C.Y * (1.0 - target_techno6));
+        }
+
+    } else {
+        if (v23 < 1.0 && ThisPtr->field_CC) {
+            ThisPtr->field_D8 = ThisPtr->field_D8 + 0.05;
+            if (ThisPtr->field_D8 > 0.98) {
+                ThisPtr->field_D8 = 1.0;
+            }
+            Point2D *object_techno1 = ThisPtr->field_E8.Points;
+
+            double target_techno9 = ThisPtr->field_D8;
+            object_techno1->X = (signed __int64)((double)ThisPtr->field_7C.X * target_techno9 + (double)ThisPtr->field_8C.X * (1.0 - target_techno9));
+            object_techno1->Y = (signed __int64)((double)ThisPtr->field_7C.Y * target_techno9 + (double)ThisPtr->field_8C.Y * (1.0 - target_techno9));
+
+            object_techno1[1].X = (signed __int64)((double)ThisPtr->field_74.X * target_techno9 + (double)ThisPtr->field_6C.X * (1.0 - target_techno9));
+            object_techno1[1].Y = (signed __int64)((double)ThisPtr->field_74.Y * target_techno9 + (double)ThisPtr->field_6C.Y * (1.0 - target_techno9));
+
+            object_techno1[2].X = (signed __int64)((double)ThisPtr->field_84.X * target_techno9 + (double)ThisPtr->field_94.X * (1.0 - target_techno9));
+            object_techno1[2].Y = (signed __int64)((double)ThisPtr->field_84.Y * target_techno9 + (double)ThisPtr->field_94.Y * (1.0 - target_techno9));
+        }
+
+        if (field_CD && 0.05 * 0.5 + ThisPtr->field_D8 >= ThisPtr->field_E0) {
+            ThisPtr->field_E0 = ThisPtr->field_E0 + 0.05;
+            if (ThisPtr->field_D8 <= ThisPtr->field_E0) { //ida misses this
+                ThisPtr->entry_E4();
+                return;
+            }
+            Point2D *v52 = ThisPtr->field_E8.Points;
+            double v53 = ThisPtr->field_E0;
+
+            v52[3].X = (signed __int64)((double)ThisPtr->field_84.X * v53 + (double)ThisPtr->field_94.X * (1.0 - v53));
+            v52[3].Y = (signed __int64)((double)ThisPtr->field_84.Y * v53 + (double)ThisPtr->field_94.Y * (1.0 - v53));
+
+            v52[4].X = (signed __int64)((double)ThisPtr->field_74.X * v53 + (double)ThisPtr->field_6C.X * (1.0 - v53));
+            v52[4].Y = (signed __int64)((double)ThisPtr->field_74.Y * v53 + (double)ThisPtr->field_6C.Y * (1.0 - v53));
+
+            v52[5].X = (signed __int64)((double)ThisPtr->field_7C.X * v53 + (double)ThisPtr->field_8C.X * (1.0 - v53));
+            v52[5].Y = (signed __int64)((double)ThisPtr->field_7C.Y * v53 + (double)ThisPtr->field_8C.Y * (1.0 - v53));
+        }
+    }
+    ThisPtr->func_671C40();
 }
