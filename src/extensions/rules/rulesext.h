@@ -29,9 +29,9 @@
 
 #include "extension.h"
 #include "container.h"
-
 #include "noinit.h"
 #include "tpoint.h"
+#include "typelist.h"
 
 
 class CCINIClass;
@@ -110,6 +110,11 @@ class RulesClassExtension final : public Extension<RulesClass>
          *  on the tactical view?
          */
         bool IsShowSuperWeaponTimers;
+
+        /**
+         *  List of units to consider "home".
+         */
+        TypeList<UnitTypeClass *> BaseUnit;
 };
 
 

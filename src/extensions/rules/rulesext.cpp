@@ -48,7 +48,8 @@ RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
     IsMPAutoDeployMCV(false),
     IsMPPrePlacedConYards(false),
     IsBuildOffAlly(true),
-    IsShowSuperWeaponTimers(true)
+    IsShowSuperWeaponTimers(true),
+    BaseUnit()
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -64,7 +65,8 @@ RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
  *  @author: CCHyper
  */
 RulesClassExtension::RulesClassExtension(const NoInitClass &noinit) :
-    Extension(noinit)
+    Extension(noinit),
+    BaseUnit(noinit)
 {
     IsInitialized = false;
 }
@@ -114,9 +116,18 @@ HRESULT RulesClassExtension::Load(IStream *pStm)
         return E_FAIL;
     }
 
+    /**
+     *  Clear vector lists.
+     */
+    BaseUnit.Clear();
+
     new (this) RulesClassExtension(NoInitClass());
 
     SWIZZLE_HERE_I_AM(id, this);
+
+    BaseUnit.Load(pStm);
+
+    SWIZZLE_REQUEST_POINTER_REMAP_LIST("BaseUnit", BaseUnit);
 
 #ifndef NDEBUG
     EXT_DEBUG_INFO("RulesExt Load: ID 0x%08X Ptr 0x%08X\n", id, this);
@@ -140,6 +151,8 @@ HRESULT RulesClassExtension::Save(IStream *pStm, BOOL fClearDirty)
     if (FAILED(hr)) {
         return hr;
     }
+
+    BaseUnit.Save(pStm);
 
     return hr;
 }
@@ -167,8 +180,11 @@ int RulesClassExtension::Size_Of() const
 void RulesClassExtension::Detach(TARGET target, bool all)
 {
     ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("RulesClassExtension::Detach - 0x%08X\n", (uintptr_t)(ThisPtr));
 
+    if (target->What_Am_I() == RTTI_UNITTYPE) {
+        BaseUnit.Delete(reinterpret_cast<UnitTypeClass *>(target));
+    }
 }
 
 
@@ -180,12 +196,13 @@ void RulesClassExtension::Detach(TARGET target, bool all)
 void RulesClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("RulesClassExtension::Compute_CRC - 0x%08X\n", (uintptr_t)(ThisPtr));
 
     crc(IsMPAutoDeployMCV);
     crc(IsMPPrePlacedConYards);
     crc(IsBuildOffAlly);
     crc(IsShowSuperWeaponTimers);
+    crc(BaseUnit.Count());
 }
 
 
@@ -290,6 +307,13 @@ bool RulesClassExtension::General(CCINIClass &ini)
     if (!ini.Is_Present(GENERAL)) {
         return false;
     }
+
+    /**
+     *  Reload the BaseUnit entry and store the value in the new class extension.
+     *  This allows us to expand the original BaseUnit logic without impacting
+     *  the original behaviour of BaseUnit.
+     */
+    BaseUnit = ini.Get_Units(GENERAL, "BaseUnit", BaseUnit);
 
     return true;
 }
