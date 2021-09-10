@@ -154,9 +154,47 @@ continue_check:
  * 
  *  @author: CCHyper
  */
-static DirStruct &Techno_Fire_Direction(TechnoClass *this_ptr)
+static AnimTypeClass *Techno_Get_Firing_Anim(TechnoClass *this_ptr, WeaponTypeClass *weapon)
 {
-    return this_ptr->Fire_Direction();
+    AnimTypeClass *anim = nullptr;
+
+    int index = 0;
+    int anim_count = weapon->Anim.Count();
+    DirStruct dir = this_ptr->Fire_Direction();
+
+    if (anim_count == 8) {
+
+        index = Dir_To_8(dir);
+        anim = weapon->Anim[index % FACING_COUNT];
+
+    } else if (anim_count == 16) {
+
+        index = Dir_To_16(dir);
+        anim = weapon->Anim[index % 16];
+
+    } else if (anim_count == 32) {
+
+        index = Dir_To_32(dir);
+        anim = weapon->Anim[index % 32];
+
+    } else if (anim_count == 64) {
+
+        index = Dir_To_64(dir);
+        anim = weapon->Anim[index % 64];
+
+    } else if (anim_count > 0) {
+
+        index = 0;
+        anim = weapon->Anim.Fetch_Head();
+
+    } else {
+
+        index = 0;
+        anim = nullptr;
+
+    }
+
+    return anim;
 }
 
 DECLARE_PATCH(_TechnoClass_Fire_At_Weapon_Anim_Patch)
@@ -168,35 +206,7 @@ DECLARE_PATCH(_TechnoClass_Fire_At_Weapon_Anim_Patch)
     static int anim_count;
     static int index;
 
-    anim_count = weapon->Anim.Count();
-    dir = &Techno_Fire_Direction(this_ptr);
-
-    if (anim_count == 8) {
-
-        index = Dir_To_8(*dir);
-        anim = weapon->Anim[index % FACING_COUNT];
-
-    } else if (anim_count == 16) {
-
-        index = Dir_To_16(*dir);
-        anim = weapon->Anim[index % 16];
-
-    } else if (anim_count == 32) {
-
-        index = Dir_To_32(*dir);
-        anim = weapon->Anim[index % 32];
-
-    } else if (anim_count == 64) {
-
-        index = Dir_To_64(*dir);
-        anim = weapon->Anim[index % 64];
-
-    } else {
-
-        index = 0;
-        anim = nullptr;
-
-    }
+    anim = Techno_Get_Firing_Anim(this_ptr, weapon);
 
     _asm { mov edx, anim }
     JMP(0x006310A6);
