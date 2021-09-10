@@ -28,13 +28,104 @@
 #include "commandext.h"
 #include "vinifera_globals.h"
 #include "tibsun_functions.h"
+#include "rules.h"
+#include "rulesext.h"
 #include "ccfile.h"
 #include "ccini.h"
 #include "object.h"
 #include "unit.h"
 #include "unittype.h"
+#include "building.h"
+#include "buildingtype.h"
 #include "asserthandler.h"
 #include "debughandler.h"
+
+
+/**
+ *  #issue-177
+ * 
+ *  This patch replaces the check on the current building to see if it
+ *  undeploys into the BaseUnit (checking the first entry only). Now, it
+ *  considers any building that is a construction yard (must be IsLeader)
+ *  when searching for the base center.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_CenterBaseCommandClass_Process_Check_BaseUnit_Patch)
+{
+    GET_REGISTER_STATIC(BuildingClass *, building, esi);
+
+    /**
+     *  Is this building a construction yard?
+     */
+    if (!building->Class->IsConstructionYard) {
+        goto not_conyard;
+    }
+
+    /**
+     *  
+     */
+continue_conyard:
+    _asm { mov esi, building }
+    JMP(0x004E9879);
+
+    /**
+     *  
+     */
+not_conyard:
+    JMP(0x004E98A5);
+}
+
+
+/**
+ *  #issue-177
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_CenterBaseCommandClass_Process_Find_BaseUnit_Patch)
+{
+    GET_REGISTER_STATIC(UnitClass *, unit, esi);
+    static UnitTypeClass *unittype;
+    static int i;
+
+    unittype = nullptr;
+
+    /**
+     *  Fetch the extended rules class instance and make sure value
+     *  entries have been loaded.
+     */
+    if (RulesExtension && RulesExtension->BaseUnit.Count() > 0) {
+
+        /**
+         *  Iterate over all defined BaseUnits, if any match the unit
+         *  we are currently processing break out of the loop. The code
+         *  before this patch already checks if we can control of the unit
+         *  so we don't need to do any checks of that type.
+         */
+        for (i = 0; i < RulesExtension->BaseUnit.Count(); ++i) {
+            if (RulesExtension->BaseUnit[i] == unit->Class) {
+                goto match;
+            }
+        }
+
+    /**
+     *  Fallback to the original code.
+     */
+    } else {
+       
+        if (Rule->BaseUnit == unit->Class) {
+            goto match;
+        }
+    }
+
+continue_loop:
+    JMP(0x004E999C);
+
+match:
+    JMP_REG(edx, 0x004E99A8);
+}
 
 
 /**
@@ -448,4 +539,6 @@ void CommandExtension_Hooks()
     Hook_Virtual(0x004EAB00, PNGScreenCaptureCommandClass::Process);
 
     Patch_Jump(0x004E95C2, &_GuardCommandClass_Process_Harvesters_Set_Mission_Patch);
+    Patch_Jump(0x004E985F, &_CenterBaseCommandClass_Process_Check_BaseUnit_Patch);
+    Patch_Jump(0x004E9988, &_CenterBaseCommandClass_Process_Find_BaseUnit_Patch);
 }

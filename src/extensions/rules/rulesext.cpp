@@ -45,7 +45,8 @@ RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
     Extension(this_ptr),
     IsMPAutoDeployMCV(false),
     IsMPPrePlacedConYards(false),
-    IsBuildOffAlly(true)
+    IsBuildOffAlly(true),
+    BaseUnit()
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -61,7 +62,8 @@ RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
  *  @author: CCHyper
  */
 RulesClassExtension::RulesClassExtension(const NoInitClass &noinit) :
-    Extension(noinit)
+    Extension(noinit),
+    BaseUnit(noinit)
 {
     IsInitialized = false;
 }
@@ -98,6 +100,20 @@ HRESULT RulesClassExtension::Load(IStream *pStm)
 
     new (this) RulesClassExtension(NoInitClass());
 
+    int count;
+
+    /**
+     *  Clear vector lists.
+     */
+    BaseUnit.Clear();
+
+    pStm->Read(&count, sizeof(count), nullptr);
+    for (int i = 0; i < count; ++i) {
+        UnitTypeClass *ptr;
+        pStm->Read(&ptr, sizeof(ptr), nullptr);
+        BaseUnit.Add(ptr);
+    }
+
     return hr;
 }
 
@@ -115,6 +131,14 @@ HRESULT RulesClassExtension::Save(IStream *pStm, BOOL fClearDirty)
     HRESULT hr = Extension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
+    }
+
+    int count;
+
+    count = BaseUnit.Count();
+    pStm->Write(&count, sizeof(count), nullptr);
+    for (int i = 0; i < count; ++i) {
+        pStm->Write(&BaseUnit[i], sizeof(UnitTypeClass *), nullptr);
     }
 
     return hr;
@@ -204,6 +228,13 @@ bool RulesClassExtension::General(CCINIClass &ini)
     if (!ini.Is_Present(GENERAL)) {
         return false;
     }
+
+    /**
+     *  Reload the BaseUnit entry and store the value in the new class extension.
+     *  This allows us to expand the original BaseUnit logic without impacting
+     *  the original behaviour of BaseUnit.
+     */
+    BaseUnit = ini.Get_Units(GENERAL, "BaseUnit", BaseUnit);
 
     return true;
 }

@@ -32,6 +32,7 @@
 
 #include "noinit.h"
 #include "tpoint.h"
+#include "typelist.h"
 
 
 class CCINIClass;
@@ -99,6 +100,11 @@ class RulesClassExtension final : public Extension<RulesClass>
          *  Can players build their own structures adjacent to structures owned by their allies?
          */
         bool IsBuildOffAlly;
+
+        /**
+         *  List of units to consider "home".
+         */
+        TypeList<UnitTypeClass *> BaseUnit;
 };
 
 
