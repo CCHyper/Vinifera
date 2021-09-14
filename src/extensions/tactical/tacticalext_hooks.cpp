@@ -40,6 +40,8 @@
 #include "scenario.h"
 #include "session.h"
 #include "colorscheme.h"
+#include "iomap.h"
+#include "cell.h"
 #include "voc.h"
 #include "fatal.h"
 #include "vinifera_globals.h"
@@ -294,7 +296,7 @@ static void Tactical_Draw_Debug_Overlay()
  * 
  *  @author: CCHyper
  */
-bool Tactical_Debug_Draw_Facings()
+static bool Tactical_Debug_Draw_Facings()
 {
     if (CurrentObjects.Count() != 1) {
         return false;
@@ -340,6 +342,616 @@ bool Tactical_Debug_Draw_Facings()
 
     screen.Y += 10;
     Simple_Text_Print(buffer2, TempSurface, &TacticalRect, &screen, ColorScheme::As_Pointer("White"), style);
+
+    return true;
+}
+
+
+/**
+ *  Draws various cell properties.
+ * 
+ *  @author: CCHyper
+ */
+static bool Tactical_Debug_Draw_Cell_Info()
+{
+    ColorScheme *text_color = ColorScheme::As_Pointer("White");
+    unsigned color_white = DSurface::RGBA_To_Pixel(255, 255, 255);
+    unsigned rect_color = DSurface::RGBA_To_Pixel(128, 0, 0); // Red
+    bool draw = true;
+
+    /**
+     *  Reset the cell iterator.
+     */
+    Map.Iterator_Reset();
+
+    /**
+     *  Iterate over all the map cells.
+     */
+    for (CellClass *cell = Map.Iterator_Next_Cell(); cell != nullptr; cell = Map.Iterator_Next_Cell()) {
+
+        Rect cellrect = cell->Get_Rect();
+
+        /**
+         *  Determine if the cell draw rect is within the viewport.
+         */
+        Rect intersect = Intersect(cellrect, TacticalRect);
+        if (intersect.Is_Valid()) {
+
+            /**
+             *  Get the center point of the cell.
+             */
+            Point2D cell_center;
+            //cell_center.X = cellrect.X + CELL_PIXEL_W/2;
+            //cell_center.Y = cellrect.Y + CELL_PIXEL_H/2;
+            cell_center.X = cellrect.X + cellrect.Width/2;
+            cell_center.Y = cellrect.Y + cellrect.Height/2;
+
+            const char *string = "XX";
+
+            /**
+             *  Fetch the text occupy rect.
+             */
+            Rect text_rect;
+            EditorFont->String_Pixel_Rect(string, &text_rect);
+
+            /**
+             *  Move into position.
+             */
+            text_rect.X = cell_center.X;
+            text_rect.Y = (cell_center.Y-text_rect.Height)-33;
+            text_rect.Width += 4;
+            text_rect.Height += 2;
+
+            /**
+             *  Passability
+             */
+#if 0
+            switch (cell->Passability) {
+                case PASSABLE_OK:
+                    rect_color = DSurface::RGBA_To_Pixel(0, 255, 128); // Green
+                    draw = false;
+                    break;
+                case PASSABLE_CRUSH:
+                    rect_color = DSurface::RGBA_To_Pixel(0, 0, 128); // Dark Blue
+                    draw = false;
+                    break;
+                case PASSABLE_WALL:
+                    rect_color = DSurface::RGBA_To_Pixel(128, 128, 0); // Yellow
+                    draw = false;
+                    break;
+                case PASSABLE_WATER:
+                    rect_color = DSurface::RGBA_To_Pixel(128, 0, 0); // Dark Red
+                    draw = false;
+                    break;
+                case PASSABLE_FREE_SPOTS:
+                    rect_color = DSurface::RGBA_To_Pixel(0, 128, 128); // Dirty something
+                    draw = false;
+                    break;
+                case PASSABLE_NO:
+                    rect_color = DSurface::RGBA_To_Pixel(64, 0, 0); // Very Dark Red
+                    draw = false;
+                    break;
+                case PASSABLE_OUTSIDE:
+                    rect_color = DSurface::RGBA_To_Pixel(0, 128, 0); // Dark Green
+                    draw = false;
+                    break;
+            };
+
+            if (draw) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->Passability);
+            }
+#endif
+            /**
+             *  field_18
+             */
+#if 0
+            if (cell->field_18) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_18->Count());
+            }
+#endif
+            /**
+             *  field_1C
+             */
+#if 0
+            if (cell->field_1C) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_1C);
+            }
+#endif
+            /**
+             *  field_20
+             */
+#if 1
+            if (cell->field_20) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_20);
+            }
+#endif
+            /**
+             *  field_24
+             */
+#if 0
+            if (cell->field_24) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%s",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), "X");
+            }
+#endif
+            /**
+             *  field_44
+             */
+#if 0
+            if (cell->field_44 != HOUSE_NONE) {
+
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_44);
+            }
+#endif
+            /**
+             *  field_48
+             */
+#if 0
+            if (cell->field_48) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_48);
+            }
+#endif
+            /**
+             *  field_4C
+             */
+#if 0
+            if (cell->field_4C) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_4C);
+            }
+#endif
+            /**
+             *  field_50
+             */
+#if 0
+            if (cell->field_50) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_50);
+            }
+#endif
+            /**
+             *  field_54
+             */
+#if 0
+            if (cell->field_54.Is_Valid()) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%s",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), "X");
+            }
+#endif
+            /**
+             *  field_64
+             */
+#if 0
+            if (cell->field_64) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_64);
+            }
+#endif
+            /**
+             *  field_68
+             */
+#if 0
+            if (cell->field_68) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_68);
+            }
+#endif
+            /**
+             *  field_6C
+             */
+#if 0
+            if (cell->field_6C) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_6C);
+            }
+#endif
+            /**
+             *  field_74
+             */
+#if 0
+            if (cell->field_74) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_74);
+            }
+#endif
+            /**
+             *  field_7C
+             */
+#if 0
+            if (cell->field_7C != 65536) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_7C);
+            }
+#endif
+            /**
+             *  field_80
+             */
+#if 0
+            if (cell->field_80) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_80);
+            }
+#endif
+            /**
+             *  field_82
+             */
+#if 0
+#endif
+            /**
+             *  field_88
+             */
+#if 0
+#endif
+            /**
+             *  field_8E
+             */
+#if 1
+            if (cell->field_8E != -1) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_8E);
+            }
+#endif
+            /**
+             *  field_90
+             */
+#if 0
+            if (cell->field_90 != 255) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_90);
+            }
+#endif
+            /**
+             *  field_94
+             */
+#if 1
+            if (cell->field_94) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_94);
+            }
+#endif
+            /**
+             *  field_95
+             */
+#if 0
+            if (cell->field_95) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_95);
+            }
+#endif
+            /**
+             *  field_98
+             */
+#if 0
+            if (cell->field_98 != 255) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_98);
+            }
+#endif
+            /**
+             *  field_99
+             */
+#if 0
+            if (cell->field_99 != 254) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_99);
+            }
+#endif
+            /**
+             *  field_9A
+             */
+#if 0
+            if (cell->field_9A) {
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X-3, cell_center.Y-3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X+4, cell_center.Y-4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+            
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print("%d",
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X+1, text_rect.Y+1),
+                    text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW), cell->field_9A);
+            }
+#endif
+        }
+    }
 
     return true;
 }
@@ -549,6 +1161,7 @@ DECLARE_PATCH(_Tactical_Render_Patch)
      *  Various developer only debugging.
      */
     //Tactical_Debug_Draw_Facings();
+    Tactical_Debug_Draw_Cell_Info();
 #endif
 
 #ifndef RELEASE
