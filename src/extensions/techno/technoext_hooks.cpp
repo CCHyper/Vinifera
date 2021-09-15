@@ -54,6 +54,91 @@
 #include "hooker_macros.h"
 
 
+
+#if 0
+DECLARE_PATCH(_)
+{
+}
+
+
+/**
+ *  A fake class for implementing new member functions which allow
+ *  access to the "this" pointer of the intended class.
+ * 
+ *  @note: This must not contain a constructor or deconstructor.
+ * 
+ *  @note: All functions must not be virtual and must also be prefixed
+ *         with "_" to prevent accidental virtualization.
+ */
+static class TechnoClassFake : public TechnoClass
+{
+    public:
+        bool _Render(Rect &rect, bool force = false, bool a3 = false);
+};
+
+
+/**
+ *  Patch for implementing Render() into 
+ * 
+ *  @warning: Do not touch this unless you know what you are doing!
+ * 
+ *  @author: CCHyper
+ */
+#include "wwfont.h"
+bool TechnoClassFake::_Render(Rect &rect, bool force, bool a3)
+{
+    //DEBUG_INFO("TechnoClass::Render()\n");
+
+
+
+    Point3D lept = Class_Of()->Lepton_Dimensions();
+    Point3D lept_center = Point3D(lept.X/2, lept.Y/2, lept.Z/2);
+
+    Point3D pix = Class_Of()->Pixel_Dimensions();
+    Point3D pixel_center = Point3D(pix.X/2, pix.Y/2, pix.Z/2);
+
+    //Coordinate coord = Get_Coord();
+    Coordinate coord = Center_Coord();
+    //coord.X = ;
+    //coord.Y = ;
+    //coord.Z = ;
+
+    Point2D screen = TacticalMap->func_60F150(coord);
+
+    /**
+     *  ????
+     */
+    screen.X -= TacticalMap->field_5C.X;
+    screen.Y -= TacticalMap->field_5C.Y;
+
+    /**
+     *  Adjust draw position relative to the viewable tactical area.
+     */
+    screen.X += TacticalRect.X;
+    screen.Y += TacticalRect.Y;
+
+    TempSurface->Fill_Rect(rect, Rect(screen.X, screen.Y, 2, 2), DSurface::RGBA_To_Pixel(255,0,0));
+
+    //screen.X += dim.X/2;
+    //screen.Y -= dim.Y;
+
+
+    TextPrintType style = TPF_CENTER|TPF_FULLSHADOW|TPF_6POINT;
+    WWFontClass *font = Font_Ptr(style);
+
+    screen.Y -= font->Get_Char_Height()/2;
+
+
+
+
+
+    Simple_Text_Print("TEST STRING", TempSurface, &rect, &screen, ColorScheme::As_Pointer("White"), style);
+
+    return ObjectClass::Render(rect, force, a3);
+}
+#endif
+
+
  /**
   *  #issue-977
   *
@@ -756,4 +841,5 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x00631223, &_TechnoClass_Fire_At_Electric_Bolt_Patch);
     Patch_Jump(0x00636F09, &_TechnoClass_Is_Allowed_To_Retaliate_Can_Retaliate_Patch);
     Patch_Jump(0x0062D4CA, &_TechnoClass_Evaluate_Object_Is_Legal_Target_Patch);
+    //Patch_Call(0x00651F39, &TechnoClassFake::_Render); // UnitClass
 }

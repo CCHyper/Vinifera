@@ -49,6 +49,8 @@
 #include "rules.h"
 #include "voc.h"
 #include "iomap.h"
+#include "floatingtext.h"
+#include "textprint.h"
 #include "spritecollection.h"
 #include "extension.h"
 #include "fatal.h"
@@ -157,6 +159,27 @@ DECLARE_PATCH(_BuildingClass_Captured_ProduceCash_Patch)
              */
             if (!ext_ptr->IsCaptureOneTimeCashGiven) {
                 newowner->Refund_Money(exttype_ptr->ProduceCashStartup);
+
+                static FloatingTextClass *floatingstring;
+                static char buffer[16];
+                static ColorSchemeType color;
+                static TextPrintType style;
+                static int timeout;
+                static int frames;
+                static int rate;
+                static Point3D pos;
+
+                style = TPF_CENTER|TPF_FULLSHADOW|TPF_6POINT;
+                timeout = 15;
+                frames = 25;
+                rate = 10;
+
+                std::snprintf(buffer, sizeof(buffer), "$%d", exttype_ptr->ProduceCashStartup);
+                color = ColorScheme::From_Name("Green");
+
+                floatingstring = FloatingTextClass::Create(buffer, color, style, pos, timeout, frames, rate);
+                floatingstring->Attached_To(this_ptr);
+
             }
 
             /**

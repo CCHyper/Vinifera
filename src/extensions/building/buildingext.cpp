@@ -31,6 +31,9 @@
 #include "buildingtypeext.h"
 #include "house.h"
 #include "housetype.h"
+#include "floatingtext.h"
+#include "colorscheme.h"
+#include "textprint.h"
 #include "wwcrc.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -272,11 +275,31 @@ void BuildingClassExtension::Produce_Cash_AI()
                  *  Check if we need to drain cash from the house or provide a bonus.
                  */
                 if (!IsBudgetDepleted && amount != 0) {
+
+                    char buffer[16];
+                    ColorSchemeType color = COLORSCHEME_NONE;
+                    TextPrintType style = TPF_CENTER|TPF_FULLSHADOW|TPF_6POINT;
+                    int timeout = 15;
+                    int frames = 25;
+                    int rate = 10;
+                    Point3D pos(0,0,0);
+
                     if (amount < 0) {
-                        This()->House->Spend_Money(std::abs(amount));
+                        ThisPtr->House->Spend_Money(std::abs(amount));
+
+                        std::snprintf(buffer, sizeof(buffer), "-$%d", std::abs(amount));
+                        color = ColorScheme::From_Name("Red");
+
                     } else {
-                        This()->House->Refund_Money(amount);
+                        ThisPtr->House->Refund_Money(amount);
+
+                        std::snprintf(buffer, sizeof(buffer), "$%d", amount);
+                        color = ColorScheme::From_Name("Green");
                     }
+
+                    FloatingTextClass *floatingstring = FloatingTextClass::Create(buffer, color, style, pos, timeout, frames, rate);
+                    floatingstring->Attached_To(ThisPtr);
+
                 }
 
             }

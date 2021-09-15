@@ -33,6 +33,7 @@
 
 
 class EBoltClass;
+class FloatingTextClass;
 class TheaterTypeClass;
 
 
@@ -94,6 +95,7 @@ extern MFCC *IsoGenericMix;
  *  Global vectors and heaps.
  */
 extern DynamicVectorClass<EBoltClass *> EBolts;
+extern DynamicVectorClass<FloatingTextClass *> FloatingText;
 extern DynamicVectorClass<TheaterTypeClass *> TheaterTypes;
 
 

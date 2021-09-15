@@ -39,6 +39,7 @@
 #include "readline.h"
 #include "cd.h"
 #include "ebolt.h"
+#include "floatingtext.h"
 #include "optionsext.h"
 #include "rulesext.h"
 #include "sessionext.h"
@@ -638,6 +639,7 @@ bool Vinifera_Shutdown()
      *  Cleanup global heaps/vectors.
      */
     EBoltClass::Clear_All();
+    FloatingTextClass::Clear_All();
     TheaterTypes.Clear();
 
     /**

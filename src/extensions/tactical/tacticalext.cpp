@@ -40,6 +40,7 @@
 #include "session.h"
 #include "scenario.h"
 #include "ebolt.h"
+#include "floatingtext.h"
 #include "house.h"
 #include "housetype.h"
 #include "super.h"
@@ -506,6 +507,10 @@ void TacticalExtension::Render_Post()
     //DEV_DEBUG_INFO("Before EBoltClass::Draw_All\n");
     EBoltClass::Draw_All();
     //DEV_DEBUG_INFO("After EBoltClass::Draw_All\n");
+
+    //DEV_DEBUG_INFO("Before FloatingTextClass::Draw_All\n");
+    FloatingTextClass::Draw_All();
+    //DEV_DEBUG_INFO("After FloatingTextClass::Draw_All\n");
 
     /**
      *  Draw any overlay text.
