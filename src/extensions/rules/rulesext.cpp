@@ -224,6 +224,8 @@ bool RulesClassExtension::Read_UI_INI()
     UIControls.UnitHealthBarDrawPos = ini.Get_Point(INGAME, "UnitHealthBarPos", UIControls.UnitHealthBarDrawPos);
     UIControls.InfantryHealthBarDrawPos = ini.Get_Point(INGAME, "InfantryHealthBarPos", UIControls.InfantryHealthBarDrawPos);
 
+    UIControls.IsShowFactoryProgress = ini.Get_Bool(INGAME, "ShowFactoryProgress", UIControls.IsShowFactoryProgress);
+
     return true;
 }
 
@@ -247,6 +249,8 @@ bool RulesClassExtension::Init_UI_Controls()
 
     UIControls.InfantryHealthBarDrawPos.X = -24;
     UIControls.InfantryHealthBarDrawPos.Y = -5;
+
+    UIControls.IsShowFactoryProgress = false;
 
     return false;
 }

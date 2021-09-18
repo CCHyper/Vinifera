@@ -32,13 +32,19 @@
 #include "technotype.h"
 #include "technotypeext.h"
 #include "tibsun_inline.h"
+#include "tibsun_globals.h"
 #include "weapontype.h"
 #include "warheadtype.h"
 #include "warheadtypeext.h"
 #include "house.h"
 #include "housetype.h"
+#include "building.h"
+#include "buildingext.h"
 #include "rules.h"
 #include "rulesext.h"
+#include "factory.h"
+#include "drawshape.h"
+#include "tactical.h"
 #include "voc.h"
 #include "fatal.h"
 #include "vinifera_util.h"
@@ -47,6 +53,188 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+
+#include "tspp.h"
+const ShapeFileStruct *&PipShapes = Make_Global<const ShapeFileStruct *>(0x00808750);
+
+
+
+/**
+ *  
+ */
+static void TechnoClass_Draw_Factory_Progress_Bars(TechnoClass *this_ptr, Point2D &point, Rect &rect, bool a2)
+{
+#ifndef NDEBUG
+    RulesExtension->UIControls.IsShowFactoryProgress = true;
+#endif
+
+    if (!RulesExtension->UIControls.IsShowFactoryProgress) {
+        return;
+    }
+
+    if (this_ptr->What_Am_I() != RTTI_BUILDING) {
+        return;
+    }
+
+    bool show = false;
+    FactoryClass *factory = nullptr;
+    BuildingClass *this_building = reinterpret_cast<BuildingClass *>(this_ptr);
+
+    if (this_ptr->House->Is_Player_Control() && this_ptr->House->Fetch_Factory(this_building->Class->ToBuild)) {
+
+        /**
+         *  
+         */
+        factory = this_ptr->House->Fetch_Factory(this_building->Class->ToBuild);
+
+    } else {
+
+        /**
+         *  
+         */
+        factory = this_building->Factory;
+    }
+
+    if (factory == nullptr || factory->Get_Object() == nullptr) {
+        return;
+    }
+
+    if (PlayerPtr->Is_Ally(this_ptr) || ((1 << PlayerPtr->Class->House) & this_ptr->SpiedBy)) {
+        show = true;
+    }
+
+    if (show) {
+
+        int height = this_ptr->Get_Height();
+
+        Point3D lepton_dim = this_ptr->Techno_Type_Class()->Lepton_Dimensions();
+        Coordinate v0(lepton_dim.X/2, lepton_dim.Y/2, lepton_dim.Z/2);
+
+        Coordinate c1(v0.X-lepton_dim.X, v0.Y-lepton_dim.Y, v0.Z-lepton_dim.Z);
+        Point2D tact_point_1 = TacticalMap->func_60F150(c1);
+        
+        Coordinate c2(v0.X-lepton_dim.X, v0.Y-lepton_dim.Y, v0.Z-lepton_dim.Z);
+        Point2D tact_point_2 = TacticalMap->func_60F150(c2);
+
+        Coordinate c3(v0.X-lepton_dim.X, v0.Y-lepton_dim.Y, v0.Z-lepton_dim.Z);
+        Point2D tact_point_3 = TacticalMap->func_60F150(c3);
+
+        Point2D draw_pos;
+
+        int v16 = (tact_point_1.Y - tact_point_2.Y) / 2;
+
+        int factory_completion = ((double)factory->Completion()/(double)FactoryClass::STEP_COUNT) * v16;
+        //int fc_0 = factory_completion;
+
+        if (factory_completion <= 1) {
+            //fc_0 = 1;
+            factory_completion = 1;
+        }
+        if (factory_completion >= v16) {
+            //fc_0 = v16;
+            factory_completion = v16;
+        }
+
+        /**
+         *  0 = blank
+         *  1 = green
+         *  2 = yellow
+         *  3 = gray
+         *  4 = red
+         *  5 = blue
+         */
+        int frame = 0;
+
+        /**
+         *  Is this buildings factory suspended? Draw gray box.
+         */
+        if (factory->IsSuspended) {
+
+            frame = 3; // Grey
+
+        /**
+         *  Factory is currently producing, draw blue box.
+         */
+        } else if (factory->Is_Building()) {
+
+            frame = 5;
+
+        }
+
+        v0.Z = 2 - 2 * v16;
+
+        if (factory_completion > 0) {
+
+            int i0 = 0;
+            int i1 = 0;
+
+            for (int i = factory_completion; i == 1; --i) {
+
+                draw_pos.X = tact_point_1.X + point.X + 4 * v16 + 3 - i0;
+                //draw_pos.Y = ??;
+
+                v0.X = v0.Z + tact_point_1.Y + point.Y + 2 - i1;
+
+                CC_Draw_Shape(TempSurface, NormalDrawer,
+                    /*ObjectTypeClass::*/PipShapes, frame,
+                    &draw_pos, &rect, SHAPE_400|SHAPE_CENTER);
+
+                i0 += 4;
+                i1 -= 2;
+            }
+
+        }
+
+        if (factory_completion < v16) {
+
+            int i0 = -2 * factory_completion;
+            int i1 = (4 * factory_completion);
+
+            for (int i = factory_completion; i == 1; --i) {
+
+                draw_pos.X = tact_point_1.X + point.X + 4 * v16 + 3 - i0;
+                //draw_pos.Y = ??;
+
+                v0.X = v0.Z + tact_point_1.Y + point.Y + 2 - i1;
+
+                CC_Draw_Shape(TempSurface, NormalDrawer,
+                    /*ObjectTypeClass::*/PipShapes, frame,
+                    &draw_pos, &rect, SHAPE_400|SHAPE_CENTER);
+
+                i0 += 4;
+                i1 -= 2;
+            }
+
+        }
+
+    }
+}
+
+
+/**
+ *  
+ */
+DECLARE_PATCH(_TechnoClass_Draw_Health_Bars_Factory_Progress_Patch)
+{
+    GET_REGISTER_STATIC(TechnoClass *, this_ptr, ebx);
+    GET_STACK_STATIC(Point2D *, rect, esp, 0x);
+    GET_STACK_STATIC(Rect *, rect, esp, 0x);
+    GET_STACK_STATIC(bool, a3, esp, 0x);
+
+    /**
+     *  Stolen bytes/code.
+     */
+    _asm { call dword ptr [eax+0x334] } // this_ptr->Draw_Pips()
+
+    /**
+     *  Draw factory progress bars.
+     */
+    TechnoClass_Draw_Factory_Progress_Bars(this_ptr, *point, *rect, a3);
+
+    JMP();
+}
 
 
 /**
@@ -394,4 +582,5 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x006328DE, &_TechnoClass_Take_Damage_IsAffectsAllies_Patch);
     Patch_Jump(0x0062C5D5, &_TechnoClass_Draw_Health_Bars_Unit_Draw_Pos_Patch);
     Patch_Jump(0x0062C55B, &_TechnoClass_Draw_Health_Bars_Infantry_Draw_Pos_Patch);
+    Patch_Jump(0x0062CA74, &_TechnoClass_Draw_Health_Bars_Factory_Progress_Patch);
 }

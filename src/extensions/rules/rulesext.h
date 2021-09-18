@@ -67,6 +67,11 @@ class RulesClassExtension final : public Extension<RulesClass>
             TPoint2D<int> UnitHealthBarDrawPos;
             TPoint2D<int> InfantryHealthBarDrawPos;
 
+            /**
+             *  
+             */
+            bool IsShowFactoryProgress;
+
         } UIControlsStruct;
 
         static UIControlsStruct UIControls;
