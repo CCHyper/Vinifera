@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          FFMPEGVIDEO.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         FFmpeg video player interface.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,34 +25,62 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#pragma once
+
+#include "always.h"
+
+
+struct AVFormatContext;
+struct AVFrame;
+struct AVCodec;
+struct AVCodecContext;
+struct SwsContext;
+
+class BSurface;
+
 
 /**
- *  Include the hook headers here.
+ *  Un-stretched video size.
  */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "bugfix_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-#include "ffmpegvideo_hooks.h"
+#define NORMAL_VIDEO_WIDTH 720
+#define NORMAL_VIDEO_HEIGHT 400
 
 
-void Setup_Hooks()
+class FFmpegVideoPlayer
 {
-    Vinifera_Memory_Hooks();
+    public:
+        FFmpegVideoPlayer();
+        FFmpegVideoPlayer(HWND hWnd, const char *filename);
+        ~FFmpegVideoPlayer();
 
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Extension_Hooks();
-    BugFix_Hooks();
+        bool Open(const char *filename);
+        void Close();
 
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
+        void Play() {}
 
-    FFmpegVideo_Hooks();
-}
+        bool Is_Loaded() { return true; }
+
+    private:
+        bool Draw_To_Screen();
+
+    public:
+        bool BreakoutAllowed;
+        bool CanStretch;
+
+    private:
+        HWND hWnd;
+        AVFormatContext *FormatContext;
+        //AVFrame *Frame;
+        //AVFrame *Frame2;
+        //AVCodec *Dec;
+        //AVCodecContext *DecContext;
+        //SwsContext *ImgConvertContext;
+
+        /**
+         *  
+         */
+        BSurface *DrawSurface;
+};
+
+
+bool FFmpeg_Init();

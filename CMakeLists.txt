@@ -148,7 +148,7 @@ endif()
 
 option(OPTION_CHECK_TARGET_BINARIES "This option controls if the launcher should check target binaries before injection." ON)
 
-
+	
 ################################################################################
 # Some general Windows definitions to keep the MSVC compiler happy with our code.
 ################################################################################
@@ -272,6 +272,17 @@ message(STATUS "Pulling in Hooker sources.")
 set(HOOKER_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/hooker")
 GlobHeaders(GLOB HOOKER_HEADERS ${HOOKER_INCLUDE_DIR})
 GlobSources(GLOB HOOKER_SOURCES ${HOOKER_INCLUDE_DIR})
+
+
+################################################################################
+# Find and link any external libraries.
+################################################################################
+#set(FFMPEG_ROOT ${OPTION_FFMPEG_PATH})
+#find_package(FFmpeg)
+find_package(FFmpeg COMPONENTS AVCODEC AVFORMAT SWSCALE REQUIRED)
+if(NOT FFMPEG_FOUND)
+	message(FATAL_ERROR "Error: Unable to find FFmpeg, please check 'FFMPEG_ROOT'!")
+endif()
 
 
 ################################################################################
@@ -457,6 +468,17 @@ if(NOT ${OPTION_CUSTOM_DEBUGGER_DIRECTORY_PATH} STREQUAL " ")
 		${COPY_DESTINATION_PATH}
 		"${TARGET_PDB}"
 	)
+	
+	# Create the post build script.
+	include(WindowsCopyFiles)
+	PostBuild_WindowsCopyFiles(${PROJECT_NAME}
+		${FFMPEG_ROOT}/bin
+		${COPY_DESTINATION_PATH}
+		"avcodec-58.dll"
+		"avformat-58.dll"
+		"avutil-56.dll"
+		"swscale-5.dll"
+	)
 endif()
 
 
@@ -572,10 +594,14 @@ add_dependencies(${PROJECT_NAME} TSpp)
 # Ensure the launcher is built with the main project.
 add_dependencies(${PROJECT_NAME} Launch${PROJECT_NAME})
 
-set(REQUIRED_LIBRARIES ws2_32 dbghelp shlwapi version)
+set(REQUIRED_LIBRARIES ws2_32 dbghelp shlwapi version strmiids)
 
 # Link to any required libraries.
 target_link_libraries(${PROJECT_NAME} ${REQUIRED_LIBRARIES})
+
+# Link in FFmpeg.
+target_include_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${FFMPEG_LIBRARIES})
 
 # Make build check state of git to check for uncommitted changes.
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_check_git)

@@ -34,6 +34,7 @@
 #include "rulesext.h"
 #include "ccfile.h"
 #include "cd.h"
+#include "ffmpegvideo.h"
 #include "debughandler.h"
 #include <string>
 
@@ -221,6 +222,14 @@ bool Vinifera_Startup()
     if (CnCNet4::IsEnabled && CnCNet5::IsActive) {
         CnCNet4::Shutdown();
         CnCNet4::IsEnabled = false;
+    }
+
+    /**
+     *  
+     */
+    if (!FFmpeg_Init()) {
+        DEBUG_ERROR("Failed to initialise FFmpeg!\n");
+        return false;
     }
 
     return true;

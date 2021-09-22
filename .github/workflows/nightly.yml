@@ -57,23 +57,57 @@ jobs:
         if:   ${{ steps.vars.outputs.GHA_REPO_ALIVE }} == 'true'
         uses: actions/checkout@v2
         
+      - name: Checkout Files
+        uses: actions/checkout@v2
+        with:
+          repository: Vinifera-Developers/Vinifera-Files
+          path: vinifera-files
+        
       - name: Set Variables
         id: vars
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+        run: |
+          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+          echo "::set-output name=msys::MINGW32"
+          echo "::set-output name=ffarch::x86"
+          echo "::set-output name=mgwarch::i686"
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          path-type: inherit
+          msystem: ${{ steps.vars.outputs.msys }}
 
       - name: Install Dependencies
         run: |
           Invoke-WebRequest -Uri https://github.com/ninja-build/ninja/releases/download/v1.10.1/ninja-win.zip -OutFile $Env:TEMP\ninja-win.zip
           Expand-Archive $Env:TEMP\ninja-win.zip -DestinationPath $Env:TEMP\ninja
           echo "$Env:TEMP\ninja" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          
+          set MSYSTEM=MSYS
+          msys2 -c 'pacman --noconfirm -S make gcc diffutils mingw-w64-${{ steps.vars.outputs.mgwarch }}-pkg-config mingw-w64-${{ steps.vars.outputs.mgwarch }}-nasm mingw-w64-${{ steps.vars.outputs.mgwarch }}-yasm'
+
       - uses: ilammy/msvc-dev-cmd@v1.4.1
         with:
           arch: x86
           
+      - uses: msys2/setup-msys2@v2
+        with:
+          path-type: inherit
+          msystem: ${{ steps.vars.outputs.msys }}
+          
+      - name: Build FFmpeg
+        shell: msys2 {0}
+        run: |
+          git clone -b release/4.4 https://github.com/FFmpeg/FFmpeg.git ffmpeg-src
+          mkdir ffmpeg
+          mkdir ffmpeg-src/build
+          cd ffmpeg-src/build
+          git checkout ${{ matrix.version }}
+          CC=cl ../configure --toolchain=msvc --arch=${{ steps.vars.outputs.ffarch }} --enable-x86asm  --enable-asm --enable-shared --disable-static --disable-programs --enable-avresample ${{ steps.vars.outputs.licflag }} --prefix=../../ffmpeg
+          make -j 2
+          make install
+          
       - name: Configure Project
         run: |
-          cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -B build -DNIGHTLY=ON
+          cmake -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -B build -DNIGHTLY=ON -DFFMPEG_ROOT=./ffmpeg-src
       
       - name: Build Project
         run: |
@@ -83,11 +117,16 @@ jobs:
         shell: bash
         run: |
           mkdir artifact
+          mkdir artifact/MOVIES/
           ls -p | grep -v /
           cp ./build/Vinifera.dll ./artifact/Vinifera.dll
           cp ./build/Vinifera.pdb ./artifact/Vinifera.pdb
           cp ./build/LaunchVinifera.exe ./artifact/LaunchVinifera.exe
           cp ./build/_deps/tspp-src/pdb/Game.pdb ./artifact/Game.pdb
+          cp ./vinifera-files/files/VINIFERA.MP4 ./artifact/MOVIES/VINIFERA.MP4
+          cp ./ffmpeg-src/build/avcodec-58.dll ./artifact/avcodec-58.dll
+          cp ./ffmpeg-src/build/avformat-58.dll ./artifact/avformat-58.dll
+          cp ./ffmpeg-src/build/swscale-5.dll ./artifact/swscale-5.dll
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
