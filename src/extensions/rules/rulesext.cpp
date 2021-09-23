@@ -48,7 +48,8 @@ RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
     IsMPAutoDeployMCV(false),
     IsMPPrePlacedConYards(false),
     IsBuildOffAlly(true),
-    IsShowSuperWeaponTimers(true)
+    IsShowSuperWeaponTimers(true),
+    LocalRadarColor(0,0,0)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -312,6 +313,7 @@ bool RulesClassExtension::AudioVisual(CCINIClass &ini)
     }
 
     IsShowSuperWeaponTimers = ini.Get_Bool(AUDIOVISUAL, "ShowSuperWeaponTimers", IsShowSuperWeaponTimers);
+    LocalRadarColor = ini.Get_RGB(AUDIOVISUAL, "LocalRadarColor", LocalRadarColor);
 
     return true;
 }

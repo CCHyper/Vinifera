@@ -41,6 +41,11 @@
 #include "hooker_macros.h"
 
 
+DECLARE_PATCH()
+{
+}
+
+
 /**
  *  Create a light source instances for terrain object.
  * 

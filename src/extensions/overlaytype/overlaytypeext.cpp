@@ -44,7 +44,8 @@ ExtensionMap<OverlayTypeClass, OverlayTypeClassExtension> OverlayTypeClassExtens
  *  @author: CCHyper
  */
 OverlayTypeClassExtension::OverlayTypeClassExtension(OverlayTypeClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    RadarColor(0,0,0)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("OverlayTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -174,6 +175,40 @@ bool OverlayTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
+
+    RadarColor = ini.Get_RGB(ini_name, "RadarColor", RadarColor);
     
     return true;
+}
+
+
+/**
+ *  
+ *  
+ *  @author: CCHyper
+ */
+RGBClass OverlayTypeClassExtension::Get_Radar_Color(int frame) const
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("OverlayTypeClassExtension::Get_Radar_Color - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    EXT_DEBUG_WARNING("OverlayTypeClassExtension::Get_Radar_Color - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    ShapeFileStruct *image = ThisPtr->Get_Image_Data();
+
+    if (!image) {
+        return RGBClass(0,0,0);
+    }
+
+    bool is_TIB2 = (ThisPtr->Type >= 127 && ThisPtr->Type <= 138);
+    bool is_TIB3 = (ThisPtr->Type >= 147 && ThisPtr->Type <= 158);
+
+    if (RadarColor != RGBStruct{0,0,0}) {
+        return RadarColor;
+        
+    } else if (is_x || is_y) {
+        return image->Get_Frame_Data(frame)->Color;
+
+    } else {
+        return image->Get_Frame_Data(frame)->Color;
+    }
 }

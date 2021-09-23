@@ -29,9 +29,9 @@
 
 #include "extension.h"
 #include "container.h"
-
 #include "noinit.h"
 #include "tpoint.h"
+#include "rgb.h"
 
 
 class CCINIClass;
@@ -110,6 +110,12 @@ class RulesClassExtension final : public Extension<RulesClass>
          *  on the tactical view?
          */
         bool IsShowSuperWeaponTimers;
+
+        /**
+         *  This is the color that the player shows up as on the radar, regardless
+         *  of what the actual house color is.
+         */
+        RGBClass LocalRadarColor;
 };
 
 

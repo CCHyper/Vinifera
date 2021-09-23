@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OVERLAYTYPEEXT.H
+ *  @file          OVERLAYEXT_HOOKS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Extended OverlayTypeClass class.
+ *  @brief         Contains the hooks for the extended OverlayClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,41 +25,23 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#pragma once
+#include "overlayext_hooks.h"
+#include "asserthandler.h"
+#include "debughandler.h"
 
-#include "extension.h"
-#include "container.h"
-#include "rgb.h"
-
-
-class OverlayTypeClass;
-class CCINIClass;
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
-class OverlayTypeClassExtension final : public Extension<OverlayTypeClass>
+DECLARE_PATCH()
 {
-    public:
-        OverlayTypeClassExtension(OverlayTypeClass *this_ptr);
-        OverlayTypeClassExtension(const NoInitClass &noinit);
-        ~OverlayTypeClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        bool Read_INI(CCINIClass &ini);
-
-        RGBClass Get_Radar_Color(int frame = 0) const;
-
-    public:
-        /**
-         *  
-         */
-        RGBClass RadarColor;
-};
+}
 
 
-extern ExtensionMap<OverlayTypeClass, OverlayTypeClassExtension> OverlayTypeClassExtensions;
+/**
+ *  Main function for patching the hooks.
+ */
+void TerrainClassExtension_Hooks()
+{
+    Patch_Jump(0x, &);
+}
