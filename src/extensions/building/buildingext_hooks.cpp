@@ -55,6 +55,78 @@
 
 
 /**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_Unlimbo_Cloning_Patch)
+{
+}
+
+
+/**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_Exit_Object_Cloning_Patch_1)
+{
+}
+
+
+/**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_Exit_Object_Cloning_Patch_2)
+{
+}
+
+
+/**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_Captured_Cloning_Patch_1)
+{
+}
+
+
+/**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_Captured_Cloning_Patch_2)
+{
+}
+
+
+/**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_?_Cloning_Patch)
+{
+}
+
+
+/**
  *  #issue-26
  * 
  *  Adds functionality for the produce cash per-frame logic.

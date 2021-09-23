@@ -91,6 +91,12 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
          *  Reset the available budget when captured?
          */
         bool IsResetBudgetOnCapture;
+
+        /**
+         *  Can this building produce a replica of the current unit being produced
+         *  at a factory of the same type?
+         */
+        bool IsCloning;
 };
 
 

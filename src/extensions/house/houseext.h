@@ -33,6 +33,7 @@
 
 class HouseClass;
 class CCINIClass;
+class BuildingClass;
 
 
 class HouseClassExtension final : public Extension<HouseClass>
@@ -50,7 +51,10 @@ class HouseClassExtension final : public Extension<HouseClass>
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
     public:
-
+        /**
+         *  
+         */
+        DynamicVectorClass<BuildingClass *> CloningVats;
 };
 
 

@@ -27,6 +27,9 @@
  ******************************************************************************/
 #include "houseext.h"
 #include "house.h"
+#include "target.h"
+#include "tibsun_globals.h"
+#include "swizzle.h"
 #include "ccini.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -44,7 +47,8 @@ ExtensionMap<HouseClass, HouseClassExtension> HouseClassExtensions;
  *  @author: CCHyper
  */
 HouseClassExtension::HouseClassExtension(HouseClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    CloningVats()
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("HouseClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -60,7 +64,8 @@ HouseClassExtension::HouseClassExtension(HouseClass *this_ptr) :
  *  @author: CCHyper
  */
 HouseClassExtension::HouseClassExtension(const NoInitClass &noinit) :
-    Extension(noinit)
+    Extension(noinit),
+    CloningVats()
 {
     IsInitialized = false;
 }
@@ -75,6 +80,8 @@ HouseClassExtension::~HouseClassExtension()
 {
     //DEV_DEBUG_TRACE("HouseClassExtension deconstructor - 0x%08X\n", (uintptr_t)(ThisPtr));
     //DEV_DEBUG_WARNING("HouseClassExtension deconstructor - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    CloningVats.Clear();
 
     IsInitialized = false;
 }
@@ -96,6 +103,34 @@ HRESULT HouseClassExtension::Load(IStream *pStm)
     }
 
     new (this) HouseClassExtension(NoInitClass());
+
+    /**
+     *  Working count.
+     */
+    int count;
+
+    /**
+     *  Clear vectors to prepare for loading.
+     */
+    CloningVats.Clear();
+
+    /**
+     *  Read in vectors from the stream.
+     */
+    pStm->Read(&count, sizeof(count), nullptr);
+    for (int i = 0; i < count; ++i) {
+        BuildingClass *ptr;
+        if (SUCCEEDED(pStm->Read(&ptr, sizeof(uintptr_t), nullptr))) {
+            CloningVats.Add(ptr);
+        }
+    }
+
+    /**
+     *  Swizzle the pointers.
+     */
+    for (int i = 0; i < count; ++i) {
+        SwizzleManager.Swizzle((void **)&CloningVats[i]);
+    }
     
     return hr;
 }
@@ -114,6 +149,21 @@ HRESULT HouseClassExtension::Save(IStream *pStm, BOOL fClearDirty)
     HRESULT hr = Extension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
+    }
+
+    /**
+     *  Working count.
+     */
+    int count;
+
+    /**
+     *  Write vectors to the stream.
+     */
+    count = CloningVats.Count();
+    pStm->Write(&count, sizeof(count), nullptr);
+    for (int i = 0; i < count; ++i) {
+        BuildingClass *ptr = CloningVats[i];
+        pStm->Write(&ptr, sizeof(uintptr_t), nullptr);
     }
 
     return hr;
@@ -143,6 +193,23 @@ void HouseClassExtension::Detach(TARGET target, bool all)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("HouseClassExtension::Detach - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    /**
+     *  Remove this target from any trackers.
+     */
+    switch (target->What_Am_I()) {
+        case RTTI_BUILDING:
+        {
+            BuildingClass *building = Target_As_Building(target);
+
+            CloningVats.Delete(building);
+
+            break;
+        }
+
+        default:
+            break;
+    }
 }
 
 
