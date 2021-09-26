@@ -66,6 +66,31 @@ class UnitTypeClassExtension final : public Extension<UnitTypeClass>
          *  The facing count for the turret graphics in the units shape file.
          */
         int TurretFacings;
+
+        /**
+         *  
+         */
+        bool IsMTank;
+
+        /**
+         *  
+         */
+        bool IsMTankSuicideOnUnload;
+
+        /**
+         *  
+         */
+        bool IsMTankSuicideSurvivor;
+
+        /**
+         *  
+         */
+        bool IsMTankEVAAnnoucement;
+
+        /**
+         *  
+         */
+        VocType MTankUnloadSound;
 };
 
 

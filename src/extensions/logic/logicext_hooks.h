@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          UNITEXT.H
+ *  @file          LOGICEXT_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended UnitClass class.
+ *  @brief         Contains the hooks for the extended LogicClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,33 +27,5 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
 
-
-class UnitClass;
-class HouseClass;
-
-
-class UnitClassExtension final : public Extension<UnitClass>
-{
-    public:
-        UnitClassExtension(UnitClass *this_ptr);
-        UnitClassExtension(const NoInitClass &noinit);
-        ~UnitClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-    public:
-        /**
-         *  
-         */
-};
-
-
-extern ExtensionMap<UnitClass, UnitClassExtension> UnitClassExtensions;
+void LogicClassExtension_Hooks();

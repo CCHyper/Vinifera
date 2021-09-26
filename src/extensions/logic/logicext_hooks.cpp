@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          UNITEXT.H
+ *  @file          LOGICEXT_HOOKS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Extended UnitClass class.
+ *  @brief         Contains the hooks for the extended LogicClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,35 +25,29 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#pragma once
+#include "logicext_hooks.h"
+#include "logicext_functions.h"
+#include "logic.h"
+#include "fatal.h"
+#include "debughandler.h"
+#include "asserthandler.h"
 
-#include "extension.h"
-#include "container.h"
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
-class UnitClass;
-class HouseClass;
-
-
-class UnitClassExtension final : public Extension<UnitClass>
+DECLARE_PATCH(_LogicClass_AI_Time_Quake_Patch)
 {
-    public:
-        UnitClassExtension(UnitClass *this_ptr);
-        UnitClassExtension(const NoInitClass &noinit);
-        ~UnitClassExtension();
+	Logic_Time_Quake_AI(this_ptr);
 
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-    public:
-        /**
-         *  
-         */
-};
+	JMP();
+}
 
 
-extern ExtensionMap<UnitClass, UnitClassExtension> UnitClassExtensions;
+/**
+ *  Main function for patching the hooks.
+ */
+void LogicClassExtension_Hooks()
+{
+	Patch_Jump(0x, &_LogicClass_AI_Time_Quake_Patch);
+}

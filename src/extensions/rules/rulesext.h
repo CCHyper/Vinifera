@@ -75,7 +75,49 @@ class RulesClassExtension final : public Extension<RulesClass>
         bool General(CCINIClass &ini);
 
     public:
+        /**
+         *  
+         */
+        double QuakeUnitDamage;
 
+        /**
+         *  
+         */
+        double QuakeBuildingDamage;
+
+        /**
+         *  
+         */
+        int QuakeInfantryDamage;
+
+		/**
+		 *  The time quake will do this percentage of damage to all units and buildings
+		 *  in the game. The number is expressed as a fixed point percentage.
+		 */
+	    double QuakeDamagePercent;
+
+        /**
+         *  Percentage chance that a time quake will occur with each super weapon use.
+         */
+	    double QuakeChance;
+
+        /**
+         *  
+         */
+        int QuakeDelay;
+
+        /**
+         *  
+         */
+        int MTankDistance;
+
+        /**
+         *  These values are used to shake the screen when the MAD tank unloads.
+         */
+        unsigned MTankShakePixelYHi;
+        unsigned MTankShakePixelYLo;
+        unsigned MTankShakePixelXHi;
+        unsigned MTankShakePixelXLo;
 };
 
 

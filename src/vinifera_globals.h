@@ -30,6 +30,7 @@
 #include "always.h"
 #include "vector.h"
 #include "ccfile.h"
+#include "tibsun_defines.h"
 
 
 extern bool Vinifera_DeveloperMode;
@@ -77,3 +78,23 @@ extern bool Vinifera_SkipToSkirmish;
 extern bool Vinifera_SkipToCampaign;
 extern bool Vinifera_SkipToInternet;
 extern bool Vinifera_ExitAfterSkip;
+
+
+/**
+ *  Game state and logic globals.
+ */
+
+/**
+ *  This is the global flag to trigger a time quake.
+ */
+extern bool TimeQuake;
+
+/**
+ *  Is a time quake pending (triggered by a unit)?
+ */
+extern bool PendingTimeQuake;
+
+/**
+ *  The center point of the time quake used for dealing damage.
+ */
+extern TARGET TimeQuakeCenter;

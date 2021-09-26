@@ -45,10 +45,14 @@ ExtensionMap<UnitTypeClass, UnitTypeClassExtension> UnitTypeClassExtensions;
  */
 UnitTypeClassExtension::UnitTypeClassExtension(UnitTypeClass *this_ptr) :
     Extension(this_ptr),
-
     IsTotable(true),
     StartTurretFrame(-1),
-    TurretFacings(32)		// Must default to 32 as all Tiberian Sun units have 32 facings for turrets.
+    TurretFacings(32),		// Must default to 32 as all Tiberian Sun units have 32 facings for turrets.
+    IsMTank(false),
+    IsMTankSuicideOnUnload(true),
+    IsMTankSuicideSurvivor(true),
+    IsMTankEVAAnnoucement(true),
+    MTankUnloadSound(VOC_NONE)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("UnitTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -201,5 +205,11 @@ bool UnitTypeClassExtension::Read_INI(CCINIClass &ini)
      */
     TurretFacings = ArtINI.Get_Int(graphic_name, "TurretFacings", TurretFacings);
     
+    IsMTank = ini.Get_Bool(ini_name, "MTank", IsMTank);
+    IsMTankSuicideOnUnload = ini.Get_Bool(ini_name, "SuicideOnUnload", IsMTankSuicideOnUnload);
+    IsMTankSuicideSurvivor = ini.Get_Bool(ini_name, "SuicideSurvivor", IsMTankSuicideSurvivor);
+    IsMTankEVAAnnoucement = ini.Get_Bool(ini_name, "MTankEVAAnnoucement", IsMTankEVAAnnoucement);
+    MTankUnloadSound = ini.Get_VocType(ini_name, "MTankUnloadSound", MTankUnloadSound);
+
     return true;
 }

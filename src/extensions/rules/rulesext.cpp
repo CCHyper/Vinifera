@@ -42,7 +42,14 @@ RulesClassExtension::UIControlsStruct RulesClassExtension::UIControls;
  *  @author: CCHyper
  */
 RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    QuakeUnitDamage(0.0),
+    QuakeBuildingDamage(0.0),
+    QuakeInfantryDamage(0.0),
+    QuakeDamagePercent(0.0),
+    QuakeChance(0.0),
+    QuakeDelay(120),
+    MTankDistance(30)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -197,6 +204,14 @@ bool RulesClassExtension::General(CCINIClass &ini)
     if (!ini.Is_Present(GENERAL)) {
         return false;
     }
+
+    QuakeUnitDamage = ini.Get_Float(GENERAL, "QuakeUnitDamage", QuakeUnitDamage);
+    QuakeBuildingDamage = ini.Get_Float(GENERAL, "QuakeBuildingDamage", QuakeBuildingDamage);
+    QuakeInfantryDamage = ini.Get_Float(GENERAL, "QuakeInfantryDamage", QuakeInfantryDamage);
+    QuakeDelay = ini.Get_Float(GENERAL, "QuakeDelay", QuakeDelay);
+    QuakeDamagePercent = ini.Get_Float(GENERAL, "QuakeDamagePercent", QuakeDamagePercent);
+    QuakeChance = ini.Get_Float(GENERAL, "QuakeChance", QuakeChance);
+    MTankDistance = ini.Get_Float(GENERAL, "MTankDistance", MTankDistance);
 
     return true;
 }

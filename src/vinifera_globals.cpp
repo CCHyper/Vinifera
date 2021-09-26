@@ -57,3 +57,7 @@ bool Vinifera_SkipToSkirmish = false;
 bool Vinifera_SkipToCampaign = false;
 bool Vinifera_SkipToInternet = false;
 bool Vinifera_ExitAfterSkip = false;
+
+bool TimeQuake = false;
+bool PendingTimeQuake = false;
+TARGET TimeQuakeCenter = nullptr;

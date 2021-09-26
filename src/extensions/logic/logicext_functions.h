@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          UNITEXT.H
+ *  @file          BUILDINGEXT_FUNCTIONS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended UnitClass class.
+ *  @brief         Contains the supporting functions for the extended BuildingClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,33 +27,10 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
+#include "always.h"
 
 
-class UnitClass;
-class HouseClass;
+class LogicClass;
 
 
-class UnitClassExtension final : public Extension<UnitClass>
-{
-    public:
-        UnitClassExtension(UnitClass *this_ptr);
-        UnitClassExtension(const NoInitClass &noinit);
-        ~UnitClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-    public:
-        /**
-         *  
-         */
-};
-
-
-extern ExtensionMap<UnitClass, UnitClassExtension> UnitClassExtensions;
+void Logic_Time_Quake_AI(LogicClass *this_ptr);
