@@ -96,9 +96,9 @@ DECLARE_PATCH(_TechnoClass_Draw_Health_Bars_Unit_Draw_Pos_Patch)
 
 
 /**
- *  #issue-411
+ *  #issue-411, #issue-
  * 
- *  Implements IsAffectsAllies for WarheadTypes.
+ *  Implements IsAffectsAllies, IsAffectsEnemies and IsAffectsSource for WarheadTypes.
  * 
  *  @note: This patch does not replace "stolen" code as per our implementation
  *         rules, this is because the call to ObjectClass::Take_Damage that follows
@@ -106,7 +106,7 @@ DECLARE_PATCH(_TechnoClass_Draw_Health_Bars_Unit_Draw_Pos_Patch)
  * 
  *  @author: CCHyper
  */
-DECLARE_PATCH(_TechnoClass_Take_Damage_IsAffectsAllies_Patch)
+DECLARE_PATCH(_TechnoClass_Take_Damage_Affects_Who_Patch)
 {
     GET_REGISTER_STATIC(TechnoClass *, this_ptr, esi);
     GET_STACK_STATIC(int *, damage, esp, 0xEC);
@@ -118,23 +118,40 @@ DECLARE_PATCH(_TechnoClass_Take_Damage_IsAffectsAllies_Patch)
     static WarheadTypeClassExtension *warheadtypeext;
     static ResultType result;
 
-    if (warhead) {
+    /**
+     *  Make sure both the weapon warhead and source of the damage are
+     *  legal before performing the checks.
+     */
+    if (warhead && source) {
 
-        /**
-         *  Is the warhead that hit us one that affects units allied with its firing owner?
-         */
         warheadtypeext = WarheadTypeClassExtensions.find(warhead);
-        if (warheadtypeext && !warheadtypeext->IsAffectsAllies) {
+        if (warheadtypeext) {
 
             /**
-             *  If the source of the damage is an ally of ours, then reset
-             *  the damage amount and return that we took no damage.
+             *  If the source of the damage matches one of the following
+             *  rules, then reset the damage amount and return that we took no damage.
              */
-            if (source && source->House->Is_Ally(this_ptr->House)) {
-                *damage = 0;
-                goto return_RESULT_NONE;
+
+            /**
+             *  Is the warhead that hit us one that affects units allied with its firing owner?
+             */
+            if (!warheadtypeext->IsAffectsAllies) {
+                if (source->House->Is_Ally(this_ptr->House)) {
+                    *damage = 0;
+                    goto return_RESULT_NONE;
+                }
             }
 
+            /**
+             *  Is the warhead that hit us one that affects units allied with its firing owner?
+             */
+            if (!warheadtypeext->IsAffectsEnemies) {
+                if (!source->House->Is_Ally(this_ptr->House)) {
+                    *damage = 0;
+                    goto return_RESULT_NONE;
+                }
+            }                     
+            
         }
 
     }
@@ -391,7 +408,7 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x0063105C, &_TechnoClass_Fire_At_Weapon_Anim_Patch);
     Patch_Jump(0x0062F6B7, &_TechnoClass_Is_Ready_To_Uncloak_Cloak_Stop_BugFix_Patch);
     Patch_Jump(0x0062E6F0, &_TechnoClass_Null_House_Warning_Patch);
-    Patch_Jump(0x006328DE, &_TechnoClass_Take_Damage_IsAffectsAllies_Patch);
+    Patch_Jump(0x006328DE, &_TechnoClass_Take_Damage_Affects_Who_Patch);
     Patch_Jump(0x0062C5D5, &_TechnoClass_Draw_Health_Bars_Unit_Draw_Pos_Patch);
     Patch_Jump(0x0062C55B, &_TechnoClass_Draw_Health_Bars_Infantry_Draw_Pos_Patch);
 }
