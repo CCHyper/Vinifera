@@ -91,6 +91,12 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
          *  Reset the available budget when captured?
          */
         bool IsResetBudgetOnCapture;
+
+        /**
+         *  A harvester will aim for this cell if it wasn't allowed to reserve the
+         *  docking cell. This is offset from the building center.
+         */
+        Cell QueueingCell;
 };
 
 

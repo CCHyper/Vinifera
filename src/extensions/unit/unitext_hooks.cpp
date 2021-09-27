@@ -36,6 +36,9 @@
 #include "technotypeext.h"
 #include "unit.h"
 #include "unittype.h"
+#include "building.h"
+#include "buildingtype.h"
+#include "buildingtypeext.h"
 #include "target.h"
 #include "rules.h"
 #include "iomap.h"
@@ -45,6 +48,48 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  #issue-585
+ * 
+ *  Implements QueueingCell for harvesters waiting at refineries.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_UnitClass_Mission_Harvest_QueueingCell_Patch)
+{
+    GET_REGISTER_STATIC(UnitClass *, this_ptr, esi);
+    GET_REGISTER_STATIC(BuildingClass *, nearest, edi);     // Nearest refinery.
+    LEA_STACK_STATIC(Cell *, queue_where, esp, 0x0);
+    LEA_STACK_STATIC(Cell *, queue_where, esp, 0x0);
+    static BuildingTypeClassExtension *buildingtypeext;
+    static Cell queueing_cell(0,0);
+
+
+    /**
+     *  Fetch the queueing cell offset for this refinery.
+     */
+    buildingtypeext = BuildingTypeClassExtensions.find(nearest->Class);
+    if (buildingtypeext) {
+        if (buildingtypeext->QueueingCell.X > 0 || buildingtypeext->QueueingCell.Y > 0) {
+            queueing_cell.X = buildingtypeext->QueueingCell.X;
+            queueing_cell.Y = buildingtypeext->QueueingCell.Y;
+        }
+    }
+
+    queue_where->X += queueing_cell.X;
+    queue_where->Y += queueing_cell.Y;
+
+    /**
+     *  Restore some expected registers.
+     */
+    _asm { mov ebp, 1 }
+    _asm { mov ebx, 1 }
+
+map_nearby_location:
+    JMP(0x006550C0);
+}
 
 
 /**
@@ -446,4 +491,5 @@ void UnitClassExtension_Hooks()
     Patch_Jump(0x006530EB, &_UnitClass_Draw_Shape_Primary_Facing_Patch);
     Patch_Jump(0x006537A8, &_UnitClass_Draw_Shape_Turret_Facing_Patch);
     Patch_Jump(0x00653D7F, &_UnitClass_Draw_It_Unloading_Harvester_Patch);
+    Patch_Jump(0x00655027, &_UnitClass_Mission_Harvest_QueueingCell_Patch);
 }

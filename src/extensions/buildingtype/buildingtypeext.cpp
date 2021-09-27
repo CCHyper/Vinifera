@@ -54,7 +54,8 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(BuildingTypeClass *this_p
     ProduceCashDelay(0),
     ProduceCashBudget(0),
     IsStartupCashOneTime(false),
-    IsResetBudgetOnCapture(false)
+    IsResetBudgetOnCapture(false),
+    QueueingCell(0,0)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("BuildingTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -194,6 +195,10 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
     ProduceCashBudget = ini.Get_Int(ini_name, "ProduceCashBudget", ProduceCashBudget);
     IsStartupCashOneTime = ini.Get_Int(ini_name, "ProduceCashStartupOneTime", IsStartupCashOneTime);
     IsResetBudgetOnCapture = ini.Get_Bool(ini_name, "ProduceCashResetOnCapture", IsResetBudgetOnCapture);
+
+    TPoint2D<int> queueing_cell = ini.Get_Point(ini_name, "QueueingCell", TPoint2D<int>(0,0));
+    QueueingCell.X = queueing_cell.X;
+    QueueingCell.Y = queueing_cell.Y;
     
     return true;
 }
