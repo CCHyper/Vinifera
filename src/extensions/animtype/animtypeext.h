@@ -29,11 +29,13 @@
 
 #include "extension.h"
 #include "container.h"
+#include "tibsun_defines.h"
 
 
 class AnimTypeClass;
 class CCINIClass;
 class ParticleTypeClass;
+class InfantryTypeClass;
 
 
 class AnimTypeClassExtension final : public Extension<AnimTypeClass>
@@ -85,6 +87,27 @@ class AnimTypeClassExtension final : public Extension<AnimTypeClass>
          *  The number of the particle to spawn.
          */
         unsigned NumberOfParticles;
+
+    //https://github.com/Phobos-developers/Phobos/pull/193
+        /**
+         *  
+         */
+        const InfantryTypeClass *MakeInfantryClass;
+
+        /**
+         *  
+         */
+        FacingType MakeInfantryFacing;
+
+        /**
+         *  
+         */
+        MissionType MakeInfantryMission;
+
+        /**
+         *  
+         */
+        //HousesType MakeInfantryHouse;
 };
 
 

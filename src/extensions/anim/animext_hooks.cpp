@@ -36,16 +36,92 @@
 #include "particle.h"
 #include "particletype.h"
 #include "particlesys.h"
+#include "techno.h"
+#include "technotype.h"
 #include "target.h"
 #include "cell.h"
 #include "rules.h"
 #include "scenario.h"
+#include "house.h"
+#include "housetype.h"
+#include "side.h"
+#include "iomap.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+
+// Right near the bottom of AI - YR 00424932
+
+bool Anim_Make_TechnoType(AnimClass *this_ptr, TechnoTypeClass *technotype, FacingType facing, MissionType mission)
+{
+    if (technotype != nullptr) {
+
+        this_ptr->Clear_Occupy_Bit(this_ptr->Coord);
+
+        HouseClass *animhouse = Houses[this_ptr->OwnerHouse];
+        if (animhouse && animhouse->IsDefeated) {
+
+#if 1 // not sure what this is for, needs confirming.
+            SideType neutral_side = SideClass::From_Name("Civilian");
+
+            for (int i = 0; i < Houses.Count(); ++i) {
+                HouseClass *hptr = Houses[i];
+                if (hptr->Class->Side == neutral_side) {
+                    animhouse = hptr;
+                }
+            }
+#endif
+
+            TechnoClass *techno = reinterpret_cast<TechnoClass *>(technotype->Create_One_Of(animhouse));
+            ASSERT(techno != nullptr);
+
+            DirType dir = Facing_Dir(facing);
+
+            if (!techno->Unlimbo(this_ptr->Coord, dir)) {
+                this_ptr->Set_Stage(this_ptr->Fetch_Stage()-1);
+                return false;
+            }
+
+            Coordinate anim_center = this_ptr->Center_Coord();
+            CellClass *anim_cell = &Map[anim_center];
+            if (anim_cell) {
+
+                if (anim_cell->IsVisible) {
+
+                    // spawn under bridge bug fix?
+                    if (this_ptr->Coord.Z > anim_cell->Center_Coord().Z) {
+
+                        this_ptr->Mark(MARK_UP);
+                        this_ptr->IsOnBridge = true;
+                        this_ptr->Mark(MARK_DOWN);
+
+                    }
+
+                }
+
+            }
+
+            /**
+             *  For non-human players (the computer), set the initial mission.
+             */
+            if (!animhouse->IsHuman) {
+                techno->Assign_Mission(mission);
+            }
+
+        }
+
+        this_ptr->entry_E4(); // Delete_This
+
+    }
+    
+    //this->removecalled179 = 1;
+}
+
 
 
 /**
@@ -279,6 +355,17 @@ DECLARE_PATCH(_AnimClass_AI_Beginning_Patch)
                 this_ptr->IsInvisible = true;
             }
 
+        }
+        
+        /**
+         *  #issue-
+         * 
+         *  Implements MakeInfantryClass for Anims.
+         * 
+         *  @author: CCHyper
+         */
+        if (animtypeext->MakeInfantryClass) {
+            this_ptr->Set_Occupy_Bit(this_ptr->Coord);
         }
 
     }

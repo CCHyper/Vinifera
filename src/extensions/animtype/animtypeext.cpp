@@ -50,7 +50,11 @@ AnimTypeClassExtension::AnimTypeClassExtension(AnimTypeClass *this_ptr) :
     ZAdjust(0),
     AttachLayer(LAYER_NONE),
     ParticleToSpawn(PARTICLE_NONE),
-    NumberOfParticles(0)
+    NumberOfParticles(0),
+    MakeInfantryClass(nullptr),
+    MakeInfantryFacing(FACING_N),
+    MakeInfantryMission(MISSION_HUNT),
+    MakeInfantryHouse(HOUSE_NONE)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("AnimTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -102,6 +106,8 @@ HRESULT AnimTypeClassExtension::Load(IStream *pStm)
     }
 
     new (this) AnimTypeClassExtension(NoInitClass());
+
+    SwizzleManager.Swizzle((void **)MakeInfantryClass);
     
     return hr;
 }
@@ -164,6 +170,9 @@ void AnimTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
 
     crc(AttachLayer);
     crc(NumberOfParticles);
+    crc(MakeInfantryFacing);
+    crc(MakeInfantryMission);
+    //crc(MakeInfantryHouse);
 }
 
 
@@ -199,6 +208,10 @@ bool AnimTypeClassExtension::Read_INI(CCINIClass &ini)
     AttachLayer = ini.Get_LayerType(ini_name, "Layer", AttachLayer);
     ParticleToSpawn = ini.Get_ParticleType(ini_name, "SpawnsParticle", ParticleToSpawn);
     NumberOfParticles = ini.Get_Int(ini_name, "NumParticles", NumberOfParticles);
+    MakeInfantryClass = ini.Get_Infantry(ini_name, "MakeInfantry", MakeInfantryClass);
+    MakeInfantryFacing = ini.Get_FacingType(ini_name, "MakeInfantryFacing", MakeInfantryFacing);
+    MakeInfantryMission = ini.Get_MissionType(ini_name, "MakeInfantryMission", MakeInfantryMission);
+    //MakeInfantryHouse = ini.Get_HousesType(ini_name, "MakeInfantryHouse", MakeInfantryHouse);
     
     return true;
 }
