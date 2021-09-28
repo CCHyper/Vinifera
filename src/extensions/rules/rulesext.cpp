@@ -248,6 +248,21 @@ bool RulesClassExtension::MPlayer(CCINIClass &ini)
 
 
 /**
+ *  Process the AI personality generals.
+ *  
+ *  @author: CCHyper
+ */
+bool RulesClassExtension::AIGenerals(CCINIClass& ini)
+{
+    static char const * const AIGENERALS = "AIGenerals";
+
+    if (!ini.Is_Present(AIGENERALS)) {
+        return false;
+    }
+}
+
+
+/**
  *  Process the UI controls and overrides.
  * 
  *  This function is here for simplicity, and is loaded from its own INI, not Rules.

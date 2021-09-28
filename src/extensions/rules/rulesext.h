@@ -57,6 +57,7 @@ class RulesClassExtension final : public Extension<RulesClass>
 
         bool General(CCINIClass &ini);
         bool MPlayer(CCINIClass &ini);
+        bool AIGenerals(CCINIClass &ini);
 
         static bool Read_UI_INI();
         static bool Init_UI_Controls();
