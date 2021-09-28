@@ -91,6 +91,21 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
          *  Reset the available budget when captured?
          */
         bool IsResetBudgetOnCapture;
+
+        /**
+         *  Does this building activate a spy satellite and reveal the tactical map?
+         */
+        bool IsSpySat;
+
+        /**
+         *  
+         */
+        VocType SpySatActivationSound;
+
+        /**
+         *  
+         */
+        VocType SpySatDeactivationSound;
 };
 
 

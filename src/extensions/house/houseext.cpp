@@ -27,6 +27,11 @@
  ******************************************************************************/
 #include "houseext.h"
 #include "house.h"
+#include "building.h"
+#include "buildingtype.h"
+#include "buildingtypeext.h"
+#include "ionstorm.h"
+#include "voc.h"
 #include "ccini.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -155,4 +160,206 @@ void HouseClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("HouseClassExtension::Compute_CRC - 0x%08X\n", (uintptr_t)(ThisPtr));
+}
+
+
+// TODO: Move when working!
+#include "iomap.h"
+#include "session.h"
+#include "tibsun_globals.h"
+void Map_Reset_Shroud(MapClass *this_ptr, HouseClass *house)
+{
+    HouseClassExtension *houseext;
+    houseext = HouseClassExtensions.find(house);
+    if (!houseext) {
+        return;
+    }
+
+    if (house) {
+        houseext->IsMapClear = false;
+    }
+
+    if (house == PlayerPtr) {
+        if (!house) {
+            DEBUG_WARNING("We tried to reset the shroud without an owner!\n");
+        }
+
+    } else if (house) {
+        return;
+    }
+
+    /**
+     *  Reset the cell iterator.
+     */
+    Map.Iterator_Reset();
+
+    /**
+     *  Iterate over all the map cells and flag them as unrevealed.
+     */
+    for (CellClass *cell = Map.Iterator_Next_Cell(); cell != nullptr; cell = Map.Iterator_Next_Cell()) {
+        // TODO: Whats going on here?
+        cell->IsMapped = false;
+        cell->IsVisible = false;
+    }
+
+    Map.All_To_Look();
+    PlayerPtr->IsVisionary = false;
+    this_ptr->Flag_To_Redraw(2);
+}
+
+void Map_Clear_Shroud(MapClass *this_ptr, HouseClass *house)
+{
+    HouseClassExtension *houseext;
+    houseext = HouseClassExtensions.find(house);
+    if (!houseext) {
+        return;
+    }
+
+    if (house) {
+        houseext->IsMapClear = true;
+    }
+
+    if (house == PlayerPtr) {
+        if (!house) {
+            DEBUG_WARNING("We tried to clear the shroud without an owner!\n");
+        }
+
+    } else if (house) {
+        return;
+    }
+
+    bool v1 = true;
+    if (Session.Type != GAME_IPX && Session.Type != GAME_INTERNET) {
+        v1 = true;
+    }
+
+    if (!PlayerPtr->IsVisionary) {
+
+        PlayerPtr->IsVisionary = true;
+
+        /**
+         *  Reset the cell iterator.
+         */
+        Map.Iterator_Reset();
+
+        /**
+         *  Iterate over all the map cells and flag them as revealed.
+         */
+        for (CellClass *cell = Map.Iterator_Next_Cell(); cell != nullptr; cell = Map.Iterator_Next_Cell()) {
+            // TODO: Whats going on here?
+            cell->IsMapped = true;
+            cell->IsVisible = true;
+        }
+
+        Map.All_To_Look();
+        this_ptr->Flag_To_Redraw(2);
+    }
+}
+
+
+/**
+ *  Handles the state of the spy satellite for the house.
+ *  
+ *  @author: CCHyper
+ */
+void HouseClassExtension::Update_SpySats()
+{
+    ASSERT(ThisPtr != nullptr);
+    //DEV_DEBUG_TRACE("HouseClassExtension::Update_SpySats - 0x%08X\n", (uintptr_t)(ThisPtr));
+    
+    ThisPtr->field_56D = false;
+
+    //if (ThisPtr != PlayerPtr) {
+    //    return;
+    //}
+
+    // TODO: Add option to override ion storms?
+    //if (IonStorm_Is_Active()) {
+    //    return;
+    //}
+
+    if (ThisPtr->Drain > ThisPtr->Power) {
+        return;
+    }
+
+    /**
+     *  Iterate over all buildings in the game world.
+     */
+    for (int i = 0; i < Buildings.Count(); ++i) {
+
+        BuildingClass *building = Buildings[i];
+        if (!building) {
+            continue;
+        }
+
+        BuildingTypeClassExtension *buildingtypeext;
+        buildingtypeext = BuildingTypeClassExtensions.find(building->Class);
+        if (!buildingtypeext) {
+            continue;
+        }
+
+        /**
+         *  Skip any buildings not active in the game world.
+         */
+        if (building->IsInLimbo || !building->IsDown) {
+            continue;
+        }
+
+        /**
+         *  
+         */
+        if (Session.Type != GAME_NORMAL) {
+
+            if (ThisPtr != PlayerPtr) {
+            }
+
+        } else if (!ThisPtr->IsHuman && !ThisPtr->IsPlayerControl) {
+            continue;
+        }
+
+        /**
+         *  
+         */
+        if (!building->IsDiscoveredByPlayer && Session.Type == GAME_NORMAL) {
+            continue;
+        }
+
+        /**
+         *  If the building is deconstructing, skip it.
+         */
+        if (building->Mission == MISSION_DECONSTRUCTION || building->MissionQueue == MISSION_DECONSTRUCTION) {
+            continue;
+        }
+
+        /**
+         *  And finally skip any buildings that are not spy sats.
+         */
+        if (!buildingtypeext->IsSpySat) {
+            continue;
+        }
+
+        /**
+         *  
+         */
+        if (IsSpySatActive) {
+            Map_Reset_Shroud(&Map, ThisPtr);
+            IsSpySatActive = false;
+
+            if (ThisPtr == PlayerPtr) {
+                Sound_Effect(buildingtypeext->SpySatDeactivationSound);
+            }
+
+        } else {
+            Map_Clear_Shroud(&Map, ThisPtr);
+            IsSpySatActive = true;
+
+            if (ThisPtr == PlayerPtr) {
+                Sound_Effect(buildingtypeext->SpySatActivationSound);
+            }
+        }
+
+        // Maybe?
+        break;
+
+    }
 }

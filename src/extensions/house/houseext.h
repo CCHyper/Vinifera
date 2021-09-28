@@ -49,8 +49,20 @@ class HouseClassExtension final : public Extension<HouseClass>
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
-    public:
+        void Update_SpySats();
 
+    public:
+        /**
+         *  This flag is used to control whether or not this house has the spy
+         *  satellite in orbit. If the satellite's there, they have unlimited
+         *  radar and the map is fully revealed.
+         */
+        bool IsSpySatActive;
+
+        /**
+         *  
+         */
+        bool IsMapClear;
 };
 
 

@@ -29,6 +29,7 @@
 #include "houseext_init.h"
 #include "vinifera_globals.h"
 #include "house.h"
+#include "houseext.h"
 #include "housetype.h"
 #include "technotype.h"
 #include "fatal.h"
@@ -37,6 +38,39 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_HouseClass_AI_SpySat_Patch)
+{
+    GET_REGISTER_STATIC(HouseClass *, this_ptr, esi);
+    static HouseClassExtension *houseext;
+
+    if (this_ptr->field_56D) {
+
+        /**
+         *  Original Code:
+         *  Update the status of radars for this house.
+         */
+        this_ptr->Update_Radars();
+
+        /**
+         *  Update the status of spy sats for this house.
+         */
+        houseext = HouseClassExtensions.find(this_ptr);
+        if (houseext) {
+            houseext->Update_SpySats();
+        }
+    }
+
+    JMP(0x004BC60D);
+}
 
 
 /**
@@ -97,5 +131,6 @@ void HouseClassExtension_Hooks()
      */
     HouseClassExtension_Init();
 
-	Patch_Jump(0x004BBD26, &_HouseClass_Can_Build_BuildCheat_Patch);
+    Patch_Jump(0x004BBD26, &_HouseClass_Can_Build_BuildCheat_Patch);
+    Patch_Jump(0x004BC606, &_HouseClass_AI_SpySat_Patch);
 }
