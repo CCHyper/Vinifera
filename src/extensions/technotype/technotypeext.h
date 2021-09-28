@@ -77,6 +77,16 @@ class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
         bool IsImmuneToEMP;
 
         /**
+         *  
+         */
+        bool IsGapGenerator;
+
+        /**
+         *  
+         */
+        unsigned char GapRadiusInCells;
+
+        /**
          *  These values are used to shake the screen when the object is destroyed.
          */
         unsigned ShakePixelYHi;
@@ -87,8 +97,7 @@ class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
         /**
          *  The graphic class to switch to when this unit is unloading (e.g., at a refinery).
          */
-        const TechnoTypeClass *UnloadingClass;
-};
+        const TechnoTypeClass *UnloadingClass;};
 
 
 extern ExtensionMap<TechnoTypeClass, TechnoTypeClassExtension> TechnoTypeClassExtensions;

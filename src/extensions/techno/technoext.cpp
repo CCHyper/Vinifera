@@ -27,6 +27,8 @@
  ******************************************************************************/
 #include "technoext.h"
 #include "techno.h"
+#include "technotype.h"
+#include "technotypeext.h"
 #include "wwcrc.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -155,4 +157,103 @@ void TechnoClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TechnoClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+}
+
+
+/**
+ *  
+ *  
+ *  @author: CCHyper
+ */
+void TechnoClassExtension::Add_Gap_Effect()
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("TechnoClassExtension::Add_Gap_Effect - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    if (!PlayerPtr) {
+        return;
+    }
+
+    if (IsJamming) {
+        return;
+    }
+
+    /**
+     *  Fetch the extended techno type instance.
+     */
+    TechnoTypeClassExtension *technotypeext;
+    technotypeext = TechnoTypeClassExtensions.find(ThisPtr->Techno_Type_Class());
+    if (!technotypeext) {
+        return;
+    }
+
+    if (!JammingRadius) {
+        JammingRadius = technotypeext->GapRadiusInCells;
+    }
+
+    /**
+     *  
+     */
+    IsJamming = true;
+
+
+
+
+
+    // TODO
+
+
+
+
+
+
+    Map.RadarClass::IsToRedraw = true;  // TS doesnt have what we need?
+    Map.Flag_To_Redraw(2);
+}
+
+
+/**
+ *  Stop a gap generator from jamming cells.
+ *  
+ *  @author: CCHyper
+ */
+void TechnoClassExtension::Remove_Gap_Effect()
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("TechnoClassExtension::Remove_Gap_Effect - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    if (!PlayerPtr) {
+        return;
+    }
+
+    if (!IsJamming) {
+        return;
+    }
+
+    /**
+     *  Fetch the extended techno type instance.
+     */
+    TechnoTypeClassExtension *technotypeext;
+    technotypeext = TechnoTypeClassExtensions.find(ThisPtr->Techno_Type_Class());
+    if (!technotypeext) {
+        return;
+    }
+
+    if (!JammingRadius) {
+        JammingRadius = technotypeext->GapRadiusInCells;
+    }
+
+    /**
+     *  
+     */
+    IsJamming = false;
+
+
+
+    // TODO
+
+
+
+    Map.RadarClass::IsToRedraw = true;  // TS doesnt have what we need?
+    Map.Flag_To_Redraw(2);
 }

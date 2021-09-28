@@ -46,7 +46,19 @@ class TechnoClassExtension final : public Extension<TechnoClass>
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
+        void Add_Gap_Effect();
+        void Remove_Gap_Effect();
+
     public:
+        /**
+         *  Used by the gap generator to decide if it should jam or unjam.
+         */
+        bool IsJamming;
+
+        /**
+         *  
+         */
+        int JammingRadius;
 };
 
 

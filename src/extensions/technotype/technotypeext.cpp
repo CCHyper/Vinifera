@@ -47,11 +47,12 @@ ExtensionMap<TechnoTypeClass, TechnoTypeClassExtension> TechnoTypeClassExtension
  */
 TechnoTypeClassExtension::TechnoTypeClassExtension(TechnoTypeClass *this_ptr) :
     Extension(this_ptr),
-
     CloakSound(VOC_NONE),
     UncloakSound(VOC_NONE),
     IsShakeScreen(false),
     IsImmuneToEMP(false),
+    IsGapGenerator(false),
+    GapRadiusInCells(0),
     ShakePixelYHi(0),
     ShakePixelYLo(0),
     ShakePixelXHi(0),
@@ -172,6 +173,8 @@ void TechnoTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
 
     crc(IsShakeScreen);
     crc(IsImmuneToEMP);
+    crc(IsGapGenerator);
+    crc(GapRadiusInCells);
     crc(ShakePixelYHi);
     crc(ShakePixelYLo);
     crc(ShakePixelXHi);
@@ -200,6 +203,8 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     UncloakSound = ini.Get_VocType(ini_name, "UncloakSound", UncloakSound);
     IsShakeScreen = ini.Get_Bool(ini_name, "CanShakeScreen", IsShakeScreen);
     IsImmuneToEMP = ini.Get_Bool(ini_name, "ImmuneToEMP", IsImmuneToEMP);
+    IsGapGenerator = ini.Get_Bool(ini_name, "GapGenerator", IsGapGenerator);
+    GapRadiusInCells = ini.Get_Int(ini_name, "GapRadiusInCells", GapRadiusInCells);
     ShakePixelYHi = ini.Get_Int(ini_name, "ShakeYhi", ShakePixelYHi);
     ShakePixelYLo = ini.Get_Int(ini_name, "ShakeYlo", ShakePixelYLo);
     ShakePixelXHi = ini.Get_Int(ini_name, "ShakeXhi", ShakePixelXHi);
