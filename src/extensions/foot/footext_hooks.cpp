@@ -36,6 +36,9 @@
 #include "hooker_macros.h"
 
 
+// 004A1C32, patch Theif check here, see FOOT.CPP 699
+
+
 /**
  *  #issue-404
  * 

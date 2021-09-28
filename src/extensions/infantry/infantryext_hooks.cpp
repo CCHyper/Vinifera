@@ -37,6 +37,11 @@
 #include "hooker_macros.h"
 
 
+// 004D74D2, patch Theif check here, see INFANTRY.CPP 3059
+
+// [somewhere in Per_Cell_Process], patch Theif check here, see INFANTRY.CPP 749
+
+
 /**
  *  #issue-80
  * 
