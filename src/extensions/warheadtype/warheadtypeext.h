@@ -68,6 +68,11 @@ class WarheadTypeClassExtension final : public Extension<WarheadTypeClass>
         bool IsAffectsEnemies;
 
         /**
+         *  Can this warhead damage the unit that fired the weapon this warhead is attached to?
+         */
+        bool IsAffectsOwner;
+
+        /**
          *  This is used to override the size of the combat light flash at the point of impact.
          */
         float CombatLightSize;

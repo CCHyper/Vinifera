@@ -133,6 +133,16 @@ DECLARE_PATCH(_TechnoClass_Take_Damage_Affects_Who_Patch)
              */
 
             /**
+             *  Is the warhead that hit one that we fired?
+             */
+            //if (!warheadtypeext->IsAffectsOwner) {        // Not working
+            //    if (source->House == this_ptr->House) {
+            //        *damage = 0;
+            //        goto return_RESULT_NONE;
+            //    }
+            //}
+
+            /**
              *  Is the warhead that hit us one that affects units allied with its firing owner?
              */
             if (!warheadtypeext->IsAffectsAllies) {
