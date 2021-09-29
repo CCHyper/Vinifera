@@ -46,6 +46,8 @@ class TechnoClassExtension final : public Extension<TechnoClass>
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
+        bool Is_Crushable(TechnoClass *crusher) const;
+
     public:
 };
 

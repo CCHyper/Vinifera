@@ -56,7 +56,9 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(TechnoTypeClass *this_ptr) :
     ShakePixelYLo(0),
     ShakePixelXHi(0),
     ShakePixelXLo(0),
-    UnloadingClass(nullptr)
+    UnloadingClass(nullptr),
+    IsOmniCrusher(false),
+    IsOmniCrushResistant(false)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("TechnoTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -176,6 +178,8 @@ void TechnoTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
     crc(ShakePixelYLo);
     crc(ShakePixelXHi);
     crc(ShakePixelXLo);
+    crc(IsOmniCrusher);
+    crc(IsOmniCrushResistant);
 }
 
 
@@ -205,6 +209,8 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     ShakePixelXHi = ini.Get_Int(ini_name, "ShakeXhi", ShakePixelXHi);
     ShakePixelXLo = ini.Get_Int(ini_name, "ShakeXlo", ShakePixelXLo);
     UnloadingClass = ini.Get_Techno(ini_name, "UnloadingClass", UnloadingClass);
+    IsOmniCrusher = ini.Get_Bool(ini_name, "OmniCrusher", IsOmniCrusher);
+    IsOmniCrushResistant = ini.Get_Bool(ini_name, "OmniCrushResistant", IsOmniCrushResistant);
 
     return true;
 }

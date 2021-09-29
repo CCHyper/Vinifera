@@ -27,6 +27,10 @@
  ******************************************************************************/
 #include "technoext.h"
 #include "techno.h"
+#include "technotype.h"
+#include "technotypeext.h"
+#include "house.h"
+#include "houseext.h"
 #include "wwcrc.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -47,8 +51,8 @@ TechnoClassExtension::TechnoClassExtension(TechnoClass *this_ptr) :
     Extension(this_ptr)
 {
     ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("TechnoClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("TechnoClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //DEV_DEBUG_TRACE("TechnoClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //DEV_DEBUG_WARNING("TechnoClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
     IsInitialized = true;
 }
@@ -73,8 +77,8 @@ TechnoClassExtension::TechnoClassExtension(const NoInitClass &noinit) :
  */
 TechnoClassExtension::~TechnoClassExtension()
 {
-    //EXT_DEBUG_TRACE("TechnoClassExtension deconstructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("TechnoClassExtension deconstructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //DEV_DEBUG_TRACE("TechnoClassExtension deconstructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //DEV_DEBUG_WARNING("TechnoClassExtension deconstructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
     IsInitialized = false;
 }
@@ -88,7 +92,7 @@ TechnoClassExtension::~TechnoClassExtension()
 HRESULT TechnoClassExtension::Load(IStream *pStm)
 {
     ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("TechnoClassExtension::Size_Of - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //DEV_DEBUG_TRACE("TechnoClassExtension::Size_Of - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
     HRESULT hr = Extension::Load(pStm);
     if (FAILED(hr)) {
@@ -109,7 +113,7 @@ HRESULT TechnoClassExtension::Load(IStream *pStm)
 HRESULT TechnoClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
     ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("TechnoClassExtension::Size_Of - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //DEV_DEBUG_TRACE("TechnoClassExtension::Size_Of - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
     HRESULT hr = Extension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
@@ -128,7 +132,7 @@ HRESULT TechnoClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 int TechnoClassExtension::Size_Of() const
 {
     ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("TechnoClassExtension::Size_Of - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //DEV_DEBUG_TRACE("TechnoClassExtension::Size_Of - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
     return sizeof(*this);
 }
@@ -142,7 +146,7 @@ int TechnoClassExtension::Size_Of() const
 void TechnoClassExtension::Detach(TARGET target, bool all)
 {
     ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("TechnoClassExtension::Detach - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //DEV_DEBUG_TRACE("TechnoClassExtension::Detach - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 }
 
 
@@ -154,5 +158,48 @@ void TechnoClassExtension::Detach(TARGET target, bool all)
 void TechnoClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("TechnoClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //DEV_DEBUG_TRACE("TechnoClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 }
+
+
+/**
+ *  
+ *  
+ *  @author: CCHyper
+ */
+bool TechnoClassExtension::Is_Crushable(TechnoClass *crusher) const
+{
+    ASSERT(ThisPtr != nullptr);
+    //DEV_DEBUG_TRACE("TechnoClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    TechnoTypeClassExtension *this_technotypeext;
+    this_technotypeext = TechnoTypeClassExtensions.find(ThisPtr->Techno_Type_Class());
+
+    TechnoTypeClassExtension *crusher_technotypeext;
+    crusher_technotypeext = TechnoTypeClassExtensions.find(crusher->Techno_Type_Class());
+
+    if ( crusher
+      && crusher_technotypeext->IsOmniCrusher
+      && ThisPtr
+      //&& (this->r.m.o.a.TargetBitfield[0] & 1) != 0
+      && !this_technotypeext->IsOmniCrushResistant
+      && ThisPtr->What_Am_I() != RTTI_BUILDING
+      && !crusher->House->Is_Ally(ThisPtr)
+      //&& !this->r.m.o.a.vftable->t.r.m.o.Is_Invulnerable(this)
+      )
+    {
+        return true;
+    }
+
+    if ( ThisPtr->Class_Of()->IsCrushable
+        && ThisPtr
+        //&& (ThisPtr->r.m.o.a.TargetBitfield[0] & 1) != 0
+        //&& !this->__Uncrushable
+        && !crusher->House->Is_Ally(ThisPtr)
+        //&& !this->r.m.o.a.vftable->t.r.m.o.Is_Invulnerable(this)
+        )
+    {
+        return true;
+    }
+
+    return false;

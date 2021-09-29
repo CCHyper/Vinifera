@@ -88,6 +88,16 @@ class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
          *  The graphic class to switch to when this unit is unloading (e.g., at a refinery).
          */
         const TechnoTypeClass *UnloadingClass;
+
+        /**
+         *  
+         */
+        bool IsOmniCrusher;
+        
+        /**
+         *  
+         */
+        bool IsOmniCrushResistant;
 };
 
 
