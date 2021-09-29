@@ -77,6 +77,11 @@ class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
         bool IsImmuneToEMP;
 
         /**
+         *  Does this units turret recoil when it fires its weapon?
+         */
+        bool IsTurretRecoil;
+
+        /**
          *  These values are used to shake the screen when the object is destroyed.
          */
         unsigned ShakePixelYHi;

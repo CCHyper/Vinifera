@@ -50,6 +50,36 @@
 
 
 /**
+ *  #issue-596
+ * 
+ *  Implements IsTurretRecoil for technos.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_TechnoClass_Fire_At_Turret_Recoil_Patch)
+{
+    GET_REGISTER_STATIC(TechnoClass *, this_ptr, esi);
+    static TechnoTypeClassExtension *technotypeext;
+
+    /**
+     *  
+     */
+    technotypeext = TechnoTypeClassExtensions.find(this_ptr->Techno_Type_Class());
+    if (technotypeext && this_ptr->Is_Turret_Equipped()) {
+        this_ptr->IsInRecoilState = technotypeext->IsTurretRecoil;
+
+    /**
+     *  Original code.
+     */
+    } else if (this_ptr->Is_Turret_Equipped()) {
+        this_ptr->IsInRecoilState = true;
+    }
+
+    JMP(0x00630E75);
+}
+
+
+/**
  *  #issue-541
  * 
  *  Allow customisation of the infantry health bar draw position.
@@ -394,4 +424,5 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x006328DE, &_TechnoClass_Take_Damage_IsAffectsAllies_Patch);
     Patch_Jump(0x0062C5D5, &_TechnoClass_Draw_Health_Bars_Unit_Draw_Pos_Patch);
     Patch_Jump(0x0062C55B, &_TechnoClass_Draw_Health_Bars_Infantry_Draw_Pos_Patch);
+    Patch_Jump(0x00630E60, &_TechnoClass_Fire_At_Turret_Recoil_Patch);
 }

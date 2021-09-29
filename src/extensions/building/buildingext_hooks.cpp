@@ -55,6 +55,36 @@
 
 
 /**
+ *  #issue-596
+ * 
+ *  Implements IsTurretRecoil for buildings.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_Mission_Missile_Turret_Recoil_Patch)
+{
+    GET_REGISTER_STATIC(BuildingClass *, this_ptr, esi);
+    static TechnoTypeClassExtension *technotypeext;
+
+    /**
+     *  
+     */
+    technotypeext = TechnoTypeClassExtensions.find(this_ptr->Techno_Type_Class());
+    if (technotypeext && this_ptr->Is_Turret_Equipped()) {
+        this_ptr->IsInRecoilState = technotypeext->IsTurretRecoil;
+
+    /**
+     *  Original code.
+     */
+    } else if (this_ptr->Is_Turret_Equipped()) {
+        this_ptr->IsInRecoilState = true;
+    }
+
+    JMP(0x00433156);
+}
+
+
+/**
  *  #issue-26
  * 
  *  Adds functionality for the produce cash per-frame logic.
