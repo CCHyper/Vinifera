@@ -48,6 +48,44 @@
 
 
 /**
+ *  #issue-598
+ * 
+ *  Implements BarrelTravel for shape units with a voxel barrel.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_UnitClass_Draw_Shape_Voxel_Barrel_Travel_Patch)
+{
+    GET_REGISTER_STATIC(UnitClass *, this_ptr, ebp);
+    LEA_STACK_STATIC(Matrix3D *, matrix, esp, 0x80);
+    static const TechnoTypeClassExtension *technotypext;
+
+    /**
+     *  Has this unit just fired is weapon (flagged to recoil)?
+     */
+    if (this_ptr->IsInRecoilState) {
+
+        /**
+         *  Custom barrel recoil travel.
+         */
+        technotypext = TechnoTypeClassExtensions.find(this_ptr->Techno_Type_Class());
+        if (technotypext) {
+            matrix->Translate_X(-((float)technotypext->BarrelTravel));
+
+        /**
+         *  Original value.
+         */
+        } else {
+            matrix->Translate_X(-2.0f);
+        }
+
+    }
+
+    JMP(0x0065341D);
+}
+
+
+/**
  *  #issue-597
  * 
  *  Implements TurretTravel for voxel units.
@@ -485,4 +523,5 @@ void UnitClassExtension_Hooks()
     Patch_Jump(0x006537A8, &_UnitClass_Draw_Shape_Turret_Facing_Patch);
     Patch_Jump(0x00653D7F, &_UnitClass_Draw_It_Unloading_Harvester_Patch);
     Patch_Jump(0x0065299F, &_UnitClass_Draw_Voxel_Voxel_Turret_Travel_Patch);
+    Patch_Jump(0x00653402, &_UnitClass_Draw_Shape_Voxel_Barrel_Travel_Patch);
 }

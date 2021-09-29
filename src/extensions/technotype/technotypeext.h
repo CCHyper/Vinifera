@@ -99,6 +99,12 @@ class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
          *  when it fires its weapon.
          */
         int TurretTravel;
+
+        /**
+         *  The movement (in pixels) that this units turret barrel will move on its
+         *  x-axis when it fires its weapon.
+         */
+        int BarrelTravel;
 };
 
 

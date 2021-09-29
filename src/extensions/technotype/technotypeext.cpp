@@ -57,7 +57,8 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(TechnoTypeClass *this_ptr) :
     ShakePixelXHi(0),
     ShakePixelXLo(0),
     UnloadingClass(nullptr),
-    TurretTravel(-2)
+    TurretTravel(2),
+    BarrelTravel(2)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("TechnoTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -205,6 +206,7 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
      */
     if (!strcmpi(ini_name, "MMCH")) {
         TurretTravel = 0;
+        BarrelTravel = 2;
     }
     
     CloakSound = ini.Get_VocType(ini_name, "CloakSound", CloakSound);
@@ -218,6 +220,7 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     ShakePixelXLo = ini.Get_Int(ini_name, "ShakeXlo", ShakePixelXLo);
     UnloadingClass = ini.Get_Techno(ini_name, "UnloadingClass", UnloadingClass);
     TurretTravel = ini.Get_Int(ini_name, "TurretTravel", TurretTravel);
+    BarrelTravel = ini.Get_Int(ini_name, "BarrelTravel", BarrelTravel);
 
     return true;
 }
