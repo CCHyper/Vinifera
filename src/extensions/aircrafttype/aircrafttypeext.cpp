@@ -44,7 +44,9 @@ ExtensionMap<AircraftTypeClass, AircraftTypeClassExtension> AircraftTypeClassExt
  *  @author: CCHyper
  */
 AircraftTypeClassExtension::AircraftTypeClassExtension(AircraftTypeClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    IsCanAcquireAirborne(false),
+    IsCanBeAirborneAcquired(true)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("AircraftTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -174,6 +176,9 @@ bool AircraftTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
+
+    IsCanAcquireAirborne = ini.Get_Bool(ini_name, "CanAcquireAirborne", IsCanAcquireAirborne);
+    IsCanBeAirborneAcquired = ini.Get_Bool(ini_name, "CanBeAirborneAcquired", IsCanBeAirborneAcquired);
     
     return true;
 }

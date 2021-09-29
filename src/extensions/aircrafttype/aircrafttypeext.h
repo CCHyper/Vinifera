@@ -52,7 +52,15 @@ class AircraftTypeClassExtension final : public Extension<AircraftTypeClass>
         bool Read_INI(CCINIClass &ini);
 
     public:
+        /**
+         *  Can this aircraft acquire airborne targets (within range) and attack them automatically?
+         */
+        bool IsCanAcquireAirborne;
 
+        /**
+         *  
+         */
+        bool IsCanBeAirborneAcquired;
 };
 
 

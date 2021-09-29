@@ -28,7 +28,9 @@
 #include "aircraftext_hooks.h"
 #include "aircraftext_init.h"
 #include "aircraft.h"
+#include "aircraftext.h"
 #include "aircrafttype.h"
+#include "aircrafttypeext.h"
 #include "object.h"
 #include "target.h"
 #include "unit.h"
@@ -40,6 +42,78 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  #issue-589
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_AircraftClass_AI_Acquire_Airborne_Targets_Patch)
+{
+    GET_REGISTER_STATIC(AircraftClass *, this_ptr, ebp);
+    static AircraftTypeClassExtension *aircrafttypeext;
+    static AircraftClass *tarcom_aircraft;
+    static AircraftTypeClassExtension *tarcom_aircrafttypeext;
+    static bool can_target;
+
+    /**
+     *  Original case.
+     *  If the target is airborne, flag to clear the target.
+     */
+    if (this_ptr->TarCom->In_Air()) {
+        can_target = false;
+    }
+
+    aircrafttypeext = AircraftTypeClassExtensions.find(this_ptr->Class);
+    if (aircrafttypeext) {
+
+        /**
+         *  
+         */
+        if (aircrafttypeext->IsCanAcquireAirborne && this_ptr->TarCom->In_Air()) {
+            can_target = true;
+        }
+
+        /**
+         *  If the target is 
+         */
+        tarcom_aircraft = Target_As_Aircraft(this_ptr->TarCom);
+        if (tarcom_aircraft && this_ptr->TarCom->In_Air()) {
+
+            /**
+             *  Check to make sure the target aircraft is allowed to be attacked while airborne.
+             */
+            tarcom_aircrafttypeext = AircraftTypeClassExtensions.find(tarcom_aircraft->Class);
+            if (tarcom_aircrafttypeext && !tarcom_aircrafttypeext->IsCanBeAirborneAcquired) {
+                can_target = false;
+            }
+
+        }
+
+    }
+
+    /**
+     *  
+     */
+    if (can_target) {
+        goto assign_target_checks;
+    }
+
+    /**
+     *  We can not attack this target, clear the tarcom.
+     */
+assign_null_target:
+    JMP(0x00409119);
+
+    /**
+     *  Continue target validation checks.
+     */
+assign_target_checks:
+    JMP(0x00409127);
+}
 
 
 /**
@@ -141,21 +215,21 @@ failed_tote_check:
  */
 DECLARE_PATCH(_AircraftClass_Init_IsCloakable_BugFix_Patch)
 {
-	GET_REGISTER_STATIC(AircraftClass *, this_ptr, esi);
-	GET_REGISTER_STATIC(AircraftTypeClass *, aircrafttype, eax);
+    GET_REGISTER_STATIC(AircraftClass *, this_ptr, esi);
+    GET_REGISTER_STATIC(AircraftTypeClass *, aircrafttype, eax);
 
-	/**
-	 *  Stolen bytes/code.
-	 */
-	this_ptr->Strength = aircrafttype->MaxStrength;
-	this_ptr->Ammo = aircrafttype->MaxAmmo;
+    /**
+     *  Stolen bytes/code.
+     */
+    this_ptr->Strength = aircrafttype->MaxStrength;
+    this_ptr->Ammo = aircrafttype->MaxAmmo;
 
-	/**
-	 *  This is the line that was missing (maybe it was by design?).
-	 */
-	this_ptr->IsCloakable = aircrafttype->IsCloakable;
+    /**
+     *  This is the line that was missing (maybe it was by design?).
+     */
+    this_ptr->IsCloakable = aircrafttype->IsCloakable;
 
-	JMP_REG(ecx, 0x004088AA);
+    JMP_REG(ecx, 0x004088AA);
 }
 
 
@@ -169,6 +243,7 @@ void AircraftClassExtension_Hooks()
      */
     AircraftClassExtension_Init();
 
-	Patch_Jump(0x00408898, &_AircraftClass_Init_IsCloakable_BugFix_Patch);
+    Patch_Jump(0x00408898, &_AircraftClass_Init_IsCloakable_BugFix_Patch);
     Patch_Jump(0x0040B819, &_AircraftClass_What_Action_Is_Totable_Patch);
+    Patch_Jump(0x00409110, &_AircraftClass_AI_Acquire_Airborne_Targets_Patch);
 }
