@@ -45,6 +45,7 @@
 #include "drawshape.h"
 #include "rules.h"
 #include "voc.h"
+#include "matrix3d.h"
 #include "iomap.h"
 #include "fatal.h"
 #include "asserthandler.h"
@@ -52,6 +53,44 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  #issue-597
+ * 
+ *  Implements TurretTravel for voxel units.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_entry_370_Voxel_Turret_Travel_Patch)
+{
+    GET_REGISTER_STATIC(BuildingClass *, this_ptr, ebp);
+    LEA_STACK_STATIC(Matrix3D *, matrix, esp, 0x64);
+    static const TechnoTypeClassExtension *technotypext;
+
+    /**
+     *  Has this building just fired is weapon (flagged to recoil)?
+     */
+    if (this_ptr->IsInRecoilState) {
+
+        /**
+         *  Custom turret recoil travel.
+         */
+        technotypext = TechnoTypeClassExtensions.find(this_ptr->Techno_Type_Class());
+        if (technotypext) {
+            matrix->Translate_X(-((float)technotypext->TurretTravel));
+
+        /**
+         *  Original value.
+         */
+        } else {
+            matrix->Translate_X(-2.0f);
+        }
+
+    }
+
+    JMP(0x006529BA);
+}
 
 
 /**

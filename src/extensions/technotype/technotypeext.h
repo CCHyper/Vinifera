@@ -93,6 +93,12 @@ class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
          *  The graphic class to switch to when this unit is unloading (e.g., at a refinery).
          */
         const TechnoTypeClass *UnloadingClass;
+
+        /**
+         *  The movement (in pixels) that this units turret will move on its x-axis
+         *  when it fires its weapon.
+         */
+        int TurretTravel;
 };
 
 

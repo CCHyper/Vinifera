@@ -48,6 +48,44 @@
 
 
 /**
+ *  #issue-597
+ * 
+ *  Implements TurretTravel for voxel units.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_UnitClass_Draw_Voxel_Voxel_Turret_Travel_Patch)
+{
+    GET_REGISTER_STATIC(UnitClass *, this_ptr, ebp);
+    LEA_STACK_STATIC(Matrix3D *, matrix, esp, 0x90);
+    static const TechnoTypeClassExtension *technotypext;
+
+    /**
+     *  Has this unit just fired is weapon (flagged to recoil)?
+     */
+    if (this_ptr->IsInRecoilState) {
+
+        /**
+         *  Custom turret recoil travel.
+         */
+        technotypext = TechnoTypeClassExtensions.find(this_ptr->Techno_Type_Class());
+        if (technotypext) {
+            matrix->Translate_X(-((float)technotypext->TurretTravel));
+
+        /**
+         *  Original value.
+         */
+        } else {
+            matrix->Translate_X(-2.0f);
+        }
+
+    }
+
+    JMP(0x006529BA);
+}
+
+
+/**
  *  #issue-188
  * 
  *  Adds support for custom (per-type) unloading class when a harvester is unloading at a refinery.
@@ -446,4 +484,5 @@ void UnitClassExtension_Hooks()
     Patch_Jump(0x006530EB, &_UnitClass_Draw_Shape_Primary_Facing_Patch);
     Patch_Jump(0x006537A8, &_UnitClass_Draw_Shape_Turret_Facing_Patch);
     Patch_Jump(0x00653D7F, &_UnitClass_Draw_It_Unloading_Harvester_Patch);
+    Patch_Jump(0x0065299F, &_UnitClass_Draw_Voxel_Voxel_Turret_Travel_Patch);
 }

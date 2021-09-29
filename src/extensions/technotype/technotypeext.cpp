@@ -56,7 +56,8 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(TechnoTypeClass *this_ptr) :
     ShakePixelYLo(0),
     ShakePixelXHi(0),
     ShakePixelXLo(0),
-    UnloadingClass(nullptr)
+    UnloadingClass(nullptr),
+    TurretTravel(-2)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("TechnoTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -195,6 +196,16 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
+
+    /**
+     *  #NOTE:
+     * 
+     *  Special case to ensure the Titan does not have recoil unless set. This
+     *  retains the expected behaviour of the vanilla game.
+     */
+    if (!strcmpi(ini_name, "MMCH")) {
+        TurretTravel = 0;
+    }
     
     CloakSound = ini.Get_VocType(ini_name, "CloakSound", CloakSound);
     UncloakSound = ini.Get_VocType(ini_name, "UncloakSound", UncloakSound);
@@ -206,6 +217,7 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     ShakePixelXHi = ini.Get_Int(ini_name, "ShakeXhi", ShakePixelXHi);
     ShakePixelXLo = ini.Get_Int(ini_name, "ShakeXlo", ShakePixelXLo);
     UnloadingClass = ini.Get_Techno(ini_name, "UnloadingClass", UnloadingClass);
+    TurretTravel = ini.Get_Int(ini_name, "TurretTravel", TurretTravel);
 
     return true;
 }
