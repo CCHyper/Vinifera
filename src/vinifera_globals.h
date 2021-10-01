@@ -77,3 +77,9 @@ extern bool Vinifera_SkipToSkirmish;
 extern bool Vinifera_SkipToCampaign;
 extern bool Vinifera_SkipToInternet;
 extern bool Vinifera_ExitAfterSkip;
+
+
+/**
+ *  Game state and logic globals.
+ */
+extern bool PendingScreenFlash;

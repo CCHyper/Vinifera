@@ -63,6 +63,11 @@ class WarheadTypeClassExtension final : public Extension<WarheadTypeClass>
         bool IsAffectsAllies;
 
         /**
+         *  
+         */
+        bool IsScreenFlash;
+
+        /**
          *  This is used to override the size of the combat light flash at the point of impact.
          */
         float CombatLightSize;
@@ -70,10 +75,10 @@ class WarheadTypeClassExtension final : public Extension<WarheadTypeClass>
         /**
          *  These values are used to shake the screen when the projectile impacts.
          */
-        unsigned int ShakePixelYHi;
-        unsigned int ShakePixelYLo;
-        unsigned int ShakePixelXHi;
-        unsigned int ShakePixelXLo;
+        unsigned ShakePixelYHi;
+        unsigned ShakePixelYLo;
+        unsigned ShakePixelXHi;
+        unsigned ShakePixelXLo;
 };
 
 

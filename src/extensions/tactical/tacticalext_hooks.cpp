@@ -524,6 +524,240 @@ static void Tactical_Draw_Information_Text()
 }
 
 
+
+
+#include "iomap.h"
+#include "bsurface.h"
+#include "dsurface.h"
+#include "hsv.h"
+#include "rgb.h"
+
+
+static void Adjust_Surface_Saturation(BSurface *surface, float level)
+{
+    if (!surface) {
+        return;
+    }
+
+    /**
+     *  Clamp the saturation level within expected range.
+     */
+    level = std::clamp(level, 0.0f, 1.0f);
+
+    unsigned char *bufptr = (unsigned char *)surface->Lock();
+    if (bufptr) {
+
+        unsigned char r;
+        unsigned char g;
+        unsigned char b;
+
+        for (int y = 0; y < surface->Get_Height(); ++y) {
+
+            /**
+             *  Make sure we skip the tab bar.
+             */
+            if (y >= TacticalRect.Y) {
+
+                for (int x = 0; x < surface->Get_Width(); ++x) {
+
+                    unsigned short *pixel = ((unsigned short *)bufptr + x);
+                    if (*pixel != 0) {
+
+                        /**
+                         *  Get the existing pixel color values.
+                         */
+                        r = ((*pixel >> DSurface::RedLeft) << DSurface::RedRight);
+                        g = ((*pixel >> DSurface::GreenLeft) << DSurface::GreenRight);
+                        b = ((*pixel >> DSurface::BlueLeft) << DSurface::BlueRight);
+                        //DSurface::Pixel_To_RGBA(*pixel, &r, &g, &b);
+
+                        /**
+                         *  Convert to HSV so we can easily adjust the saturation.
+                         */
+                        HSVClass hsv = RGBClass(r, g, b);
+                        hsv.Saturation = std::clamp((int)(level * hsv.Saturation), 0, 255);
+
+                        /**
+                         *  Now convert back to RGB.
+                         */
+                        RGBClass rgb = hsv;
+
+                        /**
+                         *  Put the adjusted pixel back.
+                         */
+                        *pixel = DSurface::RGBA_To_Pixel(rgb.Red, rgb.Green, rgb.Blue);
+                    }
+                
+                }
+            }
+
+            bufptr += surface->Get_Pitch();
+        }
+
+        surface->Unlock();
+    }
+}
+
+
+/**
+ *  
+ */
+static void Do_Chrono_Effect_AI()
+{
+    static bool _is_fading_in = false;
+    static bool _is_fading_out = false;
+
+    //static CDTimerClass<FrameTimerClass> _fading_in_timer;
+    //static CDTimerClass<FrameTimerClass> _fading_out_timer;
+    static CDTimerClass<MSTimerClass> _fading_in_timer;
+    static CDTimerClass<MSTimerClass> _fading_out_timer;
+    
+    //static const int FADE_IN_RATE = (1*TICKS_PER_SECOND)/2;
+    //static const int FADE_OUT_RATE = (1*TICKS_PER_SECOND);
+    static const int FADE_IN_RATE = 1000/3;
+    static const int FADE_OUT_RATE = 1000/3;
+
+    static BSurface *_working_surface = nullptr;
+
+    static float l = 1.0f;
+
+    /**
+     *  
+     */
+    if (!_working_surface) {
+        _working_surface = new BSurface(CompositeSurface->Get_Width(),
+            CompositeSurface->Get_Height(), CompositeSurface->Get_Bytes_Per_Pixel());
+    }
+
+    //if (PendingChronoFlash) {
+    if (PendingScreenFlash) {
+        _is_fading_in = true;
+        _is_fading_out = false;
+        _fading_in_timer = FADE_IN_RATE;
+        //PendingChronoFlash = false;
+        PendingScreenFlash = false;
+    }
+
+    /**
+     *  Fading from grey to color.
+     */
+    if (_is_fading_out) {
+        if (_fading_out_timer.Expired()) {
+            _is_fading_out = false;
+        }
+
+        /**
+         *  Update working surface.
+         */
+        _working_surface->Copy_From(*CompositeSurface);
+
+        /**
+         *  Adjust working surface saturation.
+         */
+        float level = (_fading_out_timer) * 1.0f / FADE_OUT_RATE;
+        Adjust_Surface_Saturation(_working_surface, level);
+        
+        /**
+         *  Copy back to the composite surface.
+         */
+        CompositeSurface->Copy_From(*_working_surface);
+    }
+
+    /**
+     *  Fading from color to grey.
+     */
+    if (_is_fading_in) {
+        if (_fading_in_timer.Expired()) {
+            _is_fading_in = false;
+        }
+        
+        /**
+         *  Update working surface.
+         */
+        _working_surface->Copy_From(*CompositeSurface);
+
+        /**
+         *  Adjust working surface saturation.
+         */
+        float level = (FADE_IN_RATE-_fading_in_timer) * 1.0f / FADE_IN_RATE;
+        Adjust_Surface_Saturation(_working_surface, level);
+        
+        /**
+         *  Copy back to the composite surface.
+         */
+        CompositeSurface->Copy_From(*_working_surface);
+
+        /**
+         *  Flag and prepare the fade back timer.
+         */
+        if (!_is_fading_in) {
+            _is_fading_out = true;
+            _fading_out_timer = FADE_OUT_RATE;
+        }
+    }
+}
+
+
+/**
+ *  
+ */
+static void Do_Flash_Effect_AI()
+{
+    static bool _is_fading_in = false;
+    static bool _is_fading_out = false;
+
+    //static CDTimerClass<FrameTimerClass> _fading_in_timer;
+    //static CDTimerClass<FrameTimerClass> _fading_out_timer;
+    static CDTimerClass<MSTimerClass> _fading_in_timer;
+    static CDTimerClass<MSTimerClass> _fading_out_timer;
+
+    static RGBClass flash_color(255,255,255);
+    
+    static const int FADE_INTENSITY = 90;
+    //static const int FADE_IN_RATE = (1*TICKS_PER_SECOND)/2;
+    //static const int FADE_OUT_RATE = (1*TICKS_PER_SECOND);
+    static const int FADE_IN_RATE = 1000/4;
+    static const int FADE_OUT_RATE = 1000/3;
+
+    if (PendingScreenFlash) {
+        _is_fading_in = true;
+        _is_fading_out = false;
+        _fading_in_timer = FADE_IN_RATE;
+        PendingScreenFlash = false;
+    }
+
+    /**
+     *  Fading from white to game.
+     */
+    if (_is_fading_out) {
+        if (_fading_out_timer.Expired()) {
+            _is_fading_out = false;
+        }
+        unsigned adjust = (_fading_out_timer) * FADE_INTENSITY / FADE_OUT_RATE;
+        CompositeSurface->Fill_Rect_Trans(TacticalRect, flash_color, adjust);
+    }
+
+    /**
+     *  Fading from game to white.
+     */
+    if (_is_fading_in) {
+        if (_fading_in_timer.Expired()) {
+            _is_fading_in = false;
+        }
+        unsigned adjust = (FADE_IN_RATE-_fading_in_timer) * FADE_INTENSITY / FADE_IN_RATE;
+        CompositeSurface->Fill_Rect_Trans(TacticalRect, flash_color, adjust);
+
+        /**
+         *  Flag and prepare the fade back timer.
+         */
+        if (!_is_fading_in) {
+            _is_fading_out = true;
+            _fading_out_timer = FADE_OUT_RATE;
+        }
+    }
+}
+
+
 /**
  *  This patch intercepts the end of the rendering process for Tactical.
  * 
@@ -591,6 +825,9 @@ DECLARE_PATCH(_Tactical_Render_Patch)
             }       
         }
     }
+
+    //Do_Flash_Effect_AI();
+    Do_Chrono_Effect_AI();
 
     /**
      *  Stolen bytes/code.

@@ -291,6 +291,11 @@ DECLARE_PATCH(_Select_Game_Clear_Globals_Patch)
     Vinifera_Developer_AIControl = false;
 
     /**
+     *  Clear and game state and logic globals.
+     */
+    PendingScreenFlash = false;
+
+    /**
      *  Stolen bytes/code.
      */
     Map.Set_Default_Mouse(MOUSE_NORMAL);

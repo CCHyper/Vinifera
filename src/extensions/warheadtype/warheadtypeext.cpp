@@ -45,9 +45,9 @@ ExtensionMap<WarheadTypeClass, WarheadTypeClassExtension> WarheadTypeClassExtens
  */
 WarheadTypeClassExtension::WarheadTypeClassExtension(WarheadTypeClass *this_ptr) :
     Extension(this_ptr),
-
     IsWallAbsoluteDestroyer(false),
     IsAffectsAllies(true),
+    IsScreenFlash(false),
     CombatLightSize(0.0f),
     ShakePixelYHi(0),
     ShakePixelYLo(0),
@@ -166,6 +166,7 @@ void WarheadTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
 
     crc(IsWallAbsoluteDestroyer);
     crc(IsAffectsAllies);
+    crc(IsScreenFlash);
     crc(CombatLightSize);
     crc(ShakePixelYHi);
     crc(ShakePixelYLo);
@@ -193,6 +194,7 @@ bool WarheadTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IsWallAbsoluteDestroyer = ini.Get_Bool(ini_name, "WallAbsoluteDestroyer", IsWallAbsoluteDestroyer);
     IsAffectsAllies = ini.Get_Bool(ini_name, "AffectsAllies", IsAffectsAllies);
+    IsScreenFlash = ini.Get_Bool(ini_name, "ScreenFlash", IsScreenFlash);
     CombatLightSize = ini.Get_Float_Clamp(ini_name, "CombatLightSize", 0.0f, 1.0f, CombatLightSize);
     ShakePixelYHi = ini.Get_Int(ini_name, "ShakeYhi", ShakePixelYHi);
     ShakePixelYLo = ini.Get_Int(ini_name, "ShakeYlo", ShakePixelYLo);

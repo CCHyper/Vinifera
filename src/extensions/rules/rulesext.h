@@ -31,6 +31,7 @@
 #include "container.h"
 
 #include "noinit.h"
+#include "rgb.h"
 #include "tpoint.h"
 
 
@@ -84,6 +85,16 @@ class RulesClassExtension final : public Extension<RulesClass>
          *  Are construction yards pre-placed on the map rather than a MCV given to the player?
          */
         bool IsMPPrePlacedConYards;
+
+        /**
+         *  
+         */
+        RGBClass ScreenFlashColor;
+
+        /**
+         *  
+         */
+        unsigned ScreenFlashTrans;
 };
 
 
