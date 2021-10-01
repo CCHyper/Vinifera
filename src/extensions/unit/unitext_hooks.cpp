@@ -47,6 +47,10 @@
 #include "hooker_macros.h"
 
 
+// RA Source code, UNIT.CPP Line 1391
+//Patch_Jump(0x0065048D, 0x0065049F); // YR moves harvester case before/outside of weapon check.
+
+
 /**
  *  #issue-188
  * 
