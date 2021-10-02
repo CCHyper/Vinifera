@@ -93,6 +93,11 @@ class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
          *  The refund value for the unit when it is sold at a Service Depot.
          */
         unsigned SoylentValue;
+
+        /**
+         *  Sound to play when this unit is given a movement order.
+         */
+        VocType MoveSound;
 };
 
 

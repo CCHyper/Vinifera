@@ -47,6 +47,11 @@ class TechnoClassExtension final : public Extension<TechnoClass>
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
     public:
+        /**
+         *  This is a locker to stop the movement sound from being played
+         *  in quick succession.
+         */
+        int MoveSoundLock;
 };
 
 
