@@ -51,8 +51,14 @@ class AnimTypeClassExtension final : public Extension<AnimTypeClass>
 
         bool Read_INI(CCINIClass &ini);
 
-    public:
+    protected:
+        static ConvertClass *Create_Drawer(const char *filename);
 
+    public:
+        /**
+         *  
+         */
+        int DrawerIndex;
 };
 
 

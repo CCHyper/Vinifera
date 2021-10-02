@@ -27,6 +27,8 @@
  ******************************************************************************/
 #include "animtypeext.h"
 #include "animtype.h"
+#include "palette.h"
+#include "convert.h"
 #include "ccini.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -44,11 +46,14 @@ ExtensionMap<AnimTypeClass, AnimTypeClassExtension> AnimTypeClassExtensions;
  *  @author: CCHyper
  */
 AnimTypeClassExtension::AnimTypeClassExtension(AnimTypeClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    PaletteName()
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("AnimTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
     //DEV_DEBUG_WARNING("AnimTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    PaletteName[0] = '\0';
 
     IsInitialized = true;
 }
@@ -174,6 +179,37 @@ bool AnimTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
+
+    char palbuff[16];
+    ini.Get_String(ini_name, "Palette", palbuff, sizeof(palbuff));
+    if (palbuff[0] != '\0') {
+        bool loaded = Create_Drawer(palbuff);
+        ASSERT(loaded);
+    }
     
     return true;
+}
+
+
+/**
+ *  
+ *  
+ *  @author: CCHyper
+ */
+ConvertClass *AnimTypeClassExtension::Create_Drawer(const char *filename)
+{
+    CCFileClass file(filename);
+    if (file.Is_Available()) {
+
+        PaletteClass pal;
+
+        file.Read(&pal, sizeof(PaletteClass));
+
+        ConvertClass *drawer = new ConvertClass(
+            &pal, &pal, PrimarySurface, 63);
+
+        return drawer;
+    }
+
+    return nullptr;
 }
