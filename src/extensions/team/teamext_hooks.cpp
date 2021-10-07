@@ -26,7 +26,13 @@
  *
  ******************************************************************************/
 #include "teamext_hooks.h"
+#include "vinifera_defines.h"
 #include "team.h"
+#include "teamext.h"
+#include "teamtype.h"
+#include "script.h"
+#include "scripttype.h"
+#include "scripttypeext.h"
 #include "cell.h"
 #include "iomap.h"
 #include "fatal.h"
@@ -35,6 +41,78 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  This patch extends the ScriptMissionType switch in TeamClass::AI.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_TeamClass_AI_Extend_Switch_Patch)
+{
+    GET_STACK_STATIC(bool, a3, esp, 0x10);
+    GET_REGISTER_STATIC(TeamClass *, this_ptr, esi);
+    GET_REGISTER_STATIC(ScriptMissionClass *, scriptmission, ecx);
+
+    /**
+     *  Stolen bytes/code. (inlined ScriptMissionClass copy constructor).
+     */
+    _asm { mov eax, [ecx+0x0] }
+    _asm { mov [esp+0x20], eax }    // script.Mission
+    _asm { mov ecx, [ecx+0x4] }
+    _asm { mov [esp+0x24], ecx }    // script.Data
+
+#ifndef NDEBUG
+    /**
+     *  Helper info for debugging when adding new script missions.
+     */
+    DEV_DEBUG_INFO("TeamClass::AI()\n");
+#endif
+
+    /**
+     *  Skip null team script missions.
+     */
+    if (scriptmission->Mission == SMISSION_NONE) {
+        goto do_nothing;
+    }
+
+    /**
+     *  Handle the original ScriptMissionType's.
+     */
+    if (scriptmission->Mission < SMISSION_COUNT) {
+#ifndef NDEBUG
+        DEV_DEBUG_INFO("Executing team script mission: \"%s\"\n", ScriptMissionClass::Mission_Name(scriptmission->Mission));
+#endif
+        goto smission_switch;
+    }
+
+    /**
+     *  New ScriptMissionType switch.
+     */
+    if (scriptmission->Mission < NEW_SMISSION_COUNT) {
+        DEV_DEBUG_INFO("Executing new team script mission: \"%s\"\n", ScriptMissionClassExtension::Mission_Name(scriptmission->Mission));
+    }
+
+    /**
+     *  Execute the new trigger action.
+     */
+    TeamClassExtension::Switch(this_ptr, scriptmission, a3);
+
+    /**
+     *  The default case, return doing nothing.
+     */
+do_nothing:
+    JMP(0x00622B20);
+
+    /**
+     *  The switch case for the original ScriptMissionType's
+     */
+smission_switch:
+    _asm { mov ecx, [scriptmission] }
+    _asm { mov esi, this_ptr }
+    _asm { mov edx, [esi+0x1C] } // scriptmission->Mission
+    JMP_REG(ecx, 0x006229D0);
+}
 
 
 /**
@@ -88,4 +166,5 @@ coordinate_move:
 void TeamClassExtension_Hooks()
 {
     Patch_Jump(0x00622B2C, &_TeamClass_AI_MoveCell_FixCellCalc_Patch);
+    Patch_Jump(0x006229BA, &_TeamClass_AI_Extend_Switch_Patch);
 }
