@@ -46,6 +46,7 @@ ExtensionMap<UnitTypeClass, UnitTypeClassExtension> UnitTypeClassExtensions;
 UnitTypeClassExtension::UnitTypeClassExtension(UnitTypeClass *this_ptr) :
     Extension(this_ptr),
     IsTotable(true),
+    IsCanBeStolen(true),
     StartTurretFrame(-1),
     TurretFacings(32)		// Must default to 32 as all Tiberian Sun units have 32 facings for turrets.
 {
@@ -185,6 +186,7 @@ bool UnitTypeClassExtension::Read_INI(CCINIClass &ini)
     //}
 
     IsTotable = ini.Get_Bool(ini_name, "Totable", IsTotable);
+    IsCanBeStolen = ini.Get_Bool(ini_name, "CanBeStolen", IsCanBeStolen);
 
     /**
      *  Custom turret starting frame.

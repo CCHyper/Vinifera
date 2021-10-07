@@ -58,6 +58,11 @@ class UnitTypeClassExtension final : public Extension<UnitTypeClass>
         bool IsTotable;
 
         /**
+         *  
+         */
+        bool IsCanBeStolen;
+
+        /**
          *  The starting frame for the turret graphics in the units shape file.
          */
         int StartTurretFrame;
