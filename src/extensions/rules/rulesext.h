@@ -84,6 +84,11 @@ class RulesClassExtension final : public Extension<RulesClass>
          *  Are construction yards pre-placed on the map rather than a MCV given to the player?
          */
         bool IsMPPrePlacedConYards;
+
+        /**
+         *  The distance in cells from center of enemy base the AI will consider when gathering outside enemy base.
+         */
+        int AISafeDistance;
 };
 
 

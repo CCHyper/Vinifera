@@ -44,7 +44,8 @@ RulesClassExtension::UIControlsStruct RulesClassExtension::UIControls;
 RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
     Extension(this_ptr),
     IsMPAutoDeployMCV(false),
-    IsMPPrePlacedConYards(false)
+    IsMPPrePlacedConYards(false),
+    AISafeDistance(8)
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -159,6 +160,7 @@ void RulesClassExtension::Compute_CRC(WWCRCEngine &crc) const
 
     crc(IsMPAutoDeployMCV);
     crc(IsMPPrePlacedConYards);
+    crc(AISafeDistance);
 }
 
 
@@ -202,6 +204,8 @@ bool RulesClassExtension::General(CCINIClass &ini)
     if (!ini.Is_Present(GENERAL)) {
         return false;
     }
+
+    AISafeDistance = ini.Get_Int(GENERAL, "AISafeDistance", AISafeDistance);
 
     return true;
 }
