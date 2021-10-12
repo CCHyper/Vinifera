@@ -750,3 +750,141 @@ bool Vinifera_Register_Com_Objects()
 
     return true;
 }
+
+
+
+/**
+ *  d
+ *
+ *  @author: CCHyper
+ */
+void Name_From_HousePlayer(HousesPlayerType player, char* buffer, int bufflen)
+{
+    const char* name = nullptr;
+    buffer[0] = '\0';
+
+    switch (player) {
+    case HOUSE_PLAYER_A:
+        name = TXT_PLAYER_AT_A;
+        break;
+    case HOUSE_PLAYER_B:
+        name = TXT_PLAYER_AT_B;
+        break;
+    case HOUSE_PLAYER_C:
+        name = TXT_PLAYER_AT_C;
+        break;
+    case HOUSE_PLAYER_D:
+        name = TXT_PLAYER_AT_D;
+        break;
+    case HOUSE_PLAYER_E:
+        name = TXT_PLAYER_AT_E;
+        break;
+    case HOUSE_PLAYER_F:
+        name = TXT_PLAYER_AT_F;
+        break;
+    case HOUSE_PLAYER_G:
+        name = TXT_PLAYER_AT_G;
+        break;
+    case HOUSE_PLAYER_H:
+        name = TXT_PLAYER_AT_H;
+        break;
+    default:
+        name = "<none>";
+        break;
+    };
+
+    int len = std::strlen(name);
+    std::strncpy(buffer, name, (len < bufflen ? len : bufflen));
+}
+
+
+/**
+ *  d
+ *
+ *  @author: CCHyper
+ */
+HousesPlayerType HousePlayer_From_Name(const char* name)
+{
+    if (!strcmp(name, TXT_PLAYER_AT_A)) {
+        return HOUSE_PLAYER_A;
+    }
+    if (!strcmp(name, TXT_PLAYER_AT_B)) {
+        return HOUSE_PLAYER_B;
+    }
+    if (!strcmp(name, TXT_PLAYER_AT_C)) {
+        return HOUSE_PLAYER_C;
+    }
+    if (!strcmp(name, TXT_PLAYER_AT_D)) {
+        return HOUSE_PLAYER_D;
+    }
+    if (!strcmp(name, TXT_PLAYER_AT_E)) {
+        return HOUSE_PLAYER_E;
+    }
+    if (!strcmp(name, TXT_PLAYER_AT_F)) {
+        return HOUSE_PLAYER_F;
+    }
+    if (!strcmp(name, TXT_PLAYER_AT_G)) {
+        return HOUSE_PLAYER_G;
+    }
+    if (!strcmp(name, TXT_PLAYER_AT_H)) {
+        return HOUSE_PLAYER_H;
+    }
+    return HOUSE_PLAYER_NONE;
+}
+
+
+/**
+ *  d
+ *
+ *  @author: CCHyper
+ */
+bool Is_HousePlayer(HousesType house)
+{
+    if (house >= HOUSE_PLAYER_FIRST && house < HOUSE_PLAYER_COUNT) {
+        return true;
+    }
+    return false;
+}
+
+
+/**
+ *  d
+ *
+ *  @author: CCHyper
+ */
+HouseClass* Pointer_From_HousePlayer(HousesPlayerType player)
+{
+    int index = 0;
+    switch (player) {
+    case HOUSE_PLAYER_A:
+        index = Scen->Get_House_Index_From_Start_Spot(0);
+        break;
+    case HOUSE_PLAYER_B:
+        index = Scen->Get_House_Index_From_Start_Spot(1);
+        break;
+    case HOUSE_PLAYER_C:
+        index = Scen->Get_House_Index_From_Start_Spot(2);
+        break;
+    case HOUSE_PLAYER_D:
+        index = Scen->Get_House_Index_From_Start_Spot(3);
+        break;
+    case HOUSE_PLAYER_E:
+        index = Scen->Get_House_Index_From_Start_Spot(4);
+        break;
+    case HOUSE_PLAYER_F:
+        index = Scen->Get_House_Index_From_Start_Spot(5);
+        break;
+    case HOUSE_PLAYER_G:
+        index = Scen->Get_House_Index_From_Start_Spot(6);
+        break;
+    case HOUSE_PLAYER_H:
+        index = Scen->Get_House_Index_From_Start_Spot(7);
+        break;
+    default:
+        return nullptr;
+    };
+    if (index >= 0 && index < Houses.Count()) {
+        return Houses[index];
+    }
+    return nullptr;
+}
