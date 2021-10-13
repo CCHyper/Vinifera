@@ -29,6 +29,7 @@
 #include "ext_hooks.h"
 #include "iomap.h"
 #include "saveload.h"
+#include "saveloadext.h"
 #include "vinifera_globals.h"
 #include "vinifera_util.h"
 #include "debughandler.h"
@@ -39,6 +40,31 @@
 
 
 struct IStream;
+
+
+static const char *Save_Directory = "Saved Games\\";
+static const char *Save_Filename_Format = "Saved Games\\SAVE%04lX.%3s";
+static const char *Save_Filename_Wildcard_Format = "Saved Games\\*.%3s";
+
+
+DECLARE_PATCH(_) // 00505A24
+{
+}
+
+
+DECLARE_PATCH(__) // 
+{
+}
+
+
+DECLARE_PATCH(___) // 
+{
+}
+
+
+DECLARE_PATCH(____) // 
+{
+}
 
 
 /**
@@ -305,4 +331,12 @@ void SaveLoad_Hooks()
     //Patch_Call(0x0066300B, &FakeSwizzleManagerClass::_Here_I_Am);
     //Change_Virtual_Address(0x006D7504, Get_Func_Address(&FakeSwizzleManagerClass::_Here_I_Am));
 #endif
+
+    /**
+     *  
+     */
+    Patch_Dword(0x00504FFB+1, (uintptr_t)Save_Filename_Format);
+    Patch_Dword(0x0050528E+1, (uintptr_t)Save_Filename_Format);
+    Patch_Dword(0x00505503+1, (uintptr_t)Save_Filename_Wildcard_Format);
+    Patch_Dword(0x00505859+1, (uintptr_t)Save_Filename_Wildcard_Format);
 }
