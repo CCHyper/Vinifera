@@ -90,4 +90,10 @@ class RulesClassExtension final : public GlobalExtensionClass<RulesClass>
          *  on the tactical view?
          */
         bool IsShowSuperWeaponTimers;
+
+        /**
+         *  The "double penalty" or "half penalty". Multiply this by the power
+         *  units you are short of to get the actual penalty to the build speed.
+         */
+        float LowPowerPenaltyModifier;
 };
