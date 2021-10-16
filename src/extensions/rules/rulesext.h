@@ -60,7 +60,7 @@ class RulesClassExtension final : public Extension<RulesClass>
         bool AudioVisual(CCINIClass &ini);
         bool Weapons(CCINIClass &ini);
 
-        static bool Read_UI_INI();
+        static bool Read_UI_INI(bool second_pass = false);
         static bool Init_UI_Controls();
 
     private:
@@ -84,6 +84,11 @@ class RulesClassExtension final : public Extension<RulesClass>
              *  Transparency of the text background.
              */
             unsigned TextLabelBackgroundTransparency;
+
+            /**
+             *  The color of the loading screen progress text.
+             */
+            ColorSchemeType LoadingScreenTextColor;
 
         } UIControlsStruct;
 

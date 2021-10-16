@@ -390,10 +390,11 @@ bool RulesClassExtension::Weapons(CCINIClass &ini)
  *  
  *  @author: CCHyper
  */
-bool RulesClassExtension::Read_UI_INI()
+bool RulesClassExtension::Read_UI_INI(bool second_pass)
 {
     static char const * const GENERAL = "General";
     static char const * const INGAME = "Ingame";
+    static char const * const LOADINGSCREEN = "LoadingScreen";
 
     CCFileClass file("UI.INI");
     CCINIClass ini(file);
@@ -407,6 +408,10 @@ bool RulesClassExtension::Read_UI_INI()
 
     UIControls.IsTextLabelOutline = ini.Get_Bool(INGAME, "TextLabelOutline", UIControls.IsTextLabelOutline);
     UIControls.TextLabelBackgroundTransparency = ini.Get_Int_Clamp(INGAME, "TextLabelBackgroundTransparency", 0, 100, UIControls.TextLabelBackgroundTransparency);
+
+    if (second_pass) {
+        UIControls.LoadingScreenTextColor = ini.Get_ColorSchemeType(LOADINGSCREEN, "TextColor", UIControls.LoadingScreenTextColor);
+    }
 
     return true;
 }
@@ -434,6 +439,8 @@ bool RulesClassExtension::Init_UI_Controls()
 
     UIControls.IsTextLabelOutline = true;
     UIControls.TextLabelBackgroundTransparency = 50;
+
+    UIControls.LoadingScreenTextColor = COLORSCHEME_NONE;
 
     return false;
 }

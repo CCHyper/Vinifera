@@ -118,6 +118,7 @@
 
 #include "fetchres_hooks.h"
 
+#include "progressscreen_hooks.h"
 #include "skirmishdlg_hooks.h"
 
 #include "filepcx_hooks.h"
@@ -249,6 +250,7 @@ void Extension_Hooks()
     /**
      *  Dialogs and associated code.
      */
+    ProgressScreenClassExtension_Hooks();
     SkirmishDialog_Hooks();
 
     /**

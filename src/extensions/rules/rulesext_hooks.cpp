@@ -80,6 +80,12 @@ void RulesClassFake::_Process(CCINIClass &ini)
     } else {
         Process(ini);
     }
+
+    /**
+     *  Perform a second pass of UI.INI, as we can now load entries that
+     *  are sensitive to rules data.
+     */
+    RulesClassExtension::Read_UI_INI(true);
 }
 
 
