@@ -90,6 +90,13 @@ class RulesClassExtension final : public Extension<RulesClass>
              */
             ColorSchemeType LoadingScreenTextColor;
 
+            /**
+             *  Loading screen text position overrides.
+             */
+            TPoint2D<int> LoadingScreenTextPos400;
+            TPoint2D<int> LoadingScreenTextPos480;
+            TPoint2D<int> LoadingScreenTextPos600;
+
         } UIControlsStruct;
 
         static UIControlsStruct UIControls;

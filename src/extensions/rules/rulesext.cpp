@@ -409,6 +409,10 @@ bool RulesClassExtension::Read_UI_INI(bool second_pass)
     UIControls.IsTextLabelOutline = ini.Get_Bool(INGAME, "TextLabelOutline", UIControls.IsTextLabelOutline);
     UIControls.TextLabelBackgroundTransparency = ini.Get_Int_Clamp(INGAME, "TextLabelBackgroundTransparency", 0, 100, UIControls.TextLabelBackgroundTransparency);
 
+    UIControls.LoadingScreenTextPos400 = ini.Get_Point(LOADINGSCREEN, "TextPos400", UIControls.LoadingScreenTextPos400);
+    UIControls.LoadingScreenTextPos480 = ini.Get_Point(LOADINGSCREEN, "TextPos480", UIControls.LoadingScreenTextPos480);
+    UIControls.LoadingScreenTextPos600 = ini.Get_Point(LOADINGSCREEN, "TextPos600", UIControls.LoadingScreenTextPos600);
+
     if (second_pass) {
         UIControls.LoadingScreenTextColor = ini.Get_ColorSchemeType(LOADINGSCREEN, "TextColor", UIControls.LoadingScreenTextColor);
     }
@@ -441,6 +445,12 @@ bool RulesClassExtension::Init_UI_Controls()
     UIControls.TextLabelBackgroundTransparency = 50;
 
     UIControls.LoadingScreenTextColor = COLORSCHEME_NONE;
+    UIControls.LoadingScreenTextPos400.X = -1;
+    UIControls.LoadingScreenTextPos400.Y = -1;
+    UIControls.LoadingScreenTextPos480.X = -1;
+    UIControls.LoadingScreenTextPos480.Y = -1;
+    UIControls.LoadingScreenTextPos600.X = -1;
+    UIControls.LoadingScreenTextPos600.Y = -1;
 
     return false;
 }

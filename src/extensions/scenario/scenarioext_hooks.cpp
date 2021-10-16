@@ -40,6 +40,7 @@
 #include "scenario.h"
 #include "session.h"
 #include "rules.h"
+#include "rulesext.h"
 #include "ccfile.h"
 #include "ccini.h"
 #include "addon.h"
@@ -193,6 +194,16 @@ void Draw_Loading_Screen()
             textpos.Y = solo ? 157 : 157;
         }
 
+        /**
+         *  Override the text position if defined.
+         */
+        if (RulesClassExtension::UIControls.LoadingScreenTextPos400.X > 0
+            && RulesClassExtension::UIControls.LoadingScreenTextPos400.Y > 0) {
+
+            textpos.X = RulesClassExtension::UIControls.LoadingScreenTextPos400.X;
+            textpos.Y = RulesClassExtension::UIControls.LoadingScreenTextPos400.Y;
+        }
+
         image_width = 640;
         image_height = 400;
 
@@ -216,6 +227,16 @@ void Draw_Loading_Screen()
             textpos.Y = solo ? 195 : 195;
         }
 
+        /**
+         *  Override the text position if defined.
+         */
+        if (RulesClassExtension::UIControls.LoadingScreenTextPos480.X > 0
+            && RulesClassExtension::UIControls.LoadingScreenTextPos480.Y > 0) {
+
+            textpos.X = RulesClassExtension::UIControls.LoadingScreenTextPos480.X;
+            textpos.Y = RulesClassExtension::UIControls.LoadingScreenTextPos480.Y;
+        }
+
         image_width = 640;
         image_height = 480;
 
@@ -237,6 +258,16 @@ void Draw_Loading_Screen()
         } else {
             textpos.X = solo ? 563 : 563;
             textpos.Y = solo ? 252 : 252;
+        }
+
+        /**
+         *  Override the text position if defined.
+         */
+        if (RulesClassExtension::UIControls.LoadingScreenTextPos600.X > 0
+            && RulesClassExtension::UIControls.LoadingScreenTextPos600.Y > 0) {
+
+            textpos.X = RulesClassExtension::UIControls.LoadingScreenTextPos600.X;
+            textpos.Y = RulesClassExtension::UIControls.LoadingScreenTextPos600.Y;
         }
 
         image_width = 800;
