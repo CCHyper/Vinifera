@@ -42,6 +42,45 @@
 
 
 /**
+ *  A fake class for implementing new member functions which allow
+ *  access to the "this" pointer of the intended class.
+ * 
+ *  @note: This must not contain a constructor or deconstructor!
+ *  @note: All functions must be prefixed with "_" to prevent accidental virtualization.
+ */
+class TerrainClassFake final : public TerrainClass
+{
+    public:
+        void _AI();
+};
+
+
+/**
+ *  Reimplementation of TerrainClass::AI.
+ * 
+ *  @author: CCHyper
+ */
+void TerrainClassFake::_AI()
+{
+    TerrainClassExtension *terrainext;
+
+    /**
+     *  Call the reimplementation of AI().
+     */
+    terrainext = TerrainClassExtensions.find(this);
+    if (terrainext) {
+        terrainext->AI();
+
+    /**
+     *  Call the original function.
+     */
+    } else {
+        AI();
+    }
+}
+
+
+/**
  *  Create a light source instances for terrain object.
  * 
  *  @author: CCHyper
@@ -189,4 +228,5 @@ void TerrainClassExtension_Hooks()
 
     Patch_Jump(0x006409C3, &_TerrainClass_Unlimbo_LightSource_Patch);
     Patch_Jump(0x0063F4D9, &_TerrainClass_Take_Damage_LightSource_Patch);
+    Change_Virtual_Address(0x006D82EC, Get_Func_Address(&TerrainClassFake::_AI));
 }

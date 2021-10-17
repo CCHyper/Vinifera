@@ -49,6 +49,8 @@ class TerrainClassExtension final : public Extension<TerrainClass>
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
+        void AI();
+
     public:
         /**
          *  The light source instance for this terrain object.

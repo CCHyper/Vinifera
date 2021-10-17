@@ -27,6 +27,15 @@
  ******************************************************************************/
 #include "terrainext.h"
 #include "terrain.h"
+#include "terraintype.h"
+#include "terraintypeext.h"
+#include "tibsun_globals.h"
+#include "tibsun_inline.h"
+#include "iomap.h"
+#include "cell.h"
+#include "combat.h"
+#include "rules.h"
+#include "options.h"
 #include "wwcrc.h"
 #include "lightsource.h"
 #include "asserthandler.h"
@@ -46,8 +55,10 @@ ExtensionMap<TerrainClass, TerrainClassExtension> TerrainClassExtensions;
  */
 TerrainClassExtension::TerrainClassExtension(TerrainClass *this_ptr) :
     Extension(this_ptr),
-
-    LightSource(nullptr)
+    LightSource(nullptr),
+    IsBlossoming(false),
+    IsBarnacled(false),
+    IsSporing(false)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TerrainClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -166,4 +177,59 @@ void TerrainClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TerrainClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+}
+
+
+/**
+ *  Process the terrain object AI.
+ * 
+ *  @author: CCHyper
+ */
+void TerrainClassExtension::AI()
+{
+    ASSERT(ThisPtr != nullptr);
+    //DEV_DEBUG_TRACE("TerrainClassExtension::AI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    ThisPtr->ObjectClass::AI();
+
+    if (ThisPtr->Class->IsAnimated) {
+        if (ThisPtr->Fetch_Rate() == 0) {
+            if (Probability_Of(ThisPtr->Class->AnimationProbability)) {
+                ThisPtr->Set_Rate(ThisPtr->Class->AnimationRate);
+            }
+        }
+    }
+
+    if (ThisPtr->Graphic_Logic()) {
+
+        /**
+         *  If the terrain object is in the process of crumbling, then when at the
+         *  last stage of the crumbling animation, delete the terrain object.
+         */
+        if (ThisPtr->IsCrumbling && ThisPtr->Fetch_Stage() == ThisPtr->Class->Get_Image_Data()->Get_Frame_Count()-1) {
+            ThisPtr->entry_E4();
+            return;
+        }
+
+        if (ThisPtr->Class->IsSpawnsTiberium) {
+            if (ThisPtr->Class->IsAnimated) {
+                if (ThisPtr->Fetch_Stage() == ThisPtr->Class->Get_Image_Data()->Get_Frame_Count()/2) {
+                    ThisPtr->Set_Rate(0);
+                    Map[ThisPtr->Get_Coord()].Spread_Tiberium(true);
+                }
+            }
+        }
+    }
+
+    if (ThisPtr->IsOnFire) {
+        if (Percent_Chance(1)) {
+            CellClass *mycell = &Map[ThisPtr->Get_Coord()];
+            for (FacingType facing = FACING_FIRST; facing < FACING_COUNT; ++facing) {
+                TerrainClass *terrain = mycell->Adjacent_Cell(facing).Cell_Terrain();
+                if (terrain && !terrain->IsOnFire && Scen->RandomNumber(0, 0x7FFFFFFE) * 4.656612877414201e-10 < Rule->TreeFlammability) {
+                    terrain->Catch_Fire();
+                }
+            }
+        }
+    }
 }
