@@ -50,7 +50,9 @@ TerrainTypeClassExtension::TerrainTypeClassExtension(TerrainTypeClass *this_ptr)
     LightIntensity(0),
     LightRedTint(1000000),
     LightGreenTint(1000000),
-    LightBlueTint(1000000)
+    LightBlueTint(1000000),
+    IsTransformable(false),
+    SporeWarhead(nullptr)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TerrainTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -163,6 +165,7 @@ void TerrainTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
     //EXT_DEBUG_TRACE("TerrainTypeClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
     crc(IsLightEnabled);
+    crc(IsTransformable);
 }
 
 
@@ -190,5 +193,8 @@ bool TerrainTypeClassExtension::Read_INI(CCINIClass &ini)
     LightGreenTint = ini.Get_Double(ini_name, "LightGreenTint", (LightGreenTint / 1000)) * 1000.0 + 0.1;
     LightBlueTint = ini.Get_Double(ini_name, "LightBlueTint", (LightBlueTint / 1000)) * 1000.0 + 0.1;
     
+    IsTransformable = ini.Get_Bool(ini_name, "IsTransformable", IsTransformable);
+    SporeWarhead = ini.Get_Warhead(ini_name, "SporeWarhead", SporeWarhead);
+
     return true;
 }
