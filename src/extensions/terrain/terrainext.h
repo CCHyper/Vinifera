@@ -62,6 +62,8 @@ TerrainClassExtension final : public ObjectClassExtension
         virtual const TerrainClass *This_Const() const override { return reinterpret_cast<const TerrainClass *>(ObjectClassExtension::This_Const()); }
         virtual RTTIType What_Am_I() const override { return RTTI_TERRAIN; }
 
+        void AI();
+
     public:
         /**
          *  The light source instance for this terrain object.
