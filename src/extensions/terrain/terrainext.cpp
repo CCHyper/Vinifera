@@ -183,6 +183,24 @@ void TerrainClassExtension::Compute_CRC(WWCRCEngine &crc) const
 }
 
 
+static bool T1()
+{
+    return (std::abs(Scen->RandomNumber()) % 1000000) * 0.000001 < 0.75;
+}
+
+
+static bool T2()
+{
+    return (std::abs(Scen->RandomNumber()) % 1000000) / (double)1000000 < 0.75;
+}
+
+
+static bool T3()
+{
+    return ((Scen->RandomNumber(0, INT_MAX-1) / (double)(INT_MAX-1))) < 0.75;
+}
+
+
 /**
  *  Process the terrain object AI.
  * 
@@ -192,6 +210,10 @@ void TerrainClassExtension::AI()
 {
     ASSERT(ThisPtr != nullptr);
     //DEV_DEBUG_TRACE("TerrainClassExtension::AI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    T1();
+    T2();
+    T3();
 
     ThisPtr->ObjectClass::AI();
 

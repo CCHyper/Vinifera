@@ -91,4 +91,15 @@ TerrainTypeClassExtension final : public ObjectTypeClassExtension
          *  The blue tint of this terrain objects light.
          */
         int LightBlueTint;
+
+        /**
+         *  Does this object have the capability to transform after a period
+         *  of time (such as a blossom tree?
+         */
+        bool IsTransformable;
+
+        /**
+         *  Warhead for the spores from blossom tree - affect infantry only.
+         */
+        const WarheadTypeClass *SporeWarhead;
 };

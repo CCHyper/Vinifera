@@ -69,4 +69,20 @@ TerrainClassExtension final : public ObjectClassExtension
          *  The light source instance for this terrain object.
          */
         LightSourceClass *LightSource;
+
+        /**
+         *  If this is a tree that becomes a blossom tree, is it currently doing so?
+         */
+        bool IsBlossoming;
+
+        /**
+         *  If this is a blossom tree, is it barnacled?
+         */
+        bool IsBarnacled;
+
+        /**
+         *  If this is a blossom tree that is barnacled, is it pulsing and
+         *  spewing out spores?
+         */
+        bool IsSporing;
 };
