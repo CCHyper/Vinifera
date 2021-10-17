@@ -33,6 +33,7 @@
 #include "session.h"
 #include "textprint.h"
 #include "language.h"
+#include "wwfont.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -58,8 +59,23 @@ static void Draw_Loading_Screen_Text(const char *text, Point2D &point)
 		colorscheme = ColorScheme::As_Pointer("Green", 1);
 	}
 
+	TextPrintType style = TPF_NOSHADOW;
+	if (ScreenRect.Height <= 480) {
+		style |= TPF_EFNT;
+
+	} else {
+		style |= TPF_6PT_GRAD;
+	}
+
+	/**
+	 *  Kludge to compact the text so it fits in the box.
+	 */
+	Font_Ptr(TPF_6PT_GRAD)->Set_X_Spacing(0);
+
 	Fancy_Text_Print(text, HiddenSurface, &HiddenSurface->Get_Rect(),
-		&point, colorscheme, COLOR_TBLACK, TPF_EFNT|TPF_NOSHADOW);
+		&point, colorscheme, COLOR_TBLACK, style);
+
+	Font_Ptr(TPF_6PT_GRAD)->Set_X_Spacing(1);
 }
 
 
@@ -75,9 +91,17 @@ DECLARE_PATCH(_ProgressScreenClass_Draw_Bars_TextColor_Patch)
 	GET_REGISTER_STATIC(ProgressScreenClass *, this_ptr, esi);
 	GET_REGISTER_STATIC(int, row, edi);
 	LEA_STACK_STATIC(Point2D *, textpoint, esp, 0x24);
+	static int rowheight;
+
+	if (ScreenRect.Height <= 480) {
+		rowheight = 10;
+
+	} else {
+		rowheight = 14;
+	}
 
 	textpoint->X = this_ptr->XPos;
-	textpoint->Y = 10 * row + this_ptr->YPos;
+	textpoint->Y = rowheight * row + this_ptr->YPos;
 
 	Draw_Loading_Screen_Text(Text_String(ProgressText[row].TextID), *textpoint);
 

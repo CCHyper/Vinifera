@@ -261,6 +261,12 @@ void Draw_Loading_Screen()
         }
 
         /**
+         *  We now use a larger font for the progress text.
+         */
+        textpos.X -= 11;
+        textpos.Y -= 17;
+
+        /**
          *  Override the text position if defined.
          */
         if (RulesClassExtension::UIControls.LoadingScreenTextPos600.X > 0
