@@ -54,6 +54,26 @@
 
 
 /**
+ *  Halt the game for a second just as the loading screen finishes.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Read_Scenario_Loading_Screen_False_Wait_Patch)
+{
+    if (Session.Singleplayer_Game() || Session.Players.Count() == 1) {
+        Sleep((1*1000)/2);
+    }
+
+    /**
+     *  Stolen bytes/code.
+     */
+    Session.SawCompletion = false;
+
+    JMP(0x005DBF89);
+}
+
+
+/**
  *  Reimplements the loading screen setup routine.
  * 
  *  @author: CCHyper
@@ -417,4 +437,5 @@ void ScenarioClassExtension_Hooks()
     Patch_Jump(0x005DCD92, &_Do_Lose_Skip_MPlayer_Score_Screen_Patch);
     Patch_Jump(0x005DD8D5, &_Read_Scenario_INI_MPlayer_INI_Patch);
     Patch_Jump(0x005DBA8B, &_Read_Scenario_Loading_Screen_Patch);
+    Patch_Jump(0x005DBF82, &_Read_Scenario_Loading_Screen_False_Wait_Patch);
 }
