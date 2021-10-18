@@ -32,6 +32,24 @@
 #include "debughandler.h"
 #include "asserthandler.h"
 
+#include "hooker.h"
+#include "hooker_macros.h"
+
+
+DECLARE_PATCH(_SessionClass_Loading_Callback_Print_Progress_Patch)
+{
+    GET_REGISTER_STATIC(SessionClass *, this_ptr, ecx);
+
+    /**
+     *  Log the progress update.
+     */
+    GET_STACK_STATIC(int, progress_value, esp, 0x290);
+    DEBUG_INFO("Loading Progress: %d\n", progress_value);
+
+    _asm { mov eax, progress_value }    // Restore EAX register
+    JMP_REG(ecx, 0x005EF94E);
+}
+
 
 /**
  *  Main function for patching the hooks.
@@ -42,4 +60,6 @@ void SessionClassExtension_Hooks()
      *  Initialises the extended class.
      */
     SessionClassExtension_Init();
+
+    Patch_Jump(0x005EF947, &_SessionClass_Loading_Callback_Print_Progress_Patch);
 }
