@@ -54,6 +54,18 @@
 #include "hooker_macros.h"
 
 
+DECLARE_PATCH(_TechnoClass_Assign_Target_Burst_Exploit_Patch)
+{
+    GET_REGISTER_STATIC(TechnoClass *, this_ptr, esi);
+
+    if (this_ptr->Arm.Expired()) {
+        this_ptr->CurrentBurstIndex = 0;
+    }
+
+    JMP(0x0062FDE8);
+}
+
+
 /**
  *  #issue-357
  * 
@@ -691,4 +703,5 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x00631661, &_TechnoClass_Player_Assign_Mission_Response_Patch);
     Patch_Jump(0x00630390, &_TechnoClass_Fire_At_Suicide_Patch);
     Patch_Jump(0x006312CD, &_TechnoClass_Fire_At_Electric_Bolt_Patch);
+    Patch_Jump(0x0062FDE2, &_TechnoClass_Assign_Target_Burst_Exploit_Patch);
 }
