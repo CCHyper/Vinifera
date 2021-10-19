@@ -412,6 +412,9 @@ bool RulesClassExtension::Read_UI_INI(bool second_pass)
     UIControls.LoadingScreenTextPos400 = ini.Get_Point(LOADINGSCREEN, "TextPos400", UIControls.LoadingScreenTextPos400);
     UIControls.LoadingScreenTextPos480 = ini.Get_Point(LOADINGSCREEN, "TextPos480", UIControls.LoadingScreenTextPos480);
     UIControls.LoadingScreenTextPos600 = ini.Get_Point(LOADINGSCREEN, "TextPos600", UIControls.LoadingScreenTextPos600);
+    UIControls.LoadingScreenTextPos768 = ini.Get_Point(LOADINGSCREEN, "TextPos768", UIControls.LoadingScreenTextPos768);
+    UIControls.LoadingScreenTextPos1024 = ini.Get_Point(LOADINGSCREEN, "TextPos1024", UIControls.LoadingScreenTextPos1024);
+    UIControls.LoadingScreenTextPos1080 = ini.Get_Point(LOADINGSCREEN, "TextPos1080", UIControls.LoadingScreenTextPos1080);
 
     if (second_pass) {
         UIControls.LoadingScreenTextColor = ini.Get_ColorSchemeType(LOADINGSCREEN, "TextColor", UIControls.LoadingScreenTextColor);
@@ -451,6 +454,12 @@ bool RulesClassExtension::Init_UI_Controls()
     UIControls.LoadingScreenTextPos480.Y = -1;
     UIControls.LoadingScreenTextPos600.X = -1;
     UIControls.LoadingScreenTextPos600.Y = -1;
+    UIControls.LoadingScreenTextPos768.X = -1;
+    UIControls.LoadingScreenTextPos768.Y = -1;
+    UIControls.LoadingScreenTextPos1024.X = -1;
+    UIControls.LoadingScreenTextPos1024.Y = -1;
+    UIControls.LoadingScreenTextPos1080.X = -1;
+    UIControls.LoadingScreenTextPos1080.Y = -1;
 
     return false;
 }

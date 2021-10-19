@@ -242,7 +242,7 @@ void Draw_Loading_Screen()
 
         load_filename_height = 480;
 
-    } else if (ScreenRect.Width >= 800 && ScreenRect.Height >= 600) {
+    } else if (ScreenRect.Width >= 800 && ScreenRect.Height == 600) {
 
         if (side == SIDE_GDI) {
             textpos.X = solo ? 563 : 563;
@@ -280,6 +280,123 @@ void Draw_Loading_Screen()
         image_height = 600;
 
         load_filename_height = 600;
+
+    } else if (ScreenRect.Width >= 1024 && ScreenRect.Height == 768) {
+
+        if (side == SIDE_GDI) {
+            textpos.X = solo ? 704 : 0;
+            textpos.Y = solo ? 301 : 0;
+
+        } else if (side == SIDE_NOD) {
+            textpos.X = solo ? 708 : 0;
+            textpos.Y = solo ? 306 : 0;
+            
+        /**
+         *  All other sides (uses the GDI offsets).
+         */
+        } else {
+            textpos.X = solo ? 0 : 0;
+            textpos.Y = solo ? 0 : 0;
+        }
+
+        /**
+         *  We now use a larger font for the progress text.
+         */
+        //textpos.X -= 11;
+        //textpos.Y -= 17;
+        
+        /**
+         *  Override the text position if defined.
+         */
+        if (RulesClassExtension::UIControls.LoadingScreenTextPos768.X > 0
+            && RulesClassExtension::UIControls.LoadingScreenTextPos768.Y > 0) {
+
+            textpos.X = RulesClassExtension::UIControls.LoadingScreenTextPos768.X;
+            textpos.Y = RulesClassExtension::UIControls.LoadingScreenTextPos768.Y;
+        }
+
+        image_width = 1024;
+        image_height = 768;
+
+        load_filename_height = 768;
+
+    } else if (ScreenRect.Width >= 1280 && ScreenRect.Height == 1024) {
+
+        if (side == SIDE_GDI) {
+            textpos.X = solo ? 890 : 0;
+            textpos.Y = solo ? 406 : 0;
+
+        } else if (side == SIDE_NOD) {
+            textpos.X = solo ? 892 : 0;
+            textpos.Y = solo ? 417 : 0;
+            
+        /**
+         *  All other sides (uses the GDI offsets).
+         */
+        } else {
+            textpos.X = solo ? 0 : 0;
+            textpos.Y = solo ? 0 : 0;
+        }
+
+        /**
+         *  We now use a larger font for the progress text.
+         */
+        //textpos.X -= 11;
+        //textpos.Y -= 17;
+        
+        /**
+         *  Override the text position if defined.
+         */
+        if (RulesClassExtension::UIControls.LoadingScreenTextPos1024.X > 0
+            && RulesClassExtension::UIControls.LoadingScreenTextPos1024.Y > 0) {
+
+            textpos.X = RulesClassExtension::UIControls.LoadingScreenTextPos1024.X;
+            textpos.Y = RulesClassExtension::UIControls.LoadingScreenTextPos1024.Y;
+        }
+
+        image_width = 1280;
+        image_height = 1024;
+
+        load_filename_height = 1024;
+
+    } else if (ScreenRect.Width >= 1920 && ScreenRect.Height >= 1080) {
+
+        if (side == SIDE_GDI) {
+            textpos.X = solo ? 1324 : 0;
+            textpos.Y = solo ? 430 : 0;
+
+        } else if (side == SIDE_NOD) {
+            textpos.X = solo ? 1338 : 0;
+            textpos.Y = solo ? 444 : 0;
+            
+        /**
+         *  All other sides (uses the GDI offsets).
+         */
+        } else {
+            textpos.X = solo ? 0 : 0;
+            textpos.Y = solo ? 0 : 0;
+        }
+
+        /**
+         *  We now use a larger font for the progress text.
+         */
+        //textpos.X -= 11;
+        //textpos.Y -= 17;
+        
+        /**
+         *  Override the text position if defined.
+         */
+        if (RulesClassExtension::UIControls.LoadingScreenTextPos1080.X > 0
+            && RulesClassExtension::UIControls.LoadingScreenTextPos1080.Y > 0) {
+
+            textpos.X = RulesClassExtension::UIControls.LoadingScreenTextPos1080.X;
+            textpos.Y = RulesClassExtension::UIControls.LoadingScreenTextPos1080.Y;
+        }
+
+        image_width = 1920;
+        image_height = 1080;
+
+        load_filename_height = 1080;
     }
 
     /**

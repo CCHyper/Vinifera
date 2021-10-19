@@ -96,6 +96,9 @@ class RulesClassExtension final : public Extension<RulesClass>
             TPoint2D<int> LoadingScreenTextPos400;
             TPoint2D<int> LoadingScreenTextPos480;
             TPoint2D<int> LoadingScreenTextPos600;
+            TPoint2D<int> LoadingScreenTextPos768;
+            TPoint2D<int> LoadingScreenTextPos1024;
+            TPoint2D<int> LoadingScreenTextPos1080;
 
         } UIControlsStruct;
 
