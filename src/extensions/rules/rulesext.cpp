@@ -494,6 +494,15 @@ bool RulesClassExtension::Read_UI_INI()
     UIControls.IsTextLabelOutline = ini.Get_Bool(INGAME, "TextLabelOutline", UIControls.IsTextLabelOutline);
     UIControls.TextLabelBackgroundTransparency = ini.Get_Int_Clamp(INGAME, "TextLabelBackgroundTransparency", 0, 100, UIControls.TextLabelBackgroundTransparency);
 
+    UIControls.IsBandBoxDropShadow = ini.Get_Bool(INGAME, "BandBoxDropShadow", UIControls.IsBandBoxDropShadow);
+    UIControls.IsBandBoxThick = ini.Get_Bool(INGAME, "BandBoxThick", UIControls.IsBandBoxThick);
+    UIControls.BandBoxColor = ini.Get_RGB(INGAME, "BandBoxColor", UIControls.BandBoxColor);
+    UIControls.BandBoxDropShadowColor = ini.Get_RGB(INGAME, "BandBoxDropShadowColor", UIControls.BandBoxDropShadowColor);
+    UIControls.BandBoxTintTransparency = ini.Get_Int_Clamp(INGAME, "BandBoxTintTransparency", 0, 100, UIControls.BandBoxTintTransparency);
+    UIControls.BandBoxTintColors = ini.Get_RGB_List(INGAME, "BandBoxTintColors", UIControls.BandBoxTintColors);
+
+    ASSERT_PRINT(UIControls.BandBoxTintColors.Count() == 2, "BandBoxTintColors must contain two valid entries!");
+
     return true;
 }
 
@@ -520,6 +529,15 @@ bool RulesClassExtension::Init_UI_Controls()
 
     UIControls.IsTextLabelOutline = true;
     UIControls.TextLabelBackgroundTransparency = 50;
+
+    UIControls.IsBandBoxDropShadow = false;
+    UIControls.IsBandBoxThick = false;
+    UIControls.BandBoxColor = RGBStruct{255,255,255};
+    UIControls.BandBoxDropShadowColor = RGBStruct{0,0,0};
+    UIControls.BandBoxTintTransparency = 0;
+    UIControls.BandBoxTintColors.Clear();
+    UIControls.BandBoxTintColors.Add(RGBStruct{0,0,0});
+    UIControls.BandBoxTintColors.Add(RGBStruct{255,255,255});
 
     return false;
 }

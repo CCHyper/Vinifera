@@ -90,6 +90,36 @@ class RulesClassExtension final : public GlobalExtensionClass<RulesClass>
              */
             unsigned TextLabelBackgroundTransparency;
 
+            /**
+             *  Should the tactical rubber band box be drawn with a drop shadow?
+             */
+            bool IsBandBoxDropShadow;
+
+            /**
+             *  
+             */
+            bool IsBandBoxThick;
+
+            /**
+             *  
+             */
+            RGBStruct BandBoxColor;
+
+            /**
+             *  
+             */
+            RGBStruct BandBoxDropShadowColor;
+
+            /**
+             *  Transparency of the tactical rubber band.
+             */
+            unsigned BandBoxTintTransparency;
+
+            /**
+             *  
+             */
+            TypeList<RGBStruct> BandBoxTintColors;
+
         } UIControlsStruct;
 
         static UIControlsStruct UIControls;
