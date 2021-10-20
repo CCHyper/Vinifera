@@ -62,7 +62,8 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(TechnoTypeClass *this_ptr) :
     VoiceCapture(),
     VoiceEnter(),
     VoiceDeploy(),
-    VoiceHarvest()
+    VoiceHarvest(),
+    ForbiddenHouses(-1)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TechnoTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -234,6 +235,7 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     VoiceEnter = ini.Get_VocType_List(ini_name, "VoiceEnter", VoiceEnter);
     VoiceDeploy = ini.Get_VocType_List(ini_name, "VoiceDeploy", VoiceDeploy);
     VoiceHarvest = ini.Get_VocType_List(ini_name, "VoiceHarvest", VoiceHarvest);
+    ForbiddenHouses = ini.Get_Owners(ini_name, "ForbiddenHouses", ForbiddenHouses);
 
     return true;
 }

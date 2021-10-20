@@ -124,6 +124,11 @@ class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
          *  List of voices to use when giving this object a harvest order.
          */
         TypeList<VocType> VoiceHarvest;
+
+        /**
+         *  
+         */
+        long ForbiddenHouses;
 };
 
 
