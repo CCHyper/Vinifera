@@ -47,6 +47,7 @@ AnimTypeClassExtension::AnimTypeClassExtension(AnimTypeClass *this_ptr) :
     Extension(this_ptr),
     IsHideIfNotTiberium(false),
     IsForceBigCraters(false),
+    IsShadow(false),
     ZAdjust(0),
     AttachLayer(LAYER_NONE),
     ParticleToSpawn(PARTICLE_NONE),
@@ -164,6 +165,7 @@ void AnimTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
 
     crc(AttachLayer);
     crc(NumberOfParticles);
+    crc(IsShadow);
 }
 
 
@@ -200,5 +202,29 @@ bool AnimTypeClassExtension::Read_INI(CCINIClass &ini)
     ParticleToSpawn = ini.Get_ParticleType(ini_name, "SpawnsParticle", ParticleToSpawn);
     NumberOfParticles = ini.Get_Int(ini_name, "NumParticles", NumberOfParticles);
     
+    bool shadow = ini.Get_Bool(ini_name, "Shadow", IsShadow);
+
+    /**
+     *  Adjust the defaults for animation end and loop end.
+     */
+    if (shadow != IsShadow) {
+        IsShadow = shadow;
+        if (shadow) {
+            ThisPtr->Stages /= 2;
+        } else {
+            ThisPtr->Stages *= 2;
+        }
+        if (ThisPtr->LoopEnd > ThisPtr->Stages) {
+            ThisPtr->LoopEnd = ThisPtr->Stages;
+        }
+    }
+
+    /**
+     *  We now need to reload "End" and "LoopEnd" as Shadow adjusts the default
+     *  behaviour of these to compensate for shadow frames.
+     */
+    ThisPtr->Stages = ini.Get_Int(ini_name, "End", ThisPtr->Stages);
+    ThisPtr->LoopEnd = ini.Get_Int(ini_name, "LoopEnd", ThisPtr->LoopEnd);
+
     return true;
 }

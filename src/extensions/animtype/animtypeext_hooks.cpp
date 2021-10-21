@@ -27,11 +27,46 @@
  ******************************************************************************/
 #include "animtypeext_hooks.h"
 #include "animtypeext_init.h"
+#include "animtype.h"
 #include "animtypeext.h"
 #include "supertype.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+
+/**
+ *  #issue-105
+ */
+DECLARE_PATCH(_)
+{
+    GET_REGISTER_STATIC(AnimTypeClass *, this_ptr, esi);
+    GET_REGISTER_STATIC(const ShapeFileStruct *, image, eax);
+    static AnimTypeClassExtension *animtypeext;
+
+    animtypeext = AnimTypeClassExtensions.find(this_ptr);
+
+    if (!this_ptr->Stages) {
+        this_ptr->Stages = image->Get_Frame_Count();
+
+        /**
+         *  If this animation is flagged that it has a shadow, half the
+         *  shape image frame count to find the end of the actual animation
+         *  frames.
+         */
+        if (animtypeext && animtypeext->IsShadow) {
+            this_ptr->Stages = image->Get_Frame_Count() / 2;
+        }
+    }
+
+    if (!this_ptr->LoopEnd) {
+        this_ptr->LoopEnd = this_ptr->Stages;
+    }
+
+
+    // Not sure what to do with Biggest...
+    //this_ptr->Biggest = image->Get_Frame_Count() / 2;
+}
 
 
 /**
@@ -43,4 +78,6 @@ void AnimTypeClassExtension_Hooks()
      *  Initialises the extended class.
      */
     AnimTypeClassExtension_Init();
+
+    Patch_Jump(0x00418AEF, &);
 }

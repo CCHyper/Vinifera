@@ -47,6 +47,13 @@
 #include "hooker_macros.h"
 
 
+// Shadow
+// 00414B70
+// 0041580D
+// 00415A4C somewhere around here
+// 00415B24
+
+
 /**
  *  A fake class for implementing new member functions which allow
  *  access to the "this" pointer of the intended class.

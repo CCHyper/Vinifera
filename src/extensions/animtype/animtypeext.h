@@ -65,6 +65,11 @@ class AnimTypeClassExtension final : public Extension<AnimTypeClass>
         bool IsForceBigCraters;
 
         /**
+         *  
+         */
+        bool IsShadow;
+
+        /**
          *  Fudge to this anims Z-axis (depth). Positive values move the
          *  animation "away from the screen" or "closer to the ground". Negative
          *  values do the opposite. 
