@@ -71,6 +71,8 @@ DynamicVectorClass<TheaterTypeClass *> TheaterTypes;
 
 MFCC *GenericMix = nullptr;
 MFCC *IsoGenericMix = nullptr;
+MFCC *ViniferaMix = nullptr;
+MFCC *ViniferaCacheMix = nullptr;
 
 bool Vinifera_SkipToTSMenu = false;
 bool Vinifera_SkipToFSMenu = false;

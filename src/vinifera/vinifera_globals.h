@@ -88,6 +88,8 @@ extern DynamicVectorClass<MFCC *> ViniferaMoviesMixes;
 
 extern MFCC *GenericMix;
 extern MFCC *IsoGenericMix;
+extern MFCC *ViniferaMix;
+extern MFCC *ViniferaCacheMix;
 
 
 /**

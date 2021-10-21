@@ -933,6 +933,26 @@ bool Vinifera_Init_Bootstrap_Mixfiles()
 
     Addon_Present();
 
+    ViniferaMix = new MFCC("VINIFERA.MIX", &FastKey);
+    ASSERT(ViniferaMix);
+    if (!ViniferaMix) {
+        DEBUG_WARNING("Failed to load VINIFERA.MIX!\n");
+        //return false;
+    }
+    DEBUG_INFO(" VINIFERA.MIX\n");
+
+    ViniferaCacheMix = new MFCC("VCACHE.MIX", &FastKey);
+    ASSERT(ViniferaCacheMix);
+    if (!ViniferaCacheMix) {
+        DEBUG_WARNING("Failed to load VCACHE.MIX!\n");
+        //return false;
+    }
+    if (!ViniferaCacheMix->Cache()) {
+        DEBUG_WARNING("Failed to cache VCACHE.MIX!\n");
+        //return false;
+    }
+    DEBUG_INFO(" VCACHE.MIX\n");
+
     TibSunMix = new MFCC("TIBSUN.MIX", &FastKey);
     ASSERT(TibSunMix);
     if (!TibSunMix) {

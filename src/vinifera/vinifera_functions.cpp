@@ -631,6 +631,12 @@ bool Vinifera_Shutdown()
     delete IsoGenericMix;
     IsoGenericMix = nullptr;
 
+    delete ViniferaMix;
+    ViniferaMix = nullptr;
+
+    delete ViniferaCacheMix;
+    ViniferaCacheMix = nullptr;
+
     ViniferaMapsMixes.Clear();
     ViniferaMoviesMixes.Clear();
 
