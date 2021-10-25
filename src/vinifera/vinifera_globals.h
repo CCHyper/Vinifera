@@ -38,6 +38,11 @@ class TheaterTypeClass;
 
 extern bool Vinifera_DeveloperMode;
 
+#ifndef NDEBUG
+extern bool Vinifera_MemoryWatcherEnabled;
+extern HWND MemoryWatcherHandle;
+#endif
+
 extern bool Vinifera_PerformingLoad;
 
 extern bool Vinifera_PrintFileErrors;

@@ -32,6 +32,11 @@
 
 bool Vinifera_DeveloperMode = false;
 
+#ifndef NDEBUG
+bool Vinifera_MemoryWatcherEnabled = true;
+HWND MemoryWatcherHandle = nullptr;
+#endif
+
 bool Vinifera_PerformingLoad = false;
 
 bool Vinifera_PrintFileErrors = true;
