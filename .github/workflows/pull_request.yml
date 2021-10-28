@@ -117,6 +117,7 @@ jobs:
           cp ./build/_deps/tspp-src/pdb/Game.pdb ./artifact/Game.pdb
           cp ./build/_deps/tspp-src/edb/Game.edb ./artifact/Game.edb
           cp ./vinifera-files/files/VINIFERA.WMV ./artifact/Movies/VINIFERA.VQA
+          cp ./vinifera-files/Vinifera Documentation.url ./artifact/Vinifera Documentation.url
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
