@@ -657,11 +657,28 @@ DECLARE_PATCH(_Tactical_Render_Overlay_Patch)
         }
     }
 
+    if () {
+    }
+
     /**
-     *  Stolen bytes/code.
+     *  
      */
+    static bool draw_text;
+
+    draw_text = true;
+
+    if (TacticalExtension && TacticalExtension->Draw_Tactical_Graphic()) {
+        draw_text = false;
+    }
+    
+    if (draw_text) {
+
+        /**
+         *  Stolen bytes/code.
+         */
 original_code:
-    this_ptr->Draw_Screen_Text(this_ptr->ScreenText);
+        this_ptr->Draw_Screen_Text(this_ptr->ScreenText);
+    }
 
     this_ptr->field_D30 = false;
     this_ptr->IsToRedraw = false;

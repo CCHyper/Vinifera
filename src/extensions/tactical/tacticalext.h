@@ -37,6 +37,7 @@
 
 class Tactical;
 class HouseClass;
+class BSurface;
 
 
 enum InfoTextPosType {
@@ -63,6 +64,8 @@ class TacticalMapExtension final : public Extension<Tactical>
 
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
+
+        bool Draw_Tactical_Graphic();
 
     public:
         /**
@@ -99,6 +102,11 @@ class TacticalMapExtension final : public Extension<Tactical>
          *  The lifetime timer for the information text.
          */
         CDTimerClass<MSTimerClass> InfoTextTimer;
+
+        /**
+         *  
+         */
+        XSurface *TacticalGraphicSurface;
 };
 
 

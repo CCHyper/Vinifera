@@ -42,14 +42,14 @@ TacticalMapExtension *TacticalExtension = nullptr;
  */
 TacticalMapExtension::TacticalMapExtension(Tactical *this_ptr) :
     Extension(this_ptr),
-
     IsInfoTextSet(false),
     InfoTextBuffer(),
     InfoTextPosition(BOTTOM_LEFT),
     InfoTextNotifySound(VOC_NONE),
     InfoTextNotifySoundVolume(1.0f),
     InfoTextStyle(TPF_6PT_GRAD|TPF_DROPSHADOW),
-    InfoTextTimer(0)
+    InfoTextTimer(0),
+    TacticalGraphicSurface(nullptr)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TacticalMapExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -66,9 +66,9 @@ TacticalMapExtension::TacticalMapExtension(Tactical *this_ptr) :
  */
 TacticalMapExtension::TacticalMapExtension(const NoInitClass &noinit) :
     Extension(noinit),
-
     IsInfoTextSet(false),
-    InfoTextTimer(noinit)
+    InfoTextTimer(noinit),
+    TacticalGraphicSurface(nullptr)
 {
     IsInitialized = false;
 }
@@ -163,4 +163,27 @@ void TacticalMapExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TacticalMapExtension::Compute_CRC - 0x%08X\n", (uintptr_t)(ThisPtr));
+}
+
+
+bool TacticalMapExtension::Draw_Tactical_Graphic()
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("TacticalMapExtension::Draw_Tactical_Graphic - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    if (!ThisPtr->ScreenText || ThisPtr->ScreenText == '\0') {
+        return false;
+    }
+
+    Rect image_rect = TacticalGraphicSurface->Get_Rect();
+
+    Rect draw_rect;
+    draw_rect.X = (TacticalRect.Width-image_rect.Width)/2;
+    draw_rect.Y = (TacticalRect.Height-image_rect.Height)/2;
+    draw_rect.Width = image_rect.Width;
+    draw_rect.Height = image_rect.Height;
+
+    CompositeSurface->Copy_From(*TacticalGraphicSurface);
+
+    return true;
 }
