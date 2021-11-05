@@ -291,6 +291,7 @@ DECLARE_PATCH(_Select_Game_Clear_Globals_Patch)
     Vinifera_Developer_FrameStep = false;
     Vinifera_Developer_FrameStepCount = 0;
     Vinifera_Developer_AIControl = false;
+    //Vinifera_Developer_SpawnObject = false;
 
     /**
      *  Stolen bytes/code.
