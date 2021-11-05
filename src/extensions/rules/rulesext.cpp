@@ -28,6 +28,8 @@
 #include "rulesext.h"
 #include "ccini.h"
 #include "rules.h"
+#include "swizzle.h"
+#include "newswizzle.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -113,10 +115,10 @@ HRESULT RulesClassExtension::Load(IStream *pStm)
 
     new (this) RulesClassExtension(NoInitClass());
 
-    SwizzleManager.Here_I_Am(id, this);
+    VINIFERA_SWIZZLE_HERE_I_AM(id, this, "this");
 
 #ifndef NDEBUG
-    EXT_DEBUG_INFO("RulesExt Load: ID 0x%08X Ptr 0x%08X\n", id, this);
+    //EXT_DEBUG_INFO("RulesExt Load: ID 0x%08X Ptr 0x%08X\n", id, this);
 #endif
 
     return S_OK;

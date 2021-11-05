@@ -26,8 +26,10 @@
  *
  ******************************************************************************/
 #include "ext_hooks.h"
-#include "saveload_hooks.h"
+
 #include "iomap.h"
+
+#include "saveloadext_hooks.h"
 
 /**
  *  Extended classes here.
@@ -128,9 +130,9 @@
 void Extension_Hooks()
 {
     /**
-     *  Hook the new save and load system in.
+     *  Hook the save/load support for the extension classes.
      */
-    SaveLoad_Hooks();
+    SaveLoadExt_Hooks();
 
     /**
      *  Various functions.

@@ -31,6 +31,7 @@
 #include "tibsun_defines.h"
 #include "tibsun_globals.h"
 #include "swizzle.h"
+#include "newswizzle.h"
 #include "noinit.h"
 #include "debughandler.h"
 
@@ -197,15 +198,15 @@ HRESULT Extension<T>::Load(IStream *pStm)
     /**
      *  Announce ourself to the swizzle manager.
      */
-    SwizzleManager.Here_I_Am(id, this);
+    //VINIFERA_SWIZZLE_HERE_I_AM(id, this, "this");
 
     /**
      *  Request the pointer to the base class be remapped.
      */
-    SwizzleManager.Swizzle((void **)&ThisPtr);
+    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(&ThisPtr, "ThisPtr");
 
 #ifndef NDEBUG
-    EXT_DEBUG_INFO("Ext Load: ID 0x%08X Ptr 0x%08X ThisPtr 0x%08X\n", id, this, ThisPtr);
+    //EXT_DEBUG_INFO("Ext Load: ID 0x%08X Ptr 0x%08X ThisPtr 0x%08X\n", id, this, ThisPtr);
 #endif
 
     return S_OK;
@@ -226,7 +227,7 @@ HRESULT Extension<T>::Save(IStream *pStm, BOOL fClearDirty)
     }
 
     LONG id;
-    SwizzleManager.Fetch_Swizzle_ID(this, &id);
+    VINIFERA_SWIZZLE_FETCH_POINTER_ID(this, &id, "this");
     hr = pStm->Write(&id, sizeof(id), nullptr);
     if (FAILED(hr)) {
         return E_FAIL;
@@ -239,7 +240,7 @@ HRESULT Extension<T>::Save(IStream *pStm, BOOL fClearDirty)
     }
     
 #ifndef NDEBUG
-    EXT_DEBUG_INFO("Ext Save: ID 0x%08X Ptr 0x%08X ThisPtr 0x%08X\n", id, this, ThisPtr);
+    //EXT_DEBUG_INFO("Ext Save: ID 0x%08X Ptr 0x%08X ThisPtr 0x%08X\n", id, this, ThisPtr);
 #endif
 
     return S_OK;

@@ -314,6 +314,102 @@ DECLARE_PATCH(_Select_Game_Clear_Globals_Patch)
 }
 
 
+/**
+ *  When writing save game info, write the base level Vinifera version. This patch
+ *  will block vanilla Tiberian Sun from loading any Vinifera save files.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Save_Game_Put_Game_Version)
+{
+    _asm { mov edx, 120000 };
+
+    JMP(0x005D5064);
+}
+
+
+/**
+ *  Do not allow save games below our the base level Vinifera version. This patch
+ *  will remove any support for save games made with vanilla Tiberian Sun 2.03!
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_LoadOptionsClass_Read_File_Check_Game_Version)
+{
+    GET_REGISTER_STATIC(int, version, eax);
+
+    /**
+     *  If the version in the save file does not match our build
+     *  version exactly, then don't add this file to the listing.
+     */
+    if (version != 120000) {
+        JMP(0x00505AAD);
+    }
+
+    JMP(0x00505ABB);
+}
+
+
+/**
+ *  Change the saved module filename to the DLL name. 
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Save_Game_Change_Module_Filename)
+{
+    static const char *DLL_NAME = VINIFERA_DLL;
+    _asm { push DLL_NAME }
+
+    JMP(0x005D50E2);
+}
+
+       
+/**
+ *  Removes the code which prefixed older save files with "*".
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_LoadOptionsClass_Read_File_Remove_Older_Prefixing)
+{
+    JMP(0x00505AE9);
+}
+
+
+/**
+ *  Replaces the division-by-zero crash in SwizzleManagerClass::Process_Tables() with
+ *  a readable error, produces a crash dump and then exit.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_SwizzleManagerClass_Process_Tables_Remap_Failed_Error)
+{
+    static int old_ptr;
+
+    _asm { mov eax, [edi+0x4] }
+    _asm { mov old_ptr, eax }
+    //GET_REGISTER_STATIC(int, old_ptr, edi);
+
+    DEBUG_ERROR("Swizzle Manager - Failed to remap pointer! (old_ptr = 0x%08X)!\n", old_ptr);
+
+    ShowCursor(TRUE);
+
+    MessageBoxA(MainWindow, "Failed to process save game file!", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
+
+#if 0
+    if (!IsDebuggerPresent()) {
+        Vinifera_Generate_Mini_Dump();
+    }
+#endif
+
+    Fatal("Swizzle Manager - Failed to remap pointer! (old_ptr = 0x%08X)!\n", old_ptr);
+
+    /**
+     *  We won't ever get here, but its here just for clean analysis.
+     */
+    JMP(0x0060DC15);
+}
+
+
 #ifndef NDEBUG
 /**
  *  Produces a random serial number for this client.
@@ -395,6 +491,27 @@ void Vinifera_Hooks()
      */
     Patch_Byte(0x0057C97E+3, 0x07);
 #endif
+
+    /**
+     *  Write Vinifera save files with the new base version number.
+     */
+    Patch_Jump(0x005D505E, &_Save_Game_Put_Game_Version);
+
+    /**
+     *  Change SUN.EXE to our DLL name.
+     */
+    Patch_Jump(0x005D50DD, &_Save_Game_Change_Module_Filename);
+
+    /**
+     *  Handle save files in the dialogs.
+     */
+    Patch_Jump(0x00505A9E, &_LoadOptionsClass_Read_File_Check_Game_Version);
+    Patch_Jump(0x00505ABB, &_LoadOptionsClass_Read_File_Remove_Older_Prefixing);
+
+    /**
+     *  Fire an assert on save/load fail, rather than hard crash.
+     */
+    Patch_Jump(0x0060DBFF, &_SwizzleManagerClass_Process_Tables_Remap_Failed_Error);
 
 #ifndef NDEBUG
     /**

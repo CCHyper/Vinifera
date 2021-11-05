@@ -29,6 +29,7 @@
 #include "technotype.h"
 #include "ccini.h"
 #include "swizzle.h"
+#include "newswizzle.h"
 #include "tibsun_globals.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -116,7 +117,7 @@ HRESULT TechnoTypeClassExtension::Load(IStream *pStm)
 
     new (this) TechnoTypeClassExtension(NoInitClass());
 
-    SwizzleManager.Swizzle((void **)UnloadingClass);
+    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(&UnloadingClass, "UnloadingClass");
     
     return hr;
 }
