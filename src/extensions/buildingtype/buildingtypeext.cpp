@@ -54,7 +54,8 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(BuildingTypeClass *this_p
     ProduceCashBudget(0),
     IsStartupCashOneTime(false),
     IsResetBudgetOnCapture(false),
-    IsEligibleForAllyBuilding(false)
+    IsEligibleForAllyBuilding(false),
+    FactoryExitCell(-1,-1)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("BuildingTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -87,6 +88,9 @@ BuildingTypeClassExtension::~BuildingTypeClassExtension()
     //EXT_DEBUG_WARNING("BuildingTypeClassExtension deconstructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
     IsInitialized = false;
+
+    delete [] ThisPtr->OccupyList;
+    delete [] ThisPtr->ExitList;
 }
 
 
@@ -181,11 +185,17 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
     //EXT_DEBUG_TRACE("BuildingTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
     EXT_DEBUG_WARNING("BuildingTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
+    char buffer[16] = { '\0' };
     const char *ini_name = ThisPtr->Name();
+    const char *graphic_name = ThisPtr->Graphic_Name();
 
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
+
+    //if (!ArtINI.Is_Present(graphic_name)) {
+    //    return false;
+    //}
 
     GateUpSound = ini.Get_VocType(ini_name, "GateUpSound", GateUpSound);
     GateDownSound = ini.Get_VocType(ini_name, "GateDownSound", GateDownSound);
@@ -200,5 +210,116 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
     IsEligibleForAllyBuilding = ini.Get_Bool(ini_name, "EligibleForAllyBuilding",
                                                     ThisPtr->IsConstructionYard ? true : IsEligibleForAllyBuilding);
     
+    if (ArtINI.Get_String(graphic_name, "Foundation", buffer, sizeof(buffer)) > 0 && !strcmpi(buffer, "custom")) {
+        Read_Foundation(ini, graphic_name);
+    }
+
+    if (ini.Get_String(ini_name, "Foundation", buffer, sizeof(buffer)) > 0 && !strcmpi(buffer, "custom")) {
+        Read_Foundation(ini, ini_name);
+    }
+
+    return true;
+}
+
+
+/**
+ *  @author: CCHyper
+ * 
+ *  Expected ini format;
+ *    Foundation=custom
+ *    FoundationSize=4,4
+ *    FoundationOccupyLength=16
+ *    FoundationExitLength=20
+ *    FoundationCell0=0,0
+ *    FoundationCell1=1,0
+ *    FoundationCell2=2,0
+ *    FoundationCell3=2,0
+ *    FoundationCell4=0,1
+ *    FoundationCell5=1,1
+ *    etc.
+ * 
+ *  Optional;
+ *   FoundationFactoryExitCell=3,1
+ */
+bool BuildingTypeClassExtension::Read_Foundation(CCINIClass &ini, const char *section)
+{
+    if (ini.Is_Present(section, "FoundationSize")) {
+        return false;
+    }
+
+    TPoint2D<int> size = ini.Get_Point(section, "FoundationSize", TPoint2D<int>(0,0));
+    int occupy_length = ini.Get_Int(section, "FoundationOccupyLength", 0);
+    int exit_length = ini.Get_Int(section, "FoundationExitLength", 0);
+
+    if ((!size.X || !size.Y) || !occupy_length || !exit_length) {
+        return false;
+    }
+
+    FactoryExitCell = ini.Get_Cell(section, "FoundationFactoryExitCell", FactoryExitCell);
+
+    /**
+     *  By default, war factories are hardcoded to use the 11th exit cell.
+     */
+    if (ThisPtr->ToBuild == RTTI_UNITTYPE && exit_length < 10) {
+        DEBUG_WARNING("Factory \"%s\" with RTTI_UNITTYPE can not have a custom exit list of less than 10!", ThisPtr->Name());
+        return false;
+    }
+
+    /**
+     *  Invalidate normal building size if we have a custom one set.
+     */
+    ThisPtr->Size = BSIZE_NONE;
+    delete ThisPtr->OccupyList;
+    delete ThisPtr->ExitList;
+
+    ThisPtr->OccupyList = new Cell [occupy_length+1];
+    ASSERT(ThisPtr->OccupyList != nullptr);
+
+    ThisPtr->ExitList = new Cell [exit_length+1];
+    ASSERT(ThisPtr->ExitList != nullptr);
+
+    char buffer[32];
+    for (int i = 0; i < occupy_length; ++i) {
+        std:snprintf(buffer, sizeof(buffer), "FoundationOccupyCell%d", i);
+        ThisPtr->OccupyList[i] = ini.Get_Cell(section, buffer, Cell(0,0));
+    }
+    for (int i = 0; i < exit_length; ++i) {
+        std:snprintf(buffer, sizeof(buffer), "FoundationExitCell%d", i);
+        ThisPtr->ExitList[i] = ini.Get_Cell(section, buffer, Cell(0,0));
+    }
+
+    /**
+     *  Terminate the lists.
+     */
+    ThisPtr->OccupyList[occupy_length] = Cell(REFRESH_EOL, REFRESH_EOL);
+    ThisPtr->ExitList[exit_length] = Cell(REFRESH_EOL, REFRESH_EOL);
+
+#ifndef NDEBUG
+    DEBUG_INFO("\"%s\" - CustomOccupy:", ThisPtr->Name());
+    for (int i = 0; i <= occupy_length; ++i) {
+        DEBUG_INFO("  X:%d Y:%d", ThisPtr->OccupyList[i].X,  ThisPtr->OccupyList[i].Y);
+    }
+    DEBUG_INFO("\"%s\" - CustomExit:", ThisPtr->Name());
+    for (int i = 0; i <= exit_length; ++i) {
+        DEBUG_INFO("  X:%d Y:%d", ThisPtr->ExitList[i].X,  ThisPtr->ExitList[i].Y);
+    }
+#endif
+
+#ifdef FOUNDATION_SORT_LISTS
+    auto cell_comp_func = [](const Cell &a, const Cell &b)
+    {
+        if (a.Y != b.Y) {
+            return a.Y < b.Y;
+        }
+        return a.X < b.X;
+    };
+
+    /**
+     *  Sort the lists.
+     */
+    std::qsort(ThisPtr->OccupyList, occupy_length, sizeof(Cell), cell_comp_func);
+    std::qsort(ThisPtr->OccupyList, occupy_length, sizeof(Cell), cell_comp_func);
+#endif
+
     return true;
 }

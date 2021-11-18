@@ -51,6 +51,9 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
 
         bool Read_INI(CCINIClass &ini);
 
+    protected:
+        bool Read_Foundation(CCINIClass &ini, const char *section);
+
     public:
         /**
          *  This is the sound effect to play when the animation of the gate is rising.
@@ -96,6 +99,32 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
          *  Is this building eligible for proximity checks by players who are its owner's allies?
          */
         bool IsEligibleForAllyBuilding;
+
+        /**
+         *  This is the custom size of the building. These are used to
+         *  calculate the "footprint" of the building.
+         */
+        //TPoint2D<int> CustomSize;
+
+        /**
+         *  This is a pointer to a list of offsets (from the upper left corner) that
+         *  are used to indicate the building's "footprint". This footprint is used
+         *  to determine building placement legality and terrain possibility.
+         */
+        //Cell *CustomOccupyList;
+
+        /**
+         *  When determine which cell to head toward when exiting a building, use the
+         *  list elaborated by this variable. There are directions of exit that are
+         *  more suitable than others. This list is here to inform the system which
+         *  directions those are.
+         */
+        //Cell *CustomExitList;
+
+        /**
+         *  The cell override in which war factory units "exit" from.
+         */
+        Cell FactoryExitCell;
 };
 
 
