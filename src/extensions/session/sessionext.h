@@ -52,6 +52,8 @@ class SessionClassExtension final : public Extension<SessionClass>
         void Read_MultiPlayer_Settings();
         void Write_MultiPlayer_Settings();
 
+        static ColorSchemeType Player_Color_To_Scheme_Color(PlayerColorType playercolor);
+
     public:
         typedef struct ExtGameOptionsType
         {
@@ -73,6 +75,11 @@ class SessionClassExtension final : public Extension<SessionClass>
         } ExtGameOptionsType;
 
         ExtGameOptionsType ExtOptions;
+
+        /**
+         *  
+         */
+        DynamicVectorClass<ColorSchemeType> PlayableColors;
 };
 
 

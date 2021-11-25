@@ -46,7 +46,9 @@ SessionClassExtension *SessionExtension = nullptr;
  *  @author: CCHyper
  */
 SessionClassExtension::SessionClassExtension(SessionClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    ExtOptions(),
+    PlayableColors()
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("SessionClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -126,4 +128,31 @@ void SessionClassExtension::Write_MultiPlayer_Settings()
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("SessionClassExtension::Write_MultiPlayer_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     //EXT_DEBUG_WARNING("SessionClassExtension::Write_MultiPlayer_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
+}
+
+
+/**
+ *  
+ *  
+ *  @author: CCHyper
+ */
+ColorSchemeType SessionClassExtension::Player_Color_To_Scheme_Color(PlayerColorType playercolor)
+{
+
+    /**
+     *  
+     */
+    PlayableColors.Add(3);
+    PlayableColors.Add(21);
+    PlayableColors.Add(47);
+    PlayableColors.Add(73);
+    PlayableColors.Add(27);
+    PlayableColors.Add(55);
+    PlayableColors.Add(39);
+    PlayableColors.Add(33);
+    if (RulesExtension && playercolor < RulesExtension->PlayableColors.Count()) {
+        return RulesExtension->PlayableColors[playercolor];
+    } else {
+        return ThisPtr->Player_Color_To_Scheme_Color(playercolor);
+    }
 }

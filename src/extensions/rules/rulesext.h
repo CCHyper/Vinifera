@@ -80,6 +80,19 @@ class RulesClassExtension final : public Extension<RulesClass>
              */
             unsigned TextLabelBackgroundTransparency;
 
+    /**
+     *  
+     */
+    PlayableColors.Add(3);
+    PlayableColors.Add(21);
+    PlayableColors.Add(47);
+    PlayableColors.Add(73);
+    PlayableColors.Add(27);
+    PlayableColors.Add(55);
+    PlayableColors.Add(39);
+    PlayableColors.Add(33);
+    return PlayableColors[playercolor];
+
         } UIControlsStruct;
 
         static UIControlsStruct UIControls;
