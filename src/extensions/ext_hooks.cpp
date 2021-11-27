@@ -77,6 +77,7 @@
 
 #include "technoext_hooks.h"
 #include "footext_hooks.h"
+#include "missionext_hooks.h"
 
 #include "unitext_hooks.h"
 #include "buildingext_hooks.h"
@@ -174,6 +175,9 @@ void Extension_Hooks()
     //TriggerTypeClassExtension_Hooks();
 
     TechnoClassExtension_Hooks();
+    FootClassExtension_Hooks();
+    MissionClassExtension_Hooks();
+
     UnitClassExtension_Hooks();
     AircraftClassExtension_Hooks();
     InfantryClassExtension_Hooks();
@@ -183,8 +187,6 @@ void Extension_Hooks()
     TeamClassExtension_Hooks();
     TActionClassExtension_Hooks();
     FactoryClassExtension_Hooks();
-    TechnoClassExtension_Hooks();
-    FootClassExtension_Hooks();
     AnimClassExtension_Hooks();
     BulletClassExtension_Hooks();
     TerrainClassExtension_Hooks();

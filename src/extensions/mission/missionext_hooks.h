@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          VINIFERA_DEFINES.H
+ *  @file          MISSIONEXT_HOOKS.H
  *
- *  @authors       CCHyper
+ *  @author        CCHyper
  *
- *  @brief         Vinifera defines and constants.
+ *  @brief         Contains the hooks for the extended MissionClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,40 +27,5 @@
  ******************************************************************************/
 #pragma once
 
-#include "always.h"
-#include "tibsun_defines.h"
 
-
-/**
- *  This is the base CLSID for all COM objects. When defining a new COM CLSID,
- *  you must append the two digit hex number, incrementing from the previous.
- */
-#define		VINIFERA_BASE_CLSID		"EBE80B85-EED2-4DEF-92CA-BC0C99AF4A00"
-
-/**
- *  CLSID's for all new locomotors.
- */
-#define		CLSID_TEST_LOCOMOTOR	"EBE80B85-EED2-4DEF-92CA-BC0C99AF4A01"
-
-
-/**
- *  New MissionType enum.
- */
-typedef enum NewMissionType
-{
-    /**
-     *  This offsets the new MissionType enum so they are correctly numbered.
-     */
-    NEW_MISSION_PAD = MISSION_PATROL,       // The last MissionType
-
-    /**
-     *  Add new MissionType's from here, do not reorder these!
-     */
-
-
-
-    /**
-     *  The new total MissionType count.
-     */
-    NEW_MISSION_COUNT
-} NewMissionType;
+void MissionClassExtension_Hooks();
