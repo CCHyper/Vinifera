@@ -202,4 +202,14 @@ void SessionClassExtension_Init()
     Patch_Jump(0x005ED465, &_SessionClass_Destructor_Patch);
     Patch_Jump(0x005EE17F, &_SessionClass_Read_MultiPlayer_Settings_Patch);
     Patch_Jump(0x005EE7BA, &_SessionClass_Write_MultiPlayer_Settings_Patch);
+
+    /**
+     *  #issue-459
+     * 
+     *  These patches remove calls to SessionClass::Read_Scenario_Descriptions()
+     *  to help speed up the initial game initialisation process. Scenarios will
+     *  now only be loaded when you first enter the multiplayer dialog.
+     */
+    Patch_Byte_Range(0x005ED477, 0x90, 5); // SessionClass::One_Time()
+    Patch_Byte_Range(0x0057FE2A, 0x90, 10); // NewMenuClass::Process_Game_Select()
 }
