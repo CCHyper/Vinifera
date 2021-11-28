@@ -590,13 +590,21 @@ add_dependencies(${PROJECT_NAME} TSpp)
 # Ensure the launcher is built with the main project.
 add_dependencies(${PROJECT_NAME} Launch${PROJECT_NAME})
 
-set(REQUIRED_LIBRARIES ws2_32 dbghelp shlwapi version comctl32)
+set(REQUIRED_LIBRARIES ws2_32 dbghelp shlwapi version comctl32 dsound dxguid)
 
 # Link to any required libraries.
 target_link_libraries(${PROJECT_NAME} ${REQUIRED_LIBRARIES})
 
 # Make build check state of git to check for uncommitted changes.
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_check_git)
+
+# Find and link to the FMOD library.
+find_package(FMOD)
+if (NOT FMOD_FOUND)
+	message(FATAL_ERROR "Unable to locate FMOD!")
+endif()
+
+target_link_libraries(${PROJECT_NAME} ${FMOD_LIBRARY})
 
 
 ################################################################################

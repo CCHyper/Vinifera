@@ -20,15 +20,24 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v2
         
+      - name: Checkout Files
+        uses: actions/checkout@v2
+        with:
+          repository: Vinifera-Developers/Vinifera-Files
+          path: vinifera-files
+        
       - name: Set Variables
         id: vars
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
         
       - name: Install Dependencies
         run: |
+          choco install openalsdk --no-progress
           Invoke-WebRequest -Uri https://github.com/ninja-build/ninja/releases/download/v1.10.1/ninja-win.zip -OutFile $Env:TEMP\ninja-win.zip
           Expand-Archive $Env:TEMP\ninja-win.zip -DestinationPath $Env:TEMP\ninja
           echo "$Env:TEMP\ninja" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          ninja --version
+          Rename-Item $Env:TEMP\openal-soft-1.21.0-bin\bin\${{ steps.vars.outputs.oal_path }}\soft_oal.dll OpenAL32.dll
 
       - uses: ilammy/msvc-dev-cmd@v1.10.0
         with:
@@ -50,6 +59,7 @@ jobs:
           cp ./build/Vinifera.pdb ./artifact/Vinifera.pdb
           cp ./build/LaunchVinifera.exe ./artifact/LaunchVinifera.exe
           cp ./build/_deps/tspp-src/pdb/Game.pdb ./artifact/Game.pdb
+          cp $TEMP/openal-soft-1.21.1-bin/bin/${{ steps.vars.outputs.oal_path }}/OpenAL32.dll ./artifact/OpenAL32.dll
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2

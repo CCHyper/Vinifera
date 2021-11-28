@@ -248,7 +248,8 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
 
     SetCursor(hCursor);
 
-    Audio.AudioFocusLossFunction = &Focus_Loss;
+    //Audio.AudioFocusLossFunction = &Focus_Loss;
+    FMODAudio.AudioFocusLossFunction = &Focus_Loss;
 
     /**
      *  Save the handle to our main window.

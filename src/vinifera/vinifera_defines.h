@@ -29,6 +29,7 @@
 
 #include "always.h"
 #include "tibsun_defines.h"
+#include "dsaudio.h"
 
 
 /**
@@ -41,3 +42,34 @@
  *  CLSID's for all new locomotors.
  */
 #define		CLSID_TEST_LOCOMOTOR	"EBE80B85-EED2-4DEF-92CA-BC0C99AF4A01"
+
+
+/**
+ *  Used in conjunction with the new FMOD audio engine.
+ * 
+ *  This struct tracks the sample pointer and the playing handle for a specific
+ *  sound effect. Common uses for this would be to track a looping sample.
+ */
+typedef struct AudioTrackerStruct
+{
+	AudioTrackerStruct() :
+		Voc(VOC_NONE),
+		Filename(nullptr),
+		Sample(nullptr),
+		Handle(INVALID_AUDIO_HANDLE)
+	{
+	}
+
+	~AudioTrackerStruct()
+	{
+	}
+
+	bool Is_Valid() const { return Sample != nullptr; }
+	bool Has_Started() const { return Handle != INVALID_AUDIO_HANDLE; }
+	void Reset() { Voc = VOC_NONE; Filename = nullptr; Sample = nullptr; Handle = INVALID_AUDIO_HANDLE; }
+
+	VocType Voc;			// Sound index.
+	const char *Filename;	// Sample filename.
+	const void *Sample;		// Pointer to the sample file in memory.
+	int Handle;				// Playing handle in the audio engine.
+} AudioTrackerStruct;

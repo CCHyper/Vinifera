@@ -4,11 +4,12 @@
  *
  *  @project       Vinifera
  *
- *  @file          OBJECTTYPEEXT.H
+ *  @file          FMOD_LOAD_DLL.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Extended ObjectTypeClass class.
+ *  @brief         Utility functions for performing one-time loading of
+ *                 FMOD library functions from the DLL.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,38 +28,15 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
-#include "tibsun_defines.h"
-#include "vinifera_defines.h"
+#include "al.h"
+#include "alc.h"
 
 
-class ObjectTypeClass;
-class CCINIClass;
+/**
+ *  Are all the required imports loaded?
+ */
+extern bool FMODImportsLoaded;
 
 
-class ObjectTypeClassExtension final : public Extension<ObjectTypeClass>
-{
-    public:
-        ObjectTypeClassExtension(ObjectTypeClass *this_ptr);
-        ObjectTypeClassExtension(const NoInitClass &noinit);
-        ~ObjectTypeClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        bool Read_INI(CCINIClass &ini);
-
-    public:
-        /**
-         *  
-         */
-        AudioTrackerStruct AmbientSound;
-};
-
-
-extern ExtensionMap<ObjectTypeClass, ObjectTypeClassExtension> ObjectTypeClassExtensions;
+bool Load_FMOD_DLL();
+void Unload_FMOD_DLL();

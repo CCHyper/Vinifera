@@ -43,6 +43,10 @@
 #include "tacticalext.h"
 #include "tclassfactory.h"
 #include "testlocomotion.h"
+#include "fmod_globals.h"
+#include "fmod_load_dll.h"
+#include "vorbis_load_dll.h"
+#include "miscutil.h"
 #include "debughandler.h"
 #include <string>
 
@@ -264,6 +268,45 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
  */
 bool Vinifera_Startup()
 {
+	/**
+	 *  Load the FMOD DLL.
+	 */
+	if (!Load_FMOD_DLL()) {
+		MessageBox(nullptr, "Failed to load FMOD library, please reinstall Vinifera.", "Error!", MB_OK|MB_ICONERROR);
+		return false;
+	}
+
+    DEBUG_INFO("Audio Engine: FMOD\n");
+
+	/**
+	 *  Load the Vorbis DLL (optional).
+	 */
+	if (!Load_Vorbis_DLL()) {
+		DEBUG_WARNING("Failed to load Vorbis library, continuing without Ogg support.");
+	} else {
+        DEBUG_INFO("Audio Engine: Found Vorbis library.\n");
+    }
+
+    /**
+     *  Load additional paths from the user environment vars.
+     * 
+     *  #NOTE: Paths must end in "\" otherwise this will fail.
+     */
+    DWORD rc;
+    rc = GetEnvironmentVariable("TIBSUN_MUSIC", Vinifera_MusicPath_EnvVar, sizeof(Vinifera_MusicPath_EnvVar));
+    if (rc && rc < sizeof(Vinifera_MusicPath_EnvVar)) {
+        DEV_DEBUG_INFO("Found TIBSUN_MUSIC EnvVar: \"%s\".\n", Vinifera_MusicPath_EnvVar);
+    } else {
+        Vinifera_MusicPath_EnvVar[0] = '\0';
+    }
+
+    /**
+     *  
+     */
+    if (Directory_Exists("MUSIC")) {
+        std::strncpy(Vinifera_MusicPath, "MUSIC\\", std::strlen("MUSIC\\"));
+    }
+
     /**
      *  Load Vinifera settings and overrides.
      */
@@ -323,6 +366,12 @@ bool Vinifera_Shutdown()
      *  Cleanup global heaps/vectors.
      */
     EBoltClass::Clear_All();
+
+	/**
+	 *  Unload the external library DLLs.
+	 */
+	Unload_FMOD_DLL();
+	Unload_Vorbis_DLL();
 
     DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 

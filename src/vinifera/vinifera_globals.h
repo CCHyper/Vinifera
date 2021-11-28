@@ -30,6 +30,7 @@
 #include "always.h"
 #include "vector.h"
 #include "ccfile.h"
+#include "fmod_audio.h"
 
 
 class EBoltClass;
@@ -44,6 +45,9 @@ extern char Vinifera_ProjectName[64];
 extern char Vinifera_ProjectVersion[64];
 extern char Vinifera_IconName[64];
 extern char Vinifera_CursorName[64];
+
+extern char Vinifera_MusicPath_EnvVar[PATH_MAX];
+extern char Vinifera_MusicPath[PATH_MAX];
 
 
 /**
@@ -96,3 +100,14 @@ extern bool Vinifera_SkipToSkirmish;
 extern bool Vinifera_SkipToCampaign;
 extern bool Vinifera_SkipToInternet;
 extern bool Vinifera_ExitAfterSkip;
+
+
+/**
+ *  New audio engine instance.
+ */
+//#ifdef NEW_AUDIO_ENGINE
+//#define WWAudio Audio
+//#else
+extern FMODAudioClass FMODAudio; // Actually resides in fmod_audio.cpp
+//#define WWAudio FMODAudio
+//#endif

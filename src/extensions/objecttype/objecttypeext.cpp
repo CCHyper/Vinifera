@@ -44,7 +44,8 @@ ExtensionMap<ObjectTypeClass, ObjectTypeClassExtension> ObjectTypeClassExtension
  *  @author: CCHyper
  */
 ObjectTypeClassExtension::ObjectTypeClassExtension(ObjectTypeClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    AmbientSound()
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("ObjectTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -96,6 +97,8 @@ HRESULT ObjectTypeClassExtension::Load(IStream *pStm)
     }
 
     new (this) ObjectTypeClassExtension(NoInitClass());
+
+    AmbientSound.Reset();
     
     return hr;
 }
@@ -174,6 +177,8 @@ bool ObjectTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
+
+    AmbientSound.Voc = ini.Get_VocType(ini_name, "AmbientSound", AmbientSound.Voc);
     
     return true;
 }

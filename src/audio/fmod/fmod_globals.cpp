@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OBJECTTYPEEXT.H
+ *  @file          TACTICALEXT_HOOKS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Extended ObjectTypeClass class.
+ *  @brief         Contains the hooks for the FMOD audio engine.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,40 +25,31 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#pragma once
-
-#include "extension.h"
-#include "container.h"
-#include "tibsun_defines.h"
-#include "vinifera_defines.h"
+#include "fmod_globals.h"
 
 
-class ObjectTypeClass;
-class CCINIClass;
+bool FMODInitialised = false;
 
-
-class ObjectTypeClassExtension final : public Extension<ObjectTypeClass>
-{
-    public:
-        ObjectTypeClassExtension(ObjectTypeClass *this_ptr);
-        ObjectTypeClassExtension(const NoInitClass &noinit);
-        ~ObjectTypeClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        bool Read_INI(CCINIClass &ini);
-
-    public:
-        /**
-         *  
-         */
-        AudioTrackerStruct AmbientSound;
-};
-
-
-extern ExtensionMap<ObjectTypeClass, ObjectTypeClassExtension> ObjectTypeClassExtensions;
+LPALSOURCEF alSourcef = nullptr;
+LPALSOURCE3F alSource3f = nullptr;
+LPALSOURCEI alSourcei = nullptr;
+LPALSOURCEQUEUEBUFFERS alSourceQueueBuffers = nullptr;
+LPALBUFFERDATA alBufferData = nullptr;
+LPALGENBUFFERS alGenBuffers = nullptr;
+LPALDELETEBUFFERS alDeleteBuffers = nullptr;
+LPALSOURCEUNQUEUEBUFFERS alSourceUnqueueBuffers = nullptr;
+LPALGETSOURCEI alGetSourcei = nullptr;
+LPALSOURCESTOP alSourceStop = nullptr;
+LPALSOURCEPLAY alSourcePlay = nullptr;
+LPALSOURCEPAUSE alSourcePause = nullptr;
+LPALDELETESOURCES alDeleteSources = nullptr;
+LPALGENSOURCES alGenSources = nullptr;
+LPALCOPENDEVICE alcOpenDevice = nullptr;
+LPALCCLOSEDEVICE alcCloseDevice = nullptr;
+LPALCCREATECONTEXT alcCreateContext = nullptr;
+LPALCDESTROYCONTEXT alcDestroyContext = nullptr;
+LPALCSUSPENDCONTEXT alcSuspendContext = nullptr;
+LPALCPROCESSCONTEXT alcProcessContext = nullptr;
+LPALCMAKECONTEXTCURRENT alcMakeContextCurrent = nullptr;
+LPALCGETCONTEXTSDEVICE alcGetContextsDevice = nullptr;
+LPALCGETERROR alcGetError = nullptr;
