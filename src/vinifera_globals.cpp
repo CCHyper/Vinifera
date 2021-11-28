@@ -56,6 +56,7 @@ bool Vinifera_SkipStartupMovies = false;
 
 DynamicVectorClass<MFCC *> ViniferaMapsMixes;
 DynamicVectorClass<MFCC *> ViniferaMoviesMixes;
+DynamicVectorClass<MFCC *> ViniferaScenarioMixes;
 
 DynamicVectorClass<EBoltClass *> EBolts;
 

@@ -295,14 +295,14 @@ bool Vinifera_Shutdown()
 	delete OptionsExtension;
 	OptionsExtension = nullptr;
 
-	delete RulesExtension;
-	RulesExtension = nullptr;
+	//delete RulesExtension;
+	//RulesExtension = nullptr;
 
 	delete SessionExtension;
 	SessionExtension = nullptr;
 
-	delete ScenarioExtension;
-	ScenarioExtension = nullptr;
+	//delete ScenarioExtension;
+	//ScenarioExtension = nullptr;
 
 	delete TacticalExtension;
 	TacticalExtension = nullptr;
@@ -318,6 +318,7 @@ bool Vinifera_Shutdown()
 
     ViniferaMapsMixes.Clear();
     ViniferaMoviesMixes.Clear();
+    ViniferaScenarioMixes.Clear();
 
     /**
      *  Cleanup global heaps/vectors.

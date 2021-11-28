@@ -194,6 +194,39 @@ original_code:
 
 
 /**
+ *  Patch for including the extended class members when computing a unique crc value for this instance.
+ * 
+ *  @warning: Do not touch this unless you know what you are doing!
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_SessionClass_Read_Scenario_Descriptions_Patch)
+{
+    GET_STACK_STATIC(SessionClass *, this_ptr, esp, 0x10);
+
+    /**
+     *  Find the extension instance.
+     */
+    if (!SessionExtension) {
+        goto original_code;
+    }
+
+    SessionExtension->Read_Scenario_Descriptions();
+
+    /**
+     *  Stolen bytes here.
+     */
+original_code:
+    _asm { pop edi }
+    _asm { pop esi }
+    _asm { pop ebp }
+    _asm { pop ebx }
+    _asm { add esp, 0x2AC }
+    _asm { ret }
+}
+
+
+/**
  *  Main function for patching the hooks.
  */
 void SessionClassExtension_Init()
@@ -202,6 +235,7 @@ void SessionClassExtension_Init()
     Patch_Jump(0x005ED465, &_SessionClass_Destructor_Patch);
     Patch_Jump(0x005EE17F, &_SessionClass_Read_MultiPlayer_Settings_Patch);
     Patch_Jump(0x005EE7BA, &_SessionClass_Write_MultiPlayer_Settings_Patch);
+    Patch_Jump(0x005EEE55, &_SessionClass_Read_Scenario_Descriptions_Patch);
 
     /**
      *  #issue-459

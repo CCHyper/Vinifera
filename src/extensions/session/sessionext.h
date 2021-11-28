@@ -52,6 +52,8 @@ class SessionClassExtension final : public Extension<SessionClass>
         void Read_MultiPlayer_Settings();
         void Write_MultiPlayer_Settings();
 
+        void Read_Scenario_Descriptions();
+
     public:
         typedef struct ExtGameOptionsType
         {
