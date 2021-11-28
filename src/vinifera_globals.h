@@ -30,6 +30,7 @@
 #include "always.h"
 #include "vector.h"
 #include "ccfile.h"
+#include "dsaudio8.h"
 
 
 class EBoltClass;
@@ -96,3 +97,14 @@ extern bool Vinifera_SkipToSkirmish;
 extern bool Vinifera_SkipToCampaign;
 extern bool Vinifera_SkipToInternet;
 extern bool Vinifera_ExitAfterSkip;
+
+
+/**
+ *  New audio engine instance.
+ */
+//#ifdef NEW_AUDIO_ENGINE
+//#define WWAudio Audio
+//#else
+extern DirectSound8AudioClass DirectSound8Audio; // Actually resides in dsaudio8.cpp
+//#define WWAudio DSAudio
+//#endif

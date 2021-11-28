@@ -1,21 +1,23 @@
 /*******************************************************************************
-/*                 O P E N  S O U R C E  --  V I N I F E R A                  **
+/*                  O P E N  S O U R C E -- V I N I F E R A                   **
 /*******************************************************************************
  *
- *  @project       Vinifera
+ *  @project       ProjectTSYR (Common Library)
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          DSAUDIO8_UTIL.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @contributors  tomsons26
  *
- *  @license       Vinifera is free software: you can redistribute it and/or
+ *  @brief         Main header file for the Direct Sound audio interface.
+ *
+ *  @license       ProjectTSYR is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
  *                 as published by the Free Software Foundation, either version
  *                 3 of the License, or (at your option) any later version.
  *
- *                 Vinifera is distributed in the hope that it will be
+ *                 ProjectTSYR is distributed in the hope that it will be
  *                 useful, but WITHOUT ANY WARRANTY; without even the implied
  *                 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *                 PURPOSE. See the GNU General Public License for more details.
@@ -25,34 +27,12 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#pragma once
 
-/**
- *  Include the hook headers here.
- */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "bugfix_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-#include "dsaudio8_hooks.h"
+#include "always.h"
 
 
-void Setup_Hooks()
-{
-    Vinifera_Memory_Hooks();
-
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Extension_Hooks();
-    BugFix_Hooks();
-
-    DirectSound8_Hooks();
-
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
-}
+void DS_Message_Box(HWND hWnd, HRESULT result, char const *message);
+char const *Process_DS_Result(HRESULT result, bool show_msg_box = false, bool display_ok_msg = false);
+int Convert_HMI_To_Direct_Sound_Volume(int volume);
+int Convert_Direct_Sound_Volume_To_HMI(int volume);
