@@ -20,15 +20,23 @@ jobs:
       - name: Clone Repository
         uses: actions/checkout@v2
         
+      - name: Checkout Files
+        uses: actions/checkout@v2
+        with:
+          repository: Vinifera-Developers/Vinifera-Files
+          path: vinifera-files
+        
       - name: Set Variables
         id: vars
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
         
       - name: Install Dependencies
         run: |
+          choco install openalsdk --no-progress
           Invoke-WebRequest -Uri https://github.com/ninja-build/ninja/releases/download/v1.10.1/ninja-win.zip -OutFile $Env:TEMP\ninja-win.zip
           Expand-Archive $Env:TEMP\ninja-win.zip -DestinationPath $Env:TEMP\ninja
           echo "$Env:TEMP\ninja" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          ninja --version
 
       - uses: ilammy/msvc-dev-cmd@v1.10.0
         with:
@@ -50,6 +58,10 @@ jobs:
           cp ./build/Vinifera.pdb ./artifact/Vinifera.pdb
           cp ./build/LaunchVinifera.exe ./artifact/LaunchVinifera.exe
           cp ./build/_deps/tspp-src/pdb/Game.pdb ./artifact/Game.pdb
+          cp ./vinifera-files/runtime/openal-soft.dll ./artifact/openal-soft.dll
+          cp ./vinifera-files/runtime/vorbisfile.dll ./artifact/vorbisfile.dll
+          cp ./vinifera-files/runtime/vorbis.dll ./artifact/vorbis.dll
+          cp ./vinifera-files/runtime/ogg.dll ./artifact/ogg.dll
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
@@ -99,6 +111,10 @@ jobs:
           cp ./build/Vinifera.pdb ./artifact/Vinifera.pdb
           cp ./build/LaunchVinifera.exe ./artifact/LaunchVinifera.exe
           cp ./build/_deps/tspp-src/pdb/Game.pdb ./artifact/Game.pdb
+          cp ./vinifera-files/runtime/openal-soft.dll ./artifact/openal-soft.dll
+          cp ./vinifera-files/runtime/vorbisfile.dll ./artifact/vorbisfile.dll
+          cp ./vinifera-files/runtime/vorbis.dll ./artifact/vorbis.dll
+          cp ./vinifera-files/runtime/ogg.dll ./artifact/ogg.dll
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2

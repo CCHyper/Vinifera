@@ -523,12 +523,15 @@ static void Vinifera_Assert_Handler(TSPPAssertType type, const char *expr, const
     va_list args;
     static char buf[4096];
 
-    va_start(args, msg);
-    vsnprintf(buf, sizeof(buf), msg, args);
-
-    Vinifera_Assert((AssertType)type, expr, file, line, function, ignore, allow_break, exit, msg, args);
-
-    va_end(args);
+    if (msg != nullptr) {
+        va_list args;
+        va_start(args, msg);
+        std::vsnprintf(buf, sizeof(buf), msg, args);
+        va_end(args);
+        Vinifera_Assert((AssertType)type, expr, file, line, function, ignore, allow_break, exit, buf, args);
+    } else {
+        Vinifera_Assert((AssertType)type, expr, file, line, function, ignore, allow_break, exit, nullptr, args);
+    }
 }
 
 

@@ -29,6 +29,8 @@
 
 #include "extension.h"
 #include "container.h"
+#include "tibsun_defines.h"
+#include "audio_driver.h"
 
 
 class ObjectTypeClass;
@@ -52,7 +54,10 @@ class ObjectTypeClassExtension final : public Extension<ObjectTypeClass>
         bool Read_INI(CCINIClass &ini);
 
     public:
-
+        /**
+         *  
+         */
+        AudioEvent AmbientSound;
 };
 
 
