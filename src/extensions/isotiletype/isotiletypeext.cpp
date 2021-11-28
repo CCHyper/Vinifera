@@ -27,6 +27,7 @@
  ******************************************************************************/
 #include "isotiletypeext.h"
 #include "isotiletype.h"
+#include "vinifera_globals.h"
 #include "tibsun_globals.h"
 #include "scenario.h"
 #include "theatertype.h"
@@ -192,6 +193,27 @@ bool IsometricTileTypeClassExtension::Init(CCINIClass &ini)
     if (!ini.Is_Present(GENERAL)) {
         return false;
     }
-    
+
+    WaterBridge = (IsometricTileType)ini.Get_Int(GENERAL, "WaterBridge", ISOTILE_NONE);
+
+    DestroyableCliffs2 = (IsometricTileType)ini.Get_Int(GENERAL, "DestroyableCliffs2", ISOTILE_NONE);
+    DestroyableCliffs3 = (IsometricTileType)ini.Get_Int(GENERAL, "DestroyableCliffs3", ISOTILE_NONE);
+
+    WoodBridgeSet = (IsometricTileType)ini.Get_Int(GENERAL, "WoodBridgeSet", ISOTILE_NONE);
+    Bridge2Set = (IsometricTileType)ini.Get_Int(GENERAL, "Bridge2Set", ISOTILE_NONE);
+    TrainBridge2Set = (IsometricTileType)ini.Get_Int(GENERAL, "TrainBridge2Set", ISOTILE_NONE);
+
+    Rough2Tile = (IsometricTileType)ini.Get_Int(GENERAL, "Rough2Tile", ISOTILE_NONE);
+    ClearToRough2Lat = (IsometricTileType)ini.Get_Int(GENERAL, "ClearToRough2Lat", ISOTILE_NONE);
+    Sand2Tile = (IsometricTileType)ini.Get_Int(GENERAL, "", ISOTILE_NONE);
+    ClearToSand2Lat = (IsometricTileType)ini.Get_Int(GENERAL, "", ISOTILE_NONE);
+    Green2Tile = (IsometricTileType)ini.Get_Int(GENERAL, "", ISOTILE_NONE);
+    ClearToGreen2Lat = (IsometricTileType)ini.Get_Int(GENERAL, "", ISOTILE_NONE);
+    Pave2Tile = (IsometricTileType)ini.Get_Int(GENERAL, "", ISOTILE_NONE);
+    ClearToPave2Lat = (IsometricTileType)ini.Get_Int(GENERAL, "", ISOTILE_NONE);
+
+    Swamp2Tile = (IsometricTileType)ini.Get_Int(GENERAL, "", ISOTILE_NONE);
+    WaterToSwamp2Lat = (IsometricTileType)ini.Get_Int(GENERAL, "", ISOTILE_NONE);
+
     return true;
 }

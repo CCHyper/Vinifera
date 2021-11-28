@@ -30,6 +30,7 @@
 #include "always.h"
 #include "vector.h"
 #include "ccfile.h"
+#include "tibsun_defines.h"
 
 
 class EBoltClass;
@@ -105,6 +106,27 @@ extern bool Vinifera_SkipToSkirmish;
 extern bool Vinifera_SkipToCampaign;
 extern bool Vinifera_SkipToInternet;
 extern bool Vinifera_ExitAfterSkip;
+
+
+/**
+ *  
+ */
+extern IsometricTileType WaterBridge;
+extern IsometricTileType DestroyableCliffs2;        // Copy of DestroyableCliffs
+extern IsometricTileType DestroyableCliffs3;        // Copy of DestroyableCliffs
+extern IsometricTileType WoodBridgeSet;             // 
+extern IsometricTileType Bridge2Set;                // Copy of BridgeSet
+extern IsometricTileType TrainBridge2Set;           // Copy of TrainBridgeSet
+extern IsometricTileType Rough2Tile;                // Copy of RoughTile
+extern IsometricTileType ClearToRough2Lat;
+extern IsometricTileType Sand2Tile;                 // Copy of SandTile
+extern IsometricTileType ClearToSand2Lat;
+extern IsometricTileType Green2Tile;                // Copy of GreenTile
+extern IsometricTileType ClearToGreen2Lat;
+extern IsometricTileType Pave2Tile;                 // Copy of PaveTile
+extern IsometricTileType ClearToPave2Lat;
+extern IsometricTileType Swamp2Tile;                // Copy of SwampTile
+extern IsometricTileType WaterToSwamp2Lat;
 
 
 /**

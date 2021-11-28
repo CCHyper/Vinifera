@@ -70,6 +70,23 @@ DynamicVectorClass<TheaterTypeClass *> TheaterTypes;
 MFCC *GenericMix = nullptr;
 MFCC *IsoGenericMix = nullptr;
 
+IsometricTileType WaterBridge = ISOTILE_NONE;
+IsometricTileType DestroyableCliffs2 = ISOTILE_NONE;
+IsometricTileType DestroyableCliffs3 = ISOTILE_NONE;
+IsometricTileType WoodBridgeSet = ISOTILE_NONE;
+IsometricTileType Bridge2Set = ISOTILE_NONE;
+IsometricTileType TrainBridge2Set = ISOTILE_NONE;
+IsometricTileType Rough2Tile = ISOTILE_NONE;
+IsometricTileType ClearToRough2Lat = ISOTILE_NONE;
+IsometricTileType Sand2Tile = ISOTILE_NONE;
+IsometricTileType ClearToSand2Lat = ISOTILE_NONE;
+IsometricTileType Green2Tile = ISOTILE_NONE;
+IsometricTileType ClearToGreen2Lat = ISOTILE_NONE;
+IsometricTileType Pave2Tile = ISOTILE_NONE;
+IsometricTileType ClearToPave2Lat = ISOTILE_NONE;
+IsometricTileType Swamp2Tile = ISOTILE_NONE;
+IsometricTileType WaterToSwamp2Lat = ISOTILE_NONE;
+
 bool Vinifera_SkipToTSMenu = false;
 bool Vinifera_SkipToFSMenu = false;
 bool Vinifera_SkipToLAN = false;
