@@ -53,6 +53,9 @@ extern char Vinifera_ProjectVersion[64];
 extern char Vinifera_IconName[64];
 extern char Vinifera_CursorName[64];
 
+extern bool Vinifera_IntegrityCheckFailed;
+extern uint64_t Vinifera_IntegrityCheckCRC;
+
 
 /**
  *  Defines and constants.

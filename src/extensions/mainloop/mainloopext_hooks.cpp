@@ -29,9 +29,11 @@
 #include "vinifera_globals.h"
 #include "tibsun_globals.h"
 #include "tibsun_functions.h"
+#include "integritychecker.h"
 #include "iomap.h"
 #include "tactical.h"
 #include "house.h"
+#include "session.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -71,11 +73,38 @@ create_event:
 
 static void Before_Main_Loop()
 {
+    if (!Session.Singleplayer_Game()) {
+
+        Vinifera_IntegrityCheckFailed = IntegrityChecker::Check();
+
+        /**
+         *  Has the memory been trashed? Exit the game.
+         */
+        if (Vinifera_IntegrityCheckFailed) {
+            MessageBox(MainWindow, "Tiberian Sun",
+                "Integrity check failed, the game will now close.", MB_OK|MB_ICONEXCLAMATION);
+            Emergency_Exit(EXIT_FAILURE);
+        }
+
+
+        // TODO, send new event with Vinifera_IntegrityCheckCRC.
+
+    }
 }
 
 
 static void After_Main_Loop()
 {
+    static int _delay_time = SECONDS_TO_MILLISECONDS(5);
+    static CDTimerClass<MSTimerClass> _delay = _delay_time;
+
+    if (!Session.Singleplayer_Game()) {
+        if (_delay.Expired()) {
+            IntegrityChecker::Update();
+            _delay = _delay_time;
+            _delay.Start();
+        }
+    }
 }
 
 
