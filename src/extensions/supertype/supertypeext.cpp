@@ -44,7 +44,8 @@ SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(const SuperWeaponTy
     AbstractTypeClassExtension(this_ptr),
     SidebarImage(),
     IsShowTimer(false),
-    CameoImageSurface(nullptr)
+    CameoImageSurface(nullptr),
+    IsDisableableFromShell(true)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
@@ -182,6 +183,8 @@ void SuperWeaponTypeClassExtension::Detach(TARGET target, bool all)
 void SuperWeaponTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    crc(IsDisableableFromShell);
 }
 
 
@@ -201,6 +204,7 @@ bool SuperWeaponTypeClassExtension::Read_INI(CCINIClass &ini)
     const char *ini_name = Name();
 
     IsShowTimer = ini.Get_Bool(ini_name, "ShowTimer", IsShowTimer);
+    IsDisableableFromShell = ini.Get_Bool(ini_name, "DisableableFromShell", IsDisableableFromShell);
 
     /**
      *  Fetch the cameo image surface if it exists.

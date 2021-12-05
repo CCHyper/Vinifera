@@ -71,6 +71,11 @@ class SessionClassExtension final : public GlobalExtensionClass<SessionClass>
              */
             bool IsBuildOffAlly;
 
+            /**
+             *  
+             */
+            bool IsSuperWeaponsEnabled;
+
         } ExtGameOptionsType;
 
         ExtGameOptionsType ExtOptions;

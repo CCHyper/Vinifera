@@ -78,6 +78,11 @@ SuperWeaponTypeClassExtension final : public AbstractTypeClassExtension
         bool IsShowTimer;
 
         /**
+         *  Can this super weapon be disabled from the in-game shell [multiplayer only]?
+         */
+        bool IsDisableableFromShell;
+
+        /**
          *  Pointer to the cameo image surface.
          */
         BSurface *CameoImageSurface;

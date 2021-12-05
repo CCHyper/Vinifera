@@ -56,6 +56,7 @@ SessionClassExtension::SessionClassExtension(const SessionClass *this_ptr) :
     ExtOptions.IsAutoDeployMCV = false;
     ExtOptions.IsPrePlacedConYards = false;
     ExtOptions.IsBuildOffAlly = true;
+    ExtOptions.IsSuperWeaponsEnabled = true;
 }
 
 
