@@ -29,13 +29,23 @@
 
 #include "extension.h"
 #include "container.h"
-
 #include "noinit.h"
 #include "tpoint.h"
+#include "rocketlocomotion.h"
 
 
 class CCINIClass;
 class RulesClass;
+
+
+typedef enum RocketTypes
+{
+    V3_ROCKET,
+    DREAD_MISSILE,
+    CRUISE_MISSILE,
+
+    ROCKET_COUNT
+};
 
 
 class RulesClassExtension final : public Extension<RulesClass>
@@ -110,6 +120,11 @@ class RulesClassExtension final : public Extension<RulesClass>
          *  on the tactical view?
          */
         bool IsShowSuperWeaponTimers;
+
+        /**
+         *  x
+         */
+        RocketControlStruct RocketControls[ROCKET_COUNT];
 };
 
 

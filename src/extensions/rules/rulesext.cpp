@@ -291,6 +291,59 @@ bool RulesClassExtension::General(CCINIClass &ini)
         return false;
     }
 
+    for (int index = 0; index < ROCKET_COUNT; ++index) {
+
+        static const char * _rocket_names[ROCKET_COUNT] = {
+            "V3Rocket",
+            "DMisl",
+            "CMisl"
+        };
+
+        char buffer[128];
+
+        const char *rocketname = _rocket_names[index];
+        RocketControlStruct &rocket = RocketControls[index];
+
+        std::snprintf(buffer, sizeof(buffer), "%sPauseFrames", rocketname);
+        rocket.PauseFrames = ini.Get_Int(GENERAL, buffer, rocket.PauseFrames);
+        
+        std::snprintf(buffer, sizeof(buffer), "%sTiltFrames", rocketname);
+        rocket.TiltFrames = ini.Get_Int(GENERAL, buffer, rocket.TiltFrames);
+        
+        std::snprintf(buffer, sizeof(buffer), "%sPitchInitial", rocketname);
+        rocket.PitchInitial = ini.Get_Double(GENERAL, buffer, rocket.PitchInitial);
+        
+        std::snprintf(buffer, sizeof(buffer), "%sPitchFinal", rocketname);
+        rocket.PitchFinal = ini.Get_Double(GENERAL, buffer, rocket.PitchFinal);
+        
+        std::snprintf(buffer, sizeof(buffer), "%sTurnRate", rocketname);
+        rocket.TurnRate = ini.Get_Double(GENERAL, buffer, rocket.TurnRate);
+        
+        std::snprintf(buffer, sizeof(buffer), "%sRaiseRate", rocketname);
+        rocket.RaiseRate = ini.Get_Double(GENERAL, buffer, rocket.RaiseRate);
+        
+        std::snprintf(buffer, sizeof(buffer), "%sAcceleration", rocketname);
+        rocket.Acceleration = ini.Get_Double(GENERAL, buffer, rocket.Acceleration);
+        
+        std::snprintf(buffer, sizeof(buffer), "%sAltitude", rocketname);
+        rocket.Altitude = ini.Get_Int(GENERAL, buffer, rocket.Altitude);
+        
+        std::snprintf(buffer, sizeof(buffer), "%sDamage", rocketname);
+        rocket.Damage = ini.Get_Int(GENERAL, buffer, rocket.Damage);
+        
+        std::snprintf(buffer, sizeof(buffer), "%sEliteDamage", rocketname);
+        rocket.EliteDamage = ini.Get_Int(GENERAL, buffer, rocket.EliteDamage);
+        
+        std::snprintf(buffer, sizeof(buffer), "%sBodyLength", rocketname);
+        rocket.BodyLength = ini.Get_Int(GENERAL, buffer, rocket.BodyLength);
+        
+        std::snprintf(buffer, sizeof(buffer), "%sLazyCurve", rocketname);
+        rocket.IsLazyCurve = ini.Get_Bool(GENERAL, buffer, rocket.IsLazyCurve);
+        
+        std::snprintf(buffer, sizeof(buffer), "%sType", rocketname);
+        rocket.Type = ini.Get_Aircraft(GENERAL, buffer, rocket.Type);
+    }
+
     return true;
 }
 

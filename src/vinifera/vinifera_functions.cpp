@@ -45,6 +45,7 @@
 #include "tacticalext.h"
 #include "tclassfactory.h"
 #include "testlocomotion.h"
+#include "shiplocomotion.h"
 #include "theatertype.h"
 #include "debughandler.h"
 #include <string>
@@ -648,6 +649,9 @@ bool Vinifera_Register_Com_Objects()
 
     DEBUG_INFO("  TestLocomotionClass\n");
     REGISTER_CLASS(TestLocomotionClass);
+
+    DEBUG_INFO("  ShipLocomotionClass\n");
+    REGISTER_CLASS(ShipLocomotionClass);
 
     DEBUG_INFO("  ...OK!\n");
 

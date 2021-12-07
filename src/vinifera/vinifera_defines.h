@@ -32,12 +32,7 @@
 
 
 /**
- *  This is the base CLSID for all COM objects. When defining a new COM CLSID,
- *  you must append the two digit hex number, incrementing from the previous.
- */
-#define		VINIFERA_BASE_CLSID		"EBE80B85-EED2-4DEF-92CA-BC0C99AF4A00"
-
-/**
  *  CLSID's for all new locomotors.
  */
-#define		CLSID_TEST_LOCOMOTOR	"EBE80B85-EED2-4DEF-92CA-BC0C99AF4A01"
+#define		CLSID_TEST_LOCOMOTOR	"28AD0479-08CA-49AA-8F97-03116675DBCD"
+#define		CLSID_ROCKET_LOCOMOTOR	"60A191A4-F52A-4BF0-8468-F4D212CF2C7C"
