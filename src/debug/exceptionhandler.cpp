@@ -49,6 +49,7 @@
 #include "vinifera_globals.h"
 #include "tibsun_globals.h"
 #include "vinifera_newdel.h"
+#include "vinifera_util.h"
 #include <Windows.h>
 #include <dbghelp.h>
 #include <eh.h>
@@ -964,6 +965,13 @@ LONG Vinifera_Exception_Handler(unsigned int e_code, struct _EXCEPTION_POINTERS 
                      *  Ask the user if the wish to produce a minidump.
                      */
                     Exception_Generate_Mini_Dump();
+
+                    std::vector<std::wstring> file_list;
+                    file_list.push_back(std::wstring(ExceptionFile.File_Name()));
+                    file_list.push_back(std::wstring(ExceptionFile.File_Name()));
+                    file_list.push_back(std::wstring(ExceptionFile.File_Name()));
+
+                    Vinifera_Debug_7z_Archive(file_list);
 
                     ExitAfterException = true;
                     break;

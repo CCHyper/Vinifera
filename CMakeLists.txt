@@ -293,6 +293,24 @@ endif()
 
 
 ################################################################################
+# Fetch the latest bit7z source code
+################################################################################
+include(FetchContent)
+FetchContent_Declare(
+	bit7z
+	GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+	GIT_REPOSITORY https://github.com/rikyoz/bit7z.git
+	GIT_TAG        origin/master
+)
+
+FetchContent_GetProperties(bit7z)
+if(NOT bit7z_POPULATED)
+	FetchContent_Populate(bit7z)
+	add_subdirectory(${bit7z_SOURCE_DIR} ${bit7z_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+
+################################################################################
 # Embed some git version information in the binary.
 ################################################################################
 message(STATUS "Fetching git repository information.")
@@ -571,6 +589,10 @@ target_compile_options(${PROJECT_NAME} PUBLIC /MP2)
 # Link to the TS++ static library.
 target_link_libraries(${PROJECT_NAME} TSpp)
 add_dependencies(${PROJECT_NAME} TSpp)
+
+# Link to the bit7z static library.
+target_link_libraries(${PROJECT_NAME} bit7z)
+add_dependencies(${PROJECT_NAME} bit7z)
 
 # Ensure the launcher is built with the main project.
 add_dependencies(${PROJECT_NAME} Launch${PROJECT_NAME})

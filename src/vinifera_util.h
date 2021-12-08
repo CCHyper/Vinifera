@@ -28,6 +28,8 @@
 #pragma once
 
 #include "always.h"
+#include <vector>
+#include <string>
 
 
 class XSurface;
@@ -44,3 +46,6 @@ int Vinifera_Do_WWMessageBox(const char *msg, const char *btn1, const char *btn2
 void Vinifera_DeveloperMode_Warning_WWMessageBox(const char *msg, ...);
 
 const char *Vinifera_Get_Window_Title(DWORD dwPid);
+
+bool Vinifera_Create_7z_Archive(std::wstring &filename, std::vector<std::wstring> &file_list);
+bool Vinifera_Debug_7z_Archive(std::vector<std::wstring> &file_list);

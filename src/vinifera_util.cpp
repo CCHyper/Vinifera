@@ -39,6 +39,9 @@
 #include "msgbox.h"
 #include "minidump.h"
 #include "winutil.h"
+#include <bitcompressor.hpp>
+#include <bitformat.hpp>
+#include <bitexception.hpp>
 #include <cstdio>
 
 
@@ -422,4 +425,46 @@ const char *Vinifera_Get_Window_Title(DWORD dwPid)
 #endif
 
     return _window_name;
+}
+
+
+/**
+ *  Compressing files into an 7z archive.
+ * 
+ *  Based on sample code from: https://github.com/rikyoz/bit7z
+ */
+bool Vinifera_Create_7z_Archive(std::wstring &filename, std::vector<std::wstring> &file_list)
+{
+    bit7z::BitCompressor compressor { bit7z::Bit7zLibrary(), bit7z::BitFormat::SevenZip };
+
+    compressor.compressFiles(file_list, filename);
+
+    return true;
+}
+
+
+/**
+ *  Compresses input files into an 7z archive.
+ * 
+ *  Based on sample code from: https://github.com/rikyoz/bit7z
+ */
+bool Vinifera_Debug_7z_Archive(std::vector<std::wstring> &file_list)
+{
+    extern int Execute_Day;
+    extern int Execute_Month;
+    extern int Execute_Year;
+    extern int Execute_Hour;
+    extern int Execute_Min;
+    extern int Execute_Sec;
+
+    /**
+     *  Create a unique filename for the debug archive based on the execution time of the game.
+     */
+    wchar_t fname_buffer[PATH_MAX];
+    _snwprintf((wchar_t *)fname_buffer, sizeof(fname_buffer), L"%s\\DEBUG_%s_%02u-%02u-%04u_%02u-%02u-%02u.7z",
+        Vinifera_DebugDirectory, Execute_Day, Execute_Month, Execute_Year, Execute_Hour, Execute_Min, Execute_Sec);
+
+    Vinifera_Create_7z_Archive(std::wstring(fname_buffer), file_list);
+
+    return true;
 }
