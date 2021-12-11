@@ -48,6 +48,7 @@
 #include "cdext_hooks.h"
 
 #include "playmovie_hooks.h"
+#include "vqaext_hooks.h"
 
 #include "objecttypeext_hooks.h"
 #include "technotypeext_hooks.h"
@@ -150,6 +151,7 @@ void Extension_Hooks()
     CDExtension_Hooks();
 
     PlayMovieExtension_Hooks();
+    VQAExtension_Hooks();
 
     /**
      *  All type class extensions here.
