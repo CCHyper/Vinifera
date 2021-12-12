@@ -26,8 +26,9 @@
  *
  ******************************************************************************/
 #include "rulesext.h"
-#include "ccini.h"
 #include "rules.h"
+#include "weapontype.h"
+#include "ccini.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -227,6 +228,45 @@ bool RulesClassExtension::MPlayer(CCINIClass &ini)
     IsBuildOffAlly = ini.Get_Bool(MPLAYER, "BuildOffAlly", IsBuildOffAlly);
 
     return true;
+}
+
+
+/**
+ *  Fetch all the weapon characteristic values.
+ * 
+ *  @author: CCHyper
+ */
+bool RulesClassExtension::Weapons(CCINIClass &ini)
+{
+    static const char * const WEAPONS = "Weapons";
+
+    char buf[128];
+    const WeaponTypeClass *weapontype;
+
+    int counter = ini.Entry_Count(WEAPONS);
+    for (int index = 0; index < counter; ++index) {
+        const char *entry = ini.Get_Entry(WEAPONS, index);
+
+        /**
+         *  Get a weapon entry.
+         */
+        if (ini.Get_String(WEAPONS, entry, buf, sizeof(buf))) {
+
+            /**
+             *  Find or create a weapon of the name specified.
+             */
+            weapontype = WeaponTypeClass::Find_Or_Make(buf);
+            if (weapontype) {
+                DEV_DEBUG_INFO("Rules: Found WeaponType \"%s\".\n", buf);
+            } else {
+                DEV_DEBUG_WARNING("Rules: Error processing WeaponType \"%s\"!\n", buf);
+            }
+
+        }
+
+    }
+
+    return counter > 0;
 }
 
 
