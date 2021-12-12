@@ -26,7 +26,9 @@
  *
  ******************************************************************************/
 #include "warheadtypeext.h"
+#include "vinifera_globals.h"
 #include "warheadtype.h"
+#include "armortype.h"
 #include "ccini.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -52,7 +54,8 @@ WarheadTypeClassExtension::WarheadTypeClassExtension(WarheadTypeClass *this_ptr)
     ShakePixelYHi(0),
     ShakePixelYLo(0),
     ShakePixelXHi(0),
-    ShakePixelXLo(0)
+    ShakePixelXLo(0),
+    Modifier()
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("WarheadTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -171,6 +174,7 @@ void WarheadTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
     crc(ShakePixelYLo);
     crc(ShakePixelXHi);
     crc(ShakePixelXLo);
+    crc(Modifier.Count());
 }
 
 
@@ -185,6 +189,7 @@ bool WarheadTypeClassExtension::Read_INI(CCINIClass &ini)
     //EXT_DEBUG_TRACE("WarheadTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
     EXT_DEBUG_WARNING("WarheadTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
+    char buffer[128];
     const char *ini_name = ThisPtr->Name();
 
     if (!ini.Is_Present(ini_name)) {
@@ -198,6 +203,41 @@ bool WarheadTypeClassExtension::Read_INI(CCINIClass &ini)
     ShakePixelYLo = ini.Get_Int(ini_name, "ShakeYlo", ShakePixelYLo);
     ShakePixelXHi = ini.Get_Int(ini_name, "ShakeXhi", ShakePixelXHi);
     ShakePixelXLo = ini.Get_Int(ini_name, "ShakeXlo", ShakePixelXLo);
+
+    /**
+     *  Reload the verses values into the new modifier member.
+     * 
+     *  @note: This chunk must be the last operation in the function.
+     */
+
+    /**
+     *  Build the default verses string.
+     */
+    char def_verses[128];
+    for (int i = 0; i < ArmorTypes.Count(); ++i) {
+        std::strcat(def_verses, "100%%");
+        if (i != ArmorTypes.Count()-1) {
+            std::strcat(def_verses, ",");
+        }
+    }
+
+    Modifier.Resize(ArmorTypes.Count());
+
+    /**
+     *  Load the verses value into the new modifier member.
+     */
+    if (ini.Get_String(ini_name, "Verses", def_verses, buffer, sizeof(buffer))) {
+        char *aval = std::strtok(buffer, ",");
+        for (ArmorType armor = ARMOR_FIRST; armor < ArmorTypes.Count(); ++armor) {
+            Modifier[armor] = double(aval);
+            aval = std::strtok(nullptr, ",");
+        }
+    }
+
+    /**
+     *  Reset the organic member based on the STEEL armor from the loaded modifiers.
+     */
+    ThisPtr->IsOrganic = (Modifier[ARMOR_STEEL] == 0.0);
 
     return true;
 }

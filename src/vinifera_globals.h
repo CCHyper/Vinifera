@@ -33,6 +33,7 @@
 
 
 class EBoltClass;
+class ArmorTypeClass;
 
 
 extern bool Vinifera_DeveloperMode;
@@ -84,6 +85,7 @@ extern MFCC *IsoGenericMix;
  *  Global vectors and heaps.
  */
 extern DynamicVectorClass<EBoltClass *> EBolts;
+extern DynamicVectorClass<ArmorTypeClass *> ArmorTypes;
 
 
 /**

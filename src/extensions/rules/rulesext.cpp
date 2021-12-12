@@ -28,6 +28,7 @@
 #include "rulesext.h"
 #include "rules.h"
 #include "weapontype.h"
+#include "armortype.h"
 #include "ccini.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -46,7 +47,8 @@ RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
     Extension(this_ptr),
     IsMPAutoDeployMCV(false),
     IsMPPrePlacedConYards(false),
-    IsBuildOffAlly(true)
+    IsBuildOffAlly(true),
+    Armors()
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -162,6 +164,7 @@ void RulesClassExtension::Compute_CRC(WWCRCEngine &crc) const
     crc(IsMPAutoDeployMCV);
     crc(IsMPPrePlacedConYards);
     crc(IsBuildOffAlly);
+    crc(Armors.Count());
 }
 
 
@@ -260,6 +263,45 @@ bool RulesClassExtension::Weapons(CCINIClass &ini)
                 DEV_DEBUG_INFO("Rules: Found WeaponType \"%s\".\n", buf);
             } else {
                 DEV_DEBUG_WARNING("Rules: Error processing WeaponType \"%s\"!\n", buf);
+            }
+
+        }
+
+    }
+
+    return counter > 0;
+}
+
+
+/**
+ *  Fetch all the armor characteristic values.
+ * 
+ *  @author: CCHyper
+ */
+bool RulesClassExtension::Armors(CCINIClass &ini)
+{
+    static const char * const ARMORS = "Armors";
+
+    char buf[128];
+    const ArmorTypeClass *weapontype;
+
+    int counter = ini.Entry_Count(ARMORS);
+    for (int index = 0; index < counter; ++index) {
+        const char *entry = ini.Get_Entry(ARMORS, index);
+
+        /**
+         *  Get a armor entry.
+         */
+        if (ini.Get_String(ARMORS, entry, buf, sizeof(buf))) {
+
+            /**
+             *  Find or create a armor of the name specified.
+             */
+            weapontype = ArmorTypeClass::Find_Or_Make(buf);
+            if (weapontype) {
+                DEV_DEBUG_INFO("Rules: Found ArmorType \"%s\".\n", buf);
+            } else {
+                DEV_DEBUG_WARNING("Rules: Error processing ArmorType \"%s\"!\n", buf);
             }
 
         }

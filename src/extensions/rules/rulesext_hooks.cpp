@@ -74,6 +74,18 @@ void RulesClassFake::_Process(CCINIClass &ini)
     Colors(ini);
     Houses(ini);
     Sides(ini);
+
+    /**
+     *  #issue-
+     * 
+     *  Add reading of Amors list from RULES.INI
+     * 
+     *  @author: CCHyper
+     */
+    if (RulesExtension) {
+        RulesExtension->Armors(ini);
+    }
+
     Overlays(ini);
 
     /**

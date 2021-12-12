@@ -32,6 +32,7 @@
 #include "housetype.h"
 #include "weapontype.h"
 #include "animtype.h"
+#include "armortype.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -54,6 +55,9 @@ class CCINIClassFake final : public CCINIClass
 
         long _Get_Owners(const char *section, const char *entry, const long defvalue);
         bool _Put_Owners(const char *section, const char *entry, long value);
+
+        ArmorType _Get_ArmorType(const char *section, const char *entry, const ArmorType defvalue);
+        bool _Put_ArmorType(const char *section, const char *entry, ArmorType value);
 };
 
 
@@ -129,6 +133,32 @@ bool CCINIClassFake::_Put_Owners(const char *section, const char *entry, long va
     }
 
     return true;
+}
+
+
+/**
+ *  Fetches the armor type from the INI database.
+ * 
+ *  @author: CCHyper
+ */
+ArmorType CCINIClassFake::_Get_ArmorType(const char *section, const char *entry, const ArmorType defvalue)
+{
+    char buffer[128];
+
+    Get_String(section, entry, ArmorTypeClass::As_Reference(defvalue).Get_Name(), buffer, sizeof(buffer));
+
+    return ArmorTypeClass::From_Name(buffer);
+}
+
+
+/**
+ *  Store the armor type to the INI database.
+ * 
+ *  @author: CCHyper
+ */
+bool CCINIClassFake::_Put_ArmorType(const char *section, const char *entry, ArmorType value)
+{
+    return Put_String(section, entry, ArmorTypeClass::As_Reference(value).Get_Name());
 }
 
 
@@ -223,4 +253,6 @@ void CCINIClassExtension_Hooks()
 
     Patch_Jump(0x0044ADC0, &CCINIClassFake::_Get_Owners);
     Patch_Jump(0x0044AE40, &CCINIClassFake::_Put_Owners);
+    Patch_Jump(0x0044AF50, &CCINIClassFake::_Get_ArmorType);
+    Patch_Jump(0x0044AFA0, &CCINIClassFake::_Put_ArmorType);
 }

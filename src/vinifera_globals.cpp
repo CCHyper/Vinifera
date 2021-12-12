@@ -58,6 +58,7 @@ DynamicVectorClass<MFCC *> ViniferaMapsMixes;
 DynamicVectorClass<MFCC *> ViniferaMoviesMixes;
 
 DynamicVectorClass<EBoltClass *> EBolts;
+DynamicVectorClass<ArmorTypeClass *> ArmorTypes;
 
 MFCC *GenericMix = nullptr;
 MFCC *IsoGenericMix = nullptr;

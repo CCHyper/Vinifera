@@ -36,6 +36,7 @@
 #include "ccini.h"
 #include "cd.h"
 #include "ebolt.h"
+#include "armortype.h"
 #include "optionsext.h"
 #include "rulesext.h"
 #include "sessionext.h"
@@ -323,6 +324,7 @@ bool Vinifera_Shutdown()
      *  Cleanup global heaps/vectors.
      */
     EBoltClass::Clear_All();
+    ArmorTypes.Clear();
 
     DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 
@@ -360,6 +362,8 @@ int Vinifera_Pre_Init_Game(int argc, char *argv[])
  */
 int Vinifera_Post_Init_Game(int argc, char *argv[])
 {
+    ArmorTypeClass::One_Time();
+
     return EXIT_SUCCESS;
 }
 

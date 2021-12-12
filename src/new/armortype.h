@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          WARHEADTYPEEXT_HOOKS.CPP
+ *  @file          THEATERTYPE.H
  *
- *  @author        CCHyper
+ *  @authors       CCHyper
  *
- *  @brief         Contains the hooks for the extended WarheadTypeClass.
+ *  @brief         Map armor type class.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,25 +25,42 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "warheadtypeext_hooks.h"
-#include "warheadtypeext_init.h"
-#include "warheadtypeext.h"
-#include "unittype.h"
-#include "fatal.h"
-#include "debughandler.h"
-#include "asserthandler.h"
+#pragma once 
+
+#include "always.h"
+#include "vector.h"
+#include "tibsun_defines.h"
 
 
-// TODO 0066F509
+class CCINIClass;
 
 
-/**
- *  Main function for patching the hooks.
- */
-void WarheadTypeClassExtension_Hooks()
+class ArmorTypeClass
 {
-    /**
-     *  Initialises the extended class.
-     */
-    WarheadTypeClassExtension_Init();
-}
+    public:
+        ArmorTypeClass();
+        ArmorTypeClass(const char *name);
+        ~ArmorTypeClass();
+
+        bool Read_INI(CCINIClass &ini);
+
+        static bool One_Time();
+        
+        static const ArmorTypeClass &As_Reference(ArmorType type);
+        static const ArmorTypeClass *As_Pointer(ArmorType type);
+        static const ArmorTypeClass &As_Reference(const char *name);
+        static const ArmorTypeClass *As_Pointer(const char *name);
+        static ArmorType From_Name(const char *name);
+        static const char *Name_From(ArmorType type);
+
+        static const ArmorTypeClass *Find_Or_Make(const char *name);
+
+        const char *Get_Name() const { return Name; }
+    
+    private:
+        /**
+         *  The name of this armor. This is the name as defined in the INI
+         *  and is also used for identifying the armor on object.
+         */
+        char Name[16];
+};

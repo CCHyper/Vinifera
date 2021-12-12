@@ -74,6 +74,11 @@ class WarheadTypeClassExtension final : public Extension<WarheadTypeClass>
         unsigned int ShakePixelYLo;
         unsigned int ShakePixelXHi;
         unsigned int ShakePixelXLo;
+
+        /**
+         *  
+         */
+        DynamicVectorClass<double> Modifier;
 };
 
 

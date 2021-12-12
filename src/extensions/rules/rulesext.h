@@ -59,6 +59,7 @@ class RulesClassExtension final : public Extension<RulesClass>
         bool MPlayer(CCINIClass &ini);
 
         bool Weapons(CCINIClass &ini);
+        bool Armors(CCINIClass &ini);
 
         static bool Read_UI_INI();
         static bool Init_UI_Controls();

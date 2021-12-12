@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          WARHEADTYPEEXT_HOOKS.CPP
+ *  @file          ARMORTYPE_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for the extended WarheadTypeClass.
+ *  @brief         Contains the hooks for ArmorTypeClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,25 +25,7 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "warheadtypeext_hooks.h"
-#include "warheadtypeext_init.h"
-#include "warheadtypeext.h"
-#include "unittype.h"
-#include "fatal.h"
-#include "debughandler.h"
-#include "asserthandler.h"
+#pragma once
 
 
-// TODO 0066F509
-
-
-/**
- *  Main function for patching the hooks.
- */
-void WarheadTypeClassExtension_Hooks()
-{
-    /**
-     *  Initialises the extended class.
-     */
-    WarheadTypeClassExtension_Init();
-}
+void ArmorTypeClassExtension_Hooks();
