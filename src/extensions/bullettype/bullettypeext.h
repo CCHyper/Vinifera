@@ -56,6 +56,11 @@ class BulletTypeClassExtension final : public Extension<BulletTypeClass>
          *  The number of frames between trailer anim spawns.
          */
         unsigned SpawnDelay;
+
+        /**
+         *  Does this projectile travel under the water?
+         */
+        bool IsSubSurface;
 };
 
 

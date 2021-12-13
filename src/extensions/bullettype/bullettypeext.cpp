@@ -45,7 +45,8 @@ ExtensionMap<BulletTypeClass, BulletTypeClassExtension> BulletTypeClassExtension
  */
 BulletTypeClassExtension::BulletTypeClassExtension(BulletTypeClass *this_ptr) :
     Extension(this_ptr),
-    SpawnDelay(3)           // Default hardcoded value.
+    SpawnDelay(3),          // Default hardcoded value.
+    IsSubSurface(false)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("BulletTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -156,6 +157,8 @@ void BulletTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("BulletTypeClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    crc(IsSubSurface);
 }
 
 
@@ -182,10 +185,12 @@ bool BulletTypeClassExtension::Read_INI(CCINIClass &ini)
     //    return false;
     //}
 
+    IsSubSurface = ini.Get_Bool(ini_name, "UnderWater", IsSubSurface);
+
     /**
      *  The following keys are loaded from the ArtINI database.
      */
     SpawnDelay = ArtINI.Get_Int(graphic_name, "SpawnDelay", SpawnDelay);
-    
+
     return true;
 }

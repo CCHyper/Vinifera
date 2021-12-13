@@ -41,6 +41,72 @@
 
 
 /**
+ *  #issue-
+ * 
+ *  Implements IsSubSurface for BulletTypes.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BulletClass_Is_Forced_To_Explode_IsSubSurface_Patch)
+{
+    GET_REGISTER_STATIC(BulletClass *, this_ptr, esi);
+    GET_REGISTER_STATIC(int , height, eax);
+    static CellClass const * cellptr;
+    static BulletTypeClassExtension *bullettypeext;
+
+    /**
+     *  Stolen bytes/code.
+     */
+    if (height < 0) {
+        goto return_true;
+    }
+
+    /**
+     *  Find the extended bullet type data.
+     */
+    bullettypeext = BulletTypeClassExtensions.find(this_ptr->Class);
+
+    if (bullettypeext) {
+
+        if (bullettypeext->IsSubSurface) {
+
+            cellptr = &Map[this_ptr->Coord];
+
+            /**
+             *  
+             */
+            if (this_ptr->On_Ground()) {
+                goto return_true;
+            }
+
+            /**
+             *  Check to make sure that underwater projectiles (torpedoes) will
+             *  not travel in anything but water.
+             */
+            if (cellptr->Land_Type() != LAND_WATER) {
+                goto return_true;
+            }
+
+            /**
+             *  However, if the torpedo was blocked by a bridge, then force the
+             *  torpedo to explode on top of that bridge cell.
+             */
+            if (cellptr->Is_Overlay_Low_Bridge()) {
+                goto return_true;
+            }
+        }
+    }
+
+continue_checks:
+    JMP(0x0044634C);
+
+return_true:
+    _asm { xor eax, eax }
+    JMP(0x004463B0);
+}
+
+
+/**
  *  #issue-563
  * 
  *  Implements SpawnDelay for BulletTypes.
@@ -132,4 +198,5 @@ void BulletClassExtension_Hooks()
 {
     Patch_Jump(0x00446652, &_BulletClass_Logic_ShakeScreen_Patch);
     Patch_Jump(0x004447BF, &_BulletClass_AI_SpawnDelay_Patch);
+    Patch_Jump(0x0044633E, &_BulletClass_Is_Forced_To_Explode_IsSubSurface_Patch);
 }
