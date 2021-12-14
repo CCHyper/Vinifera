@@ -3186,3 +3186,160 @@ bool AIInstantSuperRechargeCommandClass::Process()
 
     return true;
 }
+
+
+/**
+ *  Spawns a MCV with a newly created computer house at the current mouse location.
+ * 
+ *  @author: CCHyper
+ */
+const char *SpawnAIHouseCommandClass::Get_Name() const
+{
+    return "SpawnAIHouse";
+}
+
+const char *SpawnAIHouseCommandClass::Get_UI_Name() const
+{
+    return "Spawn AI Player";
+}
+
+const char *SpawnAIHouseCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *SpawnAIHouseCommandClass::Get_Description() const
+{
+    return "Spawns a MCV with a newly created computer house at the current mouse location.";
+}
+
+bool SpawnAIHouseCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+    
+    //static bool color_used[PCOLOR_COUNT];   // true = this color is in use.
+    HouseClass *housep;
+    HousesType pref_house;
+    PlayerColorType color;
+    TechnoClass *obj;
+
+    /**
+     *  Fetch the mouse coords and cell at this coord.
+     */
+    Coordinate mouse_coord = Get_Coord_Under_Mouse();
+    mouse_coord.Z = Map.Get_Cell_Height(mouse_coord);
+
+    const CellClass *cellptr = &Map[mouse_coord];
+    if (!cellptr) {
+        return false;
+    }
+
+    /**
+     *  Pick a random house; keep looping until we find one.
+     */
+    for (;;) {
+        pref_house = (HousesType)Random_Pick(0, HouseTypes.Count()-1);
+        if (HouseTypes[pref_house]->IsMultiplay) {
+            break;
+        }
+    }
+
+    /**
+     *  Update the active color tracker.
+     */
+    //for (int i = 0; i < Houses.Count(); ++i) {
+    //    HouseClass *hptr = Houses[i];
+    //    PlayerColorType pcolor = Session.Player_Color_To_Scheme_Color(color);
+    //    if (hptr && hptr->RemapColor == pcolor) {
+    //        color_used[color] = true;
+    //    }
+    //}
+
+    //bool all_colors_used = true;
+    //for (int i = 0; i < ARRAY_SIZE(color_used); ++i) {
+    //    if (!color_used[i]) {
+    //        all_colors_used = false;
+    //        break;
+    //    }
+    //}
+
+    /**
+     *  Pick a color for this house; keep looping until we find one.
+     */
+    //if (!all_colors_used) {
+    //    for (;;) {
+            color = (PlayerColorType)Random_Pick(0, (int)PCOLOR_LAST);
+    //        if (!color_used[color]) {
+    //            break;
+    //        }
+    //    }
+    //    color_used[color] = true;
+    //} else {
+    //    color = PCOLOR_GOLD;
+    //}
+
+    /**
+     *  Create the new AI house.
+     */
+    housep = new HouseClass(HouseTypes[pref_house]);
+    ASSERT(housep != nullptr);
+
+    housep->IsHuman = false;
+    //housep->IsStarted = true;
+
+    housep->Control.TechLevel = BuildLevel;
+    housep->Init_Data(color, pref_house, Session.Options.Credits);
+    housep->RemapColor = Session.Player_Color_To_Scheme_Color(color);
+    housep->Init_Remap_Color();
+
+    std::strcpy(housep->IniName, Text_String(TXT_COMPUTER));
+
+    if (Session.Type != GAME_NORMAL) {
+        housep->IQ = Rule->MaxIQ;
+    }
+
+    DiffType difficulty = Scen->CDifficulty;
+
+    if (Session.Players.Count() > 1 && Rule->IsCompEasyBonus && difficulty > DIFF_EASY) {
+        difficulty = (DiffType)(difficulty - 1);
+    }
+    housep->Assign_Handicap(difficulty);
+
+    /**
+     *  Create the MCV for the new house.
+     */
+    obj = new UnitClass(Rule->BaseUnit, housep);
+    if (obj->Unlimbo(mouse_coord, DIR_N)) {
+        if (obj != nullptr) {
+            housep->FlagHome = Cell(0,0);
+            housep->FlagLocation = nullptr;
+
+            if (Scen->SpecialFlags.InitialVeteran) {
+                obj->Veterancy.Set_Elite(true);
+            }
+
+            obj->Set_Mission(MISSION_GUARD_AREA);
+        }
+
+    } else if (obj) {
+        delete obj;
+        obj = nullptr;
+        return false;
+    }
+
+    housep->Begin_Construction();
+
+    housep->Base.Nodes[0].Where = Coord_Cell(mouse_coord);
+    housep->Base.field_50 = Coord_Cell(mouse_coord);
+
+    housep->IsStarted = true;
+    housep->field_C8 = true;
+    housep->IsBaseBuilding = true;
+
+    DEBUG_INFO("Spawned computer house \"%s\" (ID: %d, Color: \"%s\") at coord %s.\n",
+        housep->Class->Name(), housep->ID, ColorSchemes[housep->RemapColor]->Name, mouse_coord.As_String());
+
+    return true;
+}
