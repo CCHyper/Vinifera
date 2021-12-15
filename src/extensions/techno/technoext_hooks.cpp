@@ -55,6 +55,71 @@
 
 
 /**
+ *  #issue-
+ * 
+ *  
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_TechnoClass_Evaluate_Object_Passive_Targets_Patch)
+{
+    GET_REGISTER_STATIC(TechnoClass *, this_ptr, esi);
+    static TechnoTypeClassExtension *technotypeext;
+    static bool passes;
+
+    passes = false;
+    technotypeext = TechnoTypeClassExtensions.find(this_ptr->Techno_Type_Class());
+
+    /**
+     *  
+     */
+    if (RulesExtension) {
+        if (this_ptr->House->Is_Player_Control() && RulesExtension->IsAutoPassiveScan) {
+            passes = true;
+        }
+        if (!this_ptr->House->Is_Player_Control() && RulesExtension->IsComputerAutoPassiveScan) {
+            passes = true;
+        }
+    }
+
+    /**
+     *  
+     */
+    if (technotypeext) {
+        if (this_ptr->House->Is_Player_Control() && technotypeext->IsAutoPassiveScanOverride) {
+            passes = true;
+        }
+        if (!this_ptr->House->Is_Player_Control() && technotypeext->IsComputerAutoPassiveScanOverride) {
+            passes = true;
+        }
+    }
+
+    /**
+     *  
+     */
+    if (passes) {
+        goto passes_check;
+    }
+
+continue_checks:
+    _asm { mov eax, [0x007E2458] } // mov eax, Session
+    JMP_REG(ecx, 0x0062D49A);
+
+    /**
+     *  Evaluation failed.
+     */
+return_false:
+    JMP(0x0062D8C0);
+
+    /**
+     *  Passed our evaluation.
+     */
+passes_check:
+    JMP(0x0062D4BA);
+}
+
+
+/**
  *  #issue-357
  * 
  *  Creates an instance of the electric bolt from the firing techno to the target.
@@ -691,4 +756,5 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x00631661, &_TechnoClass_Player_Assign_Mission_Response_Patch);
     Patch_Jump(0x00630390, &_TechnoClass_Fire_At_Suicide_Patch);
     Patch_Jump(0x006312CD, &_TechnoClass_Fire_At_Electric_Bolt_Patch);
+    Patch_Jump(0x0062D49A, &_TechnoClass_Evaluate_Object_Passive_Targets_Patch);
 }

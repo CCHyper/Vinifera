@@ -57,6 +57,7 @@ class RulesClassExtension final : public Extension<RulesClass>
 
         bool General(CCINIClass &ini);
         bool MPlayer(CCINIClass &ini);
+        bool CombatDamage(CCINIClass &ini);
 
         static bool Read_UI_INI();
         static bool Init_UI_Controls();
@@ -99,6 +100,18 @@ class RulesClassExtension final : public Extension<RulesClass>
          *  Can players build their own structures adjacent to structures owned by their allies?
          */
         bool IsBuildOffAlly;
+
+        /**
+         *  Should player controlled vehicles consider neutral/passive targets
+         *  when evaluating potential threats?
+         */
+        bool IsAutoPassiveScan;
+
+        /**
+         *  Should computer controlled vehicles consider neutral/passive targets
+         *  when evaluating potential threats?
+         */
+        bool IsComputerAutoPassiveScan;
 };
 
 

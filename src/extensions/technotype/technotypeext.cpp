@@ -30,6 +30,7 @@
 #include "ccini.h"
 #include "swizzle.h"
 #include "tibsun_globals.h"
+#include "rulesext.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -63,11 +64,21 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(TechnoTypeClass *this_ptr) :
     VoiceEnter(),
     VoiceDeploy(),
     VoiceHarvest(),
-    IdleRate(0)
+    IdleRate(0),
+    IsAutoPassiveScanOverride(false),
+    IsComputerAutoPassiveScanOverride(false)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TechnoTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
     //EXT_DEBUG_WARNING("TechnoTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    /**
+     *  These overrides should default to the value defined in the rules data.
+     */
+    if (RulesExtension) {
+        IsAutoPassiveScanOverride = RulesExtension->IsAutoPassiveScan;
+        IsComputerAutoPassiveScanOverride = RulesExtension->IsComputerAutoPassiveScan;
+    }
 
     IsInitialized = true;
 }
@@ -238,6 +249,9 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IdleRate = ini.Get_Int(ini_name, "IdleRate", IdleRate);
     IdleRate = ArtINI.Get_Int(graphic_name, "IdleRate", IdleRate);
+
+    IsAutoPassiveScanOverride = ini.Get_Bool(ini_name, "PlayerPassiveScanOverride", IsAutoPassiveScanOverride);
+    IsComputerAutoPassiveScanOverride = ini.Get_Bool(ini_name, "ComputerPassiveScanOverride", IsComputerAutoPassiveScanOverride);
 
     return true;
 }

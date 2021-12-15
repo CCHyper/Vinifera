@@ -129,6 +129,23 @@ class TechnoTypeClassExtension final : public Extension<TechnoTypeClass>
          *  The rate at which this unit animates when it is standing idle (not moving).
          */
         unsigned IdleRate;
+
+        /**
+         *  Global Override
+         * 
+         *  Should player controlled vehicles consider neutral/passive targets
+         *  when evaluating potential threats?
+         */
+        bool IsAutoPassiveScanOverride;
+
+        /**
+         *  Global Override
+         * 
+         *  Should computer controlled vehicles consider neutral/passive targets
+         *  when evaluating potential threats?
+         */
+        bool IsComputerAutoPassiveScanOverride;
+
 };
 
 

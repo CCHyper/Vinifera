@@ -45,7 +45,9 @@ RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
     Extension(this_ptr),
     IsMPAutoDeployMCV(false),
     IsMPPrePlacedConYards(false),
-    IsBuildOffAlly(true)
+    IsBuildOffAlly(true),
+    IsAutoPassiveScan(false),
+    IsComputerAutoPassiveScan(false)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -161,6 +163,7 @@ void RulesClassExtension::Compute_CRC(WWCRCEngine &crc) const
     crc(IsMPAutoDeployMCV);
     crc(IsMPPrePlacedConYards);
     crc(IsBuildOffAlly);
+    crc(IsAutoPassiveScan);
 }
 
 
@@ -176,6 +179,7 @@ void RulesClassExtension::Process(CCINIClass &ini)
 
     General(ini);
     MPlayer(ini);
+    CombatDamage(ini);
 }
 
 
@@ -225,6 +229,26 @@ bool RulesClassExtension::MPlayer(CCINIClass &ini)
     IsMPAutoDeployMCV = ini.Get_Bool(MPLAYER, "AutoDeployMCV", IsMPAutoDeployMCV);
     IsMPPrePlacedConYards = ini.Get_Bool(MPLAYER, "PrePlacedConYards", IsMPPrePlacedConYards);
     IsBuildOffAlly = ini.Get_Bool(MPLAYER, "BuildOffAlly", IsBuildOffAlly);
+
+    return true;
+}
+
+
+/**
+ *  Process the combat and damage rules.
+ *  
+ *  @author: CCHyper
+ */
+bool RulesClassExtension::CombatDamage(CCINIClass &ini)
+{
+    static char const * const COMBATDAMAGE = "CombatDamage";
+
+    if (!ini.Is_Present(COMBATDAMAGE)) {
+        return false;
+    }
+
+    IsAutoPassiveScan = ini.Get_Bool(COMBATDAMAGE, "PlayerPassiveScan", IsAutoPassiveScan);
+    IsComputerAutoPassiveScan = ini.Get_Bool(COMBATDAMAGE, "ComputerPassiveScan", IsComputerAutoPassiveScan);
 
     return true;
 }
