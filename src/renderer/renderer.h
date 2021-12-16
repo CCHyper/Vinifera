@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          RENDERER.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,34 +25,44 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#pragma once
+
+#include "always.h"
+
+
+class XSurface;
+
 
 /**
- *  Include the hook headers here.
+ *  
  */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "bugfix_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-#include "renderer_hooks.h"
-
-
-void Setup_Hooks()
+namespace Renderer
 {
-    Vinifera_Memory_Hooks();
 
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Extension_Hooks();
-    BugFix_Hooks();
+};
 
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
 
-    Renderer_Hooks();
-}
+/**
+ *  
+ */
+namespace Renderer_ImGui
+{
+
+extern bool Show;
+extern bool BreakThread;
+
+bool Is_Available();
+
+bool Init();
+void Shutdown();
+
+void Render_Loop(XSurface *dest_surface);
+
+void Start();
+void Process();
+void Render(XSurface *dest_surface);
+void End();
+
+LRESULT WINAPI Window_Procedure(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+};

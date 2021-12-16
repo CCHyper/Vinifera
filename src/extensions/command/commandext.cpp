@@ -69,6 +69,7 @@
 #include "minidump.h"
 #include "winutil.h"
 #include "miscutil.h"
+#include "ingame_overlay.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
@@ -3183,6 +3184,47 @@ bool AIInstantSuperRechargeCommandClass::Process()
     }
 
     Vinifera_Developer_AIInstantSuperRecharge = !Vinifera_Developer_AIInstantSuperRecharge;
+
+    return true;
+}
+
+
+/**
+ *  Toggles the visibility of the ImGui debug overlay in developer mode.
+ * 
+ *  @author: CCHyper
+ */
+const char *ToggleImGuiDeveloperOverlayCommandClass::Get_Name() const
+{
+    return "ToggleImGuiDeveloperOverlay";
+}
+
+const char *ToggleImGuiDeveloperOverlayCommandClass::Get_UI_Name() const
+{
+    return "Toggle Developer Overlay";
+}
+
+const char *ToggleImGuiDeveloperOverlayCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *ToggleImGuiDeveloperOverlayCommandClass::Get_Description() const
+{
+    return "Toggles the visibility of the developer mode overlay.";
+}
+
+bool ToggleImGuiDeveloperOverlayCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    if (InGameOverlay::Mode == InGameOverlay::INGAME_OVERLAY_NONE) {
+        InGameOverlay::Mode = InGameOverlay::INGAME_OVERLAY_DEVELOPER;
+    } else {
+        InGameOverlay::Mode = InGameOverlay::INGAME_OVERLAY_NONE;
+    }
 
     return true;
 }

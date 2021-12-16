@@ -32,6 +32,7 @@
 #include "iomap.h"
 #include "tactical.h"
 #include "house.h"
+#include "ingame_overlay.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -170,6 +171,10 @@ static bool Main_Loop_Intercept()
             --Vinifera_Developer_FrameStepCount;
         }
 
+    }
+    
+    if (Vinifera_DeveloperMode) {
+        //InGameOverlay::Process();
     }
 
     return ret;

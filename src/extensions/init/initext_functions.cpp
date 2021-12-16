@@ -35,6 +35,7 @@
 #include "dsaudio.h"
 #include "vinifera_gitinfo.h"
 #include "tspp_gitinfo.h"
+#include "renderer.h"
 #include "resource.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -52,6 +53,28 @@ extern HMODULE DLLInstance;
  */
 #define TS_MAINICON		    93
 #define TS_MAINCURSOR		104
+
+
+/**
+ *  Intercept the window procedure callback.
+ */
+LRESULT CALLBACK Main_Window_Procedure_Intercept(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    /**
+     *  Did the ImgUi overlay handle the the message?
+     */
+    //if (Renderer_ImGui::Show) {
+    //    if (Renderer_ImGui::Window_Procedure(hWnd, msg, wParam, lParam)) {
+        Renderer_ImGui::Window_Procedure(hWnd, msg, wParam, lParam);
+    //        return true;
+    //    }
+    //}
+
+    /**
+     *  Call the games window procedure.
+     */
+    return Main_Window_Procedure(hWnd, msg, wParam, lParam);
+}
 
 
 /**
@@ -133,7 +156,7 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
      */
     wc.cbSize         = sizeof(WNDCLASSEX);
     wc.style          = CS_HREDRAW|CS_VREDRAW;
-    wc.lpfnWndProc    = Main_Window_Procedure;
+    wc.lpfnWndProc    = Main_Window_Procedure_Intercept;
     wc.cbClsExtra     = 0;
     wc.cbWndExtra     = 0;
     wc.hInstance      = (HINSTANCE)hInstance;

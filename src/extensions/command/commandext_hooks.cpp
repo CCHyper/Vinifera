@@ -318,6 +318,9 @@ void Init_Vinifera_Commands()
 
         cmdptr = new AIInstantSuperRechargeCommandClass;
         Commands.Add(cmdptr);
+
+        cmdptr = new ToggleImGuiDeveloperOverlayCommandClass;
+        Commands.Add(cmdptr);
     }
 
 #ifndef NDEBUG

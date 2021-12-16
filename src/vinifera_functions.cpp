@@ -36,6 +36,7 @@
 #include "ccini.h"
 #include "cd.h"
 #include "ebolt.h"
+#include "ingame_overlay.h"
 #include "optionsext.h"
 #include "rulesext.h"
 #include "sessionext.h"
@@ -289,6 +290,11 @@ bool Vinifera_Startup()
  */
 bool Vinifera_Shutdown()
 {
+    /**
+     *  Shutdown ImGui overlays.
+     */
+    InGameOverlay::Shutdown();
+
 	/**
 	 *  Delete static class extensions.
 	 */
@@ -360,6 +366,11 @@ int Vinifera_Pre_Init_Game(int argc, char *argv[])
  */
 int Vinifera_Post_Init_Game(int argc, char *argv[])
 {
+    /**
+     *  Initialises the ImGui overlays.
+     */
+    InGameOverlay::Init();
+
     return EXIT_SUCCESS;
 }
 

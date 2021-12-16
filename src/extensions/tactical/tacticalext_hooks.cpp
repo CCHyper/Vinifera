@@ -30,6 +30,9 @@
 #include "tacticalext.h"
 #include "tactical.h"
 #include "tibsun_globals.h"
+#include "vinifera_globals.h"
+#include "vinifera_util.h"
+#include "vinifera_gitinfo.h"
 #include "object.h"
 #include "objecttype.h"
 #include "unit.h"
@@ -43,10 +46,8 @@
 #include "voc.h"
 #include "laserdraw.h"
 #include "ebolt.h"
+#include "ingame_overlay.h"
 #include "fatal.h"
-#include "vinifera_globals.h"
-#include "vinifera_util.h"
-#include "vinifera_gitinfo.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <timeapi.h>
@@ -655,6 +656,13 @@ DECLARE_PATCH(_Tactical_Render_Overlay_Patch)
                 TacticalExtension->InfoTextPosition = TOP_LEFT;
             }       
         }
+    }
+
+    /**
+     *  
+     */
+    if (Vinifera_DeveloperMode) {
+        InGameOverlay::Render_To_Surface(CompositeSurface);
     }
 
     /**
