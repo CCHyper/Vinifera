@@ -63,5 +63,8 @@ class OptionsClassExtension final : public GlobalExtensionClass<OptionsClass>
 
         void Set();
 
+        void Set_Movie_Volume(double volume, bool feedback);
+
     public:
+        float MovieVolume;
 };

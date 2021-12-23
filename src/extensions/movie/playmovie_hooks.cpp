@@ -30,6 +30,7 @@
 #include "options.h"
 #include "campaign.h"
 #include "campaignext.h"
+#include "optionsext.h"
 #include "scenario.h"
 #include "vqa.h"
 #include "movie.h"
@@ -43,6 +44,85 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+
+/**
+ *  Patches in the MovieVolume from OptionsClassExtension.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Play_Ingame_Movie_1_Movie_Volume_Patch)
+{
+    static unsigned long val;
+
+    if (OptionsExtension) {
+
+        /**
+         *  Evil trick borrowed from Quake III Arena's "Q_rsqrt" which also
+         *  forces the use of general registers rather than the FPU, allowing
+         *  us to assign to a 32bit value.
+         * 
+         *  See:
+         *  https://en.wikipedia.org/wiki/Fast_inverse_square_root
+         */
+        val = *(long *)&OptionsExtension->MovieVolume;
+
+    } else {
+        val = *(long *)&Options.SoundVolume;
+    }
+
+    _asm { fld val }
+    JMP_REG(ebx, 0x00563BC8);
+}
+
+DECLARE_PATCH(_Play_Ingame_Movie_2_Movie_Volume_Patch)
+{
+    static unsigned long val;
+
+    if (OptionsExtension) {
+
+        /**
+         *  Evil trick borrowed from Quake III Arena's "Q_rsqrt" which also
+         *  forces the use of general registers rather than the FPU, allowing
+         *  us to assign to a 32bit value.
+         * 
+         *  See:
+         *  https://en.wikipedia.org/wiki/Fast_inverse_square_root
+         */
+        val = *(long *)&OptionsExtension->MovieVolume;
+
+    } else {
+        val = *(long *)&Options.SoundVolume;
+    }
+
+    _asm { fld val }
+    JMP_REG(ebx, 0x00563A8F);
+}
+
+DECLARE_PATCH(_Play_Movie_Movie_Volume_Patch)
+{
+    static unsigned long val;
+
+    if (OptionsExtension) {
+
+        /**
+         *  Evil trick borrowed from Quake III Arena's "Q_rsqrt" which also
+         *  forces the use of general registers rather than the FPU, allowing
+         *  us to assign to a 32bit value.
+         * 
+         *  See:
+         *  https://en.wikipedia.org/wiki/Fast_inverse_square_root
+         */
+        val = *(long *)&OptionsExtension->MovieVolume;
+
+    } else {
+        val = *(long *)&Options.SoundVolume;
+    }
+
+    _asm { fld val }
+    JMP_REG(esi, 0x005636E3);
+}
 
 
 /**
@@ -362,4 +442,8 @@ void PlayMovieExtension_Hooks()
     Patch_Byte(0x0057FECF+1, 0); // FS_TITLE.VQA
 
     Patch_Jump(0x00563795, &_Play_Movie_Scale_By_Ratio_Patch);
+
+    Patch_Jump(0x00563BC2, &_Play_Ingame_Movie_1_Movie_Volume_Patch);
+    Patch_Jump(0x00563A89, &_Play_Ingame_Movie_2_Movie_Volume_Patch);
+    Patch_Jump(0x005636DD, &_Play_Movie_Movie_Volume_Patch);
 }
