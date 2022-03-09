@@ -80,7 +80,7 @@ retry_dialog:
 
         case 2: // User pressed "Load Game"
         {
-#if defined(RELEASE) || !defined(NDEBUG)
+//#if defined(RELEASE) || !defined(NDEBUG)
             /**
              *  If no save games are available, notify the user and return back
              *  and reissue the main dialog.
@@ -98,12 +98,12 @@ retry_dialog:
                 Theme.Stop();
                 JMP(0x005DCE48);
             }
-#else
-            /**
-             *  We disable loading in non-release builds.
-             */
-            Vinifera_Do_WWMessageBox("Saving and Loading is disabled for non-release builds.", Text_String(TXT_OK));
-#endif
+//#else
+//            /**
+//             *  We disable loading in non-release builds.
+//             */
+//            Vinifera_Do_WWMessageBox("Saving and Loading is disabled for non-release builds.", Text_String(TXT_OK));
+//#endif
 
             /**
              *  Reissue the dialog if the user pressed cancel on the load dialog.
@@ -204,7 +204,7 @@ DECLARE_PATCH(_Save_Game_Put_Game_Version)
 }
 
 
-#ifndef RELEASE
+#if 0//#ifndef RELEASE
 /**
  *  Disables the Load, Save and Delete buttons in the options menu.
  * 
@@ -379,7 +379,7 @@ void SaveLoad_Hooks()
 
     Patch_Jump(0x0060DBFF, &_SwizzleManagerClass_Process_Tables_Remap_Failed_Error);
 
-#ifndef RELEASE
+#if 0//#ifndef RELEASE
     if (!Vinifera_DeveloperMode) {
         /**
          *  Disable loading and saving in non-release builds.
