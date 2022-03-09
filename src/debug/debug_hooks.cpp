@@ -568,11 +568,13 @@ void Debug_Hooks()
     Debug_Handler_Hooks();
     Assert_Handler_Hooks();
 
+#ifdef NDEBUG
     /**
      *  Set the runtime pure call handler.
      */
     _set_purecall_handler(Vinifera_PureCall_Handler);
     Hook_Function(0x006B51E5, &Vinifera_PureCall_Handler);
+#endif
 
     /**
      *  Hook in the Exception handler.

@@ -26,6 +26,9 @@
  *
  ******************************************************************************/
 #include "purecallhandler.h"
+
+#ifdef NDEBUG
+
 #include "stackdump.h"
 #include "textfile.h"
 #include "fatal.h"
@@ -151,3 +154,5 @@ extern "C" void __cdecl Vinifera_PureCall_Handler()
      */
     Emergency_Exit(EXIT_FAILURE);
 }
+
+#endif

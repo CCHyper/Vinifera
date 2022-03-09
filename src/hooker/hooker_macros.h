@@ -235,4 +235,4 @@
  *  prolog or epilog, ideal for jumping into and back out of.
  */
 #define DECLARE_PATCH(name) \
-    [[ noreturn ]] static __declspec(noinline) __declspec(naked) void name() noexcept
+    [[ noreturn ]] static __declspec(noinline) __declspec(naked) __declspec(no_sanitize_address) void name() noexcept
