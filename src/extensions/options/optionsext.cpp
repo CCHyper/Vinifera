@@ -26,17 +26,24 @@
  *
  ******************************************************************************/
 #include "optionsext.h"
-#include "options.h"
 #include "tibsun_globals.h"
-#include "noinit.h"
 #include "options.h"
+#include "noinit.h"
+#include "voc.h"
+#include "rules.h"
 #include "ccini.h"
 #include "rawfile.h"
+#include "wstring.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
 
 OptionsClassExtension *OptionsExtension = nullptr;
+
+
+static const char *HealthBarDisplayModeNames[HB_COUNT] = {
+    "Selected", "Damaged", "Always"
+};
 
 
 /**
@@ -45,7 +52,8 @@ OptionsClassExtension *OptionsExtension = nullptr;
  *  @author: CCHyper
  */
 OptionsClassExtension::OptionsClassExtension(OptionsClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    HealthBarDisplayMode(HB_SELECTED)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("OptionsClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -105,8 +113,25 @@ void OptionsClassExtension::Load_Settings()
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     //EXT_DEBUG_WARNING("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    static char const * const OPTIONS = "Options";
     
+    char buffer[128];
+
     RawFileClass file("SUN.INI");
+
+    HealthBarDisplayMode = HB_SELECTED;
+
+    ConfigINI.Get_String(OPTIONS, "HealthBarDisplay", buffer, sizeof(buffer));
+
+    for (int i = 0; i < HB_COUNT; ++i) {
+        if (Wstring(HealthBarDisplayModeNames[i]) == Wstring(buffer)) {
+            HealthBarDisplayMode = HealthBarDisplayModeType(i);
+            break;
+        }
+    }
+
+    DEBUG_INFO("HealthBarDisplay = %s\n", HealthBarDisplayModeNames[HealthBarDisplayMode]);
 }
 
 
@@ -135,8 +160,26 @@ void OptionsClassExtension::Save_Settings()
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     //EXT_DEBUG_WARNING("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    static char const * const OPTIONS = "Options";
+
+    char buffer[128];
     
     RawFileClass file("SUN.INI");
+
+    std::strncpy(buffer, HealthBarDisplayModeNames[HB_SELECTED], sizeof(buffer));
+
+    for (int i = 0; i < HB_COUNT; ++i) {
+        if (HealthBarDisplayMode == HealthBarDisplayModeType(i)) {
+            std::strncpy(buffer, HealthBarDisplayModeNames[i], sizeof(buffer));
+            break;
+        }
+    }
+
+    ConfigINI.Put_String(OPTIONS, "HealthBarDisplay", buffer);
+    DEBUG_INFO("HealthBarDisplay = %s\n", HealthBarDisplayModeNames[HealthBarDisplayMode]);
+
+    ConfigINI.Save(file, false);
 }
 
 

@@ -35,6 +35,8 @@
 #include "building.h"
 #include "buildingtype.h"
 #include "buildingtypeext.h"
+#include "techno.h"
+#include "technoext.h"
 #include "house.h"
 #include "housetype.h"
 #include "session.h"
@@ -46,6 +48,53 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  #issue-
+ * 
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_DisplayClass_Mouse_Left_Up_IsMouseOver_Patch)
+{
+    GET_REGISTER_STATIC(DisplayClass *, this_ptr, esi);
+    GET_REGISTER_STATIC(ObjectClass *, object, eax);
+    static TechnoClassExtension *technoext;
+    static TechnoClass *techno;
+    
+    /**
+     *  
+     */
+    if (object) {
+
+        if (object->Is_Techno()) {
+
+            techno = object->As_Techno();
+
+            /**
+             *  
+             */
+            if (techno->What_Am_I() != RTTI_BUILDING
+            || (reinterpret_cast<BuildingTypeClass *>(techno->Techno_Type_Class())->IsInvisibleInGame && !Debug_Map)) {
+
+                technoext->IsMouseOver = true;
+
+            }
+
+        }
+
+    }
+    
+    /**
+     *  Stolen bytes/code.
+     */
+    _asm { mov esi, this_ptr }
+    _asm { mov al, [esi+0x11BF] } // this->IsWaypointMode
+
+    JMP_REG(ecx, 0x00477EAB);
+}
 
 
 /**
@@ -250,6 +299,7 @@ void DisplayClassExtension_Hooks()
     Patch_Jump(0x0047AFA6, &_DisplayClass_Help_Text_GetCursorPosition_Patch);
     Patch_Jump(0x00478974, &_DisplayClass_Mouse_Left_Release_PlaceAnywhere_BugFix_Patch);
     Patch_Jump(0x004762E4, &_DisplayClass_Passes_Proximity_Passes_Check_Patch);
+    Patch_Jump(0x00477EAB, &_DisplayClass_Mouse_Left_Up_IsMouseOver_Patch);
 
     /**
      *  #issue-76

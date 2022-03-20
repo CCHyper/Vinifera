@@ -62,6 +62,11 @@ class TechnoClassExtension final : public Extension<TechnoClass>
          *  The current electric bolt instance fired by this object.
          */
         EBoltClass *ElectricBolt;
+
+        /**
+         *  Is the mouse currently over this unit?
+         */
+        bool IsMouseOver;
 };
 
 

@@ -55,6 +55,29 @@
 
 
 /**
+ *  x
+ */
+DECLARE_PATCH(_TechnoClass_AI_Start_Patch)
+{
+    GET_REGISTER_STATIC(TechnoClass *, this_ptr, esi);
+    static TechnoClassExtension *technoext;
+
+    technoext = TechnoClassExtensions.find(this_ptr);
+    if (technoext) {
+
+        /**
+         *  #issue-
+         * 
+         *  x
+         * 
+         *  @author: CCHyper
+         */
+        technoext->IsMouseOver = false;
+    }
+}
+
+
+/**
  *  #issue-357
  * 
  *  Creates an instance of the electric bolt from the firing techno to the target.
@@ -691,4 +714,5 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x00631661, &_TechnoClass_Player_Assign_Mission_Response_Patch);
     Patch_Jump(0x00630390, &_TechnoClass_Fire_At_Suicide_Patch);
     Patch_Jump(0x006312CD, &_TechnoClass_Fire_At_Electric_Bolt_Patch);
+    Patch_Jump(0x, &_TechnoClass_AI_Start_Patch);
 }

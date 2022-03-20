@@ -35,6 +35,16 @@ class OptionsClass;
 class CCINIClass;
 
 
+typedef enum HealthBarDisplayModeType
+{
+    HB_SELECTED = 0,
+    HB_DAMAGED,
+    HB_ALWAYS,
+
+    HB_COUNT,
+} HealthBarDisplayModeType;
+
+
 class OptionsClassExtension final : public Extension<OptionsClass>
 {
     public:
@@ -56,6 +66,10 @@ class OptionsClassExtension final : public Extension<OptionsClass>
         void Set();
 
     public:
+        /**
+         *  Health bar display mode.
+         */
+        HealthBarDisplayModeType HealthBarDisplayMode;
 };
 
 
