@@ -65,4 +65,7 @@ class IsometricTileTypeClassExtension final : public Extension<IsometricTileType
 };
 
 
+extern IsometricTileType ShoreToClearLat;
+
+
 extern ExtensionMap<IsometricTileTypeClass, IsometricTileTypeClassExtension> IsometricTileTypeClassExtensions;

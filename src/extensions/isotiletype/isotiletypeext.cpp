@@ -36,6 +36,12 @@
 
 
 /**
+ *  
+ */
+extern IsometricTileType ShoreToClearLat;
+
+
+/**
  *  Provides the map for all IsometricTileTypeClass extension instances.
  */
 ExtensionMap<IsometricTileTypeClass, IsometricTileTypeClassExtension> IsometricTileTypeClassExtensions;
@@ -192,6 +198,8 @@ bool IsometricTileTypeClassExtension::Init(CCINIClass &ini)
     if (!ini.Is_Present(GENERAL)) {
         return false;
     }
+
+    ShoreToClearLat = (IsometricTileType)ini.Get_Int(GENERAL, "ShoreToClearLat", ISOTILE_NONE);
     
     return true;
 }
