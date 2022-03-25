@@ -78,6 +78,11 @@ SuperWeaponTypeClassExtension final : public AbstractTypeClassExtension
         bool IsShowTimer;
 
         /**
+         *  Is this super weapon subject to checks from its launch site/building?
+         */
+        bool IsSubjectToLaunchSite;
+
+        /**
          *  Pointer to the cameo image surface.
          */
         BSurface *CameoImageSurface;

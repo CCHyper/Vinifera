@@ -44,6 +44,7 @@ SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(const SuperWeaponTy
     AbstractTypeClassExtension(this_ptr),
     SidebarImage(),
     IsShowTimer(false),
+    IsSubjectToLaunchSite(false),
     CameoImageSurface(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
@@ -182,6 +183,8 @@ void SuperWeaponTypeClassExtension::Detach(TARGET target, bool all)
 void SuperWeaponTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    crc(IsSubjectToLaunchSite);
 }
 
 
@@ -209,6 +212,8 @@ bool SuperWeaponTypeClassExtension::Read_INI(CCINIClass &ini)
     if (imagesurface) {
         CameoImageSurface = imagesurface;
     }
-    
+
+    IsSubjectToLaunchSite = ini.Get_Bool(ini_name, "SubjectToLaunchSite", IsSubjectToLaunchSite);
+
     return true;
 }
