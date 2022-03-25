@@ -27,6 +27,12 @@
  ******************************************************************************/
 #include "superext.h"
 #include "super.h"
+#include "supertype.h"
+#include "supertypeext.h"
+#include "target.h"
+#include "techno.h"
+#include "building.h"
+#include "tibsun_inline.h"
 #include "wwcrc.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -41,7 +47,8 @@
 SuperClassExtension::SuperClassExtension(const SuperClass *this_ptr) :
     AbstractClassExtension(this_ptr),
     FlashTimeEnd(0),
-    TimerFlashState(false)
+    TimerFlashState(false),
+    LaunchSite(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("SuperClassExtension::SuperClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
@@ -108,6 +115,8 @@ HRESULT SuperClassExtension::Load(IStream *pStm)
     }
 
     new (this) SuperClassExtension(NoInitClass());
+
+    SwizzleManager.Swizzle((void **)LaunchSite);
     
     return hr;
 }
@@ -163,4 +172,63 @@ void SuperClassExtension::Detach(TARGET target, bool all)
 void SuperClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("SuperClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+}
+
+
+/**
+ *  
+ *  
+ *  @author: CCHyper
+ */
+bool SuperClassExtension::Targeting_Range_Check(TARGET target) const
+{
+    SuperWeaponTypeClass *supertype = ThisPtr->Class;
+    SuperWeaponTypeClassExtension *supertypeext = SuperWeaponTypeClassExtensions.find(supertype);
+    if (!supertypeext) {
+        return false;
+    }
+
+    /**
+     *  If this building is not subject to launch site checks, then it always
+     *  passes the range checks.
+     */
+    if (!supertypeext->IsSubjectToLaunchSite) {
+        return true;
+    }
+    
+    /**
+     *  Illegal targets are an error.
+     */
+    if (!Target_Legal(target)) {
+        return false;
+    }
+    
+    /**
+     *  Invalid launch site is an error.
+     */
+    if (!LaunchSite) {
+        return false;
+    }
+
+    Coordinate check_coord = target->Center_Coord();
+    TechnoClass *target_techno = Is_Target_Techno(target) ? Target_As_Techno(target) : nullptr;
+
+    LEPTON lepton_range_min = Cell_To_Lepton(supertypeext->TargetCellRangeMinimum);
+    LEPTON lepton_range_max = Cell_To_Lepton(supertypeext->TargetCellRangeMaximum);
+
+    /**
+     *  Invalid range values set.
+     */
+    if ((lepton_range_min == 0 && lepton_range_max == 0) || lepton_range_min > lepton_range_max) {
+        DEV_DEBUG_WARNING("Invalid range values for special \"%s\" (Min: %d, Max: %d)!\n", supertype->Name());
+        return false;
+    }
+
+    /**
+     *  Calculate if the distance between the launch site and the target is
+     *  within the specified range.
+     */
+    bool in_range = Is_Distance_Within_Range(LaunchSite->Center_Coord(), check_coord, lepton_range_min, lepton_range_max);
+
+    return in_range;
 }

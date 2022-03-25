@@ -86,4 +86,11 @@ SuperWeaponTypeClassExtension final : public AbstractTypeClassExtension
          *  Pointer to the cameo image surface.
          */
         BSurface *CameoImageSurface;
+
+        /**
+         *  The minimum and maximum cell range of this super weapon for targeting
+         *  checks [only if IsSubjectToLaunchSite = true].
+         */
+        int TargetCellRangeMinimum;
+        int TargetCellRangeMaximum;
 };

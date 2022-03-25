@@ -33,6 +33,7 @@
 
 
 class HouseClass;
+class BuildingClass;
 
 
 class DECLSPEC_UUID(UUID_SUPERWEAPON_EXTENSION)
@@ -76,4 +77,9 @@ SuperClassExtension final : public AbstractClassExtension
          *  The current flash state of the timer printed on the tactical view.
          */
         bool TimerFlashState;
+
+        /**
+         *  Pointer to the building that fired this superweapon.
+         */
+        BuildingClass *LaunchSite;
 };

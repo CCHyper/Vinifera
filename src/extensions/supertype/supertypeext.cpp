@@ -45,7 +45,9 @@ SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(const SuperWeaponTy
     SidebarImage(),
     IsShowTimer(false),
     IsSubjectToLaunchSite(false),
-    CameoImageSurface(nullptr)
+    CameoImageSurface(nullptr),
+    TargetCellRangeMinimum(0),
+    TargetCellRangeMaximum(0)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
@@ -214,6 +216,9 @@ bool SuperWeaponTypeClassExtension::Read_INI(CCINIClass &ini)
     }
 
     IsSubjectToLaunchSite = ini.Get_Bool(ini_name, "SubjectToLaunchSite", IsSubjectToLaunchSite);
+
+    TargetCellRangeMinimum = std::abs(ini.Get_Int(ini_name, "TargetRangeMinimum", TargetCellRangeMinimum));
+    TargetCellRangeMaximum = std::abs(ini.Get_Int(ini_name, "TargetRangeMaximum", TargetCellRangeMaximum));
 
     return true;
 }
