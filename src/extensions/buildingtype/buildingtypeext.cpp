@@ -28,7 +28,12 @@
 #include "buildingtypeext.h"
 #include "buildingtype.h"
 #include "tibsun_defines.h"
+#include "tibsun_globals.h"
 #include "ccini.h"
+#include "ccfile.h"
+#include "mixfile.h"
+#include "wstring.h"
+#include "rules.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -54,7 +59,8 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(BuildingTypeClass *this_p
     ProduceCashBudget(0),
     IsStartupCashOneTime(false),
     IsResetBudgetOnCapture(false),
-    IsEligibleForAllyBuilding(false)
+    IsEligibleForAllyBuilding(false),
+    BuilddownData(nullptr)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("BuildingTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -199,6 +205,59 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IsEligibleForAllyBuilding = ini.Get_Bool(ini_name, "EligibleForAllyBuilding",
                                                     ThisPtr->IsConstructionYard ? true : IsEligibleForAllyBuilding);
-    
+
     return true;
+}
+
+
+/**
+ *  Performs theater specific initialization.
+ *  
+ *  @author: CCHyper
+ */
+void BuildingTypeClassExtension::Init(TheaterType theater)
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("BuildingTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    EXT_DEBUG_WARNING("BuildingTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    const char *graphic_name = ThisPtr->Graphic_Name();
+
+    if (!ArtINI.Is_Present(graphic_name)) {
+        return;
+    }
+
+    char buffer[1024];
+
+    ArtINI.Get_String(graphic_name, "Builddown", buffer, sizeof(buffer));
+
+    if (std::strlen(buffer) > 0) {
+
+        char fname_buf[1024];
+        std::snprintf(fname_buf, sizeof(fname_buf), "%s.SHP", buffer);
+        BuilddownData = (const ShapeFileStruct *)MFCC::Retrieve(fname_buf);
+        if (BuilddownData) {
+
+            int rate = 1;
+            int count = BuilddownData->Get_Frame_Count() / 2;
+            if (ThisPtr->IsGate) {
+                count = ThisPtr->GateStages + 1;
+            }
+            if (count > 0) {
+                rate = Rule->BuildupTime * float(TICKS_PER_MINUTE) / count;
+            }
+
+            Anims[NEW_BSTATE_DECONSTRUCTION].Start = 0;
+            Anims[NEW_BSTATE_DECONSTRUCTION].Count = count;
+            Anims[NEW_BSTATE_DECONSTRUCTION].Rate = rate;
+        }
+    }
+
+    /**
+     *  Fallback to the build up animation if we did not load a new image
+     *  as we replace the usage of build up being used for selling actions outright.
+     */
+    if (!BuilddownData) {
+        BuilddownData = ThisPtr->BuildupData;
+    }
 }

@@ -41,3 +41,13 @@
  *  CLSID's for all new locomotors.
  */
 #define		CLSID_TEST_LOCOMOTOR	"EBE80B85-EED2-4DEF-92CA-BC0C99AF4A01"
+
+
+typedef enum NewBStateType
+{
+    NEW_BSTATE_DECONSTRUCTION,
+
+    NEW_BSTATE_COUNT,
+
+    NEW_BSTATE_NONE = -1
+} NewBStateType;

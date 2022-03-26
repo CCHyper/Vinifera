@@ -29,6 +29,7 @@
 
 #include "extension.h"
 #include "container.h"
+#include "vinifera_defines.h"
 
 
 class BuildingTypeClass;
@@ -50,6 +51,7 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
         bool Read_INI(CCINIClass &ini);
+        void Init(TheaterType theater);
 
     public:
         /**
@@ -96,6 +98,25 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
          *  Is this building eligible for proximity checks by players who are its owner's allies?
          */
         bool IsEligibleForAllyBuilding;
+
+        /**
+         *	For each stage that a building may be in, its animation is controlled
+         *	by this structure. It dictates the starting and length of the animation
+         *	frames needed for the specified state. In addition it specifies how long
+         *	to delay between changes in animation. With this data it is possible to
+         *	control the appearance of all normal buildings. Turrets and SAM sites are
+         *	an exception since their animation is not merely cosmetic.
+         */
+        struct NewAnimControlStruct {
+            int Start;
+            int Count;
+            int Rate;
+        } Anims[NEW_BSTATE_COUNT];
+
+        /**
+         *  
+         */
+        const ShapeFileStruct * BuilddownData;
 };
 
 
