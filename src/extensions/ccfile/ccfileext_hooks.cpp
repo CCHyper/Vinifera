@@ -28,6 +28,7 @@
 #include "ccfileext_hooks.h"
 #include "ccfile.h"
 #include "cd.h"
+#include "wstring.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -46,8 +47,78 @@
 class CCFileClassFake final : public CCFileClass
 {
     public:
+        bool _Is_Available(bool forced = true);
         void _Error(FileErrorType error, bool can_retry = false, const char *filename = nullptr);
 };
+
+
+/**
+ *  Checks for existence of file on disk or in mixfile.
+ * 
+ *  The original CDFileClass did not have this function implemented, so
+ *  availability checks with CCFileClass do not check the search paths.
+ * 
+ *  @author: CCHyper
+ */
+bool CCFileClassFake::_Is_Available(bool forced)
+{
+    //DEV_DEBUG_INFO("Checking if %s is available.\n", Filename);
+
+    /**
+     *  Backup of the current filename.
+     */
+    Wstring fname = Filename;
+
+    /**
+     *	A file that is open is presumed available.
+     */
+    if (CCFileClass::Is_Open()) {
+        return true;
+    }
+
+    /**
+     *	First do a manual check if it is available with the current filename.
+     */
+    if (BufferIOFileClass::Is_Available()) {
+        return true;
+    }
+
+    /**
+     *  Attempt to find the file first. Check the current directory. If not found there, then
+     *  search all the path specifications available. If it still can't be found, then just
+     *  fall into the normal raw file filename setting system.
+     */
+    char path[_MAX_PATH];
+    SearchDriveType * srch = CDFileClass::First;
+
+    while (srch) {
+
+        /**
+         *  Build a pathname to search for.
+         */
+        std::snprintf(path, sizeof(path), "%s%s", srch->Path, fname.Peek_Buffer());
+
+        //DEV_DEBUG_INFO("Path is %s.\n", path);
+
+        /**
+         *  Check to see if the file could be found. The low level Is_Available logic will
+         *  prompt if necessary when the CD-ROM drive has been removed. In all other cases,
+         *  it will return false and the search process will continue.
+         */
+        BufferIOFileClass::Set_Name(path);
+        //DEV_DEBUG_INFO("Checking if %s is available.\n", fname.Peek_Buffer());
+        if (BufferIOFileClass::Is_Available()) {
+            return true;
+        }
+
+        /**
+         *  It wasn't found, so try the next path entry.
+         */
+        srch = (SearchDriveType *)srch->Next;
+    }
+
+    return false;
+}
 
 
 /**
@@ -90,5 +161,32 @@ void CCFileClassFake::_Error(FileErrorType error, bool can_retry, const char *fi
  */
 void CCFileClassExtension_Hooks()
 {
+    /**
+     *  These patches replace specific calls to CCFileClass::Is Available.
+     */
+    Patch_Call(0x004E092C, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x004E09EE, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x004E11B3, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x004E11F9, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x004E140E, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x004E155A, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005C64AF, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005C6547, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005C661A, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005D1B3B, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005DDC98, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005DDD1D, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005DDE66, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005EF50A, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005EF1E8, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005EE8CA, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005E4655, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005ACE26, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x005ACCEB, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x00505020, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x004E0DEB, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x004964E8, &CCFileClassFake::_Is_Available);
+    Patch_Call(0x004B70DB, &CCFileClassFake::_Is_Available);
+
     Patch_Jump(0x00449820, &CCFileClassFake::_Error);
 }
