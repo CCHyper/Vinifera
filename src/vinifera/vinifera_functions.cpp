@@ -57,6 +57,9 @@
  */
 bool Vinifera_Load_INI()
 {
+    static char const * const GENERAL = "General";
+    static char const * const SETTINGS = "Settings";
+
     CCFileClass file("VINIFERA.INI");
     INIClass ini;
 
@@ -95,6 +98,8 @@ bool Vinifera_Load_INI()
     Vinifera_ProjectVersion[sizeof(Vinifera_ProjectVersion)-1] = '\0';
     Vinifera_IconName[sizeof(Vinifera_IconName)-1] = '\0';
     Vinifera_CursorName[sizeof(Vinifera_CursorName)-1] = '\0';
+
+    Vinifera_AutoMissionSaveEnabled = ini.Get_Bool(SETTINGS, "AutoMissionSaveEnabled", Vinifera_AutoMissionSaveEnabled);
 
     return true;
 }

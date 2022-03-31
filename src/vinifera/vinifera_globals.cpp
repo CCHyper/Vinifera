@@ -59,6 +59,8 @@ bool Vinifera_Developer_AIControl = false;
 bool Vinifera_SkipWWLogoMovie = false;
 bool Vinifera_SkipStartupMovies = false;
 
+bool Vinifera_AutoMissionSaveEnabled = true;
+
 DynamicVectorClass<MFCC *> ViniferaMapsMixes;
 DynamicVectorClass<MFCC *> ViniferaMoviesMixes;
 
