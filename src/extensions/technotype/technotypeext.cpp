@@ -63,7 +63,8 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(TechnoTypeClass *this_ptr) :
     VoiceEnter(),
     VoiceDeploy(),
     VoiceHarvest(),
-    IdleRate(0)
+    IdleRate(0),
+    DebrisAnims()
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TechnoTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -114,9 +115,14 @@ HRESULT TechnoTypeClassExtension::Load(IStream *pStm)
         return E_FAIL;
     }
 
+    DebrisAnims.Clear();
+
     new (this) TechnoTypeClassExtension(NoInitClass());
 
+    DebrisAnims.Load(pStm);
+
     SWIZZLE_REQUEST_POINTER_REMAP(UnloadingClass);
+    SWIZZLE_REQUEST_POINTER_REMAP_LIST(DebrisAnims);
     
     return hr;
 }
@@ -136,6 +142,8 @@ HRESULT TechnoTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
     if (FAILED(hr)) {
         return hr;
     }
+
+    DebrisAnims.Save(pStm);
 
     return hr;
 }
@@ -184,6 +192,7 @@ void TechnoTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
     crc(ShakePixelXHi);
     crc(ShakePixelXLo);
     crc(SoylentValue);
+    crc(DebrisAnims.Count());
 }
 
 
@@ -238,6 +247,8 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IdleRate = ini.Get_Int(ini_name, "IdleRate", IdleRate);
     IdleRate = ArtINI.Get_Int(graphic_name, "IdleRate", IdleRate);
+
+    DebrisAnims = ini.Get_Anims(ini_name, "DebrisAnims", DebrisAnims);
 
     return true;
 }

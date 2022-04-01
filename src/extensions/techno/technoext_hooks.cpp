@@ -54,6 +54,34 @@
 #include "hooker_macros.h"
 
 
+// 00632B5D
+DECLARE_PATCH(_TechnoClass_Take_Damage_Spawn_Debris_Patch)
+{
+    GET_REGISTER_STATIC(TechnoClass *, this_ptr, esi);
+    static TechnoClassExtension *technoext;
+
+    technoext = TechnoClassExtensions.find(this_ptr);
+    if (technoext) {
+        technoext->Spawn_Debris();
+        goto do_explosion;
+    }
+
+    /**
+     *  Execute the original debris spawning.
+     */
+original_branch:
+    _asm { mov esi, this_ptr } // Restore "this".
+    JMP_REG(ecx, 0x00632B67);
+
+    /**
+     *  Debris spawned, now process explosion animation.
+     */
+do_explosion:
+    _asm { mov esi, this_ptr } // Restore "this".
+    JMP(0x00632D4F);
+}
+
+
 /**
  *  #issue-357
  * 

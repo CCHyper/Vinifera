@@ -312,3 +312,41 @@ void TechnoClassExtension::Response_Harvest()
 
     Sound_Effect(response);
 }
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+bool TechnoClassExtension::Spawn_Debris()
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("TechnoClassExtension::Spawn_Debris - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    int debris_max = ThisPtr->Techno_Type_Class()->MaxDebris;
+
+    return false;
+}
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+bool TechnoClassExtension::Spawn_Voxel_Debris()
+{
+    return false;
+}
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+bool TechnoClassExtension::Spawn_Anim_Debris()
+{
+    return false;
+}
