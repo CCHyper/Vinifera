@@ -32,6 +32,12 @@
 
 
 /**
+ *  If defined, this will replace the SwizzleManagerClass with our own new implementation.
+ */
+//#define VINIFERA_USE_NEW_SWIZZLE_MANAGER 1
+
+
+/**
  *  This is the base CLSID for all COM objects. When defining a new COM CLSID,
  *  you must append the two digit hex number, incrementing from the previous.
  */

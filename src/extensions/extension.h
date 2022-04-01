@@ -30,7 +30,7 @@
 #include "always.h"
 #include "tibsun_defines.h"
 #include "tibsun_globals.h"
-#include "swizzle.h"
+#include "vinifera_saveload.h"
 #include "noinit.h"
 #include "debughandler.h"
 
@@ -197,12 +197,12 @@ HRESULT Extension<T>::Load(IStream *pStm)
     /**
      *  Announce ourself to the swizzle manager.
      */
-    SWIZZLE_HERE_I_AM(id, this);
+    //VINIFERA_SWIZZLE_HERE_I_AM(id, this, "this");
 
     /**
      *  Request the pointer to the base class be remapped.
      */
-    SWIZZLE_REQUEST_POINTER_REMAP(ThisPtr);
+    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ThisPtr, "ThisPtr");
 
 #ifndef NDEBUG
     EXT_DEBUG_INFO("Ext Load: ID 0x%08X Ptr 0x%08X ThisPtr 0x%08X\n", id, this, ThisPtr);
@@ -226,7 +226,7 @@ HRESULT Extension<T>::Save(IStream *pStm, BOOL fClearDirty)
     }
 
     LONG id;
-    SWIZZLE_FETCH_POINTER_ID(this, &id);
+    VINIFERA_SWIZZLE_FETCH_SWIZZLE_ID(this, &id, "this");
     hr = pStm->Write(&id, sizeof(id), nullptr);
     if (FAILED(hr)) {
         return E_FAIL;

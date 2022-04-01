@@ -28,6 +28,8 @@
 #include "tacticalext.h"
 #include "tactical.h"
 #include "wwcrc.h"
+#include "swizzle.h"
+#include "newswizzle.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -120,7 +122,7 @@ HRESULT TacticalMapExtension::Load(IStream *pStm)
 
     new (this) TacticalMapExtension(NoInitClass());
 
-    SWIZZLE_HERE_I_AM(id, this);
+    VINIFERA_SWIZZLE_HERE_I_AM(id, this, "this");
 
 #ifndef NDEBUG
     EXT_DEBUG_INFO("TacticalExt Load: ID 0x%08X Ptr 0x%08X\n", id, this);
