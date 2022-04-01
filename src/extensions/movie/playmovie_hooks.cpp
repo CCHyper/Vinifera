@@ -26,6 +26,8 @@
  *
  ******************************************************************************/
 #include "playmovie_hooks.h"
+#include "vinifera_globals.h"
+#include "vinifera_playmovie.h"
 #include "tibsun_globals.h"
 #include "options.h"
 #include "campaign.h"
@@ -201,11 +203,11 @@ static bool Play_Intro_Movie(CampaignType campaign_id)
                  */
                 if (CCFileClass(filename).Is_Available()) {
                     DEBUG_INFO("About to play %s.\n", filename);
-                    Play_Movie(filename);
+                    Vinifera_Play_Movie(filename);
 
                 } else {
                     DEBUG_INFO("About to play INTRO.VQA.\n");
-                    Play_Movie("INTRO.VQA");
+                    Vinifera_Play_Movie("INTRO.VQA");
                 }
 
                 return true;
@@ -277,18 +279,18 @@ static void Play_Intro_SneakPeak_Movies()
          */
         if (intr0_available) {
             DEBUG_INFO("About to play INTR0.VQA.\n");
-            Play_Movie("INTR0.VQA");
+            Vinifera_Play_Movie("INTR0.VQA");
 
             /**
              *  Also attempt to play the NOD intro, just because its a nice improvement.
              */
             DEBUG_INFO("About to play INTR1.VQA.\n");
-            Play_Movie("INTR1.VQA");
+            Vinifera_Play_Movie("INTR1.VQA");
     
         } else {
         
             DEBUG_INFO("About to play INTRO.VQA.\n");
-            Play_Movie("INTRO.VQA");
+            Vinifera_Play_Movie("INTRO.VQA");
         }
 
         /**
@@ -297,7 +299,7 @@ static void Play_Intro_SneakPeak_Movies()
          */
         VQA_Clear_Option(OPTION_USE_MIX_HANDLER);
         DEBUG_INFO("About to play SIZZLE1.VQA.\n");
-        Play_Movie("SIZZLE1.VQA");
+        Vinifera_Play_Movie("SIZZLE1.VQA");
         VQA_Set_Option(OPTION_USE_MIX_HANDLER);
 
     } else {

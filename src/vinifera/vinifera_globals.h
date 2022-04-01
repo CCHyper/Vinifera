@@ -30,6 +30,7 @@
 #include "always.h"
 #include "vector.h"
 #include "ccfile.h"
+#include "tibsun_defines.h"
 
 
 class EBoltClass;

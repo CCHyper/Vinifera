@@ -38,6 +38,8 @@
 #include "cncnet4_hooks.h"
 #include "cncnet5_hooks.h"
 
+#include "video_hooks.h"
+
 
 void Setup_Hooks()
 {
@@ -50,4 +52,6 @@ void Setup_Hooks()
 
     CnCNet4_Hooks();
     CnCNet5_Hooks();
+
+    Video_Hooks();
 }

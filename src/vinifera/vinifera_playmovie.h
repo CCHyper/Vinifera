@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          WINUTIL.H
+ *  @file          VINIFERA_PLAYMOVIE.H
  *
- *  @author        CCHyper
+ *  @authors       CCHyper
  *
- *  @brief         Utility functions for interacting with the Windows API.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -28,25 +28,7 @@
 #pragma once
 
 #include "always.h"
+#include "tibsun_defines.h"
 
 
-const char *Last_System_Error_As_String();
-void Convert_System_Error_To_String(int id, char *buffer, int buf_len);
-
-const char *Get_Module_File_Name();
-const char *Get_Module_Directory();
-const char *Get_Module_File_Name_Ext();
-
-int Load_String_Ex(HINSTANCE hInstance, UINT uID, LPWSTR lpBuffer, INT nBufferMax, WORD wLanguage);
-int Load_String_Ex(HINSTANCE hInstance, UINT uID, LPCSTR lpBuffer, INT nBufferMax, WORD wLanguage);
-
-DWORD Find_Process_Id(const char *process_name);
-HANDLE Get_Process_By_Name(const char *process_name);
-
-DWORD Get_Process_Main_Thread_Id(DWORD pId);
-HANDLE Get_Thread_Handle(DWORD pId, DWORD dwDesiredAccess);
-HMODULE Get_Module_From_Address(LPVOID address);
-
-HICON LoadIconFromFile(const char *filename, int width = 48, int height = 48);
-
-bool DeleteFilesOlderThan(unsigned days, const char *dir, const char *file);
+void Vinifera_Play_Movie(const char *name, ThemeType theme = THEME_NONE, bool clear_before = true, bool stretch_allowed = true, bool clear_after = true);
