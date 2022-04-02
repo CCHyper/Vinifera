@@ -49,6 +49,10 @@
 #include "extension.h"
 #include "theatertype.h"
 #include "uicontrol.h"
+#include "video_driver.h"
+#include "ddraw_driver.h"
+#include "opengl_driver.h"
+#include "miscutil.h"
 #include "versionhelpers.h"
 #include "shellscalingapi.h"
 #include "debughandler.h"
@@ -437,6 +441,44 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
 
 
 /**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+static bool Vinifera_Init_Video_Driver()
+{
+    static char const * const AUDIO = "Video";
+
+    VideoDriver *driver = nullptr;
+
+    RawFileClass file("VIDEO.INI");
+    INIClass ini;
+    ini.Load(file);
+
+    char driver_buffer[64];
+
+    ini.Get_String(AUDIO, "Driver", "OpenGL", driver_buffer, sizeof(driver_buffer));
+
+    if (std::strcmp(driver_buffer, "DirectDraw") == 0) {
+
+        DEBUG_INFO("Video: Installing DirectDraw video driver.\n");
+
+        driver = new DirectDrawVideoDriver;
+
+    } else if (std::strcmp(driver_buffer, "OpenGL") == 0) {
+
+        DEBUG_INFO("Video: Installing OpenGL video driver.\n");
+
+        driver = new OpenGLVideoDriver;
+    }
+
+    Set_Video_Driver(driver);
+
+    return Video_Driver() != nullptr;
+}
+
+
+/**
  *  This function will get called on application startup, allowing you to
  *  perform any action that would effect the game initialisation process.
  * 
@@ -592,6 +634,14 @@ bool Vinifera_Startup()
     CnCNet4::IsEnabled = false;
     //CnCNet5::IsActive = true; // Enable when new Client system is implemented.
 #endif
+
+    /**
+     *  Install and initialise the requested video driver.
+     */
+    if (!Vinifera_Init_Video_Driver()) {
+        DEBUG_ERROR("Failed to initialise video driver!\n");
+        return false;
+    }
 
     /**
      *  Set the process to be be DPI aware.

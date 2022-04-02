@@ -26,12 +26,12 @@
  *
  ******************************************************************************/
 #include "renderer_hooks.h"
-#include "d7surface_hooks.h"
-#include "ddraw7_hooks.h"
+//#include "d7surface_hooks.h"
+//#include "ddraw7_hooks.h"
 #include "renderer.h"
 #include "tibsun_globals.h"
 #include "tibsun_functions.h"
-#include "d7surface.h"
+//#include "d7surface.h"
 #include "dsurface.h"
 #include "bsurface.h"
 #include "options.h"
@@ -47,7 +47,7 @@
 
 
 
-
+#if 0
 
 
 static XSurface *_Placement_Surface_Constructor_Patch(Surface *surface, int dummy, int width, int height, bool a3)
@@ -874,3 +874,5 @@ void Renderer_Hooks()
     Patch_Call(0x0050AF41, &Renderer::Create_Primary);
     Patch_Call(0x0060141E, &Renderer::Create_Primary);
 }
+
+#endif

@@ -27,7 +27,6 @@
  ******************************************************************************/
 #include "renderer.h"
 #include "tibsun_globals.h"
-#include "ddraw7_support.h"
 #include "bsurface.h"
 #include "options.h"
 #include "ccini.h"
@@ -36,6 +35,9 @@
 #include <chrono>
 #include "debughandler.h"
 #include "asserthandler.h"
+
+
+#if 0
 
 
 bool Borderless_Window = false;
@@ -530,3 +532,6 @@ bool Renderer::Frame_Limiter(bool force_blit)
 
     return false;
 }
+
+
+#endif

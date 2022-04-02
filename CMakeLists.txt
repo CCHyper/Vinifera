@@ -304,6 +304,43 @@ endif()
 
 
 ################################################################################
+# Fetch GLFW
+################################################################################
+message(STATUS "Fetching glfw...")
+FetchContent_Declare(
+	glfw
+	GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+	GIT_REPOSITORY https://github.com/glfw/glfw.git
+	GIT_TAG        origin/master
+)
+
+FetchContent_GetProperties(glfw)
+if(NOT glfw_POPULATED)
+	FetchContent_Populate(glfw)
+	add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+
+################################################################################
+# Fetch GLEW
+################################################################################
+message(STATUS "Downloading glew...")
+set(BUILD_UTILS OFF)
+set(BUILD_SHARED_LIBS OFF)
+FetchContent_Declare(
+	GLEW
+	URL            https://sourceforge.net/projects/glew/files/glew/2.1.0/glew-2.1.0.zip
+	SOURCE_DIR     ${CMAKE_BINARY_DIR}/_deps/glew
+)
+
+FetchContent_GetProperties(glew)
+if(NOT glew_POPULATED)
+	FetchContent_Populate(glew)
+	add_subdirectory(${CMAKE_BINARY_DIR}/_deps/glew/build/cmake)
+endif()
+
+
+################################################################################
 # Embed some git version information in the binary.
 ################################################################################
 message(STATUS "Fetching git repository information.")
@@ -617,6 +654,18 @@ target_link_libraries(${PROJECT_NAME} ${REQUIRED_LIBRARIES})
 
 # Make build check state of git to check for uncommitted changes.
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_check_git)
+
+# Link to the GFLW and GLEW static libraries.
+target_link_libraries(${PROJECT_NAME} glfw)
+add_dependencies(${PROJECT_NAME} glfw)
+
+target_include_directories(${PROJECT_NAME} BEFORE PUBLIC ${CMAKE_BINARY_DIR}/_deps/glew/include)
+target_link_libraries(${PROJECT_NAME} glew_s)
+add_dependencies(${PROJECT_NAME} glew_s)
+
+# forces __cdecl as calling convention for glfw and glew_s.
+target_compile_options(glfw PRIVATE /Gd)
+target_compile_options(glew_s PRIVATE /Gd)
 
 
 ################################################################################

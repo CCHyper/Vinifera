@@ -4,7 +4,7 @@
  *
  *  @project       Vinifera
  *
- *  @file          DDRAW7_HOOKS.H
+ *  @file          DDRAW_RENDERER.H
  *
  *  @author        CCHyper
  *
@@ -27,5 +27,26 @@
  ******************************************************************************/
 #pragma once
 
+#include "always.h"
+#include "video_driver.h"
 
-void DDraw7_Hooks();
+
+class DirectDrawVideoDriver : public VideoDriver
+{
+    public:
+        DirectDrawVideoDriver() : VideoDriver("DirectDraw") {}
+        virtual ~DirectDrawVideoDriver() {}
+
+        virtual bool Create_Window(Wstring window_title, int width, int height, int refresh_rate = 60, bool windowed = false, bool borderless = false) override;
+        virtual void Close_Window(bool force = false) override;
+        virtual void Destroy_Window(bool force = false) override;
+        virtual void Show_Window() override;
+        virtual void Hide_Window() override;
+        virtual void Minimize_Window() override;
+        virtual void Maximize_Window() override;
+        virtual bool Toggle_Fullscreen() override;
+
+    private:
+
+    private:
+};

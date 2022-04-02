@@ -4,7 +4,7 @@
  *
  *  @project       Vinifera
  *
- *  @file          DDRAW7_SUPPORT.H
+ *  @file          RENDERER_SUPPORT.H
  *
  *  @author        CCHyper
  *
@@ -28,33 +28,34 @@
 #pragma once
 
 #include "always.h"
-#include "ddraw7_util.h"
+#include "wstring.h"
 
 
-class XSurface;
-class Rect;
+class VideoDriver
+{
+    public:
+        VideoDriver(Wstring driver_name) : DriverName(driver_name) {}
+        virtual ~VideoDriver() {}
+
+        virtual Wstring &Get_Name() { return DriverName; }
+
+        virtual bool Create_Window(Wstring window_title, int width, int height, int refresh_rate = 60, bool windowed = false, bool borderless = false) = 0;
+        virtual void Close_Window(bool force = false) = 0;
+        virtual void Destroy_Window(bool force = false) = 0;
+        virtual void Show_Window() = 0;
+        virtual void Hide_Window() = 0;
+        virtual void Minimize_Window()  = 0;
+        virtual void Maximize_Window()  = 0;
+        virtual bool Toggle_Fullscreen() = 0;
+
+    private:
+        Wstring DriverName;
+};
 
 
-extern LPDIRECTDRAW7 DirectDraw7Object;
-extern LPDIRECTDRAWSURFACE7 DirectDraw7PrimarySurface;
-extern LPDIRECTDRAWSURFACE7 DirectDraw7BackSurface;
-extern LPDIRECTDRAWCLIPPER DirectDraw7Clipper;
-extern LPDDSURFACEDESC2 VideoSurfaceDescription;
+void __cdecl Set_Video_Driver(VideoDriver *driver);
+void __cdecl Remove_Video_Driver();
 
+VideoDriver * __cdecl Video_Driver();
 
-XSurface *DirectDraw7_Create_Primary(XSurface **backbuffer_surface = nullptr);
-bool DirectDraw7_Allocate_Surfaces(Rect *common_rect, Rect *composite_rect, Rect *tile_rect, Rect *sidebar_rect);
-void DirectDraw7_Release(HWND hWnd);
-void DirectDraw7_Shutdown();
-void DirectDraw7_Reset_Video_Mode();
-bool DirectDraw7_Set_Video_Mode(HWND hWnd, int width, int height, int bits_per_pixel);
-void DirectDraw7_Check_Overlapped_Blit_Capability();
-bool DirectDraw7_Prep(HWND hWnd);
-void DirectDraw7_Wait_Blit();
-void DirectDraw7_Flip(XSurface *surface);
-bool DirectDraw7_Can_Blit();
-bool DirectDraw7_Can_Flip();
-bool DirectDraw7_Is_Surface_Lost();
-void DirectDraw7_Focus_Loss();
-void DirectDraw7_Focus_Restore();
-bool DirectDraw7_Clear_Surface(LPDIRECTDRAWSURFACE7 lpSurface);
+bool Video_Driver_Is_Direct_Draw();

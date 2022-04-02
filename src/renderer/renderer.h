@@ -28,44 +28,29 @@
 #pragma once
 
 #include "always.h"
+#include "wstring.h"
 
 
-class CCINIClass;
-class Rect;
-class XSurface;
-
-
-/**
- *  
- */
-namespace Renderer
+class VideoDriver
 {
+    public:
+        VideoDriver() {}
+        virtual ~VideoDriver() {}
 
-extern bool UseDirectDraw7;
-
-extern int FrameLimit;
-extern bool BorderlessWindow;
-extern bool ClipCursorToWindow;
-
-bool Read_INI(CCINIClass &ini);
-bool Write_INI(CCINIClass &ini);
-
-void __cdecl Shutdown();
-void Reset_Video_Mode();
-bool Set_Video_Mode(HWND hWnd, int width, int height, int bits_per_pixel);
-void Check_Overlapped_Blit_Capability();
-bool Prep_Renderer(HWND hWnd);
-void Release(HWND hWnd);
-void Wait_Blit();
-bool Allocate_Surfaces(Rect *common_rect, Rect *composite_rect, Rect *tile_rect, Rect *sidebar_rect);
-XSurface *Create_Primary(XSurface **backbuffer_surface = nullptr);
-bool Flip(XSurface *surface);
-void Sync_Delay();
-void Focus_Loss();
-void Focus_Restore();
-bool Clear_Screen();
-void Set_Cursor_Clip();
-void Clear_Cursor_Clip();
-bool Frame_Limiter(bool force_blit);
-
+        virtual bool Create_Window(Wstring window_title, int width, int height, bool windowed = false, bool borderless = false) = 0;
+        virtual void Close_Window(bool force = false) = 0;
+        virtual void Destroy_Window(bool force = false) = 0;
+        virtual void Show_Window() = 0;
+        virtual void Hide_Window() = 0;
+        virtual void Minimize_Window()  = 0;
+        virtual void Maximize_Window()  = 0;
+        virtual bool Toggle_Fullscreen() = 0;
 };
+
+
+void __cdecl Set_Video_Driver(VideoDriver *driver);
+void __cdecl Remove_Video_Driver();
+
+VideoDriver * __cdecl Video_Driver();
+
+bool Video_Driver_Is_Direct_Draw();

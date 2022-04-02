@@ -40,9 +40,9 @@
 #include "theme.h"
 #include "dsaudio.h"
 #include "optionsext.h"
-#include "renderer.h"
 #include "resource.h"
 #include "tspp_gitinfo.h"
+#include "video_driver.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <Windows.h>
@@ -52,93 +52,6 @@
 
 
 extern HMODULE DLLInstance;
-
-
-/**
- *  Tiberian Sun resource constants.
- */
-#define TS_MAINICON		    93
-#define TS_MAINCURSOR		104
-
-
-
-#define MONITOR_CENTER     0x0001        // center rect to monitor 
-#define MONITOR_CLIP       0x0000        // clip rect to monitor 
-#define MONITOR_WORKAREA   0x0002        // use monitor work area 
-#define MONITOR_AREA       0x0000        // use monitor entire area 
-
-
-/**
- *  The most common problem apps have when running on a multimonitor system is
- *  that they "clip" or "pin" windows based on the SM_CXSCREEN and SM_CYSCREEN 
- *  system metrics. Because of app compatibility reasons these system metrics 
- *  return the size of the primary monitor.
- * 
- *  This shows how you use the multi-monitor functions to do the same thing.
- *  
- *  Based on Windows sample code:
- *  https://docs.microsoft.com/en-us/windows/win32/gdi/positioning-objects-on-a-multiple-display-setup
- */
-static void ClipOrCenterRectToMonitor(LPRECT prc, UINT flags)
-{
-    HMONITOR hMonitor;
-    MONITORINFO mi;
-    RECT rc;
-    int w = prc->right  - prc->left;
-    int h = prc->bottom - prc->top;
-
-    // 
-    // get the nearest monitor to the passed rect. 
-    // 
-    hMonitor = MonitorFromRect(prc, MONITOR_DEFAULTTONEAREST);
-
-    // 
-    // get the work area or entire monitor rect. 
-    // 
-    mi.cbSize = sizeof(mi);
-    GetMonitorInfo(hMonitor, &mi);
-
-    if (flags & MONITOR_WORKAREA) {
-        rc = mi.rcWork;
-    } else {
-        rc = mi.rcMonitor;
-    }
-
-    // 
-    // center or clip the passed rect to the monitor rect 
-    // 
-    if (flags & MONITOR_CENTER) {
-        prc->left = rc.left + (rc.right  - rc.left - w) / 2;
-        prc->top = rc.top  + (rc.bottom - rc.top  - h) / 2;
-        prc->right = prc->left + w;
-        prc->bottom = prc->top  + h;
-
-    } else {
-        prc->left = std::max(rc.left, std::min(rc.right-w,  prc->left));
-        prc->top = std::max(rc.top, std::min(rc.bottom-h, prc->top));
-        prc->right = prc->left + w;
-        prc->bottom = prc->top  + h;
-    }
-}
-
-static void ClipOrCenterWindowToMonitor(HWND hwnd, UINT flags)
-{
-    RECT rc;
-    GetWindowRect(hwnd, &rc);
-    ClipOrCenterRectToMonitor(&rc, flags);
-    SetWindowPos(hwnd, NULL, rc.left, rc.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
-}
-
-
-static void Get_Windows_Version()
-{
-     OSVERSIONINFOEX info;
-     ZeroMemory(&info, sizeof(OSVERSIONINFOEX));
-     info.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-     GetVersionEx((LPOSVERSIONINFO)&info);//info requires typecasting
-
-     printf("Windows version: %u.%u\n", info.dwMajorVersion, info.dwMinorVersion);
-}
 
 
 /**
@@ -152,201 +65,17 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
 
     MainWindow = nullptr;
 
-    HWND hWnd = nullptr;
-    BOOL rc;
-    WNDCLASSEX wc;
-    tagRECT rect;
-    HICON hIcon = nullptr;
-    HICON hSmIcon = nullptr;
-    HCURSOR hCursor = nullptr;
-
-    //DEV_DEBUG_INFO("Create_Main_Window() - About to call InitCommonControls()\n");
-
-    InitCommonControls();
-
-    //DEV_DEBUG_INFO("Create_Main_Window() - Preparing window name (with version info).\n");
-
     DWORD dwPid = GetProcessId(GetCurrentProcess());
     if (!dwPid) {
         DEBUG_ERROR("Create_Main_Window() - Failed to get the process id!\n");
         return;
     }
 
-    //DEV_DEBUG_INFO("Create_Main_Window() - Loading icon and cursor resources.\n");
-
-    /**
-     *  Load the Vinifera icon and cursor resources, falling back to the GAME.EXE
-     *  resources if not available or failed to load.
-     */
-    if (Vinifera_IconName[0] != '\0') {
-        DEBUG_INFO("Loading custom icon \"%s\"\n", Vinifera_IconName);
-        hIcon = (HICON)LoadImage(
-            nullptr,
-            Vinifera_IconName,
-            IMAGE_ICON,
-            0,
-            0,
-            LR_LOADFROMFILE);
-        DEBUG_INFO("Loading custom small icon \"%s\"\n", Vinifera_IconName);
-        hSmIcon = (HICON)LoadImage(
-            nullptr,
-            Vinifera_IconName,
-            IMAGE_ICON,
-            GetSystemMetrics(SM_CXSMICON),
-            GetSystemMetrics(SM_CXSMICON),
-            LR_LOADFROMFILE);
-    }
-    if (!hIcon) {
-        hIcon = LoadIcon((HINSTANCE)DLLInstance, MAKEINTRESOURCE(VINIFERA_MAINICON));
-        if (!hIcon) {
-            hIcon = LoadIcon((HINSTANCE)hInstance, MAKEINTRESOURCE(TS_MAINICON));
-        }
-    }
-    if (Vinifera_CursorName[0] != '\0') {
-        DEBUG_INFO("Loading custom cursor \"%s\"\n", Vinifera_CursorName);
-        hCursor = LoadCursorFromFile(Vinifera_CursorName);
-    }
-    if (!hCursor) {
-        hCursor = LoadCursor(nullptr, VINIFERA_MAINCURSOR); // IDC_ARROW is a system resource, does not require module.
-        if (!hCursor) {
-            hCursor = LoadCursor((HINSTANCE)hInstance, MAKEINTRESOURCE(TS_MAINCURSOR));
-        }
-    }
-
-    //DEV_DEBUG_INFO("Create_Main_Window() - Setting up window class info.\n");
-
-    /**
-     *  Register the window class.
-     */
-    wc.cbSize         = sizeof(WNDCLASSEX);
-    wc.style          = CS_HREDRAW|CS_VREDRAW;
-    wc.lpfnWndProc    = Main_Window_Procedure;
-    wc.cbClsExtra     = 0;
-    wc.cbWndExtra     = 0;
-    wc.hInstance      = (HINSTANCE)hInstance;
-    wc.hIcon          = hIcon;
-    wc.hCursor        = hCursor;
-    wc.hbrBackground  = CreateSolidBrush(RGB(0,0,0));
-    wc.lpszMenuName   = nullptr;
-    wc.lpszClassName  = "Vinifera";
-    wc.hIconSm        = (hSmIcon ? hSmIcon : hIcon);
-
-    //DEV_DEBUG_INFO("Create_Main_Window() - About to call RegisterClass()\n");
-
-    /**
-     *  Register window class.
-     */
-    rc = RegisterClassEx(&wc);
-    if (!rc) {
-        DEBUG_INFO("Create_Main_Window() - Failed to register window class!\n");
+    if (!Video_Driver()->Create_Window(Vinifera_Get_Window_Title(dwPid), width, height, 60, Debug_Windowed, false)) {
         return;
     }
-
-    /**
-     *  Get the dimensions of the primary display.
-     */
-    int display_width = GetSystemMetrics(SM_CXSCREEN);
-    int display_height = GetSystemMetrics(SM_CYSCREEN);
-
-    //DEV_DEBUG_INFO("Create_Main_Window() - Desktop size %d x %d\n", display_width, display_height);
-
-    /**
-     *  Create our main window.
-     */
-    if (Debug_Windowed) {
-
-        DEBUG_INFO("Create_Main_Window() - Creating desktop window (%d x %d).\n", width, height);
-
-        bool borderless = false;
-        if (OptionsExtension) {
-//            borderless = OptionsExtension->BorderlessWindow;
-        }
-        
-        hWnd = CreateWindowEx(
-            WS_EX_LEFT/*|WS_EX_TOPMOST*/,   // Removed: Causes focus issues when debugging with MSVC.
-            "Vinifera",
-            Vinifera_Get_Window_Title(dwPid),
-            borderless ? WS_POPUP : WS_SYSMENU|WS_MINIMIZEBOX|WS_CLIPCHILDREN|WS_CAPTION,
-            0, 0, 0, 0,
-            nullptr,
-            nullptr,
-            (HINSTANCE)hInstance,
-            nullptr);
-
-        SetRect(&rect, 0, 0, width, height);
-
-        AdjustWindowRectEx(&rect,
-            GetWindowLong(hWnd, GWL_STYLE),
-            GetMenu(hWnd) != nullptr,
-            GetWindowLong(hWnd, GWL_EXSTYLE));
-
-        /**
-         *  #BUGFIX:
-         * 
-         *  Fetch the desktop size, calculate the screen center position the window and move it.
-         */
-        RECT workarea;
-        SystemParametersInfo(SPI_GETWORKAREA, 0, &workarea, 0);
-
-        int x_pos = (display_width - width) / 2;
-        int y_pos = (((display_height - height) / 2) - (display_height - workarea.bottom));
-        
-        DEBUG_INFO("Create_Main_Window() - Moving window (%d,%d,%d,%d).\n",
-            x_pos, y_pos, (rect.right - rect.left), (rect.bottom - rect.top));
-
-        MoveWindow(hWnd, x_pos, y_pos, (rect.right - rect.left), (rect.bottom - rect.top), TRUE);
-
-    } else {
-
-        DEBUG_INFO("Create_Main_Window() - Creating fullscreen window.\n");
-
-        hWnd = CreateWindowEx(
-            WS_EX_LEFT|WS_EX_TOPMOST,
-            "Vinifera",
-            Vinifera_Get_Window_Title(dwPid),
-            WS_POPUP|WS_CLIPCHILDREN,
-            0, 0,
-            display_width,
-            display_height,
-            nullptr,
-            nullptr,
-            (HINSTANCE)hInstance,
-            nullptr);
-    }
-
-    if (!hWnd) {
-        DEBUG_INFO("Create_Main_Window() - Failed to create window!\n");
-        return;
-    }
-
-    //DEV_DEBUG_INFO("Create_Main_Window() - About to call ShowWindow()\n");
-
-    ShowWindow(hWnd, SW_SHOWNORMAL);
-    ShowCommand = nCmdShow;
-
-    //DEV_DEBUG_INFO("Create_Main_Window() - About to call UpdateWindow()\n");
-
-    UpdateWindow(hWnd);
-
-    //DEV_DEBUG_INFO("Create_Main_Window() - About to call SetFocus()\n");
-
-    SetFocus(hWnd);
-
-    //DEV_DEBUG_INFO("Create_Main_Window() - About to call RegisterHotKey()\n");
-
-    RegisterHotKey(hWnd, 1, MOD_ALT|MOD_CONTROL|MOD_SHIFT, VK_M);
-
-    //DEV_DEBUG_INFO("Create_Main_Window() - About to call SetCursor()\n");
-
-    SetCursor(hCursor);
 
     Audio.AudioFocusLossFunction = &Focus_Loss;
-
-    /**
-     *  Save the handle to our main window.
-     */
-    MainWindow = hWnd;
-    ProgramInstance = hInstance;
 
     /**
      *  #NOTE:
@@ -359,7 +88,7 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
     /**
      *  Set initial cursor clip.
      */
-    Renderer::Set_Cursor_Clip();
+    //Set_Cursor_Clip();
 
     //DEV_DEBUG_INFO("Create_Main_Window(exit)\n");
 }
