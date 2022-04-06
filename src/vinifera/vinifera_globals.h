@@ -51,6 +51,12 @@ extern char Vinifera_ProjectVersion[64];
 extern char Vinifera_IconName[64];
 extern char Vinifera_CursorName[64];
 
+extern char Vinifera_MusicPath_EnvVar[PATH_MAX];
+extern char Vinifera_MusicPath[PATH_MAX];
+
+extern char Vinifera_SoundsPath_EnvVar[PATH_MAX];
+extern char Vinifera_SoundsPath[PATH_MAX];
+
 
 /**
  *  Defines and constants.
