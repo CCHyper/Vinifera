@@ -33,6 +33,7 @@
 
 
 class EBoltClass;
+class PixelFXClass;
 class TheaterTypeClass;
 
 
@@ -92,6 +93,7 @@ extern MFCC *IsoGenericMix;
  *  Global vectors and heaps.
  */
 extern DynamicVectorClass<EBoltClass *> EBolts;
+extern DynamicVectorClass<PixelFXClass *> PixelEffects;
 extern DynamicVectorClass<TheaterTypeClass *> TheaterTypes;
 
 

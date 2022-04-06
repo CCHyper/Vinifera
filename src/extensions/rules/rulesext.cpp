@@ -30,6 +30,8 @@
 #include "rules.h"
 #include "tiberium.h"
 #include "weapontype.h"
+#include "pixelfx.h"
+#include "rgb.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -336,6 +338,39 @@ bool RulesClassExtension::MPlayer(CCINIClass &ini)
     IsMPAutoDeployMCV = ini.Get_Bool(MPLAYER, "AutoDeployMCV", IsMPAutoDeployMCV);
     IsMPPrePlacedConYards = ini.Get_Bool(MPLAYER, "PrePlacedConYards", IsMPPrePlacedConYards);
     IsBuildOffAlly = ini.Get_Bool(MPLAYER, "BuildOffAlly", IsBuildOffAlly);
+
+    return true;
+}
+
+
+/**
+ *  Process the audio and visual control rules.
+ *  
+ *  @author: CCHyper
+ */
+bool RulesClassExtension::AudioVisual(CCINIClass &ini)
+{
+    static char const * const AUDIOVISUAL = "AudioVisual";
+
+    if (!ini.Is_Present(AUDIOVISUAL)) {
+        return false;
+    }
+
+    RGBClass water_min;
+    RGBClass water_max;
+    PixelFXClass::Get_Type_Colors(FX_WATER, water_min, water_max);
+    water_min = ini.Get_RGB(AUDIOVISUAL, "WaterPixelFXColorMin", water_min);
+    water_max = ini.Get_RGB(AUDIOVISUAL, "WaterPixelFXColorMax", water_max);
+
+    PixelFXClass::Set_Type_Colors(FX_WATER, water_min, water_max);
+
+    RGBClass tib_min;
+    RGBClass tib_max;
+    PixelFXClass::Get_Type_Colors(FX_TIBERIUM, tib_min, tib_max);
+    tib_min = ini.Get_RGB(AUDIOVISUAL, "TiberiumPixelFXColorMin", tib_min);
+    tib_max = ini.Get_RGB(AUDIOVISUAL, "TiberiumPixelFXColorMax", tib_max);
+
+    PixelFXClass::Set_Type_Colors(FX_TIBERIUM, tib_min, tib_max);
 
     return true;
 }

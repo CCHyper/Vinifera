@@ -47,6 +47,10 @@
 #include "supertypeext.h"
 #include "rules.h"
 #include "rulesext.h"
+#include "pixelfx.h"
+#include "tiberium.h"
+#include "cell.h"
+#include "iomap.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -537,6 +541,11 @@ void TacticalMapExtension::Render_Post()
     /**
      *  Draw any new post effects here.
      */
+    // TODO: needs to go in Render_Overlay?
+    //DEV_DEBUG_INFO("Before PixelFXClass::Draw_All\n");
+    PixelFXClass::Draw_All();
+    //DEV_DEBUG_INFO("After PixelFXClass::Draw_All\n");
+
     //DEV_DEBUG_INFO("Before EBoltClass::Draw_All\n");
     EBoltClass::Draw_All();
     //DEV_DEBUG_INFO("After EBoltClass::Draw_All\n");
