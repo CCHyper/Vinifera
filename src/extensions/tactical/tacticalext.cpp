@@ -45,6 +45,8 @@
 #include "superext.h"
 #include "supertype.h"
 #include "supertypeext.h"
+#include "buildingtype.h"
+#include "buildingtypeext.h"
 #include "rules.h"
 #include "rulesext.h"
 #include "asserthandler.h"
@@ -724,5 +726,29 @@ void TacticalMapExtension::Draw_Super_Timers()
             );
         }
 
+    }
+}
+
+
+/**
+ *  Draws super weapon timers to the tactical screen.
+ * 
+ *  @authors: CCHyper
+ */
+void TacticalMapExtension::Draw_Radial_Indicators()
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("TacticalMapExtension::Draw_Super_Timers - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    /**
+     *  Iterate over all currently selected objects and draw their radial indicators.
+     */
+    for (int i = 0; i < CurrentObjects.Count(); ++i) {
+        ObjectClass *objptr = CurrentObjects[i];
+        if (objptr->Has_Class()) {
+            if (objptr->Class_Of()->IsHasRadialIndicator) {
+                objptr->Draw_Radial_Indicator();
+            }
+        }
     }
 }

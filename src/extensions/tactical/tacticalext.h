@@ -69,6 +69,7 @@ class TacticalMapExtension final : public Extension<Tactical>
 
         void Draw_Information_Text();
         void Draw_Super_Timers();
+        void Draw_Radial_Indicators();
 
         void Render_Post();
 

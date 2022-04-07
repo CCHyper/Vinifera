@@ -354,6 +354,28 @@ original_code:
 
 
 /**
+ *  This patch removes a inline copy of Draw_Radial_Indicators.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Tactical_Render_Inlined_Draw_Radial_Indicators_Patch)
+{
+    GET_REGISTER_STATIC(Tactical *, this_ptr, ebp);
+    
+    if (TacticalExtension) {
+        TacticalExtension->Draw_Radial_Indicators();
+    } else {
+        /**
+         *  Call the original function.
+         */
+        this_ptr->Draw_Radial_Indicators();
+    }
+
+    JMP(0x00611B48);
+}
+
+
+/**
  *  Main function for patching the hooks.
  */
 void TacticalExtension_Hooks()
@@ -365,6 +387,7 @@ void TacticalExtension_Hooks()
 
     Patch_Jump(0x00611AF9, &_Tactical_Render_Post_Effects_Patch);
     Patch_Jump(0x00611BCB, &_Tactical_Render_Overlay_Patch);
+    Patch_Jump(0x00611AFE, &_Tactical_Render_Inlined_Draw_Radial_Indicators_Patch);
 
     Patch_Jump(0x00616E9A, &_Tactical_Draw_Rally_Points_NormaliseLineAnimation_Patch);
     Patch_Jump(0x006172DB, &_Tactical_Draw_Waypoint_Paths_NormaliseLineAnimation_Patch);
