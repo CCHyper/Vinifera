@@ -941,7 +941,7 @@ void TacticalMapExtension::Draw_Radial_Indicators()
  * 
  *  @authors: CCHyper
  */
-void Tactical_Draw_Radial(Coordinate center_coord, RGBClass color, float radius, bool draw_indicator, bool animate, bool concentric, bool round)
+void Tactical_Draw_Radial(Coordinate center_coord, RGBClass color, float radius, bool draw_indicator, bool animate, bool concentric, bool round, bool red_channel, bool green_channel, bool blue_channel)
 {
     if (round) {
         radius = WWMath::Round(radius);
@@ -1070,9 +1070,9 @@ void Tactical_Draw_Radial(Coordinate center_coord, RGBClass color, float radius,
                                         -500,
                                         -500,
                                         false,
-                                        enable_red_channel,
-                                        enable_green_channel,
-                                        enable_blue_channel,
+                                        red_channel,
+                                        green_channel,
+                                        blue_channel,
                                         _line_alpha[i]);
 
     }

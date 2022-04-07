@@ -209,7 +209,21 @@ void BuildingClassExtension::Draw_Radial_Indicator() const
             return;
         }
 
-        Tactical_Draw_Radial(ThisPtr->Center_Coord(), ThisPtr->Class->RadialColor, float(range), true, true, false, true);
+        bool enable_red_channel = true;
+        bool enable_green_channel = true;
+        bool enable_blue_channel = true;
+
+        if (buildingtypeext) {
+            enable_red_channel = !buildingtypeext->IsRadialIndicaterDisableRedChannel;
+            enable_green_channel = !buildingtypeext->IsRadialIndicaterDisableGreenChannel;
+            enable_blue_channel = !buildingtypeext->IsRadialIndicaterDisableBlueChannel;
+        }
+
+        Tactical_Draw_Radial(ThisPtr->Center_Coord(), ThisPtr->Class->RadialColor, float(range), true, true, false, true,
+                            enable_red_channel,
+                            enable_green_channel,
+                            enable_blue_channel
+                        );
     }
 }
 

@@ -101,6 +101,13 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
          *  
          */
         bool IsShowRangeIndicator;
+        
+        /**
+         *  
+         */
+        bool IsRadialIndicaterDisableRedChannel;
+        bool IsRadialIndicaterDisableGreenChannel;
+        bool IsRadialIndicaterDisableBlueChannel;
 };
 
 

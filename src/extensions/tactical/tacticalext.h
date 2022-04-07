@@ -124,4 +124,4 @@ class TacticalMapExtension final : public Extension<Tactical>
 extern TacticalMapExtension *TacticalExtension;
 
 
-void Tactical_Draw_Radial(Coordinate center_coord, RGBClass color, float radius, bool draw_indicator = false, bool animate = false, bool concentric = false, bool round = true);
+void Tactical_Draw_Radial(Coordinate center_coord, RGBClass color, float radius, bool draw_indicator = false, bool animate = false, bool concentric = false, bool round = true, bool red_channel = true, bool green_channel = true, bool blue_channel = true);
