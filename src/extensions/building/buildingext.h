@@ -52,6 +52,12 @@ class BuildingClassExtension final : public Extension<BuildingClass>
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
+        void Draw_Radial_Indicator() const;
+        void Draw_Weapon_Range_Indicator() const;
+
+        int Get_Radial_Indicator_Range() const;
+        int Get_Weapon_Indicator_Range() const;
+
     public:
         /**
          *  #issue-26

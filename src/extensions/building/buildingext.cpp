@@ -27,6 +27,13 @@
  ******************************************************************************/
 #include "buildingext.h"
 #include "building.h"
+#include "buildingtype.h"
+#include "buildingtypeext.h"
+#include "weapontype.h"
+#include "tibsun_inline.h"
+#include "house.h"
+#include "housetype.h"
+#include "tacticalext.h"
 #include "wwcrc.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -172,4 +179,110 @@ void BuildingClassExtension::Compute_CRC(WWCRCEngine &crc) const
      *  Members for the Produce Cash logic.
      */
     crc(ProduceCashTimer());
+}
+
+
+/**
+ *  x
+ *  
+ *  @author: CCHyper
+ */
+void BuildingClassExtension::Draw_Radial_Indicator() const
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("BuildingClassExtension::Draw_Radial_Indicator - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    BuildingTypeClassExtension *buildingtypeext = BuildingTypeClassExtensions.find(ThisPtr->Class);
+
+    if (!ThisPtr->House->Is_Player_Control()) {
+        return;
+    }
+
+    int range = Get_Radial_Indicator_Range();
+    if (!range) {
+        return;
+    }
+
+    if (ThisPtr->Class->IsSensorArray || ThisPtr->Class->IsCloakGenerator) {
+
+        if (!ThisPtr->IsPowerOn) {
+            return;
+        }
+
+        Tactical_Draw_Radial(ThisPtr->Center_Coord(), ThisPtr->Class->RadialColor, float(range), true, true, false, true);
+    }
+}
+
+
+/**
+ *  x
+ *  
+ *  @author: CCHyper
+ */
+void BuildingClassExtension::Draw_Weapon_Range_Indicator() const
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("BuildingClassExtension::Draw_Weapon_Range_Indicator - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    BuildingTypeClassExtension *buildingtypeext = BuildingTypeClassExtensions.find(ThisPtr->Class);
+
+    if (!ThisPtr->House->Is_Player_Control()) {
+        return;
+    }
+
+    int range = Get_Weapon_Indicator_Range();
+    if (!range) {
+        return;
+    }
+
+    if (buildingtypeext && buildingtypeext->IsShowRangeIndicator) {
+        Tactical_Draw_Radial(ThisPtr->Center_Coord(), ThisPtr->House->RemapColorRGB, float(range), false, true, false, true);
+    }
+}
+
+
+/**
+ *  x
+ *  
+ *  @author: CCHyper
+ */
+int BuildingClassExtension::Get_Radial_Indicator_Range() const
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("BuildingClassExtension::Get_Radial_Indicator_Range - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    int range = 0;
+
+    if (ThisPtr->Class->IsSensorArray || ThisPtr->Class->IsCloakGenerator) {
+        range = ThisPtr->Class->CloakRadiusInCells;
+    }
+
+    return range;
+}
+
+
+/**
+ *  x
+ *  
+ *  @author: CCHyper
+ */
+int BuildingClassExtension::Get_Weapon_Indicator_Range() const
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("BuildingClassExtension::Get_Weapon_Indicator_Range - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    int range = 0;
+
+    BuildingTypeClassExtension *buildingtypeext = BuildingTypeClassExtensions.find(ThisPtr->Class);
+    if (buildingtypeext) {
+        
+        WeaponInfoStruct *winfo = ThisPtr->Get_Weapon(WEAPON_SLOT_PRIMARY);
+        ASSERT(winfo != nullptr);
+        if (winfo->Weapon && winfo->Weapon->Range > 0) {
+            range = winfo->Weapon->Range / 256;
+        }
+
+    }
+
+    return range;
 }

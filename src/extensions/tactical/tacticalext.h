@@ -122,3 +122,6 @@ class TacticalMapExtension final : public Extension<Tactical>
  *  Global instance of the extended class.
  */
 extern TacticalMapExtension *TacticalExtension;
+
+
+void Tactical_Draw_Radial(Coordinate center_coord, RGBClass color, float radius, bool draw_indicator = false, bool animate = false, bool concentric = false, bool round = true);

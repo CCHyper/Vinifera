@@ -96,6 +96,11 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
          *  Is this building eligible for proximity checks by players who are its owner's allies?
          */
         bool IsEligibleForAllyBuilding;
+
+        /**
+         *  
+         */
+        bool IsShowRangeIndicator;
 };
 
 

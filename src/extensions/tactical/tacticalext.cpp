@@ -30,12 +30,15 @@
 #include "wwcrc.h"
 #include "vinifera_globals.h"
 #include "tibsun_globals.h"
+#include "tibsun_inline.h"
 #include "colorscheme.h"
 #include "rgb.h"
 #include "wwfont.h"
 #include "foot.h"
 #include "unit.h"
 #include "unittype.h"
+#include "building.h"
+#include "buildingtype.h"
 #include "session.h"
 #include "scenario.h"
 #include "ebolt.h"
@@ -45,12 +48,20 @@
 #include "superext.h"
 #include "supertype.h"
 #include "supertypeext.h"
+#include "building.h"
+#include "buildingext.h"
 #include "buildingtype.h"
 #include "buildingtypeext.h"
 #include "rules.h"
 #include "rulesext.h"
+#include "options.h"
+#include "iomap.h"
+#include "wwmouse.h"
+#include "wwmath.h"
 #include "asserthandler.h"
 #include "debughandler.h"
+#include <algorithm>
+#include <functional>
 
 
 TacticalMapExtension *TacticalExtension = nullptr;
@@ -741,14 +752,329 @@ void TacticalMapExtension::Draw_Radial_Indicators()
     //EXT_DEBUG_TRACE("TacticalMapExtension::Draw_Super_Timers - 0x%08X\n", (uintptr_t)(ThisPtr));
 
     /**
-     *  Iterate over all currently selected objects and draw their radial indicators.
+     *  Iterate over all currently selected objects and draw their radial indicators/ranges.
      */
-    for (int i = 0; i < CurrentObjects.Count(); ++i) {
-        ObjectClass *objptr = CurrentObjects[i];
-        if (objptr->Has_Class()) {
+    if (!CurrentObjects.Empty()) {
+
+        for (int i = 0; i < CurrentObjects.Count(); ++i) {
+            ObjectClass *objptr = CurrentObjects[i];
+
             if (objptr->Class_Of()->IsHasRadialIndicator) {
                 objptr->Draw_Radial_Indicator();
+
+            } else if (objptr->What_Am_I() == RTTI_BUILDING) {
+
+                BuildingClass *bptr = reinterpret_cast<BuildingClass *>(objptr);
+                BuildingClassExtension *buildingext = BuildingClassExtensions.find(bptr);
+                BuildingTypeClassExtension *buildingtypeext = BuildingTypeClassExtensions.find(bptr->Class);
+
+                if ((buildingext && buildingtypeext) && buildingtypeext->IsShowRangeIndicator) {
+                    buildingext->Draw_Weapon_Range_Indicator();
+                }
+
             }
+
         }
+
+        // bugfix?
+        return;
     }
+
+    /**
+     *  
+     */
+    if (!Options.ActionLines) {
+        return;
+    }
+
+    /**
+     *  #BUGFIX:
+     * 
+     *  Find out where the mouse cursor is, if its over the sidebar
+     *  then skip the radial drawing. This bug is also in Red Alert 2.
+     */
+    if (WWMouse->Get_Mouse_X() >= (TacticalRect.Width-1)) {
+        return;
+    }
+    
+    /**
+     *  Only draw the radial indicators for the building we are currently placing.
+     */
+    if (!Map.PendingObjectPtr || Map.PendingObjectPtr->What_Am_I() != RTTI_BUILDING) {
+        return;
+    }
+
+    BuildingClass *pending_building = reinterpret_cast<BuildingClass *>(Map.PendingObjectPtr);
+    BuildingTypeClass *pending_buildingtype = reinterpret_cast<BuildingTypeClass *>(Map.PendingObject);
+    
+    BuildingClassExtension *pending_buildingext = BuildingClassExtensions.find(pending_building);
+    BuildingTypeClassExtension *pending_buildingtypeext = BuildingTypeClassExtensions.find(pending_buildingtype);
+    if (!pending_buildingext || !pending_buildingtypeext) {
+        return;
+    }
+
+    /**
+     *  
+     */
+    int radial_range = 0;
+
+    if (pending_buildingtype->IsHasRadialIndicator) {
+        radial_range = pending_buildingext->Get_Radial_Indicator_Range();
+
+    } else if (pending_buildingtypeext->IsShowRangeIndicator) {
+        radial_range = pending_buildingext->Get_Weapon_Indicator_Range();
+    }
+
+    if (!radial_range) {
+        return;
+    }
+
+    CellClass *cell = &Map[Map.ZoneCell];
+    Coordinate cell_coord = cell->Cell_Coord();
+
+    RGBClass color = pending_building->House->RemapColorRGB;
+
+    static CDTimerClass<MSTimerClass> _timer(5000);
+    static bool _flip = false;
+
+    if (_timer.Expired()) {
+        _timer = 5000;
+        _flip = !_flip;
+    }
+
+    int val = _timer.Value();
+    if (_flip) {
+        val = -val;
+    }
+
+    color.Adjust(val, RGBClass(0,0,0));
+
+    /**
+     *  Draw the radial for the building that is pending placement.
+     */
+    Tactical_Draw_Radial(cell_coord, color, float(radial_range), false, true, false, true);
+
+    /**
+     *  The closest distance of a building of the same class.
+     */
+    int closest = 0x7FFFFFFF;
+    
+    /**
+     *  Find the closest building(s) of the same type and fetch its distance.
+     */
+    for (int i = 0; i < Buildings.Count(); ++i) {
+        
+        BuildingClass *bptr = Buildings[i];
+
+        if (bptr == pending_building) {
+            continue;
+        }
+    
+        if (bptr->Class != pending_building->Class) {
+            continue;
+        }
+    
+        if (!bptr->IsActive) {
+            continue;
+        }
+    
+        if (!bptr->House->Is_Player()) {
+            continue;
+        }
+        
+        int dist = Distance(Map.ZoneCell, Coord_Cell(bptr->Center_Coord()));
+        if (dist <= (radial_range * 2) && dist < closest) {
+            closest = dist;
+        }
+
+    }
+
+    /**
+     *  Nothing found, bail out.
+     */
+    if (closest == 0x7FFFFFFF) {
+        return;
+    }
+
+    /**
+     *  Draw the range radial for *all* buildings of the same type that fall
+     *  within this distance.
+     */
+    for (int j = 0; j < Buildings.Count(); ++j) {
+    
+        BuildingClass *bptr = Buildings[j];
+
+        if (bptr == pending_building) {
+            continue;
+        }
+    
+        if (bptr->Class != pending_building->Class) {
+            continue;
+        }
+    
+        if (!bptr->IsActive) {
+            continue;
+        }
+    
+        if (!bptr->House->Is_Player()) {
+            continue;
+        }
+    
+        int dist = Distance(Map.ZoneCell, Coord_Cell(bptr->Center_Coord()));
+        if (dist <= closest) {
+            if (pending_buildingtype->IsHasRadialIndicator) {
+                bptr->Draw_Radial_Indicator();
+
+            } else if (pending_buildingtypeext->IsShowRangeIndicator) {
+                pending_buildingext->Draw_Weapon_Range_Indicator();
+            }
+
+        }
+    
+    }
+
+}
+
+
+/**
+ *  Draw a radial to the screen.
+ * 
+ *  @authors: CCHyper
+ */
+void Tactical_Draw_Radial(Coordinate center_coord, RGBClass color, float radius, bool draw_indicator, bool animate, bool concentric, bool round)
+{
+    if (round) {
+        radius = WWMath::Round(radius);
+    }
+
+    int size;
+
+    if (concentric) {
+        size = (int)radius;
+    } else {
+        size = (int)((radius + 0.5) / WWMath::Sqrt(2.0) * double(CELL_PIXEL_W)); // should be cell size global?
+    }
+
+    Point2D center_pixel;
+    TacticalMap->Coord_To_Pixel(center_coord, center_pixel);
+
+    center_pixel.X += TacticalRect.X;
+    center_pixel.Y += TacticalRect.Y;
+
+    Rect draw_area(
+        center_pixel.Y - size / 2,
+        center_pixel.X - size,
+        size * 2,
+        size
+    );
+
+    Rect intersect = draw_area.Intersect_With(TacticalRect);
+    if (!intersect.Is_Valid()) {
+        return;
+    }
+
+    RGBClass draw_color = color;
+
+    if (animate) {
+        draw_color.Adjust(50, RGBClass(0,0,0)); 
+    }
+
+    unsigned ellipse_color = DSurface::RGB_To_Pixel(draw_color.Red, draw_color.Green, draw_color.Blue);
+
+    /**
+     *  Draw the main radial ellipse, then draw one slightly smaller to give a thicker impression.
+     */
+    TempSurface->Draw_Ellipse(center_pixel, size, size / 2, TacticalRect, ellipse_color);
+    TempSurface->Draw_Ellipse(center_pixel, size - 1, size / 2 - 1, TacticalRect, ellipse_color);
+
+    /**
+     *  Draw the sweeping indicator line.
+     */
+    if (!draw_indicator) {
+        return;
+    }
+
+    double d_size = (double)size;
+    double size_half = (double)size / 2;
+
+    /**
+     *  The alpha values for the lines (producing the fall-off effect).
+     */
+    static const double _line_alpha[] = {
+        //0.05, 0.20, 0.40, 1.0                     // original values.
+        0.05, 0.10, 0.20, 0.40, 0.60, 0.80, 1.0     // new values.
+    };
+
+    static const int _rate = 50;
+
+    for (int i = 0; i < ARRAY_SIZE(_line_alpha); ++i) {
+
+        static int _offset = 0;
+        static CDTimerClass<MSTimerClass> sweep_rate(_rate);
+
+        if (sweep_rate.Expired()) {
+            sweep_rate = _rate;
+            ++_offset;
+        }
+
+        float angle_offset = (_offset + i) * 0.05;
+        int angle_increment = angle_offset / DEG_TO_RADF(360);
+        float angle = angle_offset - (angle_increment * DEG_TO_RADF(360)); 
+
+        Point2D line_start;
+        Point2D line_end;
+
+        if (WWMath::Fabs(angle - DEG_TO_RADF(90)) < 0.001) {
+
+            line_start = center_pixel;
+            line_end = Point2D(center_pixel.X, center_pixel.Y + (-size_half));
+
+        } else if (WWMath::Fabs(angle - DEG_TO_RADF(270)) < 0.001) {
+
+            line_start = center_pixel;
+            line_end = Point2D(center_pixel.X, center_pixel.Y + size_half);
+
+        } else {
+
+            double angle_tan = WWMath::Tan(angle);
+            double xdist = WWMath::Sqrt(1.0 / ((angle_tan * angle_tan) / (size_half * size_half) + 1.0 / (d_size * d_size)));
+            double ydist = WWMath::Sqrt((1.0 - (xdist * xdist) / (d_size * d_size)) * (size_half * size_half));
+
+            if (angle > DEG_TO_RADF(90) && angle < DEG_TO_RADF(270)) {
+                xdist = -xdist;
+            }
+
+            if (angle < DEG_TO_RADF(180)) {
+                ydist = -ydist;
+            }
+
+            line_start = center_pixel;
+            line_end = Point2D(center_pixel.X + xdist, center_pixel.Y + ydist);
+
+        }
+
+        line_start.X -= TacticalRect.X;
+        line_start.Y -= TacticalRect.Y;
+
+        line_end.X -= TacticalRect.X;
+        line_end.Y -= TacticalRect.Y;
+
+        bool enable_red_channel = false;
+        bool enable_green_channel = true;
+        bool enable_blue_channel = false;
+
+        TempSurface->Draw_Line_entry_3C(TacticalRect,
+                                        line_start,
+                                        line_end,
+                                        draw_color,
+                                        -500,
+                                        -500,
+                                        false,
+                                        enable_red_channel,
+                                        enable_green_channel,
+                                        enable_blue_channel,
+                                        _line_alpha[i]);
+
+    }
+
 }

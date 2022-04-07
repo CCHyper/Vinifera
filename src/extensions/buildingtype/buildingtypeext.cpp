@@ -54,7 +54,8 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(BuildingTypeClass *this_p
     ProduceCashBudget(0),
     IsStartupCashOneTime(false),
     IsResetBudgetOnCapture(false),
-    IsEligibleForAllyBuilding(false)
+    IsEligibleForAllyBuilding(false),
+    IsShowRangeIndicator(false)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("BuildingTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -200,5 +201,7 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
     IsEligibleForAllyBuilding = ini.Get_Bool(ini_name, "EligibleForAllyBuilding",
                                                     ThisPtr->IsConstructionYard ? true : IsEligibleForAllyBuilding);
     
+    IsShowRangeIndicator = ini.Get_Bool(ini_name, "ShowRangeIndicator", IsShowRangeIndicator);
+
     return true;
 }

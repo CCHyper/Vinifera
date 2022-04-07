@@ -34,6 +34,7 @@
 #include "tibsun_functions.h"
 #include "vinifera_util.h"
 #include "building.h"
+#include "buildingext.h"
 #include "buildingtype.h"
 #include "buildingtypeext.h"
 #include "technotype.h"
@@ -52,6 +53,37 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  A fake class for implementing new member functions which allow
+ *  access to the "this" pointer of the intended class.
+ * 
+ *  @note: This must not contain a constructor or destructor!
+ *  @note: All functions must be prefixed with "_" to prevent accidental virtualization.
+ */
+class BuildingClassFake final : public BuildingClass
+{
+    public:
+        void _Draw_Radial_Indicator() const;
+};
+
+
+/**
+ *  Reimplementation of BuildingClass::In_Which_Layer.
+ * 
+ *  @author: CCHyper
+ */
+void BuildingClassFake::_Draw_Radial_Indicator() const
+{
+    BuildingClassExtension *buildingext = nullptr;
+    buildingext = BuildingClassExtensions.find(this);
+    if (buildingext) {
+        buildingext->Draw_Radial_Indicator();
+    } else {
+        BuildingClass::Draw_Radial_Indicator();
+    }
+}
 
 
 /**
@@ -459,4 +491,5 @@ void BuildingClassExtension_Hooks()
     Patch_Jump(0x00429A96, &_BuildingClass_AI_ProduceCash_Patch);
     Patch_Jump(0x0042F67D, &_BuildingClass_Captured_ProduceCash_Patch);
     Patch_Jump(0x0042E179, &_BuildingClass_Grand_Opening_ProduceCash_Patch);
+    Change_Virtual_Address(0x006CC414, Get_Func_Address(&BuildingClassFake::_Draw_Radial_Indicator));
 }
