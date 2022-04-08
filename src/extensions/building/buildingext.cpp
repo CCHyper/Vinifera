@@ -203,23 +203,47 @@ void BuildingClassExtension::Draw_Radial_Indicator() const
         return;
     }
 
-    if (ThisPtr->Class->IsSensorArray || ThisPtr->Class->IsCloakGenerator) {
+    if (!ThisPtr->IsPowerOn) {
+        return;
+    }
 
-        if (!ThisPtr->IsPowerOn) {
-            return;
+    bool enable_red_channel = true;
+    bool enable_green_channel = true;
+    bool enable_blue_channel = true;
+
+    if (buildingtypeext) {
+        enable_red_channel = !buildingtypeext->IsRadialIndicaterDisableRedChannel;
+        enable_green_channel = !buildingtypeext->IsRadialIndicaterDisableGreenChannel;
+        enable_blue_channel = !buildingtypeext->IsRadialIndicaterDisableBlueChannel;
+    }
+
+    RGBClass color = ThisPtr->Class->RadialColor;
+    Coordinate coord = ThisPtr->Center_Coord();
+
+    if (buildingtypeext && buildingtypeext->IsConcentricRadialIndicator) {
+
+        int v99 = 1024;
+
+        int time = timeGetTime();
+        int v5 = (time >> 1) & (v99-1);
+
+        if ( ((time >> 1) & (v99/2)) == 0 ) {
+
+            if ( ((time >> 1) & (v99/4)) == 0 ) {
+                color.Adjust(~(time >> 1), RGBClass(0,0,0));
+            }
+
+            Tactical_Draw_Radial(coord, color, float(range), false, false, false, true);
         }
 
-        bool enable_red_channel = true;
-        bool enable_green_channel = true;
-        bool enable_blue_channel = true;
-
-        if (buildingtypeext) {
-            enable_red_channel = !buildingtypeext->IsRadialIndicaterDisableRedChannel;
-            enable_green_channel = !buildingtypeext->IsRadialIndicaterDisableGreenChannel;
-            enable_blue_channel = !buildingtypeext->IsRadialIndicaterDisableBlueChannel;
+        int v6 = (v5 * (int)((double)(range + 0.5) / WWMath::Sqrt(2.0) * double(CELL_PIXEL_W))) >> v99;
+        if (v6 > 32) {
+            Tactical_Draw_Radial(coord, color, v6, false, false, true, true);
         }
 
-        Tactical_Draw_Radial(ThisPtr->Center_Coord(), ThisPtr->Class->RadialColor, float(range), true, true, false, true,
+    } else if (ThisPtr->Class->IsSensorArray || ThisPtr->Class->IsCloakGenerator) {
+
+        Tactical_Draw_Radial(coord, color, float(range), true, true, false, true,
                             enable_red_channel,
                             enable_green_channel,
                             enable_blue_channel
