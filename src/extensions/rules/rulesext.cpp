@@ -73,7 +73,9 @@ RulesClassExtension::RulesClassExtension(const RulesClass *this_ptr) :
     IsMPAutoDeployMCV(false),
     IsMPPrePlacedConYards(false),
     IsBuildOffAlly(true),
-    IsShowSuperWeaponTimers(true)
+    IsShowSuperWeaponTimers(true),
+    IsShowPlacementCursor(true),
+    PlacementCursorTranslucentLevel(CURSOR_TRANSLUCENT_50)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("RulesClassExtension::RulesClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 
@@ -450,6 +452,8 @@ bool RulesClassExtension::AudioVisual(CCINIClass &ini)
     }
 
     IsShowSuperWeaponTimers = ini.Get_Bool(AUDIOVISUAL, "ShowSuperWeaponTimers", IsShowSuperWeaponTimers);
+    IsShowPlacementCursor = ini.Get_Bool(AUDIOVISUAL, "ShowPlacementCursor", IsShowPlacementCursor);
+    PlacementCursorTranslucentLevel = (BPCTranslucentType)ini.Get_Int(AUDIOVISUAL, "PlacementCursorTranslucentLevel", PlacementCursorTranslucentLevel);
 
     return true;
 }

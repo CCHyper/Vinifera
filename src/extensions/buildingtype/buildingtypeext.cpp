@@ -28,6 +28,9 @@
 #include "buildingtypeext.h"
 #include "buildingtype.h"
 #include "tibsun_defines.h"
+#include "tibsun_globals.h"
+#include "convert.h"
+#include "ccfile.h"
 #include "ccini.h"
 #include "wwcrc.h"
 #include "extension.h"
@@ -50,7 +53,15 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(const BuildingTypeClass *
     ProduceCashBudget(0),
     IsStartupCashOneTime(false),
     IsResetBudgetOnCapture(false),
-    IsEligibleForAllyBuilding(false)
+    IsEligibleForAllyBuilding(false),
+    PlacementCursorImage(nullptr),
+    PlacementCursorStartFrame(0),
+    PlacementCursorEndFrame(0),
+    PlacementCursorRate(0),
+    PlacementCursorDrawer(nullptr),
+    PlacementCursorTranslucentLevelOverride(CURSOR_TRANSLUCENT_NOT_SET),
+    PlacementCursorXYAdjust(0,0),
+    IsPlacementCursorRemap(true)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("BuildingTypeClassExtension::BuildingTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
@@ -78,6 +89,11 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(const NoInitClass &noinit
 BuildingTypeClassExtension::~BuildingTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("BuildingTypeClassExtension::~BuildingTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    PlacementCursorImage = nullptr;
+
+    delete PlacementCursorDrawer;
+    PlacementCursorDrawer = nullptr;
 
     BuildingTypeExtensions.Delete(this);
 }
@@ -190,6 +206,8 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
         return false;
     }
 
+    char buffer[256];
+
     const char *ini_name = Name();
 
     GateUpSound = ini.Get_VocType(ini_name, "GateUpSound", GateUpSound);
@@ -204,6 +222,51 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IsEligibleForAllyBuilding = ini.Get_Bool(ini_name, "EligibleForAllyBuilding",
                                                     This()->IsConstructionYard ? true : IsEligibleForAllyBuilding);
-    
+
+    ini.Get_String(ini_name, "PlacementCursorImage", buffer, sizeof(buffer));
+    if (buffer[0] != '\0') {
+        std::strcat(buffer, ".SHP");
+        PlacementCursorImage = (const ShapeFileStruct *)MFCC::Retrieve(buffer);
+        ASSERT_PRINT(PlacementCursorImage != nullptr, "Building %s must have a valid image set for custom placement cursors!", This()->Name());
+        
+        PlacementCursorEndFrame = PlacementCursorImage->Get_Frame_Count()-1;
+
+    } else if (This()->Image) {
+
+        /**
+         *  
+         */
+        PlacementCursorImage = This()->Image;
+        PlacementCursorEndFrame = (PlacementCursorImage->Get_Frame_Count()/2)-1;
+    }
+
+    ini.Get_String(ini_name, "PlacementCursorPalette", buffer, sizeof(buffer));
+    if (buffer[0] != '\0') {
+        std::strcat(buffer, ".PAL");
+        PlacementCursorDrawer = ConvertClass::Create_Drawer(buffer, &GamePalette, PrimarySurface);
+        ASSERT_PRINT(PlacementCursorDrawer != nullptr, "Building %s must have a valid palette set for custom placement cursors!", This()->Name());
+    }
+
+    ini.Get_String(ini_name, "PlacementCursorGoodPalette", buffer, sizeof(buffer));
+    if (buffer[0] != '\0') {
+        std::strcat(buffer, ".PAL");
+        PlacementCursorGoodDrawer = ConvertClass::Create_Drawer(buffer, &GamePalette, PrimarySurface);
+        ASSERT_PRINT(PlacementCursorGoodDrawer != nullptr, "Building %s must have a valid palette set for custom placement cursors!", This()->Name());
+    }
+
+    ini.Get_String(ini_name, "PlacementCursorBadPalette", buffer, sizeof(buffer));
+    if (buffer[0] != '\0') {
+        std::strcat(buffer, ".PAL");
+        PlacementCursorBadDrawer = ConvertClass::Create_Drawer(buffer, &GamePalette, PrimarySurface);
+        ASSERT_PRINT(PlacementCursorBadDrawer != nullptr, "Building %s must have a valid palette set for custom placement cursors!", This()->Name());
+    }
+
+    PlacementCursorStartFrame = ini.Get_Int(ini_name, "PlacementCursorStartFrame", PlacementCursorStartFrame);
+    PlacementCursorEndFrame = ini.Get_Int(ini_name, "PlacementCursorEndFrame", PlacementCursorEndFrame);
+    PlacementCursorRate = ini.Get_Int(ini_name, "PlacementCursorRate", PlacementCursorRate);
+    PlacementCursorTranslucentLevelOverride = (BPCTranslucentType)ini.Get_Int(ini_name, "PlacementCursorTLucentOverride", PlacementCursorTranslucentLevelOverride);
+    IsPlacementCursorRemap = ini.Get_Bool(ini_name, "PlacementCursorRemap", IsPlacementCursorRemap);
+    PlacementCursorXYAdjust = ini.Get_Point(ini_name, "PlacementCursorXYAdjust", PlacementCursorXYAdjust);
+
     return true;
 }

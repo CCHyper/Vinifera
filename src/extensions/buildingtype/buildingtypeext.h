@@ -29,6 +29,10 @@
 
 #include "technotypeext.h"
 #include "buildingtype.h"
+#include "vinifera_defines.h"
+
+
+class ConvertClass;
 
 
 class DECLSPEC_UUID(UUID_BUILDINGTYPE_EXTENSION)
@@ -106,4 +110,51 @@ BuildingTypeClassExtension final : public TechnoTypeClassExtension
          *  Is this building eligible for proximity checks by players who are its owner's allies?
          */
         bool IsEligibleForAllyBuilding;
+
+        /**
+         *  The "phantom" image to show when in manual placement mode with this building.
+         */
+        const ShapeFileStruct *PlacementCursorImage;
+
+        /**
+         *  The starting frame of the animation loop.
+         */
+        int PlacementCursorStartFrame;
+
+        /**
+         *  The end frame for the animation loop. If this is zero, then no animation
+         *  of the shape is performed, and StartFrame is used instead.
+         */
+        int PlacementCursorEndFrame;
+
+        /**
+         *  The animation rate of the 
+         */
+        int PlacementCursorRate;
+
+        /**
+         *  
+         */
+        ConvertClass *PlacementCursorDrawer;
+
+        /**
+         *  
+         */
+        ConvertClass *PlacementCursorGoodDrawer;
+        ConvertClass *PlacementCursorBadDrawer;
+
+        /**
+         *  
+         */
+        BPCTranslucentType PlacementCursorTranslucentLevelOverride;
+
+        /**
+         *  pixel adjust
+         */
+        TPoint2D<int> PlacementCursorXYAdjust;
+
+        /**
+         *  Should the placement image be remapped to the house color?
+         */
+        bool IsPlacementCursorRemap;
 };

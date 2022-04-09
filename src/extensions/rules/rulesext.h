@@ -29,6 +29,7 @@
 
 #include "always.h"
 #include "tibsun_defines.h"
+#include "vinifera_defines.h"
 #include "rules.h"
 #include "extension.h"
 #include "tpoint.h"
@@ -90,4 +91,14 @@ class RulesClassExtension final : public GlobalExtensionClass<RulesClass>
          *  on the tactical view?
          */
         bool IsShowSuperWeaponTimers;
+
+        /**
+         *  
+         */
+        bool IsShowPlacementCursor;
+
+        /**
+         *  
+         */
+        BPCTranslucentType PlacementCursorTranslucentLevel;
 };

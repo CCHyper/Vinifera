@@ -245,6 +245,33 @@ DECLARE_PATCH(_Tactical_Draw_Waypoint_Paths_DrawNormalLine_Patch)
 
 
 /**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+static Cell cellpos;
+DECLARE_PATCH(_Tactical_Draw_Placement_Object_Preview_Patch)
+{
+    GET_STACK_STATIC(int, pos_x, esp, 0x14);
+    GET_REGISTER_STATIC(int, pos_y, edi);
+
+    cellpos.X = pos_x;
+    cellpos.Y = pos_y;
+
+    if (!Debug_Map) {
+        TacticalMapExtension->Draw_Placement_Preview(cellpos);
+    }
+
+    /**
+     *  Stolen bytes/code.
+     */
+    _asm { mov ecx, dword ptr ds:0x007494FC } // restore register ECX with "Display.PendingObject".
+
+    JMP(0x0061203A);
+}
+
+
+/**
  *  This patch intercepts the post effects rendering process for Tactical
  *  allowing us to draw any new effects/systems.
  * 
@@ -265,6 +292,252 @@ DECLARE_PATCH(_Tactical_Render_Post_Effects_Patch)
     TacticalMapExtension->Render_Post();
 
     JMP(0x00611AFE);
+}
+
+
+#include "colorscheme.h"
+static void Print_Tactical_Info()
+{
+    static ColorScheme * TextColor = nullptr;
+    if (!TextColor) {
+        TextColor = ColorScheme::As_Pointer("White");
+        ASSERT(TextColor != nullptr);
+    }
+
+    // Format print string.
+    char buffer[4096];
+
+    // Get primary surface rect.
+    Rect surfrect = PrimarySurface->Get_Rect();
+    Rect comprect = CompositeSurface->Get_Rect();
+
+    // Draw background rect.
+    int rect_width = 400; // Needed, otherwise the box jitters about due to Coord value change.
+    int rect_height = 100;
+    Rect boxrect(comprect.X, comprect.Y + 16, rect_width, rect_height);
+    //CompositeSurface->Fill_Rect(boxrect, MAKE_RGB565(0, 0, 0));
+    RGBClass rgb{0, 0, 0};
+
+    int lines = 20; // Update this when you add a line!
+    boxrect.Height = lines * 24 + 4; // 4 == header spacing.
+
+    CompositeSurface->Fill_Rect_Trans(boxrect, rgb, 50);
+
+    // Draw position.
+    Point2D drawpos;
+    drawpos.X = 1;
+    drawpos.Y = 17;
+
+    Fancy_Text_Print("Tactical",
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y /*= 10*/),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    // Make a space under the title.
+    drawpos.Y += 4;
+
+    //
+    // Tactical
+    //
+    std::snprintf(buffer, sizeof(buffer), "LastAIFrame: %d", TacticalMap->LastAIFrame);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "field_5C: %d,%d", TacticalMap->field_5C.X, TacticalMap->field_5C.Y);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "field_64: %d,%d", TacticalMap->field_64.X, TacticalMap->field_64.Y);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "MoveFrom: %d,%d", TacticalMap->MoveFrom.X, TacticalMap->MoveFrom.Y);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "field_84: %d,%d", TacticalMap->MoveTo.X, TacticalMap->MoveTo.Y);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "field_D18: %d,%d", TacticalMap->field_D18.X, TacticalMap->field_D18.Y);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "field_D20: %d,%d", TacticalMap->field_D20.X, TacticalMap->field_D20.Y);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "field_D28: %d,%d", TacticalMap->field_D28.X, TacticalMap->field_D28.Y);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "TacticalRect: %d,%d,%d,%d",
+        TacticalMap->field_D34.X, TacticalMap->field_D34.Y, TacticalMap->field_D34.Width, TacticalMap->field_D34.Height);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "Band: %d,%d,%d,%d",
+        TacticalMap->Band.X, TacticalMap->Band.Y, TacticalMap->Band.Width, TacticalMap->Band.Height);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "field_D54: %d", TacticalMap->field_D54);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    //std::snprintf(buffer, sizeof(buffer), "field_98: %d", TacticalMap->field_98);
+    //Fancy_Text_Print(buffer,
+    //    CompositeSurface,
+    //    &surfrect,
+    //    &Point2D(drawpos.X, drawpos.Y += 12),
+    //    TextColor,
+    //    COLOR_TBLACK,
+    //    TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "field_78: %d", TacticalMap->field_78);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "field_6C: %d", TacticalMap->field_6C);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "ZoomFactor: %lf", TacticalMap->ZoomFactor);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "MoveRate: %lf", TacticalMap->MoveRate);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    std::snprintf(buffer, sizeof(buffer), "MoveFactor: %lf", TacticalMap->MoveFactor);
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    drawpos.Y += 4;
+
+    std::snprintf(buffer, sizeof(buffer),
+        "field_D64: [0] %lf, %lf, %lf, %lf\n"
+        "           [1] %lf, %lf, %lf, %lf\n"
+        "           [2] %lf, %lf, %lf, %lf\n"
+        "           [3] %lf, %lf, %lf, %lf\n",
+        TacticalMap->field_D64[0].X, TacticalMap->field_D64[0].Y, TacticalMap->field_D64[0].Z, TacticalMap->field_D64[0].W,
+        TacticalMap->field_D64[1].X, TacticalMap->field_D64[1].Y, TacticalMap->field_D64[1].Z, TacticalMap->field_D64[1].W,
+        TacticalMap->field_D64[2].X, TacticalMap->field_D64[2].Y, TacticalMap->field_D64[2].Z, TacticalMap->field_D64[2].W,
+        TacticalMap->field_D64[3].X, TacticalMap->field_D64[3].Y, TacticalMap->field_D64[3].Z, TacticalMap->field_D64[3].W
+    );
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    drawpos.Y += 12 * 3 - 6;
+
+    std::snprintf(buffer, sizeof(buffer),
+        "field_D94: [0] %lf, %lf, %lf, %lf\n"
+        "           [1] %lf, %lf, %lf, %lf\n"
+        "           [2] %lf, %lf, %lf, %lf\n"
+        "           [3] %lf, %lf, %lf, %lf\n",
+        TacticalMap->field_D94[0].X, TacticalMap->field_D94[0].Y, TacticalMap->field_D94[0].Z, TacticalMap->field_D94[0].W,
+        TacticalMap->field_D94[1].X, TacticalMap->field_D94[1].Y, TacticalMap->field_D94[1].Z, TacticalMap->field_D94[1].W,
+        TacticalMap->field_D94[2].X, TacticalMap->field_D94[2].Y, TacticalMap->field_D94[2].Z, TacticalMap->field_D94[2].W,
+        TacticalMap->field_D94[3].X, TacticalMap->field_D94[3].Y, TacticalMap->field_D94[3].Z, TacticalMap->field_D94[3].W
+    );
+    Fancy_Text_Print(buffer,
+        CompositeSurface,
+        &surfrect,
+        &Point2D(drawpos.X, drawpos.Y += 12),
+        TextColor,
+        COLOR_TBLACK,
+        TextPrintType(TPF_VCR|TPF_NOSHADOW));
+
+    drawpos.Y += 12 * 3;
 }
 
 
@@ -345,6 +618,8 @@ original_code:
     this_ptr->field_D30 = false;
     this_ptr->IsToRedraw = false;
 
+    Print_Tactical_Info();
+
     JMP(0x00611BE4);
 }
 
@@ -365,6 +640,8 @@ void TacticalExtension_Hooks()
     Patch_Jump(0x00616E9A, &_Tactical_Draw_Rally_Points_NormaliseLineAnimation_Patch);
     Patch_Jump(0x006172DB, &_Tactical_Draw_Waypoint_Paths_NormaliseLineAnimation_Patch);
     Patch_Jump(0x00617327, &_Tactical_Draw_Waypoint_Paths_DrawNormalLine_Patch);
+
+    Patch_Jump(0x00612034, &_Tactical_Draw_Placement_Object_Preview_Patch);
 
     /**
      *  #issue-351

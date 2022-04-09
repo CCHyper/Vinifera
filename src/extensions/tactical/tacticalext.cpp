@@ -46,6 +46,13 @@
 #include "superext.h"
 #include "supertype.h"
 #include "supertypeext.h"
+#include "building.h"
+#include "buildingtype.h"
+#include "buildingtypeext.h"
+#include "session.h"
+#include "scenario.h"
+#include "iomap.h"
+#include "drawshape.h"
 #include "rules.h"
 #include "rulesext.h"
 #include "swizzle.h"
@@ -687,4 +694,139 @@ void TacticalExtension::Draw_Super_Timers()
         }
 
     }
+}
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+void TacticalExtension::Draw_Placement_Preview(Cell &cellpos)
+{
+    //EXT_DEBUG_TRACE("TacticalExtension::Draw_Placement_Preview - 0x%08X\n", (uintptr_t)(This()));
+
+    if (!RuleExtension->IsShowPlacementCursor) {
+        return;
+    }
+
+    if (!Map.PendingObject || !Map.PendingObjectPtr) {
+        return;
+    }
+
+    if (Map.PendingObject->What_Am_I() != RTTI_BUILDINGTYPE) {
+        return;
+    }
+
+    BuildingClass *building = reinterpret_cast<BuildingClass *>(Map.PendingObjectPtr);
+    BuildingTypeClass *buildingtype = reinterpret_cast<BuildingTypeClass *>(Map.PendingObject);
+
+    /**
+     *  
+     */
+    if (buildingtype->ToOverlay) {
+        return;
+    }
+
+    BuildingTypeClassExtension *buildingtypeext = Extension::Fetch<BuildingTypeClassExtension>(buildingtype);
+
+    const ShapeFileStruct *shape = buildingtypeext->PlacementCursorImage;
+    BPCTranslucentType translucenttype = RuleExtension->PlacementCursorTranslucentLevel;
+    ConvertClass *drawer = buildingtypeext->PlacementCursorDrawer;
+    int frame = buildingtypeext->PlacementCursorStartFrame;
+    ShapeFlagsType flags = SHAPE_NORMAL|SHAPE_CENTER;
+
+    /**
+     *  
+     */
+    if (buildingtypeext->PlacementCursorTranslucentLevelOverride != CURSOR_TRANSLUCENT_NOT_SET) {
+        translucenttype = buildingtypeext->PlacementCursorTranslucentLevelOverride;
+    }
+
+    /**
+     *  
+     */
+    switch (translucenttype) {
+        case CURSOR_TRANSLUCENT_NONE:
+        default:
+            break;
+        case CURSOR_TRANSLUCENT_25:
+            flags |= SHAPE_TRANS25;
+            break;
+        case CURSOR_TRANSLUCENT_50:
+            flags |= SHAPE_TRANS50;
+            break;
+        case CURSOR_TRANSLUCENT_75:
+            flags |= SHAPE_TRANS75;
+            break;
+    };
+
+    flags |= SHAPE_ALPHA;
+
+    /**
+     *  
+     */
+    if (buildingtypeext->IsPlacementCursorRemap) {
+        ColorScheme *scheme = ColorSchemes[building->House->RemapColor];
+        drawer = scheme->Drawer;
+        flags |= SHAPE_REMAP;
+    }
+
+    if (shape == buildingtype->Image) {
+        frame = buildingtype->Image->Get_Frame_Count()/2-1;
+    }
+
+    /**
+     *  
+     */
+    if (buildingtypeext->PlacementCursorEndFrame <= shape->Get_Frame_Count()) {
+        if (buildingtypeext->PlacementCursorEndFrame > 0 && buildingtypeext->PlacementCursorRate > 0) {
+            int frame_count = (buildingtypeext->PlacementCursorEndFrame - buildingtypeext->PlacementCursorStartFrame);
+
+            /**
+             *  
+             */
+            int time = timeGetTime();
+            //int offset = (-time / buildingtypeext->PlacementCursorRate) & frame_count;
+            int offset = (-time / 40) & frame_count;
+
+            frame += offset;
+        }
+    }
+
+    Cell zone_cell = Map.ZoneCell;
+
+    zone_cell.X += cellpos.X + Map.ZoneOffset.X;
+    zone_cell.Y += cellpos.Y + Map.ZoneOffset.Y;
+
+    Coordinate zone_coord = Cell_Coord(zone_cell, true);
+
+    zone_coord.Z = Map.Get_Cell_Height(zone_coord);
+
+    Point2D screen = TacticalMap->func_60F150(zone_coord);
+
+    screen.X -= TacticalMap->field_5C.X;
+    screen.Y -= TacticalMap->field_5C.Y;
+
+    screen.X += buildingtypeext->PlacementCursorXYAdjust.X;
+    screen.Y += buildingtypeext->PlacementCursorXYAdjust.Y;
+
+    if (!drawer) {
+        if (Map.IsProximityCheck) {
+            drawer = buildingtypeext->PlacementCursorGoodDrawer;
+        } else {
+            drawer = buildingtypeext->PlacementCursorBadDrawer;
+        }
+    }
+
+    /**
+     *  
+     */
+    CC_Draw_Shape(TempSurface,
+                  MouseDrawer,
+                  shape,
+                  frame,
+                  &screen,
+                  &TempSurface->Get_Rect(),
+                  flags);
 }
