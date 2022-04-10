@@ -46,6 +46,9 @@
 #include "msglistext_hooks.h"
 #include "sessionext_hooks.h"
 #include "cdext_hooks.h"
+#include "themeext_hooks.h"
+#include "vocext_hooks.h"
+#include "msengineext_hooks.h"
 
 #include "playmovie_hooks.h"
 
@@ -161,6 +164,9 @@ void Extension_Hooks()
     MessageListClassExtension_Hooks();
     SessionClassExtension_Hooks();
     CDExtension_Hooks();
+    ThemeClassExtension_Hooks();
+    VocClassExtension_Hooks();
+    MSEngineExtension_Hooks();
 
     PlayMovieExtension_Hooks();
 

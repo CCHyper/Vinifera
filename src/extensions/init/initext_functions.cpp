@@ -37,7 +37,7 @@
 #include "session.h"
 #include "iomap.h"
 #include "theme.h"
-#include "dsaudio.h"
+#include "audio_driver.h"
 #include "vinifera_gitinfo.h"
 #include "tspp_gitinfo.h"
 #include "resource.h"
@@ -253,7 +253,8 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
 
     SetCursor(hCursor);
 
-    Audio.AudioFocusLossFunction = &Focus_Loss;
+    //Audio.AudioFocusLossFunction = &Focus_Loss;
+    Audio_Driver()->Set_Focus_Loss_Function(&Focus_Loss);
 
     /**
      *  Save the handle to our main window.

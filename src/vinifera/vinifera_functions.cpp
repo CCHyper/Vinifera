@@ -46,8 +46,22 @@
 #include "tclassfactory.h"
 #include "testlocomotion.h"
 #include "theatertype.h"
+#include "audio_driver.h"
+#include "null_driver.h"
+#include "dsound_driver.h"
+#include "xaudio2_driver.h"
+#include "miscutil.h"
 #include "debughandler.h"
 #include <string>
+
+
+extern bool Fix_Credit_Tick_Sfx;
+
+
+/**
+ *  
+ */
+char Audio_DriverName[32];
 
 
 /**
@@ -57,6 +71,11 @@
  */
 bool Vinifera_Load_INI()
 {
+    static char const * const GENERAL = "General";
+    static char const * const AUDIO = "Audio";
+
+    char buffer[1024];
+
     CCFileClass file("VINIFERA.INI");
     INIClass ini;
 
@@ -66,9 +85,9 @@ bool Vinifera_Load_INI()
 
     ini.Load(file);
 
-    ini.Get_String("General", "ProjectName", Vinifera_ProjectName, sizeof(Vinifera_ProjectName));
-    ini.Get_String("General", "IconFile", Vinifera_IconName, sizeof(Vinifera_IconName));
-    ini.Get_String("General", "CursorFile", Vinifera_CursorName, sizeof(Vinifera_CursorName));
+    ini.Get_String(GENERAL, "ProjectName", Vinifera_ProjectName, sizeof(Vinifera_ProjectName));
+    ini.Get_String(GENERAL, "IconFile", Vinifera_IconName, sizeof(Vinifera_IconName));
+    ini.Get_String(GENERAL, "CursorFile", Vinifera_CursorName, sizeof(Vinifera_CursorName));
 
 #if defined(TS_CLIENT)
     /**
@@ -88,13 +107,19 @@ bool Vinifera_Load_INI()
 
     ini.Get_String("DTA", "Version", Vinifera_ProjectVersion, sizeof(Vinifera_ProjectVersion));
 #else
-    ini.Get_String("General", "ProjectVersion", "No version number set", Vinifera_ProjectVersion, sizeof(Vinifera_ProjectVersion));
+    ini.Get_String(GENERAL, "ProjectVersion", "No version number set", Vinifera_ProjectVersion, sizeof(Vinifera_ProjectVersion));
 #endif
 
     Vinifera_ProjectName[sizeof(Vinifera_ProjectName)-1] = '\0';
     Vinifera_ProjectVersion[sizeof(Vinifera_ProjectVersion)-1] = '\0';
     Vinifera_IconName[sizeof(Vinifera_IconName)-1] = '\0';
     Vinifera_CursorName[sizeof(Vinifera_CursorName)-1] = '\0';
+
+    ini.Get_String(AUDIO, "Driver", "DirectSound", Audio_DriverName, sizeof(Audio_DriverName));
+    Audio_DriverName[sizeof(Audio_DriverName)-1] = '\0';
+
+    AudioDriver::MaxSampleTrackers = ini.Get_Int_Clamp(AUDIO, "MaxSampleTrackers", 5, 32, AudioDriver::MaxSampleTrackers);
+    AudioDriver::IsReverseChannels = ini.Get_Bool(AUDIO, "ReverseChannels", AudioDriver::IsReverseChannels);
 
     return true;
 }
@@ -402,6 +427,47 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
 
 
 /**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+static bool Vinifera_Init_Audio_Driver()
+{
+    AudioDriver *driver = nullptr;
+    Wstring driver_name = Audio_DriverName;
+
+    if (driver_name.Is_Empty() || driver_name == "DirectSound") {
+
+        DEBUG_INFO("Audio: Installing DirectSound audio driver.\n");
+
+        driver = new DirectSoundAudioDriver;
+
+    } else if (driver_name == "XAudio2") {
+
+        DEBUG_INFO("Audio: Installing XAudio2 audio driver.\n");
+
+        driver = new XAudio2AudioDriver;
+
+        /**
+         *  The "expected" credit tick rate is actually the result of the orignal
+         *  DirectSound audio engine being limited to only 4 sounds playing at
+         *  one time. So, to make sure we retain the expectation, this will
+         *  enable a patch that will limit the rate the sound effect is played.
+         */
+        Fix_Credit_Tick_Sfx = true;
+
+    } else {
+        DEBUG_INFO("Audio: Installing Null audio driver.\n");
+        driver = new NullAudioDriver;
+    }
+
+    Set_Audio_Driver(driver);
+
+    return Audio_Driver() != nullptr;
+}
+
+
+/**
  *  This function will get called on application startup, allowing you to
  *  perform any action that would effect the game initialisation process.
  * 
@@ -409,6 +475,35 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
  */
 bool Vinifera_Startup()
 {
+    /**
+     *  Load additional paths from the user environment vars.
+     * 
+     *  #NOTE: Paths must end in "\" otherwise this will fail!
+     */
+    DWORD rc;
+    rc = GetEnvironmentVariable("TIBSUN_MUSIC", Vinifera_MusicPath_EnvVar, sizeof(Vinifera_MusicPath_EnvVar));
+    if (rc && rc < sizeof(Vinifera_MusicPath_EnvVar)) {
+        DEV_DEBUG_INFO("Found TIBSUN_MUSIC EnvVar: \"%s\".\n", Vinifera_MusicPath_EnvVar);
+    } else {
+        Vinifera_MusicPath_EnvVar[0] = '\0';
+    }
+    rc = GetEnvironmentVariable("TIBSUN_SOUNDS", Vinifera_SoundsPath_EnvVar, sizeof(Vinifera_SoundsPath_EnvVar));
+    if (rc && rc < sizeof(Vinifera_SoundsPath_EnvVar)) {
+        DEV_DEBUG_INFO("Found TIBSUN_MUSIC EnvVar: \"%s\".\n", Vinifera_SoundsPath_EnvVar);
+    } else {
+        Vinifera_SoundsPath_EnvVar[0] = '\0';
+    }
+
+    /**
+     *  
+     */
+    if (Directory_Exists("MUSIC")) {
+        std::strncpy(Vinifera_MusicPath, "MUSIC\\", std::strlen("MUSIC\\"));
+    }
+    if (Directory_Exists("SOUNDS")) {
+        std::strncpy(Vinifera_SoundsPath, "SOUNDS\\", std::strlen("SOUNDS\\"));
+    }
+
     /**
      *  #issue-514:
      * 
@@ -524,6 +619,14 @@ bool Vinifera_Startup()
     if (CnCNet4::IsEnabled && CnCNet5::IsActive) {
         CnCNet4::Shutdown();
         CnCNet4::IsEnabled = false;
+    }
+
+    /**
+     *  Install and initialise the requested audio driver.
+     */
+    if (!Vinifera_Init_Audio_Driver()) {
+        DEBUG_ERROR("Failed to initialise audio driver!\n");
+        return false;
     }
 
     return true;

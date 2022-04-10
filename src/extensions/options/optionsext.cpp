@@ -28,6 +28,7 @@
 #include "optionsext.h"
 #include "options.h"
 #include "tibsun_globals.h"
+#include "vinifera_globals.h"
 #include "noinit.h"
 #include "options.h"
 #include "ccini.h"
@@ -120,8 +121,11 @@ void OptionsClassExtension::Load_Init_Settings()
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     //EXT_DEBUG_WARNING("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
-    
+
     RawFileClass file("SUN.INI");
+
+    INIClass ini;
+    ini.Load(file);
 }
 
 
@@ -135,8 +139,10 @@ void OptionsClassExtension::Save_Settings()
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
     //EXT_DEBUG_WARNING("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
-    
+
     RawFileClass file("SUN.INI");
+
+    ConfigINI.Save(file, false);
 }
 
 
