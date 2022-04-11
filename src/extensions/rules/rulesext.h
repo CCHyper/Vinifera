@@ -110,6 +110,17 @@ class RulesClassExtension final : public Extension<RulesClass>
          *  on the tactical view?
          */
         bool IsShowSuperWeaponTimers;
+
+        /**
+         *  
+         */
+        CrateType WaterCrate;
+
+        /**
+         *  Percent chance that a water crate will be generated instead of a land
+         *  crate when crates are on and the game type is multiplayer.
+         */
+        float WaterCrateChance;
 };
 
 
