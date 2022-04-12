@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OPTIONSEXT.H
+ *  @file          RENDERER_SUPPORT.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended OptionsClass class.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,47 +27,49 @@
  ******************************************************************************/
 #pragma once
 
+#if 0
+
 #include "always.h"
-#include "extension.h"
-#include "options.h"
 
 
 class CCINIClass;
+class Rect;
+class XSurface;
 
 
-class OptionsClassExtension final : public GlobalExtensionClass<OptionsClass>
+/**
+ *  
+ */
+namespace Renderer
 {
-    public:
-        IFACEMETHOD(Load)(IStream *pStm);
-        IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 
-    public:
-        OptionsClassExtension(const OptionsClass *this_ptr);
-        OptionsClassExtension(const NoInitClass &noinit);
-        virtual ~OptionsClassExtension();
+extern bool UseDirectDraw7;
 
-        /**
-         *  OptionsClass extension does not require these to be used, but we
-         *  implement them for completeness.
-         */
-        virtual int Size_Of() const override;
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+extern int FrameLimit;
+extern bool BorderlessWindow;
+extern bool ClipCursorToWindow;
 
-        virtual const char *Name() const override { return "Options"; }
-        virtual const char *Full_Name() const override { return "Options"; }
+bool Read_INI(CCINIClass &ini);
+bool Write_INI(CCINIClass &ini);
 
-        void Load_Settings();
-        void Load_Init_Settings();
-        void Save_Settings();
+void __cdecl Shutdown();
+void Reset_Video_Mode();
+bool Set_Video_Mode(HWND hWnd, int width, int height, int bits_per_pixel);
+void Check_Overlapped_Blit_Capability();
+bool Prep_Renderer(HWND hWnd);
+void Release(HWND hWnd);
+void Wait_Blit();
+bool Allocate_Surfaces(Rect *common_rect, Rect *composite_rect, Rect *tile_rect, Rect *sidebar_rect);
+XSurface *Create_Primary(XSurface **backbuffer_surface = nullptr);
+bool Flip(XSurface *surface);
+void Sync_Delay();
+void Focus_Loss();
+void Focus_Restore();
+bool Clear_Screen();
+void Set_Cursor_Clip();
+void Clear_Cursor_Clip();
+bool Frame_Limiter(bool force_blit);
 
-        void Set();
-
-    public:
-        bool IsWindowed;
-        int WindowWidth;
-        int WindowHeight;
-        bool IsBorderlessWindow;
-        bool IsClipCursorToWindow;
-        int RefreshRate;
 };
+
+#endif

@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OPTIONSEXT_HOOKS.CPP
+ *  @file          SDL_GLOBALS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for the extended OptionsClass.
+ *  @brief         SDL2 globals.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,41 +25,44 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "optionsext_hooks.h"
-#include "optionsext_init.h"
-#include "optionsext.h"
-#include "fatal.h"
-#include "debughandler.h"
-#include "asserthandler.h"
+#pragma once
 
-#include "hooker.h"
-#include "hooker_macros.h"
+#if 0
+
+#include "sdl_functions.h"
+#include "sdl_globals.h"
+#include "sdlsurface.h"
+#include "dsurface.h"
+#include "tibsun_globals.h"
+#include "tibsun_functions.h"
+#include "textprint.h"
+#include "debughandler.h"
 
 
 /**
- *  x
+ *  
  * 
  *  @author: CCHyper
  */
-DECLARE_PATCH(_WinMain_Load_Init_Settings_Patch)
+void Set_SDL_Palette(void *rpalette)
 {
-    OptionsExtension->Load_Init_Settings();
+    SDL_Color colors[256];
 
-    _asm { push 0x31C } // sizeof WWKeyboardClass
+    unsigned char *rcolors = (unsigned char *)rpalette;
+    for (int i = 0; i < 256; i++) {
+        colors[i].r = (unsigned char)rcolors[i * 3] << 2;
+        colors[i].g = (unsigned char)rcolors[i * 3 + 1] << 2;
+        colors[i].b = (unsigned char)rcolors[i * 3 + 2] << 2;
+        colors[i].a = 255;
+    }
 
-    JMP(0x00601283);
-}
-
-
-/**
- *  Main function for patching the hooks.
- */
-void OptionsClassExtension_Hooks()
-{
     /**
-     *  Initialises the extended class.
+     *  First color is transparent. This needs to be set so that hardware cursor has
+     *  transparent surroundings when converting from 8-bit to 32-bit.
      */
-    OptionsClassExtension_Init();
+    colors[0].a = 0;
 
-    Patch_Jump(0x0060127E, &_WinMain_Load_Init_Settings_Patch);
+    SDL_SetPaletteColors(SDLPalette, colors, 0, ARRAY_SIZE(colors));
 }
+
+#endif

@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OPTIONSEXT_HOOKS.CPP
+ *  @file          RENDERER_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for the extended OptionsClass.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,41 +25,7 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "optionsext_hooks.h"
-#include "optionsext_init.h"
-#include "optionsext.h"
-#include "fatal.h"
-#include "debughandler.h"
-#include "asserthandler.h"
-
-#include "hooker.h"
-#include "hooker_macros.h"
+#pragma once
 
 
-/**
- *  x
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_WinMain_Load_Init_Settings_Patch)
-{
-    OptionsExtension->Load_Init_Settings();
-
-    _asm { push 0x31C } // sizeof WWKeyboardClass
-
-    JMP(0x00601283);
-}
-
-
-/**
- *  Main function for patching the hooks.
- */
-void OptionsClassExtension_Hooks()
-{
-    /**
-     *  Initialises the extended class.
-     */
-    OptionsClassExtension_Init();
-
-    Patch_Jump(0x0060127E, &_WinMain_Load_Init_Settings_Patch);
-}
+void Renderer_Hooks();

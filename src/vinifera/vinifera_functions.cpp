@@ -49,9 +49,21 @@
 #include "extension.h"
 #include "theatertype.h"
 #include "uicontrol.h"
+#include "video_driver.h"
+#include "ddraw_driver.h"
+#include "dx7_driver.h"
+#include "dx9_driver.h"
+#include "sdl2_driver.h"
+#include "opengl_driver.h"
+#include "miscutil.h"
+#include "versionhelpers.h"
+#include "shellscalingapi.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <string>
+
+
+extern void Video_Hooks();
 
 
 static DynamicVectorClass<Wstring> ViniferaSearchPaths;
@@ -435,6 +447,67 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
 
 
 /**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+static bool Vinifera_Init_Video_Driver()
+{
+    static char const * const VIDEO = "Video";
+
+    VideoDriver *driver = nullptr;
+
+    RawFileClass file("VINIFERA.INI");
+    INIClass ini;
+    ini.Load(file);
+
+    char driver_buffer[64];
+
+    ini.Get_String(VIDEO, "Driver", "DirectDraw", driver_buffer, sizeof(driver_buffer));
+
+    if (std::strcmp(driver_buffer, "DirectDraw") == 0) {
+        DEBUG_INFO("Video: Installing DirectDraw video driver.\n");
+        driver = new DirectDrawVideoDriver;
+    }
+#if defined(DX7_RENDERER)
+    else if (std::strcmp(driver_buffer, "DirectX7") == 0) {
+        DEBUG_INFO("Video: Installing DirectX7 video driver.\n");
+        driver = new DirectX7VideoDriver;
+    }
+#endif
+#if defined(DX9_RENDERER)
+    else if (std::strcmp(driver_buffer, "DirectX9") == 0) {
+        DEBUG_INFO("Video: Installing DirectX9 video driver.\n");
+        driver = new DirectX9VideoDriver;
+    }
+#endif
+#if defined(SDL2_RENDERER)
+    else if (std::strcmp(driver_buffer, "SDL2") == 0) {
+        DEBUG_INFO("Video: Installing SDL video driver.\n");
+        driver = new SDL2VideoDriver;
+    } 
+#endif
+#if defined(OPENGL_RENDERER)
+    else if (std::strcmp(driver_buffer, "OpenGL") == 0) {
+        DEBUG_INFO("Video: Installing OpenGL video driver.\n");
+        driver = new OpenGLVideoDriver;
+    }
+#endif
+
+    Set_Video_Driver(driver);
+
+    /**
+     *  x
+     */
+    if (!Video_Driver_Is_Direct_Draw()) {
+        Video_Hooks();
+    }
+
+    return Video_Driver() != nullptr;
+}
+
+
+/**
  *  This function will get called on application startup, allowing you to
  *  perform any action that would effect the game initialisation process.
  * 
@@ -590,6 +663,31 @@ bool Vinifera_Startup()
     CnCNet4::IsEnabled = false;
     //CnCNet5::IsActive = true; // Enable when new Client system is implemented.
 #endif
+
+    /**
+     *  Install and initialise the requested video driver.
+     */
+    if (!Vinifera_Init_Video_Driver()) {
+        DEBUG_ERROR("Failed to initialise video driver!\n");
+        return false;
+    }
+
+    /**
+     *  Set the process to be be DPI aware.
+     */
+    if (true /*Vinifera_MakeProcessDPIAware*/ /*&& !IsProcessDPIAware()*/) {
+        bool dpi_aware = false;
+        if (IsWindows10OrGreater()) {
+            dpi_aware = SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_UNAWARE_GDISCALED);
+        } else if (IsWindowsVistaOrGreater()) {
+            dpi_aware = SUCCEEDED(SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE));
+        } else {
+            dpi_aware = SetProcessDPIAware();
+        }
+        if (dpi_aware) {
+            DEBUG_INFO("Process is now DPI aware.\n");
+        }
+    }
 
     return true;
 }

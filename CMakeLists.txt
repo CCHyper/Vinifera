@@ -153,6 +153,11 @@ endif()
 
 option(OPTION_CHECK_TARGET_BINARIES "This option controls if the launcher should check target binaries before injection." ON)
 
+option(OPTION_ENABLE_DX7_RENDERER "DirectX7 Support." OFF)
+option(OPTION_ENABLE_DX9_RENDERER "DirectX9 Support." OFF)
+option(OPTION_ENABLE_SDL2_RENDERER "SDL2 Support." OFF)
+option(OPTION_ENABLE_OPENGL_RENDERER "OpenGL Support." OFF)
+
 
 ################################################################################
 # Some general Windows definitions to keep the MSVC compiler happy with our code.
@@ -300,6 +305,144 @@ FetchContent_GetProperties(TSpp)
 if(NOT tspp_POPULATED)
 	FetchContent_Populate(TSpp)
 	add_subdirectory(${tspp_SOURCE_DIR} ${tspp_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+
+################################################################################
+# Fetch the latest SDL2 library
+################################################################################
+if(OPTION_ENABLE_SDL2_RENDERER)
+
+    message(STATUS "Fetching SDL2...")
+    
+    find_package(SDL2 QUIET)
+    if(NOT SDL2_FOUND)
+        include(FetchContent)
+        FetchContent_Declare(
+            SDL2
+            GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+            GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+            GIT_TAG        release-2.26.3
+            GIT_PROGRESS   TRUE
+        )
+        
+        set(SDL2_DISABLE_INSTALL OFF)
+        set(SDL2_DISABLE_SDL2MAIN OFF)
+        set(SDL2_DISABLE_UNINSTALL OFF)
+
+        FetchContent_MakeAvailable(SDL2)
+    endif()
+endif()
+
+
+################################################################################
+# Fetch the latest OpenGL libraries
+################################################################################
+if(OPTION_ENABLE_OPENGL_RENDERER)
+
+	message(STATUS "Fetching OpenGL...")
+    find_package(OpenGL REQUIRED)
+
+	############################################################################
+	# Fetch GLFW
+	############################################################################
+	message(STATUS "Fetching GLFW...")
+    
+    find_package(GLFW QUIET)
+
+    if(NOT GLFW_FOUND)
+        FetchContent_Declare(
+            GLFW
+            GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+            GIT_REPOSITORY https://github.com/Vinifera-Developers/glfw.git
+            GIT_TAG        origin/master
+            GIT_PROGRESS   TRUE
+        )
+        
+        # Remove various items we do not need.
+        set(GLFW_LIBRARY_TYPE STATIC)
+        set(GLFW_BUILD_EXAMPLES OFF)
+        set(GLFW_BUILD_TESTS OFF)
+        set(GLFW_BUILD_DOCS OFF)
+        set(GLFW_INSTALL OFF)
+
+        FetchContent_MakeAvailable(GLFW)
+    endif()
+
+
+	############################################################################
+	# Fetch GLEW
+	############################################################################
+#	message(STATUS "Fetching GLEW...")
+
+	#set(BUILD_UTILS OFF)
+	#set(BUILD_SHARED_LIBS OFF)
+
+	#FetchContent_Declare(
+	#	GLEW
+	#	URL            https://sourceforge.net/projects/glew/files/glew/2.1.0/glew-2.1.0.zip
+	#	SOURCE_DIR     ${CMAKE_BINARY_DIR}/_deps/glew
+    #    GIT_PROGRESS   TRUE
+	#)
+    #
+	#FetchContent_GetProperties(GLEW)
+	#if(NOT GLEW_POPULATED)
+	#	FetchContent_Populate(GLEW)
+	#	add_subdirectory(${CMAKE_BINARY_DIR}/_deps/glew/build/cmake)
+	#endif()
+    
+#   find_package(GLEW QUIET)
+#
+#   if(NOT GLEW_FOUND)
+#       include(FetchContent)
+#       FetchContent_Declare(
+#               GLEW
+#               #GIT_REPOSITORY https://github.com/Perlmint/glew-cmake
+#               #GIT_TAG glew-cmake-2.2.0
+#               GIT_REPOSITORY https://github.com/Vinifera-Developers/glew.git
+#               GIT_TAG origin/master
+#               GIT_PROGRESS   TRUE
+#       )
+#       
+#       # Remove various items we do not need.
+#       #set(glew-cmake_BUILD_SHARED OFF)
+#       set(BUILD_UTILS OFF)
+#       set(BUILD_SHARED_LIBS OFF)
+#       
+#       FetchContent_MakeAvailable(GLEW)
+#       
+#       #add_subdirectory(${CMAKE_BINARY_DIR}/_deps/glew-src/build/cmake)
+#   endif()
+    
+    
+	############################################################################
+	# Fetch GLAD
+	############################################################################
+	message(STATUS "Fetching GLAD...")
+    
+    find_package(GLAD QUIET)
+
+    if(NOT GLAD_FOUND)
+        FetchContent_Declare(
+            GLAD
+            GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+            GIT_REPOSITORY https://github.com/Dav1dde/glad.git
+            GIT_TAG        origin/master
+            GIT_PROGRESS   TRUE
+        )
+        
+        # Remove various items we do not need.
+
+        FetchContent_MakeAvailable(GLAD)
+        
+        #add_subdirectory(${CMAKE_BINARY_DIR}/_deps/glad-src/cmake)
+        
+        #set(GLAD_SOURCES_DIR "${PROJECT_SOURCE_DIR}/../../..")
+        #add_subdirectory("${GLAD_SOURCES_DIR}/cmake" glad_cmake)
+        
+        #glad_add_library(glad_gl_core_mx_33 REPRODUCIBLE MX API gl:core=3.3)
+    endif()
+
 endif()
 
 
@@ -610,13 +753,51 @@ add_dependencies(${PROJECT_NAME} TSpp)
 # Ensure the launcher is built with the main project.
 add_dependencies(${PROJECT_NAME} Launch${PROJECT_NAME})
 
-set(REQUIRED_LIBRARIES ws2_32 dbghelp shlwapi version comctl32)
+set(REQUIRED_LIBRARIES ws2_32 dbghelp shlwapi version comctl32 shcore ddraw dxguid gdi32)
 
 # Link to any required libraries.
 target_link_libraries(${PROJECT_NAME} ${REQUIRED_LIBRARIES})
 
 # Make build check state of git to check for uncommitted changes.
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_check_git)
+
+
+if(OPTION_ENABLE_DX7_RENDERER)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC DX7_RENDERER=1)
+endif()
+
+if(OPTION_ENABLE_DX9_RENDERER)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC DX9_RENDERER=1)
+endif()
+
+if(OPTION_ENABLE_SDL2_RENDERER)
+	target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_BINARY_DIR}/_deps/sdl2-src/include) # For some reason it uses sdl2-build...
+	target_link_libraries(${PROJECT_NAME} SDL2main SDL2-static)
+	add_dependencies(${PROJECT_NAME} SDL2main SDL2-static)
+
+	target_compile_definitions(${PROJECT_NAME} PUBLIC SDL2_RENDERER=1)
+endif()
+
+# Link to the OpenGL, GFLW and GLEW static libraries.
+if(OPTION_ENABLE_OPENGL_RENDERER)
+
+    target_link_libraries(${PROJECT_NAME} OpenGL::GL)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC OPENGL_RENDERER=1)
+
+	target_link_libraries(${PROJECT_NAME} glfw)
+	add_dependencies(${PROJECT_NAME} glfw)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC OPENGL_GLFW=1)
+
+	#target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_BINARY_DIR}/_deps/glew/include) # For some reason it is not building glew...
+	#target_link_libraries(${PROJECT_NAME} glew_s)
+	#add_dependencies(${PROJECT_NAME} glew_s)
+	#target_compile_definitions(${PROJECT_NAME} PUBLIC OPENGL_GLEW=1)
+    
+	add_dependencies(${PROJECT_NAME} glad-generate-files) # force generation of glad files on build.
+	target_link_libraries(${PROJECT_NAME} glad)
+	add_dependencies(${PROJECT_NAME} glad)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC OPENGL_GLAD=1)
+endif()
 
 
 ################################################################################
@@ -641,4 +822,3 @@ SetCustomProjectFilters("Generated Files" ${GIT_POST_CONFIGURE_FILE})
 
 # Force the default startup project.
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Vinifera)
-

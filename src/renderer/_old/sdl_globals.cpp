@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OPTIONSEXT_HOOKS.CPP
+ *  @file          SDL_GLOBALS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for the extended OptionsClass.
+ *  @brief         SDL2 globals.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,41 +25,22 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "optionsext_hooks.h"
-#include "optionsext_init.h"
-#include "optionsext.h"
-#include "fatal.h"
-#include "debughandler.h"
-#include "asserthandler.h"
+#pragma once
 
-#include "hooker.h"
-#include "hooker_macros.h"
+#include "sdl_globals.h"
 
+#if 0
 
-/**
- *  x
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_WinMain_Load_Init_Settings_Patch)
-{
-    OptionsExtension->Load_Init_Settings();
+bool UseSDL2 = true;
+bool SDLBorderless = false;
+bool SDLBorderlessFullscreen = true;
+bool SDLHardwareRenderer = false;
+bool SDLClipMouseToWindow = true;
 
-    _asm { push 0x31C } // sizeof WWKeyboardClass
+SDL_Window *SDLWindow = nullptr;
+SDL_Renderer *SDLWindowRenderer = nullptr;
+SDL_Surface *SDLWindowSurface = nullptr;
+SDL_Texture *SDLWindowTexture = nullptr;
+SDL_Palette *SDLPalette = nullptr;
 
-    JMP(0x00601283);
-}
-
-
-/**
- *  Main function for patching the hooks.
- */
-void OptionsClassExtension_Hooks()
-{
-    /**
-     *  Initialises the extended class.
-     */
-    OptionsClassExtension_Init();
-
-    Patch_Jump(0x0060127E, &_WinMain_Load_Init_Settings_Patch);
-}
+#endif
