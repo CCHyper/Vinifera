@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          AUDIO_DRIVER.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         Contains the hooks for the new audio engine.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,31 +25,66 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#include "audio_driver.h"
+#include "tibsun_functions.h"
+#include "tibsun_globals.h"
+#include "debughandler.h"
+#include "asserthandler.h"
+
 
 /**
- *  Include the hook headers here.
+ *  
  */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "audio_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
+static AudioDriver *AudioEngine = nullptr;
 
 
-void Setup_Hooks()
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void __cdecl Install_Audio_Driver(AudioDriver *driver)
 {
-    Vinifera_Memory_Hooks();
+    if (AudioEngine) {
+        DEBUG_INFO("Audio: Removing \"%s\" as the audio driver.\n", AudioEngine->Get_Name().Peek_Buffer());
+        Uninstall_Audio_Driver();
+    }
 
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Audio_Hooks();
-    Extension_Hooks();
+    AudioEngine = driver;
+    DEBUG_INFO("Audio: Using \"%s\" audio driver.\n", AudioEngine->Get_Name().Peek_Buffer());
 
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
+    /**
+     *  
+     */
+    std::atexit(Uninstall_Audio_Driver);
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+/**
+ *  Removes the current audio driver.
+ */
+void __cdecl Uninstall_Audio_Driver()
+{
+    delete AudioEngine;
+    AudioEngine = nullptr;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+/**
+ *  Fetch the audio driver instance.
+ */
+AudioDriver * __cdecl Audio_Driver()
+{
+    ASSERT(AudioEngine != nullptr);
+    return AudioEngine;
 }

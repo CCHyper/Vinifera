@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          XAUDIO2_GLOBALS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,31 +25,10 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#pragma once
 
-/**
- *  Include the hook headers here.
- */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "audio_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
+#include "xaudio2_globals.h"
 
 
-void Setup_Hooks()
-{
-    Vinifera_Memory_Hooks();
-
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Audio_Hooks();
-    Extension_Hooks();
-
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
-}
+IXAudio2 *AudioEngine = nullptr;
+IXAudio2MasteringVoice *MasterVoice = nullptr;

@@ -30,3 +30,4 @@
 
 bool Prev_Theme_Command();
 bool Next_Theme_Command();
+bool Play_Pause_Theme_Command();

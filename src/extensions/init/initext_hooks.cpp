@@ -29,17 +29,126 @@
 #include "initext_functions.h"
 #include "vinifera_globals.h"
 #include "tibsun_globals.h"
+#include "tibsun_functions.h"
 #include "special.h"
 #include "playmovie.h"
 #include "cd.h"
 #include "newmenu.h"
 #include "addon.h"
 #include "command.h"
+#include "ttimer.h"
+#include "stimer.h"
+#include "audio_driver.h"
+#include "audio_util.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+extern bool NewThemeClassHooked;
+
+
+extern void Audio_Driver_Focus_Loss();
+extern void Audio_Driver_Focus_Restore();
+extern bool Audio_Driver_In_Focus();
+
+
+/**
+ *  Patch to remove the Play_Song as the new audio engine(s) will start
+ *  themes instantly, and this request interferes with the new menu system
+ *  play request.
+ * 
+ *  @author: CCHyper
+ */
+static bool Is_GMenu_Available() { return CCFileClass("GMENU.MIX").Is_Available(); }
+DECLARE_PATCH(_Select_Game_Skip_Intro_Play_Patch)
+{
+    if (!Is_GMenu_Available()) {
+        Theme_Play_Song(Get_Intro_Theme());
+    }
+
+    JMP(0x004E1FA7);
+}
+
+
+/**
+ *  Removes a inlined instance of Focus_Loss in Main_Window_Procedure.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Main_Window_Procedure_Inlined_Focus_Loss_Patch)
+{
+    Focus_Loss();
+
+    JMP(0x00685F10);
+}
+
+
+/**
+ *  Fixes bug where cnc-ddraw erronisouly ignores focus loss/gain messages. This
+ *  patch ensures the game logic is processed correctly by flagging GameInFocus
+ *  when focus status changes by explictly checking the foreground window.
+ * 
+ *  @author: CCHyper
+ */
+static bool _audio_in_focus = false;
+//static CDTimerClass<MSTimerClass> _focus_check_timer = 10; //SECONDS_TO_MILLISECONDS(1);
+DECLARE_PATCH(_Main_Window_Procedure_cnc_ddraw_Check_Focus_Loss_Patch)
+{
+    if (GetActiveWindow() != MainWindow && Audio_Driver_In_Focus()) {
+        if (NewThemeClassHooked) {
+            Audio_Driver_Focus_Loss();
+        }
+    }
+
+    _asm { mov ecx, [0x00865040] } // MainWindow
+    _asm { test ecx, ecx }
+
+    JMP(0x00685C3D);
+}
+
+DECLARE_PATCH(_Main_Window_Procedure_cnc_ddraw_WM_ACTIVATEAPP_Patch)
+{
+    GET_REGISTER_STATIC(HWND, hWnd, ebp);
+    GET_REGISTER_STATIC(HWND, _MainWindow, ecx);
+    GET_STACK_STATIC(UINT, wParam, esp, 0x14);
+    static HWND _hWnd;
+
+#ifndef NDEBUG
+    DEV_DEBUG_INFO("wParam == %d.\n", (BOOL)wParam);
+#endif
+
+    _hWnd = GetActiveWindow();
+    if (_hWnd == _MainWindow) {
+        DEV_DEBUG_INFO("Main_Window_Procesure(): GameInFocus = true.\n");
+        //GameInFocus = true;
+
+        goto focus_gain;
+
+    } else {
+        DEV_DEBUG_INFO("Main_Window_Procesure(): GameInFocus = false.\n");
+        //GameInFocus = false;
+
+        goto focus_loss;
+
+    }
+
+    /**
+     *  Handle focus gain.
+     */
+focus_gain:
+    Audio_Driver_Focus_Restore();
+    JMP(0x00685F1C);
+    
+    /**
+     *  Handle focus loss.
+     */
+focus_loss:
+    Audio_Driver_Focus_Loss();
+    JMP(0x00685F10);
+}
 
 
 /**
@@ -260,6 +369,14 @@ void GameInit_Hooks()
     Patch_Call(0x004E8735, &Addon_Enabled);
 
     Patch_Jump(0x00685F69, &_Main_Window_Procedure_Scroll_Sidebar_Check_Patch);
+
+    if (CCFileClass("DDRAW.DLL").Is_Available()) {
+        //Patch_Jump(0x00685C35, &_Main_Window_Procedure_cnc_ddraw_Check_Focus_Loss_Patch);
+        //Patch_Jump(0x00685E5C, &_Main_Window_Procedure_cnc_ddraw_WM_ACTIVATEAPP_Patch);
+    }
+
+    //Patch_Jump(0x004E1F6B, &_Select_Game_Skip_Intro_Play_Patch);
+    //Patch_Jump(0x00685E91, &_Main_Window_Procedure_Inlined_Focus_Loss_Patch);
 
 #if defined(TS_CLIENT)
     /**

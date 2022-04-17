@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          XAUDIO2_DEBUG.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,31 +25,25 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#pragma once
+
+#include "always.h"
+#include "debughandler.h"
+
 
 /**
- *  Include the hook headers here.
+ *  
  */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "audio_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-
-
-void Setup_Hooks()
-{
-    Vinifera_Memory_Hooks();
-
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Audio_Hooks();
-    Extension_Hooks();
-
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
-}
+#ifndef NDEBUG
+#define XAUDIO2_DEBUG_INFO(x, ...) DEBUG_INFO(x, ##__VA_ARGS__)
+#define XAUDIO2_DEBUG_WARNING(x, ...) DEBUG_WARNING(x, ##__VA_ARGS__)
+#define XAUDIO2_DEBUG_ERROR(x, ...) DEBUG_ERROR(x, ##__VA_ARGS__)
+#define XAUDIO2_DEBUG_FATAL(x, ...) DEBUG_FATAL(x, ##__VA_ARGS__)
+#define XAUDIO2_DEBUG_TRACE(x, ...) DEBUG_TRACE(x, ##__VA_ARGS__)
+#else
+#define XAUDIO2_DEBUG_INFO(x, ...) ((void)0)
+#define XAUDIO2_DEBUG_WARNING(x, ...) ((void)0)
+#define XAUDIO2_DEBUG_ERROR(x, ...) ((void)0)
+#define XAUDIO2_DEBUG_FATAL(x, ...) ((void)0)
+#define XAUDIO2_DEBUG_TRACE(x, ...) ((void)0)
+#endif

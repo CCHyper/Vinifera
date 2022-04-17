@@ -1,3 +1,4 @@
+
 /*******************************************************************************
 /*                 O P E N  S O U R C E  --  V I N I F E R A                  **
 /*******************************************************************************
@@ -36,6 +37,9 @@
 #include "scenario.h"
 #include "addon.h"
 #include "fatal.h"
+#include "wstring.h"
+#include "audio_driver.h"
+#include "audio_util.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
@@ -51,7 +55,105 @@ static class ThemeClassFake final : public ThemeClass
 {
     public:
         bool _Is_Allowed(ThemeType index) const;
+        void _Scan();
+        int _Play_Song(ThemeType theme);
 };
+
+
+/**
+ *  Reimplementation of ThemeClass::Scan(), with file preloading added.
+ * 
+ *  @author: CCHyper
+ */
+void ThemeClassFake::_Scan()
+{
+    if (Audio_Driver()->Is_Available() && !Debug_Quiet && Themes.Count() > 0) {
+
+        for (ThemeType theme = THEME_FIRST; theme < Themes.Count(); ++theme) {
+
+            ThemeControl *tctrl = Themes[theme];
+            Wstring fname = tctrl->Name;
+
+            /**
+             *  Check to see if the theme exists.
+             */
+            bool available = Audio_Driver()->Is_Audio_File_Available(fname);
+            if (available) {
+                tctrl->Available = Audio_Driver()->Request_Preload(fname, PRELOAD_MUSIC);
+            } else {
+                DEV_DEBUG_WARNING("Theme: Unable to find \"%s\"!\n", fname.Peek_Buffer());
+            }
+
+        }
+
+        //Audio_Driver()->Start_Preloader();
+
+    }
+}
+
+
+/**
+ *  Reimplementation of ThemeClass::Play_Song().
+ * 
+ *  @author: CCHyper
+ */
+int ThemeClassFake::_Play_Song(ThemeType theme)
+{
+    if (ScoresPresent && Audio_Driver()->Is_Available() && !Debug_Quiet) {
+
+        /**
+         *  Stop any theme currently playing in a abrupt manner.
+         */
+        Stop();
+
+        if (theme != THEME_NONE && theme != THEME_QUIET) {
+
+            ThemeControl *tctrl = Themes[theme];
+        
+            /**
+             *  #BUGFIX:
+             *  Check for availability of the theme before attempting to play it.
+             *  This stops the theme handler from spamming attempts to the audio engine.
+             */
+            if (tctrl->Available) {
+
+                if (Volume > 0) {
+
+                    Score = theme;
+
+                    /**
+                     *  Attempt to play the theme.
+                     */
+                    Wstring fname = tctrl->Name;
+
+                    //Audio_Driver()->Set_Stream_Low_Impact(true);
+                    Current = Audio_Driver()->Play_Music(fname);
+                    //Audio_Driver()->Set_Stream_Low_Impact(false);
+
+                    if (Current == INVALID_AUDIO_HANDLE) {
+                        return INVALID_AUDIO_HANDLE;
+                    }
+
+                    if (IsRepeat || tctrl->Repeat) {
+                        DEBUG_INFO("Theme::Play_Song(%d:%s) - Playing (Repeating)\n", Score, tctrl->Name);
+                        Pending = theme;
+
+                    } else {
+                        DEBUG_INFO("Theme::Play_Song(%d:%s) - Playing\n", Score, tctrl->Name);
+                    }
+
+                } else {
+                    Pending = theme;
+                }
+
+            }
+
+        }
+
+    }
+
+    return Current;
+}
 
 
 /**
@@ -134,4 +236,7 @@ void ThemeClassExtension_Hooks()
     ThemeClassExtension_Init();
 
     Patch_Jump(0x00644300, &ThemeClassFake::_Is_Allowed);
+
+    Patch_Jump(0x00643C70, &ThemeClassFake::_Scan);
+    Patch_Jump(0x00643FE0, &ThemeClassFake::_Play_Song);
 }

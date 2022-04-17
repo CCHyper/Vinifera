@@ -380,6 +380,39 @@ bool NextThemeCommandClass::Process()
 
 
 /**
+ *  Skip to the next playable music track.
+ * 
+ *  @author: CCHyper
+ */
+const char *PlayPauseThemeCommandClass::Get_Name() const
+{
+    return "PlayPauseTheme";
+}
+
+const char *PlayPauseThemeCommandClass::Get_UI_Name() const
+{
+    return "Music: Play/Pause Track";
+}
+
+const char *PlayPauseThemeCommandClass::Get_Category() const
+{
+    return Text_String(TXT_INTERFACE);
+}
+
+const char *PlayPauseThemeCommandClass::Get_Description() const
+{
+    return "Toggle play/pause for the currently playing music track.";
+}
+
+bool PlayPauseThemeCommandClass::Process()
+{
+    Play_Pause_Theme_Command();
+
+    return true;
+}
+
+
+/**
  *  Scroll tactical map to the north-east.
  * 
  *  @author: CCHyper
