@@ -4,7 +4,7 @@
  *
  *  @project       ProjectTSYR (Common Library)
  *
- *  @file          THEME.CPP
+ *  @file          AUDIO_NEWTHEME.CPP
  *
  *  @author        Joe L. Bostic (see notes below)
  *
@@ -32,7 +32,7 @@
  *                 https://github.com/ElectronicArts/CnC_Remastered_Collection
  *
  ******************************************************************************/
-#include "audio_newtheme.h"
+#include "audio_theme.h"
 #include "tibsun_inline.h"
 #include "tibsun_globals.h"
 #include "session.h"
@@ -151,33 +151,31 @@ const char * NewThemeClass::Full_Name(ThemeType theme) const
  */
 void NewThemeClass::AI()
 {
-    if (!Audio_Driver()->Is_Available() || Debug_Quiet) {
-        return;
-    }
-
-#if 0
     /**
      *  #BUGFIX:
      *  Ok, this might end up causing more issues, but we need to skip the
-     *  theme update process to every 1 second, otherwise it greatly increases
-     *  chance of the new audio processing thread trying to 
+     *  theme update process to every 250ms, otherwise it greatly increases
+     *  chance of the new audio processing thread trying to access shared data.
      */
-    static CDTimerClass<MSTimerClass> _sleeper = 1000;
+    static CDTimerClass<MSTimerClass> _sleeper = 250;
     if (!_sleeper.Expired()) {
         return;
     }
-    _sleeper = 1000;
-#endif
+    _sleeper = 250;
+
+    if (!Audio_Driver()->Is_Available() || Debug_Quiet) {
+        return;
+    }
 
     if (!ScoresPresent || Volume <= 0 || ScenarioInit) {
         return;
     }
 
-    if (Pending == THEME_NONE || Pending == THEME_QUIET) {
+    if (IsPaused || Still_Playing()) {
         return;
     }
 
-    if (IsPlaying || IsPaused) {
+    if (Pending == THEME_NONE || Pending == THEME_QUIET) {
         return;
     }
     
@@ -334,8 +332,9 @@ bool NewThemeClass::Play_Song(ThemeType theme)
                  */
                 Wstring fname = tctrl->Name;
 
-                bool ok = Audio_Driver()->Play_Music(fname);
+                bool ok = Audio_Driver()->Play(STREAM_MUSIC, fname);
                 if (!ok) {
+                    DEBUG_INFO("Theme::Play_Song(%d:%s) - Failed to play!\n", Score, tctrl->Name);
                     return false;
                 }
 
@@ -423,12 +422,14 @@ void NewThemeClass::Stop(bool fade)
         return;
     }
 
+    Wstring score = Themes[Score]->Name;
+
     if (fade && Still_Playing()) {
         DEBUG_INFO("Theme::Stop(%d) - Fading\n", Score);
         Audio_Driver()->Fade_Out_Music();
     } else {
         DEBUG_INFO("Theme::Stop(%d)\n", Score);
-        Audio_Driver()->Stop_Music();
+        Audio_Driver()->Stop(STREAM_MUSIC, score);
     }
 
     Score = THEME_NONE;
@@ -455,7 +456,9 @@ void NewThemeClass::Suspend(bool fade)
 
     DEBUG_INFO("Theme::Suspend(%d)\n", Score);
 
-    Audio_Driver()->Stop_Music();
+    Wstring score = Themes[Score]->Name;
+
+    Audio_Driver()->Stop(STREAM_MUSIC, score);
 
     Pending = Score;
     Score = THEME_NONE;
@@ -529,6 +532,7 @@ void NewThemeClass::Clear()
 void NewThemeClass::Set_Volume(int volume)
 {
     float theme_vol = 1.0f;
+    Wstring name;
 
     Volume = std::min(volume, 255);
 
@@ -536,6 +540,7 @@ void NewThemeClass::Set_Volume(int volume)
         ThemeType play = What_Is_Playing();
         if (play >= THEME_FIRST && play < Themes.Count()) {
             theme_vol = Themes[play]->Volume;
+            name = Themes[play]->Name;
         }
     }
 
@@ -543,7 +548,9 @@ void NewThemeClass::Set_Volume(int volume)
 
     volf *= theme_vol;
 
-    Audio_Driver()->Set_Music_Volume(volf);
+    if (name.Is_Not_Empty()) {
+        Audio_Driver()->Set_Volume(STREAM_MUSIC, name, volf);
+    }
 }
 
 
@@ -583,15 +590,13 @@ int NewThemeClass::Process(CCINIClass & ini)
  */
 bool NewThemeClass::Still_Playing() const
 {
-    if (IsPlaying) {
-        return true;
+    if (!Audio_Driver()->Is_Available() || Volume <= 0 || Debug_Quiet) {
+        return false;
     }
 
-    if (Audio_Driver()->Is_Available() && Volume > 0 && !Debug_Quiet) {
-        return Audio_Driver()->Is_Music_Playing();
-    }
+    //((bool)IsPlaying) = Audio_Driver()->Is_Music_Finished();
 
-    return false;
+    return IsPlaying;
 }
 
 
@@ -701,49 +706,50 @@ void NewThemeClass::Scan()
 {
     if (Audio_Driver()->Is_Available() && !Debug_Quiet && Themes.Count() > 0) {
 
+        /**
+         *  Clear the existing music bank.
+         */
+        Audio_Driver()->Clear_Sample_Bank(SAMPLE_MUSIC);
+
         for (ThemeType theme = THEME_FIRST; theme < Themes.Count(); ++theme) {
 
             ThemeControl *tctrl = Themes[theme];
 
-            bool available = false;
+            tctrl->Available = false;
 
             /**
              *  
              */
             if (std::strlen(tctrl->Sound) > 0) {
-                Wstring soundname = tctrl->Sound;
-                available = Audio_Driver()->Is_Audio_File_Available(soundname);
-                if (available) {
-                    tctrl->Available = Audio_Driver()->Request_Preload(soundname, PRELOAD_MUSIC);
+                if (Audio_Driver()->Is_Audio_File_Available(tctrl->Sound)) {
+                    tctrl->Available = Audio_Driver()->Request_Preload(tctrl->Sound, SAMPLE_MUSIC);
                 }
             }
             
             /**
-             *  Custom override was not available, use the base ini name.
+             *  Custom override was not available or found, use the base ini name.
              */
-            if (!available) {
+            if (!tctrl->Available) {
 
                 /**
                  *  Check to see if the theme exists, request preload of asset if available.
                  */
-                Wstring name = tctrl->Name;
-                available = Audio_Driver()->Is_Audio_File_Available(name);
-                if (available) {
-                    tctrl->Available = Audio_Driver()->Request_Preload(name, PRELOAD_MUSIC);
+                if (Audio_Driver()->Is_Audio_File_Available(tctrl->Name)) {
+                    tctrl->Available = Audio_Driver()->Request_Preload(tctrl->Name, SAMPLE_MUSIC);
+                    if (!tctrl->Available) {
+                        DEBUG_WARNING("Theme: Failed to preload \"%s\"!\n", tctrl->Name);
+                    }
+                } else {
+                    DEV_DEBUG_WARNING("Theme: Unable to find \"%s\"!\n", tctrl->Name);
                 }
-            }
-
-            if (!available) {
-                DEV_DEBUG_WARNING("Theme: Unable to find \"%s\"!\n", tctrl->Name);
             }
 
         }
         
         /**
-         *  Flag the preloader to begin.
+         *  Flag the preloader thread to begin.
          */
-        Audio_Driver()->Start_Preloader();
-
+        Audio_Driver()->Start_Preloader(SAMPLE_MUSIC);
     }
 }
 

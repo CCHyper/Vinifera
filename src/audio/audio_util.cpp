@@ -29,15 +29,24 @@
 #include "tibsun_globals.h"
 #include "vinifera_globals.h"
 #include "audio_driver.h"
-#include "audio_newtheme.h"
+#include "audio_theme.h"
+#include "audio_vox.h"
+#include "audio_voc.h"
 #include "theme.h"
 #include "dsaudio.h"
 #include "wwaud.h"
 #include "wstring.h"
 #include "ramfile.h"
 #include "ccfile.h"
+#include "ccini.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+#include <algorithm>
+
+
+Wstring AudioDriverName = "DirectSound";
+unsigned int AudioMaxSimultaneousSounds = AUDIO_DEFAULT_NUM_TRACKERS; // Original value from the TibSun DirectSound audio engine.
+bool AudioCrossfadeMusic = false;
 
 
 extern NewThemeClass NewTheme;
@@ -137,7 +146,7 @@ const char * Theme_Full_Name(ThemeType theme)
 static bool Direct_Sound_Init()
 {
 #ifndef VINIFERA_AUDIO_HOOK_AHANDLE
-    DEV_DEBUG_INFO("Audio[VQ]: Initialising DirectSound.\n");
+    DEV_DEBUG_INFO("Audio: Initialising DirectSound.\n");
     return Audio.Init(MainWindow, 16, false, 22050);
 #else
     return true;
@@ -147,7 +156,7 @@ static bool Direct_Sound_Init()
 static void Direct_Sound_End()
 {
 #ifndef VINIFERA_AUDIO_HOOK_AHANDLE
-    DEV_DEBUG_INFO("Audio[VQ]: Shutting down DirectSound.\n");
+    DEV_DEBUG_INFO("Audio: Shutting down DirectSound.\n");
     Audio.End();
 #endif
 }
@@ -164,7 +173,7 @@ static bool Direct_Sound_Is_Available()
 static bool Direct_Sound_Start_Engine()
 {
 #ifndef VINIFERA_AUDIO_HOOK_AHANDLE
-    DEV_DEBUG_INFO("Audio[VQ]: Starting DirectSound.\n");
+    DEV_DEBUG_INFO("Audio: Starting DirectSound.\n");
     return Audio.Start_Primary_Sound_Buffer(true);
 #else
     return true;
@@ -174,20 +183,56 @@ static bool Direct_Sound_Start_Engine()
 static void Direct_Sound_Stop_Engine()
 {
 #ifndef VINIFERA_AUDIO_HOOK_AHANDLE
-    DEV_DEBUG_INFO("Audio[VQ]: Stopping DirectSound.\n");
+    DEV_DEBUG_INFO("Audio: Stopping DirectSound.\n");
     Audio.Stop_Primary_Sound_Buffer();
 #endif
 }
 
 
 /**
+ *  Utility functions for converting the integer audio volume to and from float.
+ */
+unsigned int Audio_fVolume_To_iVolume(float vol)
+{
+    vol = std::clamp(vol, 0.0f, 1.0f);
+    return (vol * 255);
+}
+
+float Audio_iVolume_To_fVolume(unsigned int vol)
+{
+    return float(vol) / 255.0f;
+}
+
+
+/**
+ *  
+ */
+bool Audio_Read_INI(INIClass &ini)
+{
+    static char const * const AUDIO = "Audio";
+
+    char buffer[128];
+
+    ini.Get_String(AUDIO, "Driver", AudioDriverName.Peek_Buffer(), buffer, sizeof(buffer));
+    AudioDriverName = buffer;
+
+    AudioMaxSimultaneousSounds = ini.Get_Int_Clamp(AUDIO, "MaxSimultaneousSounds", 4, 64, AudioMaxSimultaneousSounds);
+
+    AudioCrossfadeMusic = ini.Get_Bool(AUDIO, "CrossfadeMusic", AudioCrossfadeMusic);
+
+    return AudioDriverName.Is_Not_Empty();
+}
+
+
+/**
  *  These wrappers are required due to the stack being used when calling
- *  a static function.
+ *  the Audio_Driver static function.
  */
 bool Audio_Driver_Init(HWND hWnd, int bits_per_sample, bool stereo, int rate, int num_trackers)
 {
     return Direct_Sound_Init() && Audio_Driver()->Init(hWnd, bits_per_sample, stereo, rate, num_trackers);
 }
+
 void Audio_Driver_End()
 {
     Direct_Sound_End();

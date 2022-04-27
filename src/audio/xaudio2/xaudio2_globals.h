@@ -29,6 +29,8 @@
 
 #include "always.h"
 #include <xaudio2.h>
+
+#define XAUDIO2_HELPER_FUNCTIONS 1
 #include <xaudio2fx.h>
 
 
@@ -55,13 +57,3 @@
     #define SPEAKER_7POINT1_SURROUND (SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | SPEAKER_FRONT_CENTER | SPEAKER_LOW_FREQUENCY | SPEAKER_BACK_LEFT | SPEAKER_BACK_RIGHT | SPEAKER_SIDE_LEFT  | SPEAKER_SIDE_RIGHT)
 #endif
 
-
-/**
- *  
- */
-extern IXAudio2 *AudioEngine;
-
-/**
- *  
- */
-extern IXAudio2MasteringVoice *MasterVoice;

@@ -42,11 +42,26 @@ typedef const void * AudioSample;
 /**
  *  
  */
-typedef enum AudioPreloadType
+typedef enum AudioSampleType
 {
-    PRELOAD_SFX,
-    PRELOAD_MUSIC,
-} AudioPreloadType;
+    SAMPLE_NONE,
+
+    SAMPLE_SFX,
+    SAMPLE_SPEECH,
+    SAMPLE_MUSIC,
+} AudioSampleType;
+
+/**
+ *  
+ */
+typedef enum AudioStreamType
+{
+    STREAM_NONE,
+
+    STREAM_SFX,
+    STREAM_SPEECH,
+    STREAM_MUSIC,
+} AudioStreamType;
 
 
 /**
@@ -79,28 +94,62 @@ class AudioDriver
         virtual void Sound_Callback() = 0;
 
         /**
-         *  Music playback.
+         *  Sound effect i/o.
          */
-        virtual bool Play_Music(Wstring filename) = 0;
+        //virtual bool Play_SoundEffect(Wstring filename, float volume = 1.0f, float pan = 0.0f, bool one_shot = true, int loop_count = 1) = 0;
+        //virtual bool Stop_SoundEffect(Wstring filename, bool force = true) = 0;
+        //virtual bool Is_SoundEffect_Playing(Wstring filename) const = 0;
+        virtual void Set_SoundEffect_Volume(float volume) = 0;
+        virtual float Get_SoundEffect_Volume() = 0;
+
+        /**
+         *  Speech i/o.
+         */
+        //virtual bool Play_Speech(Wstring filename, float volume = 1.0f) = 0;
+        //virtual bool Stop_Speech(Wstring filename, bool force = false) = 0;
+        //virtual bool Is_Speech_Playing(Wstring filename) const = 0;
+        virtual void Set_Speech_Volume(float volume) = 0;
+        virtual float Get_Speech_Volume() = 0;
+
+        /**
+         *  Music i/o.
+         */
+        //virtual bool Play_Music(Wstring filename) = 0;
         virtual bool Pause_Music() = 0;
         virtual bool UnPause_Music() = 0;
-        virtual bool Stop_Music() = 0;
+        //virtual bool Stop_Music() = 0;
         virtual void Fade_In_Music(int seconds = 1, float step = 0.10f) = 0;
         virtual void Fade_Out_Music(int seconds = 1, float step = 0.10f) = 0;
-        virtual bool Is_Music_Playing() const = 0;
-        virtual bool Is_Music_Paused() const = 0;
-        virtual bool Is_Music_Fading_In() const = 0;
-        virtual bool Is_Music_Fading_Out() const = 0;
+        //virtual bool Is_Music_Playing() const = 0;
+        //virtual bool Is_Music_Finished() const = 0;
+        //virtual bool Is_Music_Paused() const = 0;
+        //virtual bool Is_Music_Fading_In() const = 0;
+        //virtual bool Is_Music_Fading_Out() const = 0;
         virtual void Set_Music_Volume(float volume) = 0;
         virtual float Get_Music_Volume() = 0;
+
+        virtual bool Play(AudioStreamType type, Wstring filename, float volume = 1.0f) = 0;
+        virtual bool Play_SoundEffect(Wstring filename, float volume = 1.0f, float pan = 0.0f, int loop_count = 1) = 0;
+        virtual bool Stop(AudioStreamType type, Wstring filename, bool force = false, bool all = true) = 0;
+
+        virtual bool Is_Playing(AudioStreamType type, Wstring filename) const = 0;
+        virtual void Set_Volume(AudioStreamType type, Wstring filename, float volume) = 0;
+        virtual float Get_Volume(AudioStreamType type, Wstring filename) = 0;
 
         /**
          *  Sound asset preloading.
          */
-        virtual bool Request_Preload(Wstring filename, AudioPreloadType type) = 0;
-        virtual void Start_Preloader() = 0;
+        virtual bool Request_Preload(Wstring filename, AudioSampleType type) = 0;
+        virtual void Start_Preloader(AudioSampleType type) = 0;
+
+        virtual void Clear_Sample_Bank(AudioSampleType type) = 0;
+        //virtual void Clear_SoundEffect_Bank() = 0;
+        //virtual void Clear_Speech_Bank() = 0;
+        //virtual void Clear_Music_Bank() = 0;
 
         virtual bool Is_Audio_File_Available(Wstring filename) = 0;
+
+        virtual void Debug_Dump_Sound_Banks() {}
 
     protected:
         /**

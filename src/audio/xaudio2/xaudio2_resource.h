@@ -38,12 +38,7 @@ class CCFileClass;
 
 enum XAudio2FileFormatType
 {
-    //FORMAT_WAV,
-    //FORMAT_FLAC,
     FORMAT_OGG,
-    //FORMAT_WMA,
-    //FORMAT_MP3,
-    //FORMAT_AUD,       // Westwood Aud is not supported yet.
 
     FORMAT_COUNT,
 
@@ -78,7 +73,7 @@ class XAudio2SoundResource
 
         virtual bool Load(Wstring fname) = 0;
         virtual bool Is_Available() const { return IsAvailable; }
-        virtual FileClass * Unique_File_Handle() const = 0;
+        virtual std::unique_ptr<CCFileClass> Get_Unique_File_Handle() const = 0;
 
     protected:
         /**
@@ -110,10 +105,10 @@ class XAudio2CCSoundResource final : public XAudio2SoundResource
 
         virtual bool Load(Wstring fname) override;
         virtual bool Is_Available() const override { return IsAvailable; }
-        virtual CCFileClass * Unique_File_Handle() const override { return new CCFileClass(FullName.Peek_Buffer()); }
+        virtual std::unique_ptr<CCFileClass> Get_Unique_File_Handle() const override { return std::make_unique<CCFileClass>(FullName.Peek_Buffer()); }
 };
 
 
-XAudio2Stream *XAudio2_Create_Sample_From_Resource(XAudio2SoundResource *res);
+std::unique_ptr<XAudio2Stream> XAudio2_Create_Sample_From_Resource(XAudio2SoundResource *res);
 bool XAudio2_Is_File_Available(Wstring filename);
 unsigned int XAudio2_Get_Filename_Hash(Wstring filename);

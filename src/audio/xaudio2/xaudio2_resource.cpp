@@ -60,7 +60,7 @@ static bool Sample_Is_Ogg(const void *sample)
  * 
  *  @author: CCHyper
  */
-static CCFileClass *XAudio2_Get_Audio_File_Handle(Wstring filename)
+static std::unique_ptr<CCFileClass> XAudio2_Get_Audio_File_Handle(Wstring filename)
 {
     CCFileClass file;
     Wstring tmp;
@@ -78,7 +78,7 @@ static CCFileClass *XAudio2_Get_Audio_File_Handle(Wstring filename)
             file.Set_Name(tmp.Peek_Buffer());
             if (file.Is_Available()) {
                 //DEV_DEBUG_INFO("XAudio2: Get_File_Handle found file \"%s\" in Music enviroment path.\n", fname.Peek_Buffer());
-                return new CCFileClass(tmp.Peek_Buffer());
+                return std::make_unique<CCFileClass>(tmp.Peek_Buffer());
             }
         }
         if (Vinifera_SoundsPath_EnvVar[0] != '\0') {
@@ -86,7 +86,7 @@ static CCFileClass *XAudio2_Get_Audio_File_Handle(Wstring filename)
             file.Set_Name(tmp.Peek_Buffer());
             if (file.Is_Available()) {
                 //DEV_DEBUG_INFO("XAudio2: Get_File_Handle found file \"%s\" in Sounds enviroment path.\n", fname.Peek_Buffer());
-                return new CCFileClass(tmp.Peek_Buffer());
+                return std::make_unique<CCFileClass>(tmp.Peek_Buffer());
             }
         }
 #endif
@@ -96,7 +96,7 @@ static CCFileClass *XAudio2_Get_Audio_File_Handle(Wstring filename)
             file.Set_Name(tmp.Peek_Buffer());
             if (file.Is_Available()) {
                 //DEV_DEBUG_INFO("XAudio2: Get_File_Handle found file \"%s\" in Music path.\n", fname.Peek_Buffer());
-                return new CCFileClass(tmp.Peek_Buffer());
+                return std::make_unique<CCFileClass>(tmp.Peek_Buffer());
             }
         }
         if (Vinifera_SoundsPath[0] != '\0') {
@@ -104,7 +104,7 @@ static CCFileClass *XAudio2_Get_Audio_File_Handle(Wstring filename)
             file.Set_Name(tmp.Peek_Buffer());
             if (file.Is_Available()) {
                 //DEV_DEBUG_INFO("XAudio2: Get_File_Handle found file \"%s\" in Sound path.\n", fname.Peek_Buffer());
-                return new CCFileClass(tmp.Peek_Buffer());
+                return std::make_unique<CCFileClass>(tmp.Peek_Buffer());
             }
         }
 #endif
@@ -114,7 +114,7 @@ static CCFileClass *XAudio2_Get_Audio_File_Handle(Wstring filename)
          */
         if (CCFileClass(fname.Peek_Buffer()).Is_Available()) {
             //DEV_DEBUG_INFO("XAudio2: Get_File_Handle found file \"%s\" in a mix file.\n", filename);
-            return new CCFileClass(fname.Peek_Buffer());
+            return std::make_unique<CCFileClass>(fname.Peek_Buffer());
         }
 
     }
@@ -141,19 +141,19 @@ bool XAudio2CCSoundResource::Load(Wstring fname)
         
     fname.To_Upper();
 
-    CCFileClass *fh = XAudio2_Get_Audio_File_Handle(fname);
+    std::unique_ptr<CCFileClass> fh = XAudio2_Get_Audio_File_Handle(fname);
     if (!fh) {
         return false;
     }
 
     if (!fh->Is_Available()) {
-        delete fh;
+        //delete fh;
         return false;
     }
 
     int file_size = fh->Size();
     if (file_size <= 0) {
-        delete fh;
+        //delete fh;
         return false;
     }
 
@@ -161,7 +161,7 @@ bool XAudio2CCSoundResource::Load(Wstring fname)
     char buffer[16];
     int read = fh->Read(&buffer, sizeof(buffer));
     if (read <= 0) {
-        delete fh;
+        //delete fh;
         return false;
     }
 
@@ -186,7 +186,7 @@ bool XAudio2CCSoundResource::Load(Wstring fname)
 #endif
 
     fh->Close();
-    delete fh;
+    //delete fh;
 
     return true;
 }
@@ -197,21 +197,19 @@ bool XAudio2CCSoundResource::Load(Wstring fname)
  * 
  *  @author: CCHyper
  */
-XAudio2Stream *XAudio2_Create_Sample_From_Resource(XAudio2SoundResource *res)
+std::unique_ptr<XAudio2Stream> XAudio2_Create_Sample_From_Resource(XAudio2SoundResource *res)
 {
     ASSERT(res != nullptr);
 
-    XAudio2Stream *sample = nullptr;
-
     switch (res->Get_Type()) {
         case FORMAT_OGG:
-            sample = new OggStream(res);
-            break;
+            return std::make_unique<OggStream>(res);
+
         default:
             break;
     };
 
-    return sample;
+    return nullptr;
 }
 
 
@@ -275,7 +273,7 @@ bool XAudio2_Is_File_Available(Wstring filename)
 
     }
 
-    return nullptr;
+    return false;
 }
 
 

@@ -1,21 +1,21 @@
 /*******************************************************************************
-/*                 O P E N  S O U R C E  --  V I N I F E R A                  **
+/*                  O P E N  S O U R C E -- V I N I F E R A                   **
 /*******************************************************************************
  *
- *  @project       Vinifera
+ *  @project       ProjectTSYR (Common Library)
  *
- *  @file          XAUDIO2_GLOBALS.CPP
+ *  @file          AUDIO_NEWVOC.H
  *
- *  @author        CCHyper
+ *  @author        CCHyper, tomsons26
  *
  *  @brief         
  *
- *  @license       Vinifera is free software: you can redistribute it and/or
+ *  @license       ProjectTSYR is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
  *                 as published by the Free Software Foundation, either version
  *                 3 of the License, or (at your option) any later version.
  *
- *                 Vinifera is distributed in the hope that it will be
+ *                 ProjectTSYR is distributed in the hope that it will be
  *                 useful, but WITHOUT ANY WARRANTY; without even the implied
  *                 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  *                 PURPOSE. See the GNU General Public License for more details.
@@ -27,5 +27,16 @@
  ******************************************************************************/
 #pragma once
 
-#include "xaudio2_globals.h"
+#include "always.h"
+#include "tibsun_defines.h"
 
+
+class NewVocClass
+{
+    public:
+        static void Preload();
+
+        static int Play(VocType voc, int a2, float volume = 1.0f);
+        static int Play(VocType voc, float volume = 1.0f);
+        static int Play(VocType voc, Coordinate &coord);
+};

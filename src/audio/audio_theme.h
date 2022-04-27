@@ -4,7 +4,7 @@
  *
  *  @project       ProjectTSYR (Common Library)
  *
- *  @file          THEME.H
+ *  @file          AUDIO_NEWTHEME.H
  *
  *  @author        Joe L. Bostic (see notes below)
  *
@@ -43,7 +43,7 @@ class CCINIClass;
 
 
 /**
- *  A reimplementation of ThemeClass to use the new audio driver interface.
+ *  A reimplementation of ThemeClass to use with the new audio driver interface.
  */
 class NewThemeClass
 {
@@ -200,10 +200,18 @@ class NewThemeClass
          */
         bool IsShuffle;
 
+    private:
+        /**
+         *  Internal flag: Is there a theme currently playing?
+         */
         bool IsPlaying;
-
+        
+        /**
+         *  Internal flag: Is the current theme paused?
+         */
         bool IsPaused;
         
+    public:
         /**
          *  x
          */

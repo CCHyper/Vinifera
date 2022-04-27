@@ -28,7 +28,9 @@
 #include "audio_hooks.h"
 #include "audio_driver.h"
 #include "audio_util.h"
-#include "audio_newtheme.h"
+#include "audio_theme.h"
+#include "audio_vox.h"
+#include "audio_voc.h"
 #include "tspp_audio_intercept.h"
 #include "vinifera_globals.h"
 #include "tibsun_functions.h"
@@ -47,9 +49,11 @@
 
 
 /**
- *  Has the new theme engine been hooked?
+ *  Has the new interfaces been hooked?
  */
 bool NewThemeClassHooked = false;
+bool NewVoxClassHooked = false;
+bool NewVocClassHooked = false;
 
 extern NewThemeClass NewTheme;
 
@@ -494,10 +498,31 @@ DECLARE_PATCH(_CreditsClass_Graphic_Logic_Limit_Sfx_Patch)
 
 
 /**
+ *  Load the speech file assets (e.g. for preloading).
+ */
+DECLARE_PATCH(_Prep_Speech_For_Side_Preload_Files_Patch)
+{
+    VoxClass::Init();
+
+    VoxClass::Preload();
+
+    _asm { mov al, 1 }
+    _asm { pop edi }
+    _asm { pop esi }
+    _asm { add esp, 0x0A8 }
+    _asm { retn }
+}
+
+
+/**
  *  Patch in the new theme handler.
  */
 void NewTheme_Hooks()
 {
+    if (NewThemeClassHooked) {
+        return;
+    }
+
 #ifndef NDEBUG
     DEV_DEBUG_INFO("Patching in NewThemeClass.\n");
 #endif
@@ -754,6 +779,263 @@ void NewTheme_Hooks()
     Patch_Jump(0x00685B84, 0x00685B95);
 
     NewThemeClassHooked = true;
+}
+
+
+/**
+ *  Patch in the new vox handler.
+ */
+void NewVox_Hooks()
+{
+    if (NewVoxClassHooked) {
+        return;
+    }
+
+#ifndef NDEBUG
+    DEV_DEBUG_INFO("Patching in Vox.\n");
+#endif
+
+#if 0
+    Patch_Call(0x0042F644, &VoxClass::Speak);
+    Patch_Call(0x0042F77D, &VoxClass::Speak);
+    Patch_Call(0x004306AF, &VoxClass::Speak);
+    Patch_Call(0x0043109A, &VoxClass::Speak);
+    Patch_Call(0x00431150, &VoxClass::Speak);
+    Patch_Call(0x00431A0D, &VoxClass::Speak);
+    Patch_Call(0x00431CDB, &VoxClass::Speak);
+    Patch_Call(0x00431E3A, &VoxClass::Speak);
+    Patch_Call(0x0043224C, &VoxClass::Speak);
+    Patch_Call(0x0043293E, &VoxClass::Speak);
+    Patch_Call(0x00433483, &VoxClass::Speak);
+    Patch_Call(0x00434CAA, &VoxClass::Speak);
+    Patch_Call(0x00436881, &VoxClass::Speak);
+    Patch_Call(0x0043690C, &VoxClass::Speak);
+    Patch_Call(0x00458F26, &VoxClass::Speak);
+    Patch_Call(0x004715BD, &VoxClass::Speak);
+    Patch_Call(0x00478A37, &VoxClass::Speak);
+    Patch_Call(0x004A4DB0, &VoxClass::Speak);
+    Patch_Call(0x004A5331, &VoxClass::Speak);
+    Patch_Call(0x004BCC3A, &VoxClass::Speak);
+    Patch_Call(0x004BCCBE, &VoxClass::Speak);
+    Patch_Call(0x004BCD8C, &VoxClass::Speak);
+    Patch_Call(0x004BD489, &VoxClass::Speak);
+    Patch_Call(0x004BD512, &VoxClass::Speak);
+    Patch_Call(0x004BDE63, &VoxClass::Speak);
+    Patch_Call(0x004BE090, &VoxClass::Speak);
+    Patch_Call(0x004BE0B1, &VoxClass::Speak);
+    Patch_Call(0x004BEC13, &VoxClass::Speak);
+    Patch_Call(0x004BF64E, &VoxClass::Speak);
+    Patch_Call(0x004BF6D2, &VoxClass::Speak);
+    Patch_Call(0x004BFDDE, &VoxClass::Speak);
+    Patch_Call(0x004BFF8A, &VoxClass::Speak);
+    Patch_Call(0x004C5666, &VoxClass::Speak);
+    Patch_Call(0x004D34C4, &VoxClass::Speak);
+    Patch_Call(0x004D377A, &VoxClass::Speak);
+    Patch_Call(0x004ED5BB, &VoxClass::Speak);
+    Patch_Call(0x00589BD1, &VoxClass::Speak);
+    Patch_Call(0x005B9166, &VoxClass::Speak);
+    Patch_Call(0x005BF672, &VoxClass::Speak);
+    Patch_Call(0x005DD000, &VoxClass::Speak);
+    Patch_Call(0x005F4674, &VoxClass::Speak);
+    Patch_Call(0x005F4DD0, &VoxClass::Speak);
+    Patch_Call(0x005F5A94, &VoxClass::Speak);
+    Patch_Call(0x005F5B71, &VoxClass::Speak);
+    Patch_Call(0x005F5B9B, &VoxClass::Speak);
+    Patch_Call(0x005F5D69, &VoxClass::Speak);
+    Patch_Call(0x005F5DC1, &VoxClass::Speak);
+    Patch_Call(0x005F5E71, &VoxClass::Speak);
+    Patch_Call(0x005F5E8D, &VoxClass::Speak);
+    Patch_Call(0x0060B799, &VoxClass::Speak);
+    Patch_Call(0x0060B7EA, &VoxClass::Speak);
+    Patch_Call(0x0060B8C8, &VoxClass::Speak);
+    Patch_Call(0x0060BBBC, &VoxClass::Speak);
+    Patch_Call(0x0060BCD6, &VoxClass::Speak);
+    Patch_Jump(0x0060BE2E, &VoxClass::Speak);
+    Patch_Jump(0x0060BE3B, &VoxClass::Speak);
+    Patch_Call(0x0060BE85, &VoxClass::Speak);
+    Patch_Call(0x00619C57, &VoxClass::Speak);
+    Patch_Call(0x00619CAB, &VoxClass::Speak);
+    Patch_Call(0x00619DC9, &VoxClass::Speak);
+    Patch_Call(0x00619F20, &VoxClass::Speak);
+    Patch_Call(0x0061A2B5, &VoxClass::Speak);
+    Patch_Call(0x0061BCC5, &VoxClass::Speak);
+    Patch_Call(0x0061BD16, &VoxClass::Speak);
+    Patch_Call(0x0061BE8D, &VoxClass::Speak);
+    Patch_Call(0x0061C055, &VoxClass::Speak);
+    Patch_Call(0x0061C615, &VoxClass::Speak);
+    Patch_Call(0x0061C9D1, &VoxClass::Speak);
+    Patch_Call(0x0061CA47, &VoxClass::Speak);
+    Patch_Call(0x0061D053, &VoxClass::Speak);
+    Patch_Call(0x00622E75, &VoxClass::Speak);
+    Patch_Call(0x0062683C, &VoxClass::Speak);
+    Patch_Call(0x0063A3C0, &VoxClass::Speak);
+    Patch_Call(0x006501EE, &VoxClass::Speak);
+    Patch_Call(0x00650C7E, &VoxClass::Speak);
+
+    Patch_Call(0x00462C9B, &VoxClass::Speak_AI);
+    Patch_Call(0x00594290, &VoxClass::Speak_AI);
+    //Patch_Call(0x006658D9, &VoxClass::Speak_AI); // Speak
+    //Patch_Call(0x00665930, &VoxClass::Speak_AI); // Speak
+    //Patch_Call(0x00665B20, &VoxClass::Speak_AI); // Is_Speaking
+
+    Patch_Call(0x004BC726, &VoxClass::Is_Speaking);
+    Patch_Call(0x004BC757, &VoxClass::Is_Speaking);
+    Patch_Call(0x004BC7EE, &VoxClass::Is_Speaking);
+    Patch_Call(0x004BC81F, &VoxClass::Is_Speaking);
+    Patch_Call(0x004E2E33, &VoxClass::Is_Speaking);
+    Patch_Call(0x00589BB6, &VoxClass::Is_Speaking);
+    Patch_Call(0x005B9156, &VoxClass::Is_Speaking);
+    Patch_Call(0x005BCC57, &VoxClass::Is_Speaking);
+    Patch_Call(0x005DCD3D, &VoxClass::Is_Speaking);
+    Patch_Call(0x005DCD71, &VoxClass::Is_Speaking);
+    Patch_Call(0x005DD02E, &VoxClass::Is_Speaking);
+    Patch_Call(0x005DD062, &VoxClass::Is_Speaking);
+
+    Patch_Call(0x00589BA0, &VoxClass::Set_Speech_Volume);
+    Patch_Call(0x00589F85, &VoxClass::Set_Speech_Volume);
+    Patch_Call(0x0058A539, &VoxClass::Set_Speech_Volume);
+#endif
+
+    Patch_Jump(0x00665800, &VoxClass::Speak);
+    Patch_Jump(0x00665940, &VoxClass::Speak_AI);
+    Patch_Jump(0x00665AF0, &VoxClass::Stop_Speaking);
+    Patch_Jump(0x00665B20, &VoxClass::Is_Speaking);
+    Patch_Jump(0x00665B70, &VoxClass::Set_Speech_Volume);
+
+    Patch_Jump(0x004E86E0, &_Prep_Speech_For_Side_Preload_Files_Patch);
+
+    NewVoxClassHooked = true;
+}
+
+
+/**
+ *  Patch in the new voc handler.
+ */
+void NewVoc_Hooks()
+{
+    if (NewVocClassHooked) {
+        return;
+    }
+
+#ifndef NDEBUG
+    DEV_DEBUG_INFO("Patching in Voc.\n");
+#endif
+
+//Patch_Call(0x0042EB85, &);
+//Patch_Call(0x00462F50, &);
+//Patch_Call(0x004714C7, &);
+//Patch_Call(0x00480514, &);
+//Patch_Call(0x0048110C, &);
+//Patch_Call(0x004970AA, &);
+//Patch_Call(0x004A5348, &);
+//Patch_Call(0x004BEBD4, &);
+//Patch_Call(0x004C0183, &);
+//Patch_Call(0x004D1055, &);
+//Patch_Call(0x004E5080, &);
+//Patch_Call(0x004E93B3, &);
+//Patch_Call(0x004E9531, &);
+//Patch_Call(0x004E961B, &);
+//Patch_Call(0x004E9731, &);
+//Patch_Call(0x004ECF62, &);
+//Patch_Call(0x004FFA49, &);
+//Patch_Call(0x005208A4, &);
+//Patch_Call(0x005564F1, &);
+//Patch_Call(0x0055BA83, &);
+//Patch_Call(0x0055C215, &);
+//Patch_Call(0x0055EF1F, &);
+//Patch_Call(0x0055FD82, &);
+//Patch_Call(0x005733AA, &);
+//Patch_Call(0x00576AE7, &);
+//Patch_Call(0x00576D15, &);
+//Patch_Call(0x00579B1E, &);
+//Patch_Call(0x00579CFE, &);
+//Patch_Call(0x00579FDF, &);
+//Patch_Call(0x0057A307, &);
+//Patch_Call(0x0057A828, &);
+//Patch_Call(0x0057AC3E, &);
+//Patch_Call(0x0057B2F2, &);
+//Patch_Call(0x00589AF1, &);
+//Patch_Call(0x00589B4D, &);
+//Patch_Call(0x00590D2C, &);
+//Patch_Call(0x00594AB0, &);
+//Patch_Call(0x00596B30, &);
+//Patch_Call(0x00597810, &);
+//Patch_Call(0x00599753, &);
+//Patch_Call(0x00599778, &);
+//Patch_Call(0x0059C3F5, &);
+//Patch_Call(0x005ADFAF, &);
+//Patch_Call(0x005B3994, &);
+//Patch_Call(0x005BBE82, &);
+//Patch_Call(0x005BBEB4, &);
+//Patch_Call(0x005BBF56, &);
+//Patch_Call(0x005BBFD6, &);
+//Patch_Call(0x005BC02E, &);
+//Patch_Call(0x005BC0F1, &);
+//Patch_Call(0x005BC125, &);
+//Patch_Call(0x005C11E4, &);
+//Patch_Call(0x005F3022, &);
+//Patch_Call(0x005F33E4, &);
+//Patch_Call(0x005F4ABC, &);
+//Patch_Call(0x00619E2E, &);
+//Patch_Call(0x0061BF3A, &);
+//Patch_Call(0x00622E8D, &);
+//Patch_Call(0x00626861, &);
+//Patch_Call(0x0063048E, &);
+//Patch_Call(0x00637381, &);
+//Patch_Call(0x006373E1, &);
+//Patch_Call(0x00637441, &);
+//Patch_Call(0x0064F344, &);
+//Patch_Call(0x0066D017, &);
+//Patch_Call(0x0068B6DD, &);
+//Patch_Call(0x0068FF16, &);
+//Patch_Call(0x00694E05, &);
+//Patch_Call(0x00699825, &);
+//Patch_Call(0x0069B2B3, &);
+//    Patch_Call(0x00589BE8, &NewSoundEffectClass::Play);
+//Patch_Call(0x00409ADC, &);
+//Patch_Call(0x00414D9C, &);
+//Patch_Call(0x00415186, &);
+//Patch_Call(0x00415D9E, &);
+//Patch_Call(0x0042AC29, &);
+//Patch_Call(0x0042B6DA, &);
+//Patch_Call(0x0042EACA, &);
+//Patch_Call(0x0043059A, &);
+//Patch_Call(0x00430F26, &);
+//Patch_Call(0x00431337, &);
+//Patch_Call(0x00433189, &);
+//Patch_Call(0x00433BC3, &);
+//Patch_Call(0x00433C7C, &);
+//Patch_Call(0x00435497, &);
+//Patch_Call(0x004589A8, &);
+//Patch_Call(0x0048359D, &);
+//Patch_Call(0x00499A7F, &);
+//Patch_Call(0x0049B5D5, &);
+//Patch_Call(0x0049B873, &);
+//Patch_Call(0x0049CB92, &);
+//Patch_Call(0x004D3DAD, &);
+//Patch_Call(0x004D5F9A, &);
+//Patch_Call(0x00619EBD, &);
+//Patch_Call(0x00619EEA, &);
+//Patch_Call(0x0061BFE3, &);
+//Patch_Call(0x0061C01F, &);
+//Patch_Call(0x006310D9, &);
+//Patch_Call(0x00632A22, &);
+//Patch_Call(0x006330EE, &);
+//Patch_Call(0x00633BE2, &);
+//Patch_Call(0x00633C86, &);
+//Patch_Call(0x0064BE1C, &);
+//Patch_Call(0x0064C1EA, &);
+//Patch_Call(0x0064C2C5, &);
+//Patch_Call(0x0064C67B, &);
+//Patch_Call(0x0064C85B, &);
+//Patch_Call(0x00650F8E, &);
+//Patch_Call(0x00651E5F, &);
+//Patch_Call(0x006574BA, &);
+//Patch_Call(0x0065DDB4, &);
+//Patch_Call(0x0065E6DF, &);
+//Patch_Call(0x0065EEB6, &);
+
+    NewVocClassHooked = true;
 }
 
 

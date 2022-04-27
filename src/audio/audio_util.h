@@ -27,11 +27,13 @@
  ******************************************************************************/
 #include "always.h"
 #include "tibsun_defines.h"
+#include "wstring.h"
 #include "dsaudio.h"
 #include "debughandler.h"
 
 
 class CCFileClass;
+class INIClass;
 
 
 /**
@@ -40,13 +42,15 @@ class CCFileClass;
 #define AUDIO_DEFAULT_BITS 16
 #define AUDIO_DEFAULT_STEREO 1
 #define AUDIO_DEFAULT_RATE 48000
-#define AUDIO_DEFAULT_NUM_TRACKERS 16
+#define AUDIO_DEFAULT_NUM_TRACKERS 5
 
 
 /**
  *  
  */
-bool Sample_Is_Ogg(const void *sample);
+extern Wstring AudioDriverName;
+extern unsigned int AudioMaxSimultaneousSounds;
+extern bool AudioCrossfadeMusic;
 
 
 /**
@@ -62,6 +66,19 @@ ThemeType Theme_What_Is_Playing();
 int Theme_Max_Themes();
 bool Theme_Is_Allowed(ThemeType theme);
 const char * Theme_Full_Name(ThemeType theme);
+
+
+/**
+ *  Utility functions for converting the integer audio volume to and from float.
+ */
+unsigned int Audio_fVolume_To_iVolume(float vol);
+float Audio_iVolume_To_fVolume(unsigned int vol);
+
+
+/**
+ *  
+ */
+bool Audio_Read_INI(INIClass &ini);
 
 
 /**

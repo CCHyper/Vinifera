@@ -30,6 +30,8 @@
 #include "xaudio2_stream.h"
 #include "xaudio2_debug.h"
 #include "xaudio2_globals.h"
+#include "audio_util.h"
+#include "critsection.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
@@ -38,9 +40,15 @@
 #include <vector>
 
 
+IXAudio2 *XAudio2AudioDriver::AudioEngine = nullptr;
+IXAudio2MasteringVoice *XAudio2AudioDriver::MasterVoice = nullptr;
+
+
+
 // TODO
 // consumer and producer threads for handling preloading and playback.
 // https://stackoverflow.com/questions/16277840/c-syncing-threads-in-most-elegant-way
+
 
 
 struct PreloadRequest
@@ -49,103 +57,118 @@ struct PreloadRequest
     bool operator == (const PreloadRequest & that) const { return Filename == that.Filename && Type == that.Type; }
 
     Wstring Filename;
-    AudioPreloadType Type;
+    AudioSampleType Type;
 };
 
 // Files requested be preloaded into the audio engine.
 //DynamicVectorClass<PreloadRequest> PreloadRequests;
 static std::vector<PreloadRequest> PreloadRequests;
 
+#if 0
 template<typename T>
-void pop_front(std::vector<T> & vec)
+static void vector_pop_front(std::vector<T> & vec)
 {
     //ASSERT(!vec.empty());
     vec.erase(vec.begin());
+}
+#endif
+
+template<typename T>
+static void vector_erase(std::vector<T> & vec, T & elem)
+{
+    //ASSERT(!vec.empty());
+    vec.erase(std::remove(vec.begin(), vec.end(), elem), vec.end());
 }
 
 
 
 
-
-static Wstring SoundRequestName;
-static Wstring MusicRequestName;
+static SimpleCriticalSectionClass XAudio2CriticalSection;
 
 
 
 
-#if 0
-
-enum JobRequestType
+typedef struct RequestType
 {
-    JOB_PLAY,
-    JOB_STOP,
+    //bool operator == (RequestType &that) const { return Name != that.Name; }
+    //bool operator != (RequestType &that) const { return Name != that.Name; }
+
+    RequestType(Wstring name, float volume) :
+        Name(name),
+        Volume(volume)
+    {
+    }
+
+    Wstring Name;
+    float Volume;
 };
 
-typedef struct AudioJobRequest
+inline bool operator == (const RequestType &left, const RequestType &right)
 {
-    AudioJobRequest(JobRequestType type, Wstring &filename, float volume, float pitch, int priority, bool loop) :
-        Type(type),
-        Filename(filename),
-        Volume(volume),
-        Pitch(pitch),
-        Priority(priority),
-        IsLoop(loop)
+    return left.Name != right.Name;
+}
+
+inline bool operator != (const RequestType &left, const RequestType &right)
+{
+    return left.Name != right.Name;
+}
+
+static std::vector<RequestType> SpeechRequests;
+static std::vector<RequestType> MusicRequests;
+
+
+
+
+
+typedef struct SoundEffectRequestType : public RequestType
+{
+    SoundEffectRequestType(Wstring name, float volume, float pan, int loop_count) :
+        RequestType(name, volume),
+        Pan(pan),
+        LoopCount(loop_count)
     {
     }
 
-    ~AudioJobRequest()
-    {
-    }
+    float Pan;
+    int LoopCount;
+};
 
-    bool operator != (const AudioJobRequest & that) const { return Type != that.Type && Filename != that.Filename; }
-    bool operator == (const AudioJobRequest & that) const { return Type == that.Type && Filename == that.Filename; }
-
-    JobRequestType Type;
-
-    Wstring Filename;
-    float Volume;
-    float Pitch;
-    int Priority;
-    bool IsLoop;
-
-} AudioJobRequest;
-
-static DynamicVectorClass<AudioJobRequest *> JobRequests;
-
-#endif
+static std::vector<SoundEffectRequestType> SoundEffectRequests;
 
 
+
+
+static std::thread XAudio2_Preload_Thread;
+static volatile bool XAudio2_Preload_Begin = false;
 
 static std::thread XAudio2_Sound_Thread;
 static volatile bool XAudio2_Sound_Thread_Active = false;
 static volatile bool XAudio2_Sound_Thread_Running = false;
 
-static void __cdecl XAudio2_Sound_Thread_Function()
+
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void __cdecl XAudio2AudioDriver::Sound_Thread_Function()
 {
-    XAUDIO2_DEBUG_INFO("XAudio2: Starting sound thread.\n");
+    XAUDIO2_DEBUG_INFO("XAudio2: Entering sound thread.\n");
 
     XAudio2_Sound_Thread_Running = true;
 
     while (XAudio2_Sound_Thread_Active) {
 
+        reinterpret_cast<XAudio2AudioDriver *>(Audio_Driver())->Handle_Requests();
+
+        reinterpret_cast<XAudio2AudioDriver *>(Audio_Driver())->Thread_Callback();
+
         // Sleep the thread.
         std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::milliseconds(50));
 
-        reinterpret_cast<XAudio2AudioDriver *>(Audio_Driver())->Process_File_Preload();
-
-        if (SoundRequestName.Is_Not_Empty()) {
-            reinterpret_cast<XAudio2AudioDriver *>(Audio_Driver())->Handle_Sound_Request();
-            SoundRequestName.Release_Buffer();
-        }
-
-        reinterpret_cast<XAudio2AudioDriver *>(Audio_Driver())->Thread_Sound_Callback();
-
-        if (MusicRequestName.Is_Not_Empty()) {
-            reinterpret_cast<XAudio2AudioDriver *>(Audio_Driver())->Handle_Music_Request();
-            MusicRequestName.Release_Buffer();
-        }
-
-        reinterpret_cast<XAudio2AudioDriver *>(Audio_Driver())->Thread_Music_Callback();
+        //std::this_thread::yield();
     }
 
     XAudio2_Sound_Thread_Running = false;
@@ -154,32 +177,89 @@ static void __cdecl XAudio2_Sound_Thread_Function()
 }
 
 
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void __cdecl XAudio2AudioDriver::Preload_Thread_Function()
+{
+    XAUDIO2_DEBUG_INFO("XAudio2: Entering preload thread.\n");
+
+    while (true) {
+
+        if (!XAudio2_Sound_Thread_Running) {
+            break;
+        }
+
+        if (XAudio2_Preload_Begin) {
+            reinterpret_cast<XAudio2AudioDriver *>(Audio_Driver())->Process_File_Preload_Requests();
+            XAudio2_Preload_Begin = false;
+        }
+
+        // Sleep the thread.
+        //std::this_thread::sleep_until(std::chrono::system_clock::now() + std::chrono::milliseconds(50));
+
+        std::this_thread::yield();
+    }
+
+    XAUDIO2_DEBUG_INFO("XAudio2: Exiting preload thread.\n");
+}
 
 
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 XAudio2AudioDriver::XAudio2AudioDriver() :
     AudioDriver("XAudio2"),
     IsAvailable(false),
     IsEnabled(false),
     MasterVolume(1.0f),
-    SoundVolume(1.0f),
+    SoundEffectVolume(1.0f),
+    SpeechVolume(1.0f),
     MusicVolume(1.0f),
-    Sounds(32),
-    Music(nullptr),
-    SoundBankIndex(),
-    MusicBankIndex()
+    //SoundEffectStreams(), //SoundEffectStream(nullptr),
+    SoundEffectBankIndex(),
+    MaxSimultaneousSounds(AudioMaxSimultaneousSounds),
+    //SpeechStreams(), //SpeechStream(nullptr),
+    SpeechBankIndex(),
+    //MusicStreams(), //MusicStream(nullptr),
+    MusicBankIndex(),
+    //MusicStreamIsFinished(false),
+    Streams()
 {
 }
 
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 XAudio2AudioDriver::~XAudio2AudioDriver()
 {
+    // empty
 }
 
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 bool XAudio2AudioDriver::Init(HWND hWnd, int bits_per_sample, bool stereo, int rate, int num_trackers, bool reverse_channels)
 {
     HRESULT hr;
 
     AudioEngine = nullptr;
     MasterVoice = nullptr;
+
+    /**
+     *  This only applies to sound effects.
+     */
+    MaxSimultaneousSounds = num_trackers;
 
     //hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
     //if (FAILED(hr)) {
@@ -192,28 +272,34 @@ bool XAudio2AudioDriver::Init(HWND hWnd, int bits_per_sample, bool stereo, int r
     flags |= XAUDIO2_DEBUG_ENGINE;
 #endif
 
-    // Create XAudio2 Engine.
+    // Create the XAudio2 Engine.
     hr = XAudio2Create(&AudioEngine, flags);
     if (FAILED(hr)) {
         return false;
     }
 
-    // Create Master Voice for Engine.
+#ifdef _DEBUG
+    XAUDIO2_DEBUG_CONFIGURATION debugConfig = {0};
+    debugConfig.BreakMask = XAUDIO2_LOG_ERRORS;
+    debugConfig.TraceMask = XAUDIO2_LOG_ERRORS;
+    AudioEngine->SetDebugConfiguration(&debugConfig);
+#endif
+
+    // Create Master Voice for the Engine.
     hr = AudioEngine->CreateMasteringVoice(&MasterVoice);
     if (FAILED(hr)) {
         SafeRelease(AudioEngine);
         return false;
     }
 
-    // create basic samples.
-    for (int i = 0; i < Sounds.Length(); ++i) {
-        Sounds[i] = new XAudio2Stream();
-    }
-
     // sound maintenance thread.
     XAudio2_Sound_Thread_Active = true;
-    XAudio2_Sound_Thread = std::thread(&XAudio2_Sound_Thread_Function);
+    XAudio2_Sound_Thread = std::thread(&Sound_Thread_Function);
     XAudio2_Sound_Thread.detach(); // The thread is now free, and runs on its own.
+
+    // sound preloading threads.
+    XAudio2_Preload_Thread = std::thread(&Preload_Thread_Function);
+    XAudio2_Preload_Thread.detach(); // The thread is now free, and runs on its own.
 
     IsAvailable = true;
     IsEnabled = true;
@@ -221,164 +307,96 @@ bool XAudio2AudioDriver::Init(HWND hWnd, int bits_per_sample, bool stereo, int r
     return true;
 }
 
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 void XAudio2AudioDriver::End()
 {
     XAudio2_Sound_Thread_Active = false;
 
-    Sounds.Clear();
+    //delete SoundEffectStream;
+    //SoundEffectStream = nullptr;
+//    SoundEffectStreams.clear();
 
-    delete Music;
-    Music = nullptr;
+    //delete SpeechStream;
+    //SpeechStream = nullptr;
+//    SpeechStreams.clear();
 
-    SoundBankIndex.Clear();
+    //delete MusicStream;
+    //MusicStream = nullptr;
+//    MusicStreams.clear();
+
+    Streams.clear();
+
+    SoundEffectBankIndex.Clear();
+    SpeechBankIndex.Clear();
     MusicBankIndex.Clear();
+
     PreloadRequests.clear();
     
-    if (MasterVoice != nullptr)
+    if (MasterVoice != nullptr) {
         MasterVoice->DestroyVoice();
         MasterVoice = nullptr;
+    }
 
     SafeRelease(AudioEngine);
 
     //CoUninitialize();
 }
 
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 bool XAudio2AudioDriver::Is_Available() const
 {
     return IsAvailable;
 }
 
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 bool XAudio2AudioDriver::Is_Enabled() const
 {
     return IsEnabled;
 }
 
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 void XAudio2AudioDriver::Enable()
 {
     IsEnabled = true;
 }
 
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 void XAudio2AudioDriver::Disable()
 {
     IsEnabled = false;
 }
 
-bool XAudio2AudioDriver::Play_Music(Wstring filename)
-{
-    MusicRequestName = filename;
-    
-    return true;
-}
 
-bool XAudio2AudioDriver::Pause_Music()
-{
-    if (!Music) {
-        return false;
-    }
-
-    return Music->Pause();
-}
-
-bool XAudio2AudioDriver::UnPause_Music()
-{
-    if (!Music) {
-        return false;
-    }
-
-    return Music->UnPause();
-}
-
-bool XAudio2AudioDriver::Stop_Music()
-{
-    if (!Music) {
-        return false;
-    }
-
-    //return Music->Stop();
-    delete Music;
-    Music = nullptr;
-
-    return true;
-}
-
-void XAudio2AudioDriver::Fade_In_Music(int seconds, float step)
-{
-    if (!Music) {
-        return;
-    }
-
-    Music->Fade_In(seconds, step);
-}
-
-void XAudio2AudioDriver::Fade_Out_Music(int seconds, float step)
-{
-    if (!Music) {
-        return;
-    }
-    
-    Music->Fade_Out(seconds, step);
-}
-
-bool XAudio2AudioDriver::Is_Music_Playing() const
-{
-    if (!Music) {
-        return false;
-    }
-
-    return Music->Is_Playing();
-}
-
-
-bool XAudio2AudioDriver::Is_Music_Paused() const
-{
-    if (!Music) {
-        return false;
-    }
-
-    return Music->Is_Paused();
-}
-
-
-bool XAudio2AudioDriver::Is_Music_Fading_In() const
-{
-    if (!Music) {
-        return false;
-    }
-
-    return Music->IsFadingIn;
-}
-
-bool XAudio2AudioDriver::Is_Music_Fading_Out() const
-{
-    if (!Music) {
-        return false;
-    }
-
-    return Music->IsFadingOut;
-}
-
-void XAudio2AudioDriver::Set_Music_Volume(float volume)
-{
-    //ASSERT(volume >= 0.0f);
-    //ASSERT(volume <= 1.0f);
-
-    if (!Music) {
-        return;
-    }
-
-    //volume = std::clamp(volume, -1.0f, 1.0f);
-    Music->Set_Volume(volume);
-}
-
-float XAudio2AudioDriver::Get_Music_Volume()
-{
-    if (!Music) {
-        return false;
-    }
-
-    return Music->Get_Volume();
-}
-
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 bool XAudio2AudioDriver::Start_Engine(bool forced)
 {
     if (AudioEngine) {
@@ -389,6 +407,12 @@ bool XAudio2AudioDriver::Start_Engine(bool forced)
     return false;
 }
 
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 void XAudio2AudioDriver::Stop_Engine()
 {
     if (AudioEngine) {
@@ -396,22 +420,39 @@ void XAudio2AudioDriver::Stop_Engine()
     }
 }
 
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 void XAudio2AudioDriver::Focus_Loss()
 {
     XAUDIO2_DEBUG_INFO("XAudio2::Focus_Loss().\n");
 
     if (MasterVoice) {
 
-        /**
-         *  Pause the music track.
-         */
-        if (Music) {
-            Music->Pause();
-        }
+        {
 
-        // #NOTE: We don't pause the sound effects here as that would
-        //        create a situation where the gameply and sounds are 
+        //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+        // #NOTE: We don't pause the sound effects and eva speech here as that
+        //        would create a situation where the gameply and sounds are 
         //        out of sync when focus is regained.
+
+        /**
+         *  Pause the music tracks.
+         */
+        for (auto &it : Streams) {
+            if (it->Type == STREAM_MUSIC) {
+                it->Pause();
+            }
+        }
+        //if (MusicStream) {
+        //    MusicStream->Pause();
+        //}
+
+        }
 
         /**
          *  Store the current master volume before muting.
@@ -424,22 +465,39 @@ void XAudio2AudioDriver::Focus_Loss()
     InFocus = false;
 }
 
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 void XAudio2AudioDriver::Focus_Restore()
 {
     XAUDIO2_DEBUG_INFO("XAudio2::Focus_Restore().\n");
 
     if (MasterVoice) {
 
+        {
+
+        //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+        // #NOTE: We don't resume the sound effects and eva speech here as that
+        //        would create a situation where the gameply and sounds are 
+        //        out of sync when focus is regained.
+
         /**
          *  Resume the music track.
          */
-        if (Music) {
-            Music->UnPause();
+        for (auto &it : Streams) {
+            if (it->Type == STREAM_MUSIC) {
+                it->UnPause();
+            }
         }
+        //if (MusicStream) {
+        //    MusicStream->UnPause();
+        //}
 
-        // #NOTE: We don't resume the sound effects here as that would
-        //        create a situation where the gameply and sounds are 
-        //        out of sync when focus is regained.
+        }
 
         /**
          *  
@@ -454,179 +512,27 @@ void XAudio2AudioDriver::Focus_Restore()
     InFocus = true;
 }
 
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 void XAudio2AudioDriver::Sound_Callback()
 {
-    // XAudio2 driver runs in its own maintance thread.
+    // XAudio2 API runs in its own maintance thread, so we don't need to implement this.
 }
 
-bool XAudio2AudioDriver::Handle_Sound_Request()
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void XAudio2AudioDriver::Process_File_Preload_Requests()
 {
-    return true;
-}
+    int count = PreloadRequests.size();
 
-void XAudio2AudioDriver::Thread_Sound_Callback()
-{
-    if (!IsAvailable || !IsEnabled) {
-        return;
-    }
-}
-
-bool XAudio2AudioDriver::Handle_Music_Request()
-{
-    if (MusicRequestName.Is_Empty()) {
-        XAUDIO2_DEBUG_WARNING("XAudio2::Play_File - Invalid filename!\n");
-        return false;
-    }
-
-    if (!MusicBankIndex.Count()) {
-        XAUDIO2_DEBUG_WARNING("XAudio2::Play_File - Music bank is empty!\n");
-        return false;
-    }
-
-    unsigned int key = XAudio2_Get_Filename_Hash(MusicRequestName);
-    if (!MusicBankIndex.Is_Present(key)) {
-        XAUDIO2_DEBUG_WARNING("XAudio2::Play_File - Failed to find \"%s\" in Music bank!\n", MusicRequestName.Peek_Buffer());
-        return false;
-    }
-
-    XAudio2SoundResource *resource = MusicBankIndex[key];
-    if (!resource) {
-        XAUDIO2_DEBUG_WARNING("XAudio2::Play_File - Sound resource is null!\n");
-        return false;
-    }
-
-    XAudio2Stream *stream = XAudio2_Create_Sample_From_Resource(resource);
-    if (!stream) {
-        XAUDIO2_DEBUG_WARNING("XAudio2::Play_File - Sample is null!\n");
-        return false;
-    }
-
-    // delete previous, replace it with our new one.
-    delete Music;
-    Music = stream;
-
-    return true;
-}
-
-// maintain music streaming.
-void XAudio2AudioDriver::Thread_Music_Callback()
-{
-    if (!IsAvailable || !IsEnabled) {
-        return;
-    }
-
-    if (!Music) {
-        return;
-    }
-
-    // open up pending streams.
-    if (Music->Is_Pending()) {
-        Music->Open_Stream();
-    }
-
-    if (Music->Is_Paused() || !Music->Is_Playing()) {
-        return;
-    }
-
-    // Fill buffer with more data.
-    Music->Update_Stream();
-
-    // If we have finished, stop the stream (playing any remaining buffers).
-    if (Music->Is_Finished()) {
-        Music->Stop(true);
-
-    // handle fading in.
-    } else if (Music->IsFadingIn) {
-
-        float vol = Music->Get_Volume();
-        vol += (Music->FadeInStep / float(Music->FadeInSeconds));
-        Music->Set_Volume(vol);
-
-        XAUDIO2_DEBUG_INFO("XAudio2[Music] - Fading -> Vol %f.\n", vol);
-
-        
-    // handle fading out.
-    } else if (Music->IsFadingOut) {
-
-        float vol = Music->Get_Volume();
-        vol -= (Music->FadeOutStep / float(Music->FadeOutSeconds));
-        Music->Set_Volume(vol);
-
-        XAUDIO2_DEBUG_INFO("XAudio2[Music] - Fading -> Vol %f.\n", vol);
-
-        if (Music->Get_Volume() <= 0.0f) {
-            XAUDIO2_DEBUG_INFO("XAudio2[Music] - Fading -> Stop.\n");
-            Music->Stop(true);
-        }
-    }
-}
-
-void XAudio2AudioDriver::Process_Job_Requests()
-{
-#if 0
-    for (int i = 0; i < JobRequests.Count(); ++i) {
-
-        AudioJobRequest *req = JobRequests[i];
-        if (!req) {
-            continue;
-        }
-
-        unsigned int key = XAudio2_Get_Filename_Hash(req->Filename);
-        if (!SoundBankIndex.Is_Present(key)) {
-            XAUDIO2_DEBUG_WARNING("XAudio2[Job] - Failed to find \"%s\" in sound bank!\n", req->Filename.Peek_Buffer());
-            continue;
-        }
-
-        XAudio2SoundResource *resource = SoundBankIndex[key];
-        if (!resource) {
-            XAUDIO2_DEBUG_WARNING("XAudio2[Job] - Sound resource is null!\n");
-            continue;
-        }
-
-        switch (req->Type)
-        {
-            case JOB_STOP:
-            {
-                break;
-            }
-
-            case JOB_PLAY:
-            {
-                int playing_handle = Get_Free_Sample_Handle();
-                if (playing_handle == INVALID_AUDIO_HANDLE) {
-                    continue;
-                }
-
-                XAudio2Stream *stream = XAudio2_Create_Sample_From_Resource(resource);
-                if (!stream) {
-                    XAUDIO2_DEBUG_WARNING("XAudio2[Job] - Sample is null!\n");
-                    continue;
-                }
-
-                // delete previous, replace it with our new one.
-                delete ActiveStreams[playing_handle];
-                ActiveStreams[playing_handle] = stream;
-
-                if (!stream->Load(resource)) {
-                    XAUDIO2_DEBUG_WARNING("XAudio2[Job] - Failed to load!\n");
-                    continue;
-                }
-
-                if (!stream->Start()) {
-                    XAUDIO2_DEBUG_WARNING("XAudio2[Job] - Failed to start!\n");
-                    continue;
-                }
-
-                break;
-            }
-        };
-
-    }
-#endif
-}
-
-void XAudio2AudioDriver::Process_File_Preload()
-{
     // Load all the requested files into the index.
     for (int i = 0; i < PreloadRequests.size(); ++i) {
     
@@ -640,7 +546,7 @@ void XAudio2AudioDriver::Process_File_Preload()
     
         if (!resource->Load(req.Filename)) {
             XAUDIO2_DEBUG_ERROR("XAudio2[Preload]: Preloading of \"%s\" failed!\n", req.Filename.Peek_Buffer());
-            pop_front(PreloadRequests); // Remove this request.
+            PreloadRequests.erase(PreloadRequests.begin()); // remove this request.
             continue;
         }
 
@@ -649,37 +555,60 @@ void XAudio2AudioDriver::Process_File_Preload()
         switch (req.Type) {
 
             default:
-                XAUDIO2_DEBUG_WARNING("XAudio2[Preload]: File \"%s\" is invalid preload request!\n", req.Filename.Peek_Buffer());
+                XAUDIO2_DEBUG_WARNING("XAudio2[Preload]: File \"%s\" is an invalid preload request!\n", req.Filename.Peek_Buffer());
                 break;
 
-            case PRELOAD_MUSIC:
-            {    
+            case SAMPLE_SFX:
+            {
+                XAUDIO2_DEBUG_INFO("XAudio2[Preload]: SoundEffect \"%s\".\n", req.Filename.Peek_Buffer());
+
+                if (SoundEffectBankIndex.Is_Present(key)) {
+                    XAUDIO2_DEBUG_WARNING("XAudio2[Preload]: File \"%s\" is already present in SoundEffect bank!\n", req.Filename.Peek_Buffer());
+                    PreloadRequests.erase(PreloadRequests.begin()); // remove this request.
+                    continue;
+                }
+    
+                if (!SoundEffectBankIndex.Add_Index(key, resource)) {
+                    XAUDIO2_DEBUG_ERROR("XAudio2[Preload]: Failed to add \"%s\" to SoundEffect bank!\n", req.Filename.Peek_Buffer());
+                    PreloadRequests.erase(PreloadRequests.begin()); // remove this request.
+                    continue;
+                }
+            
+                break;
+            }
+
+            case SAMPLE_SPEECH:
+            {
+                XAUDIO2_DEBUG_INFO("XAudio2[Preload]: Speech \"%s\".\n", req.Filename.Peek_Buffer());
+
+                if (SpeechBankIndex.Is_Present(key)) {
+                    XAUDIO2_DEBUG_WARNING("XAudio2[Preload]: File \"%s\" is already present in Speech bank!\n", req.Filename.Peek_Buffer());
+                    PreloadRequests.erase(PreloadRequests.begin()); // remove this request.
+                    continue;
+                }
+    
+                if (!SpeechBankIndex.Add_Index(key, resource)) {
+                    XAUDIO2_DEBUG_ERROR("XAudio2[Preload]: Failed to add \"%s\" to Speech bank!\n", req.Filename.Peek_Buffer());
+                    PreloadRequests.erase(PreloadRequests.begin()); // remove this request.
+                    continue;
+                }
+            
+                break;
+            }
+
+            case SAMPLE_MUSIC:
+            {
+                XAUDIO2_DEBUG_INFO("XAudio2[Preload]: Music \"%s\".\n", req.Filename.Peek_Buffer());
+
                 if (MusicBankIndex.Is_Present(key)) {
-                    XAUDIO2_DEBUG_WARNING("XAudio2[Preload]: File \"%s\" is already present in music bank!\n", req.Filename.Peek_Buffer());
-                    pop_front(PreloadRequests); // Remove this request.
+                    XAUDIO2_DEBUG_WARNING("XAudio2[Preload]: File \"%s\" is already present in Music bank!\n", req.Filename.Peek_Buffer());
+                    PreloadRequests.erase(PreloadRequests.begin()); // remove this request.
                     continue;
                 }
     
                 if (!MusicBankIndex.Add_Index(key, resource)) {
-                    XAUDIO2_DEBUG_ERROR("XAudio2[Preload]: Failed to add \"%s\" to music bank!\n", req.Filename.Peek_Buffer());
-                    pop_front(PreloadRequests); // Remove this request.
-                    continue;
-                }
-
-                break;
-            }
-            
-            case PRELOAD_SFX:
-            {    
-                if (SoundBankIndex.Is_Present(key)) {
-                    XAUDIO2_DEBUG_WARNING("XAudio2[Preload]: File \"%s\" is already present in sound bank!\n", req.Filename.Peek_Buffer());
-                    pop_front(PreloadRequests); // Remove this request.
-                    continue;
-                }
-    
-                if (!SoundBankIndex.Add_Index(key, resource)) {
-                    XAUDIO2_DEBUG_ERROR("XAudio2[Preload]: Failed to add \"%s\" to sound bank!\n", req.Filename.Peek_Buffer());
-                    pop_front(PreloadRequests); // Remove this request.
+                    XAUDIO2_DEBUG_ERROR("XAudio2[Preload]: Failed to add \"%s\" to Music bank!\n", req.Filename.Peek_Buffer());
+                    PreloadRequests.erase(PreloadRequests.begin()); // remove this request.
                     continue;
                 }
 
@@ -688,75 +617,1238 @@ void XAudio2AudioDriver::Process_File_Preload()
 
         };
 
-        // pop the element from the 
-        pop_front(PreloadRequests);
+        PreloadRequests.erase(PreloadRequests.begin()); // remove this request.
     
         XAUDIO2_DEBUG_INFO("XAudio2[Preload]: File \"%s\" preloaded OK.\n", resource->Get_Name().Peek_Buffer());
     }
 
+    if (count > 0) {
+        XAUDIO2_DEBUG_INFO("XAudio2[Preload]: Finished preloading of %d files.\n", count);
+    }
 }
 
-bool XAudio2AudioDriver::Request_Preload(Wstring filename, AudioPreloadType type)
+
+bool XAudio2AudioDriver::Handle_Requests()
 {
-    XAUDIO2_DEBUG_INFO("XAudio2: File \"%s\" has been requested for preloading.\n", filename.Peek_Buffer());
+    if (SoundEffectRequests.size() > 0) {
+
+        if (!SoundEffectBankIndex.Count()) {
+            XAUDIO2_DEBUG_WARNING("XAudio2::Handle_SoundEffect_Request - SoundEffect bank is empty!\n");
+            return false;
+        }
+
+        for (int i = 0; i < SoundEffectRequests.size(); ++i) {
+    
+            auto &it = SoundEffectRequests.front();
+
+            if (it.Name.Is_Empty()) {
+                XAUDIO2_DEBUG_WARNING("XAudio2::Handle_SoundEffect_Request - Invalid filename!\n");
+                continue;
+            }
+
+            unsigned int key = XAudio2_Get_Filename_Hash(it.Name);
+            if (!SoundEffectBankIndex.Is_Present(key)) {
+                XAUDIO2_DEBUG_WARNING("XAudio2::Handle_SoundEffect_Request - Failed to find \"%s\" in SoundEffect bank!\n", it.Name.Peek_Buffer());
+                continue;
+            }
+
+            XAudio2SoundResource *resource = SoundEffectBankIndex[key];
+            if (!resource) {
+                XAUDIO2_DEBUG_WARNING("XAudio2::Handle_SoundEffect_Request - Sound resource is null!\n");
+                continue;
+            }
+
+            std::unique_ptr<XAudio2Stream> stream = XAudio2_Create_Sample_From_Resource(resource);
+            if (!stream) {
+                XAUDIO2_DEBUG_WARNING("XAudio2::Handle_SoundEffect_Request - Sample is null!\n");
+                continue;
+            }
+
+            //SoundEffectStreams.push_back(std::move(stream));
+            Streams.push_back(std::move(stream));
+
+            SoundEffectRequests.erase(SoundEffectRequests.begin()); // pop front
+        }
+
+    }
+
+    if (SpeechRequests.size() > 0) {
+
+        if (!SpeechBankIndex.Count()) {
+            XAUDIO2_DEBUG_WARNING("XAudio2::Handle_Speech_Request - Speech bank is empty!\n");
+            return false;
+        }
+
+        for (int i = 0; i < SpeechRequests.size(); ++i) {
+    
+            auto &it = SpeechRequests.front();
+
+            if (it.Name.Is_Empty()) {
+                XAUDIO2_DEBUG_WARNING("XAudio2::Handle_Speech_Request - Invalid filename!\n");
+                continue;
+            }
+
+            unsigned int key = XAudio2_Get_Filename_Hash(it.Name);
+            if (!SpeechBankIndex.Is_Present(key)) {
+                XAUDIO2_DEBUG_WARNING("XAudio2::Handle_Speech_Request - Failed to find \"%s\" in Speech bank!\n", it.Name.Peek_Buffer());
+                continue;
+            }
+
+            XAudio2SoundResource *resource = SpeechBankIndex[key];
+            if (!resource) {
+                XAUDIO2_DEBUG_WARNING("XAudio2::Handle_Speech_Request - Sound resource is null!\n");
+                continue;
+            }
+
+            std::unique_ptr<XAudio2Stream> stream = XAudio2_Create_Sample_From_Resource(resource);
+            if (!stream) {
+                XAUDIO2_DEBUG_WARNING("XAudio2::Handle_Speech_Request - Sample is null!\n");
+                continue;
+            }
+
+            //SpeechStreams.push_back(std::move(stream));
+            Streams.push_back(std::move(stream));
+
+            SpeechRequests.erase(SpeechRequests.begin()); // pop front
+        }
+
+    }
+
+    if (MusicRequests.size() > 0) {
+
+        if (!MusicBankIndex.Count()) {
+            XAUDIO2_DEBUG_WARNING("XAudio2::Handle_Music_Request - Music bank is empty!\n");
+            return false;
+        }
+
+        for (int i = 0; i < MusicRequests.size(); ++i) {
+    
+            auto &it = MusicRequests.front();
+
+            if (it.Name.Is_Empty()) {
+                XAUDIO2_DEBUG_WARNING("XAudio2::Handle_Music_Request - Invalid filename!\n");
+                continue;
+            }
+
+            unsigned int key = XAudio2_Get_Filename_Hash(it.Name);
+            if (!MusicBankIndex.Is_Present(key)) {
+                XAUDIO2_DEBUG_WARNING("XAudio2::Handle_Music_Request - Failed to find \"%s\" in Music bank!\n", it.Name.Peek_Buffer());
+                continue;
+            }
+
+            XAudio2SoundResource *resource = MusicBankIndex[key];
+            if (!resource) {
+                XAUDIO2_DEBUG_WARNING("XAudio2::Handle_Music_Request - Sound resource is null!\n");
+                continue;
+            }
+
+            std::unique_ptr<XAudio2Stream> stream = XAudio2_Create_Sample_From_Resource(resource);
+            if (!stream) {
+                XAUDIO2_DEBUG_WARNING("XAudio2::Handle_Music_Request - Sample is null!\n");
+                continue;
+            }
+
+            //MusicStreams.push_back(std::move(stream));
+            Streams.push_back(std::move(stream));
+        
+            MusicRequests.erase(MusicRequests.begin()); // pop front
+        }
+
+    }
+
+    return true;
+}
+
+
+void XAudio2AudioDriver::Thread_Callback()
+{
+    if (!IsAvailable || !IsEnabled) {
+        return;
+    }
+
+#if 0
+    for (int i = 0; i < SpeechStreams.size(); ++i) {
+    
+        XAudio2Stream *stream = SpeechStreams.front().get();
+
+        // open up pending streams.
+        if (stream->Is_Pending()) {
+            XAUDIO2_DEBUG_INFO("XAudio2[Speech] - Opening pending stream for \"%s\".\n", stream->Get_Name().Peek_Buffer());
+            if (!stream->Open_Stream()) {
+                MusicStreams.erase(MusicStreams.begin()); // pop front
+            }
+            continue;
+        }
+
+        if (stream->Is_Paused()) {
+            XAUDIO2_DEBUG_INFO("XAudio2[Speech] - \"%s\" is paused...\n", stream->Get_Name().Peek_Buffer());
+            continue;
+        }
+
+        // Fill buffer with data.
+        if (!stream->Update_Stream()) {
+            XAUDIO2_DEBUG_ERROR("XAudio2[Speech] - Update stream failed -> Stopping.\n");
+            SpeechStreams.erase(SpeechStreams.begin()); // pop front
+            continue;
+        }
+
+        // If the buffer is depleted, stop the stream (and playing any remaining buffers).
+        if (stream->Is_Buffer_Empty()) {
+            XAUDIO2_DEBUG_INFO("XAudio2[Speech] - \"%s\" Buffer Empty -> Stopping.\n", stream->Get_Name().Peek_Buffer());
+            stream->Stop(true);
+            SpeechStreams.erase(SpeechStreams.begin()); // pop front
+            continue;
+        }
+
+        // If the buffer is finished, now remove it.
+        if (stream->Is_Finished()) {
+            XAUDIO2_DEBUG_INFO("XAudio2[Speech] - \"%s\" Finished -> Removing.\n", stream->Get_Name().Peek_Buffer());
+            SpeechStreams.erase(SpeechStreams.begin()); // pop front
+            continue;
+        }
+
+    }
+
+    for (int i = 0; i < MusicStreams.size(); ++i) {
+    
+        XAudio2Stream *stream = MusicStreams.front().get();
+
+        // open up pending streams.
+        if (stream->Is_Pending()) {
+            XAUDIO2_DEBUG_INFO("XAudio2[Music] - Opening pending stream.\n");
+            if (!stream->Open_Stream()) {
+                MusicStreams.erase(MusicStreams.begin()); // pop front
+            }
+            continue;
+        }
+
+        if (stream->Is_Paused()) {
+            XAUDIO2_DEBUG_INFO("XAudio2[Music] - \"%s\" is paused...\n", stream->Get_Name().Peek_Buffer());
+            continue;
+        }
+
+        // Fill buffer with more data.
+        if (!stream->Update_Stream()) {
+            XAUDIO2_DEBUG_ERROR("XAudio2[Music] - Update stream failed -> Stopping.\n");
+            MusicStreams.erase(MusicStreams.begin()); // pop front
+            continue;
+        }
+
+        // If we have finished, stop the stream (playing any remaining buffers).
+        if (stream->Is_Finished()) {
+            XAUDIO2_DEBUG_INFO("XAudio2[Music] - Finished -> Stopping.\n");
+            stream->Stop(true);
+            MusicStreams.erase(MusicStreams.begin()); // pop front
+
+            //MusicStreamIsFinished = false;
+
+        // handle fading in.
+        } else if (stream->IsFadingIn) {
+
+            float vol = stream->Get_Volume();
+            vol += (stream->FadeInStep / float(stream->FadeInSeconds));
+            stream->Set_Volume(vol);
+
+            XAUDIO2_DEBUG_INFO("XAudio2[Music] - Fading -> Vol %f.\n", vol);
+
+        
+        // handle fading out.
+        } else if (stream->IsFadingOut) {
+
+            float vol = stream->Get_Volume();
+            vol -= (stream->FadeOutStep / float(stream->FadeOutSeconds));
+            stream->Set_Volume(vol);
+
+            XAUDIO2_DEBUG_INFO("XAudio2[Music] - Fading -> Vol %f.\n", vol);
+
+            if (stream->Get_Volume() <= 0.0f) {
+                XAUDIO2_DEBUG_INFO("XAudio2[Music] - Fading -> Stop.\n");
+                stream->Stop(true);
+                MusicStreams.erase(MusicStreams.begin()); // pop front
+            }
+        }
+
+    }
+#endif
+
+    for (int i = 0; i < Streams.size(); ++i) {
+    
+        XAudio2Stream *stream = Streams.front().get();
+
+        // open up pending streams.
+        if (stream->Is_Pending()) {
+            XAUDIO2_DEBUG_INFO("XAudio2[%s] - Opening pending stream.\n", stream->Get_Name().Peek_Buffer());
+            if (!stream->Open_Stream()) {
+                Streams.erase(Streams.begin()); // pop front
+            }
+            continue;
+        }
+
+        if (stream->Is_Paused()) {
+            XAUDIO2_DEBUG_INFO("XAudio2[%s] - Is paused...\n", stream->Get_Name().Peek_Buffer(), stream->Get_Name().Peek_Buffer());
+            continue;
+        }
+
+        // Fill buffer with more data.
+        if (!stream->Update_Stream()) {
+            XAUDIO2_DEBUG_ERROR("XAudio2[%s] - Update stream failed -> Stopping.\n", stream->Get_Name().Peek_Buffer());
+            Streams.erase(Streams.begin()); // pop front
+            continue;
+        }
+
+        // If we have finished, stop the stream (playing any remaining buffers).
+        if (stream->Is_Finished()) {
+            XAUDIO2_DEBUG_INFO("XAudio2[%s] - Finished -> Stopping.\n", stream->Get_Name().Peek_Buffer());
+            stream->Stop(true);
+            Streams.erase(Streams.begin()); // pop front
+            continue;
+        }
+
+        if (stream->Type == STREAM_MUSIC) {
+
+            // handle fading in.
+            if (stream->IsFadingIn) {
+                float vol = stream->Get_Volume();
+                vol += (stream->FadeInStep / float(stream->FadeInSeconds));
+                stream->Set_Volume(vol);
+                XAUDIO2_DEBUG_INFO("XAudio2[%s] - Fading -> Vol %f.\n", vol, stream->Get_Name().Peek_Buffer());
+                continue;
+            }
+
+            // handle fading out.
+            if (stream->IsFadingOut) {
+                float vol = stream->Get_Volume();
+                vol -= (stream->FadeOutStep / float(stream->FadeOutSeconds));
+                stream->Set_Volume(vol);
+                XAUDIO2_DEBUG_INFO("XAudio2[%s] - Fading -> Vol %f.\n", vol, stream->Get_Name().Peek_Buffer());
+                if (stream->Get_Volume() <= 0.0f) {
+                    XAUDIO2_DEBUG_INFO("XAudio2[%s] - Fading -> Stop.\n", stream->Get_Name().Peek_Buffer());
+                    stream->Stop(true);
+                    Streams.erase(Streams.begin()); // pop front
+                }
+                continue;
+            }
+
+        }
+
+    }
+}
+
+
+bool XAudio2AudioDriver::Play(AudioStreamType type, Wstring filename, float volume)
+{
+    bool play = false;
+
+    switch (type) {
+        case STREAM_SFX:
+            ASSERT_FATAL_PRINT(true, "Please use Play_SoundEffect() for sound effects!");
+            play = false;
+            break;
+        case STREAM_SPEECH:
+            XAUDIO2_DEBUG_INFO("XAudio2[Speech]: File \"%s\" has been requested for playing.\n", filename.Peek_Buffer());
+            SpeechRequests.emplace_back(filename, volume);
+            play = true;
+            break;
+        case STREAM_MUSIC:
+            XAUDIO2_DEBUG_INFO("XAudio2[Music]: File \"%s\" has been requested for playing.\n", filename.Peek_Buffer());
+            MusicRequests.emplace_back(filename, volume);
+            play = true;
+            break;
+        default:
+            break;
+    };
+
+    return play;
+}
+
+// pan == left or right channel, one_shot == one time sound, otherwise loop_count is used.
+bool XAudio2AudioDriver::Play_SoundEffect(Wstring filename, float volume, float pan, int loop_count)
+{
+    bool play = false;
+
+    //switch (type) {
+    //    case STREAM_SFX:
+            XAUDIO2_DEBUG_INFO("XAudio2[SoundEffect]: File \"%s\" has been requested for playing.\n", filename.Peek_Buffer());
+            SoundEffectRequests.emplace_back(filename, volume, pan, loop_count);
+            play = true;
+    //        break;
+    //    case STREAM_SPEECH:
+    //    case STREAM_MUSIC:
+    //        ASSERT_FATAL_PRINT(true, "Please use Play() for non-sound effects!");
+    //        play = false;
+    //        break;
+    //    default:
+    //        break;
+    //};
+
+    return play;
+}
+
+bool XAudio2AudioDriver::Stop(AudioStreamType type, Wstring filename, bool force, bool all)
+{
+    bool stopped = false;
+
+#if 0
+    switch (type) {
+        case STREAM_SFX:
+            for (auto &it : SoundEffectStreams) {
+                if (it->Get_Name() == filename) {
+                    stopped |= it->Stop();
+                    if (!all) {
+                        break;
+                    }
+                }
+            }
+            break;
+        case STREAM_SPEECH:
+            for (auto &it : SpeechStreams) {
+                if (it->Get_Name() == filename && it->Is_Playing()) {
+                    stopped |= it->Stop();
+                    break;
+                }
+            }
+            break;
+        case STREAM_MUSIC:
+            for (auto &it : MusicStreams) {
+                if (it->Get_Name() == filename && it->Is_Playing()) {
+                    stopped |= it->Stop();
+                    break;
+                }
+            }
+            break;
+        default:
+            break;
+    };
+#endif
+
+    for (auto &it : Streams) {
+        if (it->Get_Name() == filename) {
+            if (it->Type == type && it->Is_Playing()) {
+                stopped |= it->Stop();
+                if (!all) {
+                    break;
+                }
+            }
+        }
+    }
+
+    return stopped;
+}
+
+bool XAudio2AudioDriver::Is_Playing(AudioStreamType type, Wstring filename) const
+{
+    bool is_playing = false;
+
+#if 0
+    switch (type) {
+        case STREAM_SFX:
+            for (auto &it : SoundEffectStreams) {
+                if (it->Get_Name() == filename && it->Is_Playing()) {
+                    is_playing = true;
+                    break;
+                }
+            }
+            break;
+        case STREAM_SPEECH:
+            for (auto &it : SpeechStreams) {
+                if (it->Get_Name() == filename && it->Is_Playing()) {
+                    is_playing = true;
+                    break;
+                }
+            }
+            break;
+        case STREAM_MUSIC:
+            for (auto &it : MusicStreams) {
+                if (it->Get_Name() == filename && it->Is_Playing()) {
+                    is_playing = true;
+                    break;
+                }
+            }
+            break;
+        default:
+            break;
+    };
+#endif
+
+    for (auto &it : Streams) {
+        if (it->Get_Name() == filename) {
+            if (it->Type == type && it->Is_Playing()) {
+                is_playing = true;
+                break;
+            }
+        }
+    }
+
+    return is_playing;
+}
+
+void XAudio2AudioDriver::Set_Volume(AudioStreamType type, Wstring filename, float volume)
+{
+#if 0
+    switch (type) {
+        case STREAM_SFX:
+            for (auto &it : SoundEffectStreams) {
+                if (it->Get_Name() == filename) {
+                    it->Set_Volume(volume);
+                    //break;    // TODO; break here or update all?
+                }
+            }
+            break;
+        case STREAM_SPEECH:
+            for (auto &it : SpeechStreams) {
+                if (it->Get_Name() == filename) {
+                    it->Set_Volume(volume);
+                    //break;    // TODO; break here or update all?
+                }
+            }
+            break;
+        case STREAM_MUSIC:
+            for (auto &it : MusicStreams) {
+                if (it->Get_Name() == filename) {
+                    it->Set_Volume(volume);
+                    //break;    // TODO; break here or update all?
+                }
+            }
+            break;
+        default:
+            break;
+    };
+#endif
+
+    for (auto &it : Streams) {
+        if (it->Get_Name() == filename) {
+            if (it->Type == type) {
+                it->Set_Volume(volume);
+                //break;    // TODO; break here or update all?
+            }
+        }
+    }
+}
+
+float XAudio2AudioDriver::Get_Volume(AudioStreamType type, Wstring filename)
+{
+#if 0
+    switch (type) {
+        case STREAM_SFX:
+            for (auto &it : SoundEffectStreams) {
+                if (it->Get_Name() == filename) {
+                    return it->Get_Volume();
+                }
+            }
+            break;
+        case STREAM_SPEECH:
+            for (auto &it : SpeechStreams) {
+                if (it->Get_Name() == filename) {
+                    return it->Get_Volume();
+                }
+            }
+            break;
+        case STREAM_MUSIC:
+            for (auto &it : MusicStreams) {
+                if (it->Get_Name() == filename) {
+                    return it->Get_Volume();
+                }
+            }
+            break;
+        default:
+            break;
+    };
+#endif
+
+    for (auto &it : Streams) {
+        if (it->Get_Name() == filename) {
+            if (it->Type == type) {
+                return it->Get_Volume();
+            }
+        }
+    }
+
+    return 0.0f;
+}
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Request_Preload(Wstring filename, AudioSampleType type)
+{
+    XAUDIO2_DEBUG_INFO("XAudio2[Preload]: File \"%s\" has been requested for preloading.\n", filename.Peek_Buffer());
 
     PreloadRequests.push_back(PreloadRequest{filename, type});
 
     return true;
 }
 
-void XAudio2AudioDriver::Start_Preloader()
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void XAudio2AudioDriver::Start_Preloader(AudioSampleType type)
 {
-#if 0
     if (!PreloadRequests.size()) {
+        XAUDIO2_DEBUG_INFO("XAudio2[Preload]: Preload start requested but list is empty!\n");
         return;
     }
+    
+    XAUDIO2_DEBUG_INFO("XAudio2[Preload]: Preload of %d files requested.\n", PreloadRequests.size());
 
-    XAUDIO2_DEBUG_INFO("XAudio2: Preload of %d files requested.\n", PreloadRequests.Count());
-
-#if 0
-    // Load all the requested files into the index.
-    for (int i = 0; i < PreloadRequests.Count(); ++i) {
-
-        Wstring reqname = PreloadRequests[i];
-        reqname.To_Upper();
-
-        XAUDIO2_DEBUG_INFO("XAudio2[Preload]: Preloading \"%s\"...\n", reqname.Peek_Buffer());
-
-        XAudio2SoundResource *resource = new XAudio2SoundResource();
-        ASSERT(resource != nullptr);
-
-        if (!resource->Load(reqname)) {
-            XAUDIO2_DEBUG_ERROR("XAudio2[Preload]: Preloading of \"%s\" failed!\n", reqname.Peek_Buffer());
-            PreloadRequests.Delete(i); // Remove this request.
-            continue;
-        }
-
-        unsigned int key = XAudio2_Get_Filename_Hash(resource->Filename);
-
-        if (SoundBankIndex.Is_Present(key)) {
-            XAUDIO2_DEBUG_WARNING("XAudio2[Preload]: File \"%s\" is already present in sound bank!\n", reqname.Peek_Buffer());
-            PreloadRequests.Delete(i); // Remove this request.
-            continue;
-        }
-
-        if (!SoundBankIndex.Add_Index(key, resource)) {
-            XAUDIO2_DEBUG_ERROR("XAudio2[Preload]: Failed to add \"%s\" to sound bank!\n", reqname.Peek_Buffer());
-            PreloadRequests.Delete(i); // Remove this request.
-            continue;
-        }
-
-        XAUDIO2_DEBUG_INFO("XAudio2[Preload]: File \"%s\" preloaded OK.\n", resource->FilenameExt.Peek_Buffer());
-    }
-
-    PreloadRequests.Clear();
-#endif
-
-#endif
-
+    XAudio2_Preload_Begin = true;
 }
 
+
+void XAudio2AudioDriver::Clear_Sample_Bank(AudioSampleType type)
+{
+    switch (type) {
+        case SAMPLE_SFX:
+            XAUDIO2_DEBUG_INFO("XAudio2[Preload]: Clearing SoundEffect (%d) bank.\n", SoundEffectBankIndex.Count());
+            SoundEffectBankIndex.Clear();
+            break;
+        case SAMPLE_SPEECH:
+            XAUDIO2_DEBUG_INFO("XAudio2[Preload]: Clearing Speech (%d) bank.\n", SoundEffectBankIndex.Count());
+            SpeechBankIndex.Clear();
+            break;
+        case SAMPLE_MUSIC:
+            XAUDIO2_DEBUG_INFO("XAudio2[Preload]: Clearing Music (%d) bank.\n", SoundEffectBankIndex.Count());
+            MusicBankIndex.Clear();
+            break;
+        default:
+            break;
+    }
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 bool XAudio2AudioDriver::Is_Audio_File_Available(Wstring filename)
 {
     return XAudio2_Is_File_Available(filename);
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void XAudio2AudioDriver::Debug_Dump_Sound_Banks()
+{
+#ifndef NDEBUG
+#endif
+
+    XAUDIO2_DEBUG_INFO("SoundEffect - Count: %d\n", SoundEffectBankIndex.Count());
+
+    for (int i = 0; i < SoundEffectBankIndex.Count(); ++i) {
+        XAudio2SoundResource *entry = SoundEffectBankIndex.Fetch_By_Position(i);
+        XAUDIO2_DEBUG_INFO("  %04d: %s %s\n", i, entry->Get_Name().Peek_Buffer(), entry->Get_FullName().Peek_Buffer());
+    }
+
+    XAUDIO2_DEBUG_INFO("Speech - Count: %d\n", SpeechBankIndex.Count());
+
+    for (int i = 0; i < SpeechBankIndex.Count(); ++i) {
+        XAudio2SoundResource *entry = SpeechBankIndex.Fetch_By_Position(i);
+        XAUDIO2_DEBUG_INFO("  %04d: %s %s\n", i, entry->Get_Name().Peek_Buffer(), entry->Get_FullName().Peek_Buffer());
+    }
+
+    XAUDIO2_DEBUG_INFO("Music - Count: %d\n", MusicBankIndex.Count());
+
+    for (int i = 0; i < MusicBankIndex.Count(); ++i) {
+        XAudio2SoundResource *entry = MusicBankIndex.Fetch_By_Position(i);
+        XAUDIO2_DEBUG_INFO("  %04d: %s %s\n", i, entry->Get_Name().Peek_Buffer(), entry->Get_FullName().Peek_Buffer());
+    }
+}
+
+
+/**
+ *  
+ *  Sound effect stream interface 
+ *  
+ */
+ 
+#if 0
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Play_SoundEffect(Wstring filename, float volume, float pan, bool one_shot, int loop_count)
+{
+    // one_shot == one time sound, otherwise loop_count is used.
+
+    XAUDIO2_DEBUG_INFO("XAudio2[SoundEffect]: File \"%s\" has been requested for playing.\n", filename.Peek_Buffer());
+
+    SoundEffectRequests.emplace_back(filename, volume, pan, one_shot, loop_count);
+
+    return false;
+}
+#endif
+
+
+#if 0
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Stop_SoundEffect(Wstring filename, bool force)
+{
+    bool stopped = false;
+
+    for (auto &it : SpeechStreams) {
+        if (it->Get_Name() == filename && it->Is_Playing()) {
+            stopped = true;
+            break;
+        }
+    }
+
+    return stopped;
+}
+#endif
+
+
+#if 0
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Is_SoundEffect_Playing(Wstring filename) const
+{
+    bool is_playing = false;
+
+    for (auto &it : SpeechStreams) {
+        if (it->Get_Name() == filename && it->Is_Playing()) {
+            is_playing = true;
+            break;
+        }
+    }
+
+    return is_playing;
+}
+#endif
+
+
+#if 1
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void XAudio2AudioDriver::Set_SoundEffect_Volume(float volume)
+{
+    //ASSERT(volume >= 0.0f);
+    //ASSERT(volume <= 1.0f);
+
+    SoundEffectVolume = volume;
+
+#if 0
+    if (!SoundEffectStream) {
+        return;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    //volume = std::clamp(volume, -1.0f, 1.0f);
+    SoundEffectStream->Set_Volume(volume);
+#endif
+}
+#endif
+
+
+#if 1
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+float XAudio2AudioDriver::Get_SoundEffect_Volume()
+{
+#if 0
+    if (!SoundEffectStream) {
+        return 0.0f;
+    }
+#endif
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    //return SoundEffectStream->Get_Volume();
+    return SoundEffectVolume;
+}
+#endif
+
+
+/**
+ *  
+ *  Speech stream interface 
+ *  
+ */
+
+
+#if 0
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Play_Speech(Wstring filename, float volume)
+{
+    XAUDIO2_DEBUG_INFO("XAudio2[Speech]: File \"%s\" has been requested for playing.\n", filename.Peek_Buffer());
+
+    SpeechRequests.emplace_back(filename, volume);
+
+    return true;
+}
+#endif
+
+
+#if 0
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Stop_Speech(Wstring filename, bool force)
+{
+    bool stopped = false;
+
+    for (auto &it : SpeechStreams) {
+        if (it->Get_Name() == filename && it->Is_Playing()) {
+            stopped = true;
+            break;
+        }
+    }
+
+    return stopped;
+}
+#endif
+
+
+#if 0
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Is_Speech_Playing(Wstring filename) const
+{
+    bool is_playing = false;
+
+    for (auto &it : SpeechStreams) {
+        if (it->Get_Name() == filename && it->Is_Playing()) {
+            is_playing = true;
+            break;
+        }
+    }
+
+    return is_playing;
+}
+#endif
+
+
+#if 1
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void XAudio2AudioDriver::Set_Speech_Volume(float volume)
+{
+    //ASSERT(volume >= 0.0f);
+    //ASSERT(volume <= 1.0f);
+
+    SpeechVolume = volume;
+
+#if 0
+    if (!SpeechStream) {
+        return;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    //volume = std::clamp(volume, -1.0f, 1.0f);
+    SpeechStream->Set_Volume(volume);
+#endif
+}
+#endif
+
+
+#if 1
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+float XAudio2AudioDriver::Get_Speech_Volume()
+{
+#if 0
+    if (!SpeechStream) {
+        return 0.0f;
+    }
+#endif
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    //return SpeechStream->Get_Volume();
+    return SpeechVolume;
+}
+#endif
+
+
+/**
+ *  
+ *  Music stream interface 
+ *  
+ */
+
+#if 0
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Play_Music(Wstring filename)
+{
+    XAUDIO2_DEBUG_INFO("XAudio2[Music]: File \"%s\" has been requested for playing.\n", filename.Peek_Buffer());
+
+    MusicRequests.emplace_back(filename, 1.0f);
+
+    return true;
+}
+#endif
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Pause_Music()
+{
+#if 0
+    if (!MusicStream) {
+        return false;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    return MusicStream->Pause();
+#endif
+
+    bool retval = false;
+
+    for (auto &it : Streams) {
+        if (it->Type == STREAM_MUSIC) {
+            retval |= it->Pause();
+        }
+    }
+
+    return retval;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::UnPause_Music()
+{
+#if 0
+    if (!MusicStream) {
+        return false;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    return MusicStream->UnPause();
+#endif
+
+    bool retval = false;
+
+    for (auto &it : Streams) {
+        if (it->Type == STREAM_MUSIC) {
+            retval |= it->UnPause();
+        }
+    }
+
+    return retval;
+}
+
+
+#if 0
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Stop_Music()
+{
+#if 0
+    if (!MusicStream) {
+        return false;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    //return MusicStream->Stop();
+    delete MusicStream;
+    MusicStream = nullptr;
+
+    return true;
+#endif
+
+    bool retval = false;
+
+    for (auto &it : MusicStreams) {
+        retval |= it->Stop();
+        vector_erase(MusicStreams, it);
+    }
+
+    return retval;
+}
+#endif
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void XAudio2AudioDriver::Fade_In_Music(int seconds, float step)
+{
+#if 0
+    if (!MusicStream) {
+        return;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    MusicStream->Fade_In(seconds, step);
+#endif
+
+    for (auto &it : Streams) {
+        if (it->Type == STREAM_MUSIC) {
+            it->Fade_In(seconds, step);
+        }
+    }
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void XAudio2AudioDriver::Fade_Out_Music(int seconds, float step)
+{
+#if 0
+    if (!MusicStream) {
+        return;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+    
+    MusicStream->Fade_Out(seconds, step);
+#endif
+
+    for (auto &it : Streams) {
+        if (it->Type == STREAM_MUSIC) {
+            it->Fade_Out(seconds, step);
+        }
+    }
+}
+
+
+#if 0
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Is_Music_Playing() const
+{
+#if 0
+    if (!MusicStream) {
+        return false;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    return MusicStream->Is_Playing();
+#endif
+
+    bool retval = false;
+
+    for (auto &it : MusicStreams) {
+        retval |= it->Is_Playing();
+    }
+
+    return retval;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Is_Music_Finished() const
+{
+#if 0
+    if (!MusicStream) {
+        return false;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    return MusicStreamIsFinished;
+    //return MusicStream->Is_Finished();
+#endif
+
+    bool retval = false;
+
+    for (auto &it : MusicStreams) {
+        retval |= it->Pause();
+    }
+
+    return retval;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Is_Music_Paused() const
+{
+#if 0
+    if (!MusicStream) {
+        return false;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    return MusicStream->Is_Paused();
+#endif
+
+    bool retval = false;
+
+    for (auto &it : MusicStreams) {
+        retval |= it->Is_Paused();
+    }
+
+    return retval;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Is_Music_Fading_In() const
+{
+#if 0
+    if (!MusicStream) {
+        return false;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    return MusicStream->IsFadingIn;
+#endif
+
+    bool retval = false;
+
+    for (auto &it : MusicStreams) {
+        retval |= it->IsFadingIn;
+    }
+
+    return retval;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2AudioDriver::Is_Music_Fading_Out() const
+{
+#if 0
+    if (!MusicStream) {
+        return false;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    return MusicStream->IsFadingOut;
+#endif
+
+    bool retval = false;
+
+    for (auto &it : MusicStreams) {
+        retval |= it->IsFadingOut;
+    }
+
+    return retval;
+}
+#endif
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void XAudio2AudioDriver::Set_Music_Volume(float volume)
+{
+#if 0
+    //ASSERT(volume >= 0.0f);
+    //ASSERT(volume <= 1.0f);
+
+    MusicVolume = volume;
+
+    if (!MusicStream) {
+        return;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    //volume = std::clamp(volume, -1.0f, 1.0f);
+    MusicStream->Set_Volume(volume);
+#endif
+
+    for (auto &it : Streams) {
+        if (it->Type == STREAM_MUSIC) {
+            it->Set_Volume(volume);
+        }
+    }
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+float XAudio2AudioDriver::Get_Music_Volume()
+{
+#if 0
+    if (!MusicStream) {
+        return 0.0f;
+    }
+
+    //ScopedCriticalSectionClass cs(&XAudio2CriticalSection);
+
+    return MusicStream->Get_Volume();
+#endif
+
+    return 1.0f; // TODO
 }

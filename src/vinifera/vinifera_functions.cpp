@@ -47,6 +47,7 @@
 #include "testlocomotion.h"
 #include "theatertype.h"
 #include "audio_driver.h"
+#include "audio_util.h"
 #include "xaudio2_driver.h"
 #include "vorbis_load_dll.h"
 #include "miscutil.h"
@@ -55,8 +56,8 @@
 
 
 extern void NewTheme_Hooks();
-
-static Wstring AudioDriverName;
+extern void NewVox_Hooks();
+extern void NewVoc_Hooks();
 
 
 /**
@@ -67,7 +68,6 @@ static Wstring AudioDriverName;
 bool Vinifera_Load_INI()
 {
     static char const * const GENERAL = "General";
-    static char const * const AUDIO = "Audio";
 
     char buffer[1024];
 
@@ -110,8 +110,7 @@ bool Vinifera_Load_INI()
     Vinifera_IconName[sizeof(Vinifera_IconName)-1] = '\0';
     Vinifera_CursorName[sizeof(Vinifera_CursorName)-1] = '\0';
 
-    ini.Get_String(AUDIO, "Driver", "DirectSound", buffer, sizeof(buffer));
-    AudioDriverName = buffer;
+    Audio_Read_INI(ini);
 
     return true;
 }
@@ -452,6 +451,8 @@ static bool Vinifera_Init_Audio_Driver()
          *  to new audio drivers only.
          */
         NewTheme_Hooks();
+        NewVox_Hooks();
+        NewVoc_Hooks();
 
     } else {
         DEBUG_ERROR("Audio: Invalid audio driver defined!\n");
@@ -472,12 +473,13 @@ static bool Vinifera_Init_Audio_Driver()
  */
 bool Vinifera_Startup()
 {
+    DWORD rc;
+
     /**
      *  Load additional paths from the user environment vars.
      * 
      *  #NOTE: Paths must end in "\" otherwise this will fail!
      */
-    DWORD rc;
     rc = GetEnvironmentVariable("TIBSUN_MUSIC", Vinifera_MusicPath_EnvVar, sizeof(Vinifera_MusicPath_EnvVar));
     if (rc && rc < sizeof(Vinifera_MusicPath_EnvVar)) {
         DEV_DEBUG_INFO("Found TIBSUN_MUSIC EnvVar: \"%s\".\n", Vinifera_MusicPath_EnvVar);
@@ -508,8 +510,7 @@ bool Vinifera_Startup()
      * 
      *  @author: CCHyper
      */
-#if defined(TS_CLIENT)
-    DWORD rc;
+//#if defined(TS_CLIENT)
     DynamicVectorClass<Wstring> search_paths;
 
     /**
@@ -522,14 +523,15 @@ bool Vinifera_Startup()
     /**
      *  Add various local search drives to loading of files locally.
      */
-    search_paths.Add("INI");
-    search_paths.Add("MIX");
-    //search_paths.Add("MOVIES");
-    //search_paths.Add("MUSIC");
-    //search_paths.Add("SOUNDS");
-    search_paths.Add("MAPS");
-    search_paths.Add("MAPS\\MULTIPLAYER");
-    search_paths.Add("MAPS\\MISSION");
+    search_paths.Add("HQ");
+//    search_paths.Add("INI");
+//    search_paths.Add("MIX");
+//    //search_paths.Add("MOVIES");
+//    //search_paths.Add("MUSIC");
+//    //search_paths.Add("SOUNDS");
+//    search_paths.Add("MAPS");
+//    search_paths.Add("MAPS\\MULTIPLAYER");
+//    search_paths.Add("MAPS\\MISSION");
 
     /**
      *  Current path (perhaps set set with -CD) should go next.
@@ -563,7 +565,7 @@ bool Vinifera_Startup()
     delete [] new_path;
 
     DEBUG_INFO("SearchPath: %s\n", CCFileClass::RawPath);
-#endif
+//#endif
 
     /**
      *  Load Vinifera settings and overrides.

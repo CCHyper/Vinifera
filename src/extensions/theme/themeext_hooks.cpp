@@ -72,22 +72,26 @@ void ThemeClassFake::_Scan()
         for (ThemeType theme = THEME_FIRST; theme < Themes.Count(); ++theme) {
 
             ThemeControl *tctrl = Themes[theme];
-            Wstring fname = tctrl->Name;
+
+            Wstring themename = tctrl->Name;
+            themename.As_Upper();
 
             /**
              *  Check to see if the theme exists.
              */
-            bool available = Audio_Driver()->Is_Audio_File_Available(fname);
-            if (available) {
-                tctrl->Available = Audio_Driver()->Request_Preload(fname, PRELOAD_MUSIC);
+            bool available = Audio_Driver()->Is_Audio_File_Available(themename);
+            if (Audio_Driver()->Is_Audio_File_Available(themename)) {
+                tctrl->Available = Audio_Driver()->Request_Preload(themename, SAMPLE_MUSIC);
+                if (!tctrl->Available) {
+                    DEBUG_WARNING("Theme: Failed to preload \"%s\"!\n", themename.Peek_Buffer());
+                }
             } else {
-                DEV_DEBUG_WARNING("Theme: Unable to find \"%s\"!\n", fname.Peek_Buffer());
+                DEV_DEBUG_WARNING("Theme: Unable to find \"%s\"!\n", themename.Peek_Buffer());
             }
 
         }
 
-        //Audio_Driver()->Start_Preloader();
-
+        Audio_Driver()->Start_Preloader(SAMPLE_MUSIC);
     }
 }
 
@@ -126,9 +130,7 @@ int ThemeClassFake::_Play_Song(ThemeType theme)
                      */
                     Wstring fname = tctrl->Name;
 
-                    //Audio_Driver()->Set_Stream_Low_Impact(true);
-                    Current = Audio_Driver()->Play_Music(fname);
-                    //Audio_Driver()->Set_Stream_Low_Impact(false);
+                    Current = Audio_Driver()->Play(STREAM_MUSIC, fname);
 
                     if (Current == INVALID_AUDIO_HANDLE) {
                         return INVALID_AUDIO_HANDLE;

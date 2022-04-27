@@ -26,6 +26,7 @@
  *
  ******************************************************************************/
 #include "xaudio2_stream.h"
+#include "xaudio2_driver.h"
 #include "xaudio2_resource.h"
 #include "xaudio2_globals.h"
 #include "xaudio2_debug.h"
@@ -46,8 +47,10 @@ XAudio2Stream::XAudio2Stream(XAudio2SoundResource *res) :
     FileName(),
     FileHandle(nullptr),
     SoundResource(nullptr),
+    StreamingCallback(),
     IsActive(false),
     Status(STREAM_STATUS_NULL),
+    Type(STREAM_NONE),
     IsFadingIn(false),
     FadeInSeconds(1),
     FadeInStep(0.10f),
@@ -62,7 +65,7 @@ XAudio2Stream::XAudio2Stream(XAudio2SoundResource *res) :
     if (res) {
         SoundResource = res;
         FileName = res->Get_Name();
-        DEV_DEBUG_INFO("XAudio2Stream:: Created stream for \"%s\".\n", FileName.Peek_Buffer());
+        DEV_DEBUG_INFO("XAudio2Stream -  Created stream for \"%s\".\n", FileName.Peek_Buffer());
 
         // resource set, flag as pending.
         Status = STREAM_STATUS_PENDING;
@@ -97,8 +100,9 @@ void XAudio2Stream::Reset()
 
     if (FileHandle) {
         FileHandle->Close();
-        delete FileHandle;
-        FileHandle = nullptr;
+        //delete FileHandle;
+        //FileHandle = nullptr;
+        FileHandle.release();
     }
 
     IsActive = false;
@@ -119,9 +123,31 @@ void XAudio2Stream::Reset()
  * 
  *  @author: CCHyper
  */
+Wstring XAudio2Stream::Get_Name() const
+{
+    return SoundResource->Get_Name();
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+Wstring XAudio2Stream::Get_FileName() const
+{
+    return SoundResource->Get_Name();
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
 bool XAudio2Stream::Open_Stream()
 {
-    return true;
+    return false;
 }
 
 
@@ -132,7 +158,7 @@ bool XAudio2Stream::Open_Stream()
  */
 bool XAudio2Stream::Update_Stream()
 {
-    return true;
+    return false;
 }
 
 
@@ -150,6 +176,17 @@ int XAudio2Stream::Queued_Buffer_Count() const
     XAUDIO2_VOICE_STATE state;
     SourceVoice->GetState(&state);
     return state.BuffersQueued;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2Stream::Is_Buffer_Empty() const
+{
+    return Queued_Buffer_Count() <= 0;
 }
 
 
@@ -177,7 +214,7 @@ bool XAudio2Stream::Start()
     // Start the voice.
     HRESULT hr = SourceVoice->Start();
     if (FAILED(hr)) {
-        DEBUG_ERROR("Stream::Start - Failed to start \"%s\"!\n", FileName.Peek_Buffer());
+        DEBUG_ERROR("XAudio2Stream::Start - Failed to start \"%s\"!\n", FileName.Peek_Buffer());
         return false;
     }
 
@@ -186,7 +223,7 @@ bool XAudio2Stream::Start()
     Status = STREAM_STATUS_STARTED;
 
 #ifndef NDEBUG
-    DEV_DEBUG_INFO("Stream::Start - Started \"%s\".\n", FileName.Peek_Buffer());
+    DEV_DEBUG_INFO("XAudio2Stream::Start - Started \"%s\".\n", FileName.Peek_Buffer());
 #endif
 
     return true;
@@ -209,14 +246,14 @@ bool XAudio2Stream::Stop(bool play_tails)
     // stop voice
     hr = SourceVoice->Stop(play_tails ? XAUDIO2_PLAY_TAILS : 0);
     if (FAILED(hr)) {
-        DEBUG_ERROR("Stream::Stop - Failed to stop \"%s\"!\n", FileName.Peek_Buffer());
+        DEBUG_ERROR("XAudio2Stream::Stop - Failed to stop \"%s\"!\n", FileName.Peek_Buffer());
         return false;
     }
 
     // flush buffers
     hr = SourceVoice->FlushSourceBuffers();
     if (FAILED(hr)) {
-        DEBUG_ERROR("XAudio2: Failed to flush \"%s\" buffers!\n", FileName.Peek_Buffer());
+        DEBUG_ERROR("XAudio2Stream::Stop -  Failed to flush \"%s\" buffers!\n", FileName.Peek_Buffer());
         return false;
     }
 
@@ -225,7 +262,7 @@ bool XAudio2Stream::Stop(bool play_tails)
     Status = STREAM_STATUS_STOPPED;
 
 #ifndef NDEBUG
-    DEV_DEBUG_INFO("Stream::Stop - Stopped \"%s\".\n", FileName.Peek_Buffer());
+    DEV_DEBUG_INFO("XAudio2Stream::Stop - Stopped \"%s\".\n", FileName.Peek_Buffer());
 #endif
 
     return true;
@@ -252,7 +289,7 @@ bool XAudio2Stream::Play()
     // flush old data out of buffer.
     hr = SourceVoice->FlushSourceBuffers();
     if (FAILED(hr)) {
-        DEBUG_ERROR("Stream::Play - Failed to flush \"%s\" buffers!\n", FileName.Peek_Buffer());
+        DEBUG_ERROR("XAudio2Stream::Play - Failed to flush \"%s\" buffers!\n", FileName.Peek_Buffer());
         return false;
     }
 
@@ -262,14 +299,14 @@ bool XAudio2Stream::Play()
     // start voice from beginning of buffer.
     hr = SourceVoice->Start();
     if (FAILED(hr)) {
-        DEBUG_ERROR("Stream::Play - Failed to start \"%s\"!\n", FileName.Peek_Buffer());
+        DEBUG_ERROR("XAudio2Stream::Play - Failed to start \"%s\"!\n", FileName.Peek_Buffer());
         return false;
     }
 
     Status = STREAM_STATUS_PLAYING;
 
 #ifndef NDEBUG
-    DEV_DEBUG_INFO("Stream::Start - Playing \"%s\".\n", FileName.Peek_Buffer());
+    DEV_DEBUG_INFO("XAudio2Stream::Start - Playing \"%s\".\n", FileName.Peek_Buffer());
 #endif
 
     return true;
@@ -299,14 +336,14 @@ bool XAudio2Stream::Pause(bool play_tails)
     // stop voice and save position in buffer.
     HRESULT hr = SourceVoice->Stop(play_tails ? XAUDIO2_PLAY_TAILS : 0);
     if (FAILED(hr)) {
-        DEBUG_ERROR("Stream::Pause - Failed to stop \"%s\"!\n", FileName.Peek_Buffer());
+        DEBUG_ERROR("XAudio2Stream::Pause - Failed to stop \"%s\"!\n", FileName.Peek_Buffer());
         return false;
     }
 
     Status = STREAM_STATUS_PAUSED;
 
 #ifndef NDEBUG
-    DEV_DEBUG_INFO("Stream::Start - Paused \"%s\".\n", FileName.Peek_Buffer());
+    DEV_DEBUG_INFO("XAudio2Stream::Start - Paused \"%s\".\n", FileName.Peek_Buffer());
 #endif
 
     return true;
@@ -336,14 +373,14 @@ bool XAudio2Stream::UnPause()
     // start voice.
     HRESULT hr = SourceVoice->Start();
     if (FAILED(hr)) {
-        DEBUG_ERROR("Stream::UnPause - Failed to stop \"%s\"!\n", FileName.Peek_Buffer());
+        DEBUG_ERROR("XAudio2Stream::UnPause - Failed to stop \"%s\"!\n", FileName.Peek_Buffer());
         return false;
     }
 
     Status = STREAM_STATUS_PLAYING;
 
 #ifndef NDEBUG
-    DEV_DEBUG_INFO("Stream::Start - UnPaused \"%s\".\n", FileName.Peek_Buffer());
+    DEV_DEBUG_INFO("XAudio2Stream::Start - UnPaused \"%s\".\n", FileName.Peek_Buffer());
 #endif
 
     return true;
@@ -358,6 +395,17 @@ bool XAudio2Stream::UnPause()
 bool XAudio2Stream::Is_Pending() const
 {
     return Status == STREAM_STATUS_PENDING;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2Stream::Is_Started() const
+{
+    return Status == STREAM_STATUS_STARTED;
 }
 
 
@@ -402,6 +450,17 @@ bool XAudio2Stream::Is_Stopped() const
 bool XAudio2Stream::Is_Finished() const
 {
     return Status == STREAM_STATUS_FINISHED;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool XAudio2Stream::Is_Loop_Ended() const
+{
+    return Status == STREAM_STATUS_LOOP_END;
 }
 
 
@@ -499,7 +558,7 @@ bool XAudio2Stream::Set_Pan(float pan)
 
     // Get Speaker config.
     DWORD dwChannelMask;
-    MasterVoice->GetChannelMask(&dwChannelMask);
+    XAudio2AudioDriver::Get_Master_Voice()->GetChannelMask(&dwChannelMask);
     
     // A pan of -1.0 indicates all left speaker, 
     // 1.0 is all right speaker, 0.0 is default and split between left and right.
@@ -551,7 +610,7 @@ bool XAudio2Stream::Set_Pan(float pan)
     SourceVoice->GetVoiceDetails(&VoiceDetails);
 
     XAUDIO2_VOICE_DETAILS MasterVoiceDetails;
-    MasterVoice->GetVoiceDetails(&MasterVoiceDetails);
+    XAudio2AudioDriver::Get_Master_Voice()->GetVoiceDetails(&MasterVoiceDetails);
 
     HRESULT hr = SourceVoice->SetOutputMatrix(nullptr, VoiceDetails.InputChannels, MasterVoiceDetails.InputChannels, outputMatrix);
     if (FAILED(hr)) {
@@ -656,7 +715,7 @@ bool OggStream::Open_Stream()
 
     DEV_DEBUG_INFO("OggStream::Open_Stream - Opening file handle for \"%s\".\n", FileName.Peek_Buffer());
 
-    FileHandle = SoundResource->Unique_File_Handle();
+    FileHandle = SoundResource->Get_Unique_File_Handle();
     if (!FileHandle) {
         DEBUG_ERROR("OggStream::Open_Stream - File handle is null!\n");
         Reset();
@@ -666,7 +725,7 @@ bool OggStream::Open_Stream()
     FileHandle->Open(FILE_ACCESS_READ);
 
     // Open the Ogg-Vorbis file pipe.
-    ov_ret = ov_open_callbacks(FileHandle, OggVorbisFile, nullptr, -1, cc_ov_callbacks);
+    ov_ret = ov_open_callbacks(FileHandle.get(), OggVorbisFile, nullptr, -1, cc_ov_callbacks);
     //ov_ret = ov_test_callbacks(FileHandle, OggVorbisFile, nullptr, -1, cc_ov_callbacks);
     if (vorbisFailed(ov_ret)) {
         vorbisError(ov_ret);
@@ -685,7 +744,7 @@ bool OggStream::Open_Stream()
     Format.cbSize          = sizeof(WAVEFORMATEX);
 
     // Create the source voice.
-    hr = AudioEngine->CreateSourceVoice(&SourceVoice, &Format);
+    hr = XAudio2AudioDriver::Get_Audio_Engine()->CreateSourceVoice(&SourceVoice, &Format, 0, XAUDIO2_DEFAULT_FREQ_RATIO, &StreamingCallback);
     if (FAILED(hr)) {
         DEBUG_ERROR("OggStream::Open_Stream - Failed to create voice for \"%s\"!\n", FileName.Peek_Buffer());
         Reset();
@@ -754,7 +813,7 @@ bool OggStream::Update_Stream()
     SourceVoice->GetState(&state);
     if (state.BuffersQueued >= MAX_BUFFER_COUNT - 1) {
 #ifndef NDEBUG
-        //DEV_DEBUG_WARNING("OggStream::Update_Stream - Stream for \"%s\" still has queued buffers!\n", FileName.Peek_Buffer());
+        DEV_DEBUG_WARNING("OggStream::Update_Stream - Stream for \"%s\" still has queued buffers!\n", FileName.Peek_Buffer());
 #endif
         return false;
     }
@@ -796,12 +855,13 @@ bool OggStream::Update_Stream()
 
     XAUDIO2_BUFFER buffer;
     ZeroMemory(&buffer, sizeof(XAUDIO2_BUFFER));
+    buffer.pContext = this;
     buffer.pAudioData = (BYTE *)&Buffers[BufferIndex];
 
     // Have we reached the end?
     if (!total_bytes_read) {
         buffer.Flags = XAUDIO2_END_OF_STREAM; // Tell the source voice not to expect any data after this buffer.
-        Status = STREAM_STATUS_FINISHED;
+        //Status = STREAM_STATUS_FINISHED;
     }
 
     buffer.AudioBytes = STREAMING_BUFFER_SIZE;
