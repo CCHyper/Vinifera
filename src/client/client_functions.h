@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          CLIENT_FUNCTIONS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         Various supporting functions for the client system.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,31 +25,25 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#pragma once
 
-/**
- *  Include the hook headers here.
- */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-#include "client_hooks.h"
+#include "always.h"
+#include "client_globals.h"
+#include "cncnet5_globals.h"
 
 
-void Setup_Hooks()
+namespace Client
 {
-    Vinifera_Memory_Hooks();
 
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Extension_Hooks();
+bool Parse_Command_Line(int argc, char *argv[]);
 
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
-    Client_Hooks();
-}
+bool Init();
+bool Startup();
+bool Shutdown();
+
+bool Start_Game();
+bool Main_Loop();
+
+bool Dump_End_Game_Info();
+
+}; // namespace Client

@@ -32,6 +32,8 @@
 #include "iomap.h"
 #include "tactical.h"
 #include "house.h"
+#include "client_functions.h"
+#include "client_globals.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -158,6 +160,13 @@ static bool Main_Loop_Intercept()
          *  The games main loop function.
          */
         ret = Main_Loop();
+
+#if defined(TS_CLIENT)
+        /**
+         *  Client main loop.
+         */
+        ret |= Client::Main_Loop();
+#endif
 
         After_Main_Loop();
 

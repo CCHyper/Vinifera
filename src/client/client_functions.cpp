@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          CLIENT_FUNCTIONS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         Various supporting functions for the client system.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,31 +25,74 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#include "client_functions.h"
+#include "tibsun_functions.h"
+#include "tibsun_globals.h"
+#include "debughandler.h"
+
+
+bool Client::Parse_Command_Line(int argc, char *argv[])
+{
+    return true;
+}
+
+
+bool Client::Init()
+{
+    return true;
+}
+
+
+bool Client::Startup()
+{
+    return true;
+}
+
+
+bool Client::Shutdown()
+{
+    if (!Dump_End_Game_Info()) {
+        DEBUG_ERROR("Client: Failed to export game-end information!\n");
+        return false;
+    }
+
+    return true;
+}
+
 
 /**
- *  Include the hook headers here.
+ *  Starts a game session.
+ *  
+ *  @author: CCHyper
  */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-#include "client_hooks.h"
-
-
-void Setup_Hooks()
+bool Client::Start_Game()
 {
-    Vinifera_Memory_Hooks();
+    /**
+     *  Temporary, 
+     */
+    return Select_Game(_Select_Game_fade);
+}
 
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Extension_Hooks();
 
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
-    Client_Hooks();
+/**
+ *  Main Loop function for handling any client systems.
+ * 
+ *  @author: CCHyper
+ */
+bool Client::Main_Loop()
+{
+    return true;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool Client::Dump_End_Game_Info()
+{
+    // TODO 0x005687A0
+
+    return true;
 }
