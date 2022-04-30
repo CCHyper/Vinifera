@@ -49,7 +49,9 @@ RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
     IsMPPrePlacedConYards(false),
     IsBuildOffAlly(true),
     IsShowSuperWeaponTimers(true),
-    WaterCrate(CRATE_NONE)
+    WaterCrate(CRATE_MONEY),
+    WaterCrateImage(nullptr),
+    WaterCrateChance(0.2f)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -122,6 +124,8 @@ HRESULT RulesClassExtension::Load(IStream *pStm)
 #ifndef NDEBUG
     EXT_DEBUG_INFO("RulesExt Load: ID 0x%08X Ptr 0x%08X\n", id, this);
 #endif
+
+    SWIZZLE_REQUEST_POINTER_REMAP(WaterCrateImage);
 
     return S_OK;
 }
@@ -333,7 +337,7 @@ bool RulesClassExtension::MPlayer(CCINIClass &ini)
     if (!ini.Is_Present(MPLAYER)) {
         return false;
     }
-
+    
     IsMPAutoDeployMCV = ini.Get_Bool(MPLAYER, "AutoDeployMCV", IsMPAutoDeployMCV);
     IsMPPrePlacedConYards = ini.Get_Bool(MPLAYER, "PrePlacedConYards", IsMPPrePlacedConYards);
     IsBuildOffAlly = ini.Get_Bool(MPLAYER, "BuildOffAlly", IsBuildOffAlly);
@@ -341,6 +345,29 @@ bool RulesClassExtension::MPlayer(CCINIClass &ini)
     return true;
 }
 
+
+/**
+ *  Fetch all the goodie crate rules and characteristics.
+ * 
+ *  @author: CCHyper
+ */
+bool RulesClassExtension::CrateRules(CCINIClass &ini)
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("RulesClassExtension::CrateRules - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+    static char const * const CRATERULES = "CrateRules";
+
+    if (!ini.Is_Present(CRATERULES)) {
+        return false;
+    }
+
+    WaterCrate = ini.Get_CrateType(CRATERULES, "WaterCrate", WaterCrate);
+    WaterCrateImage = ini.Get_Overlay(CRATERULES, "WaterCrateImg", WaterCrateImage);
+    WaterCrateChance = ini.Get_Float(CRATERULES, "WaterCrateChance", WaterCrateChance);
+
+    return true;
+}
 
 /**
  *  Fetch all the weapon characteristic values.

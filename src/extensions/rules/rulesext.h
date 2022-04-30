@@ -29,13 +29,13 @@
 
 #include "extension.h"
 #include "container.h"
-
 #include "noinit.h"
 #include "tpoint.h"
 
 
 class CCINIClass;
 class RulesClass;
+class OverlayTypeClass;
 
 
 class RulesClassExtension final : public Extension<RulesClass>
@@ -59,6 +59,7 @@ class RulesClassExtension final : public Extension<RulesClass>
         bool MPlayer(CCINIClass &ini);
         bool AudioVisual(CCINIClass &ini);
         bool Weapons(CCINIClass &ini);
+        bool CrateRules(CCINIClass &ini);
 
         static bool Read_UI_INI();
         static bool Init_UI_Controls();
@@ -112,9 +113,14 @@ class RulesClassExtension final : public Extension<RulesClass>
         bool IsShowSuperWeaponTimers;
 
         /**
-         *  
+         *  The water crate in solo play will have this powerup.
          */
         CrateType WaterCrate;
+
+        /**
+         *  The image to display for a water crate.
+         */
+        const OverlayTypeClass *WaterCrateImage;
 
         /**
          *  Percent chance that a water crate will be generated instead of a land
