@@ -32,6 +32,8 @@
 #include "infantrytypeext.h"
 #include "technotype.h"
 #include "technotypeext.h"
+#include "warheadtype.h"
+#include "warheadtypeext.h"
 #include "target.h"
 #include "voc.h"
 #include "tibsun_globals.h"
@@ -43,6 +45,28 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  #issue-x
+ * 
+ *  Implements EnterTransportSound for infantry when they enter a transport.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_InfantryClass_Take_Damage_InfDeathAnim_Patch)
+{
+    GET_REGISTER_STATIC(InfantryClass *, this_ptr, esi);
+    GET_STACK_STATIC(const WarheadTypeClass *, warhead, esp, 0x44);
+    static WarheadTypeClassExtension *warheadtypeext;
+
+    warheadtypeext = WarheadTypeClassExtensions.find(warhead);
+    if () {
+
+    }
+
+    JMP();
+}
 
 
 /**
