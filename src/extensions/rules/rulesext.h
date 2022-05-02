@@ -120,6 +120,56 @@ class RulesClassExtension final : public GlobalExtensionClass<RulesClass>
              */
             TypeList<RGBStruct> BandBoxTintColors;
 
+            /**
+             *  
+             */
+            bool IsMovementLineDashed;
+
+            /**
+             *  
+             */
+            bool IsMovementLineDropShadow;
+
+            /**
+             *  
+             */
+            bool IsMovementLineThick;
+
+            /**
+             *  
+             */
+            RGBStruct MovementLineColor;
+
+            /**
+             *  
+             */
+            RGBStruct MovementLineDropShadowColor;
+
+            /**
+             *  
+             */
+            bool IsTargetLineDashed;
+
+            /**
+             *  
+             */
+            bool IsTargetLineDropShadow;
+
+            /**
+             *  
+             */
+            bool IsTargetLineThick;
+
+            /**
+             *  
+             */
+            RGBStruct TargetLineColor;
+
+            /**
+             *  
+             */
+            RGBStruct TargetLineDropShadowColor;
+
         } UIControlsStruct;
 
         static UIControlsStruct UIControls;
