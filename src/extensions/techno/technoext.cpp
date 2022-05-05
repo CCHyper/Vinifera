@@ -32,10 +32,16 @@
 #include "house.h"
 #include "voc.h"
 #include "ebolt.h"
+#include "infantry.h"
+#include "infantrytype.h"
+#include "house.h"
+#include "housetype.h"
+#include "target.h"
 #include "tibsun_inline.h"
 #include "wwcrc.h"
 #include "asserthandler.h"
 #include "debughandler.h"
+#include "Commctrl.h"
 
 
 /**
@@ -196,10 +202,64 @@ void TechnoClassExtension::Response_Capture()
 
         response = technotypeext->VoiceCapture[Sim_Random_Pick(0, technotypeext->VoiceCapture.Count()-1)];
 
-    } else if (technotype->VoiceMove.Count() > 0) {
-        
-        response = technotype->VoiceMove[Sim_Random_Pick(0, technotype->VoiceMove.Count()-1)];
+    } else {
+
+        bool got_voice = false;
     
+        /**
+         *  #issue-798 and #issue-799
+         * 
+         *  This fixes a "bug" (more of a lack of implementation?) where the Engineer and other infiltrators
+         *  have capture voices defined on VoiceAttack, but the original code used VoiceMove for MISSION_CAPTURE.
+         *  
+         *  Now, depending on the target, the game will now use VoiceAttack for MISSION_CAPTURE.
+         * 
+         *  @author: CCHyper
+         */
+        if (ThisPtr->What_Am_I() == RTTI_INFANTRY) {
+            InfantryClass *inf_this = reinterpret_cast<InfantryClass *>(ThisPtr);
+
+            if (Target_Legal(ThisPtr->TarCom) && Is_Target_Techno(ThisPtr->TarCom)) {
+                TechnoClass *tarcom = Target_As_Techno(ThisPtr->TarCom);
+
+                if (
+                    /**
+                     *  Engineer: IsMultiplayPassive, Player and Ally targets.
+                     */
+                    (inf_this->Class->IsEngineer && (tarcom->House->Class->IsMultiplayPassive
+                                                  || tarcom->House->Is_Player()
+                                                  || tarcom->House->Is_Ally(ThisPtr->House)))
+
+                    || 
+                    
+                    /**
+                     *  Thief, VehicleThief, Agent: IsMultiplayPassive and Enemy targets.
+                     */
+                    ((inf_this->Class->IsThief || inf_this->Class->IsVehicleThief || inf_this->Class->IsAgent)
+                          && tarcom->House->Class->IsMultiplayPassive
+                          || (!tarcom->House->Is_Player() && !tarcom->House->Is_Ally(ThisPtr->House))
+
+                    )) {
+                 
+                    if (technotype->VoiceAttack.Count() > 0) {
+                        response = technotype->VoiceAttack[Sim_Random_Pick(0, technotype->VoiceAttack.Count()-1)];
+                    }
+
+                    got_voice = true;
+                 
+                }
+
+            }
+
+        }
+
+        /**
+         *  If the capture override was not chosen, fall back to using VoiceMove.
+         */
+        if (!got_voice && technotype->VoiceMove.Count() > 0) {
+            response = technotype->VoiceMove[Sim_Random_Pick(0, technotype->VoiceMove.Count()-1)];    
+        }
+
     }
 
     Sound_Effect(response);

@@ -243,7 +243,30 @@ static void Techno_Player_Assign_Mission_Response_Switch(TechnoClass *this_ptr, 
             if (technoext) {
                 technoext->Response_Capture();
             } else {
-                this_ptr->Response_Move();
+
+                /**
+                 *  #issue-798 and #issue-799
+                 * 
+                 *  x
+                 * 
+                 *  @author: CCHyper
+                 */
+                if (this_ptr->What_Am_I() == RTTI_INFANTRY) {
+
+                    InfantryClass *inf_this = reinterpret_cast<InfantryClass *>(this_ptr);
+                    if (inf_this->Class->IsEngineer
+                     || inf_this->Class->IsThief
+                     || inf_this->Class->IsVehicleThief
+                     || inf_this->Class->IsAgent) {
+
+                        this_ptr->Response_Attack();
+                    } else {
+                        this_ptr->Response_Move();
+                    }
+                
+                } else {
+                    this_ptr->Response_Move();
+                }
             }
             break;
 
