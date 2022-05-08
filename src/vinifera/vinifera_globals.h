@@ -72,6 +72,7 @@ extern bool Vinifera_Developer_FrameStep;
 extern int Vinifera_Developer_FrameStepCount;
 extern bool Vinifera_Developer_AIControl;
 extern bool Vinifera_Developer_ShowMission;
+extern bool Vinifera_Developer_ShowAction;
 
 
 /**

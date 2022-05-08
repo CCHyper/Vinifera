@@ -387,6 +387,9 @@ void Init_Vinifera_Commands()
 
         cmdptr = new ToggleMissionCommandClass;
         Commands.Add(cmdptr);
+
+        cmdptr = new ToggleActionCommandClass;
+        Commands.Add(cmdptr);
     }
 
 #ifndef NDEBUG

@@ -56,6 +56,7 @@ bool Vinifera_Developer_FrameStep = false;
 int Vinifera_Developer_FrameStepCount = 0;
 bool Vinifera_Developer_AIControl = false;
 bool Vinifera_Developer_ShowMission = false;
+bool Vinifera_Developer_ShowAction = false;
 
 bool Vinifera_SkipWWLogoMovie = false;
 bool Vinifera_SkipStartupMovies = false;

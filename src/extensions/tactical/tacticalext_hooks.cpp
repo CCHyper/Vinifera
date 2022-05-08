@@ -289,7 +289,10 @@ DECLARE_PATCH(_Tactical_Render_Overlay_Patch)
              */
             //TacticalExtension->Debug_Draw_Facings();
 
-            if (Vinifera_Developer_ShowMission) {
+            if (Vinifera_Developer_ShowAction) {
+                TacticalExtension->Debug_Draw_Actions();
+
+            } else if (Vinifera_Developer_ShowMission) {
                 TacticalExtension->Debug_Draw_Missions();
             }
 #endif

@@ -74,11 +74,17 @@ class TacticalMapExtension final : public Extension<Tactical>
 
         bool Debug_Draw_Facings();
         bool Debug_Draw_Missions();
+        bool Debug_Draw_Actions();
 
     private:
         void Super_Draw_Timer(int row_index, ColorScheme *color, int time, const char *name, unsigned long *flash_time, bool *flash_state);
 
     public:
+        /**
+         *  The current mouse action, used for debug purposes.
+         */
+        ActionType CurrentAction;
+
         /**
          *  Has information text been set?
          */

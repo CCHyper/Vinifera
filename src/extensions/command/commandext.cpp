@@ -3260,3 +3260,40 @@ bool ToggleMissionCommandClass::Process()
 
     return true;
 }
+
+
+/**
+ *  Toggle the display of the current object mission status.
+ * 
+ *  @author: CCHyper
+ */
+const char *ToggleActionCommandClass::Get_Name() const
+{
+    return "ToggleAction";
+}
+
+const char *ToggleActionCommandClass::Get_UI_Name() const
+{
+    return "Toggle Action Display";
+}
+
+const char *ToggleActionCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *ToggleActionCommandClass::Get_Description() const
+{
+    return "Toggle the display of the mouse actions.";
+}
+
+bool ToggleActionCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    Vinifera_Developer_ShowAction = !Vinifera_Developer_ShowAction;
+
+    return true;
+}

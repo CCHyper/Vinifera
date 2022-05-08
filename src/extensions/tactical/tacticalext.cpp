@@ -30,6 +30,7 @@
 #include "wwcrc.h"
 #include "vinifera_globals.h"
 #include "tibsun_globals.h"
+#include "tibsun_functions.h"
 #include "colorscheme.h"
 #include "rgb.h"
 #include "wwfont.h"
@@ -47,6 +48,7 @@
 #include "supertypeext.h"
 #include "rules.h"
 #include "rulesext.h"
+#include "wwmouse.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -61,7 +63,7 @@ TacticalMapExtension *TacticalExtension = nullptr;
  */
 TacticalMapExtension::TacticalMapExtension(Tactical *this_ptr) :
     Extension(this_ptr),
-
+    CurrentAction(ACTION_NONE),
     IsInfoTextSet(false),
     InfoTextBuffer(),
     InfoTextPosition(BOTTOM_LEFT),
@@ -403,6 +405,30 @@ bool TacticalMapExtension::Debug_Draw_Missions()
         screen.X = org_screen_x - (font->String_Pixel_Width(buffer3)/2);
         Simple_Text_Print(buffer3, TempSurface, &TacticalRect, &screen, ColorScheme::As_Pointer("White"), COLOR_BLACK, style);
     }
+
+    return true;
+}
+
+
+/**
+ *  Draws the current mouse action.
+ * 
+ *  @author: CCHyper
+ */
+bool TacticalMapExtension::Debug_Draw_Actions()
+{
+    ASSERT(ThisPtr != nullptr);
+
+    Point2D mousepos = WWMouse->Get_Mouse_XY();
+
+    TextPrintType style = TPF_CENTER|TPF_FULLSHADOW|TPF_6POINT;
+    WWFontClass *font = Font_Ptr(style);
+
+    char buffer[32];
+
+    std::snprintf(buffer, sizeof(buffer), "%s", Action_From_Name(CurrentAction));
+
+    Simple_Text_Print(buffer, TempSurface, &TacticalRect, &mousepos, ColorScheme::As_Pointer("White"), COLOR_BLACK, style);
 
     return true;
 }
