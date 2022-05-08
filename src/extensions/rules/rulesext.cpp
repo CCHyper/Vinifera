@@ -454,6 +454,11 @@ bool RulesClassExtension::AudioVisual(CCINIClass &ini)
 
     IsShowSuperWeaponTimers = ini.Get_Bool(AUDIOVISUAL, "ShowSuperWeaponTimers", IsShowSuperWeaponTimers);
 
+    IonBlastShakePixelYHi = ini.Get_Int(AUDIOVISUAL, "IonBlastShakeYhi", IonBlastShakePixelYHi);
+    IonBlastShakePixelYLo = ini.Get_Int(AUDIOVISUAL, "IonBlastShakeYlo", IonBlastShakePixelYLo);
+    IonBlastShakePixelXHi = ini.Get_Int(AUDIOVISUAL, "IonBlastShakeXhi", IonBlastShakePixelXHi);
+    IonBlastShakePixelXLo = ini.Get_Int(AUDIOVISUAL, "IonBlastShakeXlo", IonBlastShakePixelXLo);
+
     return true;
 }
 

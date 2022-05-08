@@ -97,4 +97,12 @@ class RulesClassExtension final : public GlobalExtensionClass<RulesClass>
          *  to break from a shot.
          */
         int IceStrength;
+
+        /**
+         *  These values are used to shake the screen when the ion cannon blast occures.
+         */
+        unsigned int IonBlastShakePixelYHi;
+        unsigned int IonBlastShakePixelYLo;
+        unsigned int IonBlastShakePixelXHi;
+        unsigned int IonBlastShakePixelXLo;
 };
