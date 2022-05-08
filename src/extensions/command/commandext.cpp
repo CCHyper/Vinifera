@@ -3223,3 +3223,40 @@ bool AIInstantSuperRechargeCommandClass::Process()
 
     return true;
 }
+
+
+/**
+ *  Toggle the display of the current object mission status.
+ * 
+ *  @author: CCHyper
+ */
+const char *ToggleMissionCommandClass::Get_Name() const
+{
+    return "ToggleMission";
+}
+
+const char *ToggleMissionCommandClass::Get_UI_Name() const
+{
+    return "Toggle Mission Display";
+}
+
+const char *ToggleMissionCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *ToggleMissionCommandClass::Get_Description() const
+{
+    return "Toggle the display of the current object mission status.";
+}
+
+bool ToggleMissionCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    Vinifera_Developer_ShowMission = !Vinifera_Developer_ShowMission;
+
+    return true;
+}

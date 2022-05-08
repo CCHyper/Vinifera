@@ -282,7 +282,6 @@ void TacticalMapExtension::Draw_Debug_Overlay()
 }
 
 
-#ifndef NDEBUG
 /**
  *  Draws the current unit facing number.
  * 
@@ -319,8 +318,6 @@ bool TacticalMapExtension::Debug_Draw_Facings()
     screen.X += TacticalRect.X;
     screen.Y += TacticalRect.Y;
 
-    TempSurface->Fill_Rect(TacticalRect, Rect(screen.X, screen.Y, 2, 2), DSurface::RGB_To_Pixel(255,0,0));
-
     TextPrintType style = TPF_CENTER|TPF_FULLSHADOW|TPF_6POINT;
     WWFontClass *font = Font_Ptr(style);
 
@@ -332,14 +329,83 @@ bool TacticalMapExtension::Debug_Draw_Facings()
     std::snprintf(buffer1, sizeof(buffer1), "%d", unit->PrimaryFacing.Current().Get_Dir());
     std::snprintf(buffer2, sizeof(buffer2), "%d", unit->PrimaryFacing.Current().Get_Raw());
 
-    Simple_Text_Print(buffer1, TempSurface, &TacticalRect, &screen, ColorScheme::As_Pointer("White"), style);
+    Simple_Text_Print(buffer1, TempSurface, &TacticalRect, &screen, ColorScheme::As_Pointer("White"), COLOR_BLACK, style);
 
     screen.Y += 10;
-    Simple_Text_Print(buffer2, TempSurface, &TacticalRect, &screen, ColorScheme::As_Pointer("White"), style);
+    Simple_Text_Print(buffer2, TempSurface, &TacticalRect, &screen, ColorScheme::As_Pointer("White"), COLOR_BLACK, style);
 
     return true;
 }
-#endif
+
+
+/**
+ *  Draws the current object mission state.
+ * 
+ *  @author: CCHyper
+ */
+bool TacticalMapExtension::Debug_Draw_Missions()
+{
+    ASSERT(ThisPtr != nullptr);
+
+    if (CurrentObjects.Count() != 1) {
+        return false;
+    }
+
+    ObjectClass *object = CurrentObjects.Fetch_Head();
+    if (!object->Is_Techno()) {
+        return false;
+    }
+
+    TechnoClass *techno = reinterpret_cast<TechnoClass *>(object);
+
+    Point3D lept = techno->Class_Of()->Lepton_Dimensions();
+    Point3D lept_center = Point3D(lept.X/2, lept.Y/2, lept.Z/2);
+
+    Point3D pix = techno->Class_Of()->Pixel_Dimensions();
+    Point3D pixel_center = Point3D(pix.X/2, pix.Y/2, pix.Z/2);
+
+    Coordinate coord = techno->Center_Coord();
+
+    Point2D screen = TacticalMap->func_60F150(coord);
+
+    screen.X -= TacticalMap->field_5C.X;
+    screen.Y -= TacticalMap->field_5C.Y;
+
+    screen.X += TacticalRect.X;
+    screen.Y += TacticalRect.Y;
+
+    TextPrintType style = TPF_CENTER|TPF_FULLSHADOW|TPF_6POINT;
+    WWFontClass *font = Font_Ptr(style);
+
+    char buffer1[32];
+    char buffer2[32];
+    char buffer3[32];
+
+    std::snprintf(buffer1, sizeof(buffer1), "%s", MissionClass::Mission_Name(techno->Mission));
+    std::snprintf(buffer2, sizeof(buffer2), "%s", MissionClass::Mission_Name(techno->SuspendedMission));
+    std::snprintf(buffer3, sizeof(buffer3), "%s", MissionClass::Mission_Name(techno->MissionQueue));
+
+    int org_screen_x = screen.X;
+
+    if (techno->Mission != MISSION_NONE) {
+        screen.X = org_screen_x - (font->String_Pixel_Width(buffer1)/2);
+        Simple_Text_Print(buffer1, TempSurface, &TacticalRect, &screen, ColorScheme::As_Pointer("White"), COLOR_BLACK, style);
+    }
+
+    if (techno->SuspendedMission != MISSION_NONE) {
+        screen.Y += font->Get_Char_Height();
+        screen.X = org_screen_x - (font->String_Pixel_Width(buffer2)/2);
+        Simple_Text_Print(buffer2, TempSurface, &TacticalRect, &screen, ColorScheme::As_Pointer("White"), COLOR_BLACK, style);
+    }
+
+    if (techno->MissionQueue != MISSION_NONE) {
+        screen.Y += font->Get_Char_Height();
+        screen.X = org_screen_x - (font->String_Pixel_Width(buffer3)/2);
+        Simple_Text_Print(buffer3, TempSurface, &TacticalRect, &screen, ColorScheme::As_Pointer("White"), COLOR_BLACK, style);
+    }
+
+    return true;
+}
 
 
 /**

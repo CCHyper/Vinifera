@@ -283,6 +283,17 @@ DECLARE_PATCH(_Tactical_Render_Overlay_Patch)
 
         if (TacticalExtension) {
 
+#ifndef NDEBUG
+            /**
+             *  Various developer only debugging.
+             */
+            //TacticalExtension->Debug_Draw_Facings();
+
+            if (Vinifera_Developer_ShowMission) {
+                TacticalExtension->Debug_Draw_Missions();
+            }
+#endif
+
             TacticalExtension->Draw_Debug_Overlay();
 
             if (Vinifera_Developer_FrameStep) {
@@ -291,13 +302,6 @@ DECLARE_PATCH(_Tactical_Render_Overlay_Patch)
 
         }
     }
-
-#ifndef NDEBUG
-    /**
-     *  Various developer only debugging.
-     */
-    //Tactical_Debug_Draw_Facings();
-#endif
 
 #ifndef RELEASE
     /**

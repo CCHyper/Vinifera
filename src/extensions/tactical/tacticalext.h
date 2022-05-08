@@ -72,9 +72,8 @@ class TacticalMapExtension final : public Extension<Tactical>
 
         void Render_Post();
 
-#ifndef NDEBUG
         bool Debug_Draw_Facings();
-#endif
+        bool Debug_Draw_Missions();
 
     private:
         void Super_Draw_Timer(int row_index, ColorScheme *color, int time, const char *name, unsigned long *flash_time, bool *flash_state);

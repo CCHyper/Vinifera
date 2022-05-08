@@ -384,6 +384,9 @@ void Init_Vinifera_Commands()
 
         cmdptr = new AIInstantSuperRechargeCommandClass;
         Commands.Add(cmdptr);
+
+        cmdptr = new ToggleMissionCommandClass;
+        Commands.Add(cmdptr);
     }
 
 #ifndef NDEBUG
