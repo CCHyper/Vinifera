@@ -149,26 +149,24 @@ class RulesClassExtension final : public GlobalExtensionClass<RulesClass>
              *  
              */
             bool IsTargetLineDashed;
-
-            /**
-             *  
-             */
             bool IsTargetLineDropShadow;
-
-            /**
-             *  
-             */
             bool IsTargetLineThick;
-
-            /**
-             *  
-             */
             RGBStruct TargetLineColor;
+            RGBStruct TargetLineDropShadowColor;
 
             /**
              *  
              */
-            RGBStruct TargetLineDropShadowColor;
+            bool IsTargetLaserDashed;
+            bool IsTargetLaserDropShadow;
+            bool IsTargetLaserThick;
+            RGBStruct TargetLaserColor;
+            RGBStruct TargetLaserDropShadowColor;
+
+            /**
+             *  
+             */
+            unsigned TargetLaserTime;
 
         } UIControlsStruct;
 

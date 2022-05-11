@@ -513,6 +513,12 @@ bool RulesClassExtension::Read_UI_INI()
     UIControls.IsTargetLineThick = ini.Get_Bool(INGAME, "TargetLineThick", UIControls.IsTargetLineThick);
     UIControls.TargetLineColor = ini.Get_RGB(INGAME, "TargetLineColor", UIControls.TargetLineColor);
     UIControls.TargetLineDropShadowColor = ini.Get_RGB(INGAME, "TargetLineDropShadowColor", UIControls.TargetLineDropShadowColor);
+    UIControls.IsTargetLaserDashed = ini.Get_Bool(INGAME, "TargetLaserDashed", UIControls.IsTargetLaserDashed);
+    UIControls.IsTargetLaserDropShadow = ini.Get_Bool(INGAME, "TargetLaserDropShadow", UIControls.IsTargetLaserDropShadow);
+    UIControls.IsTargetLaserThick = ini.Get_Bool(INGAME, "TargetLaserThick", UIControls.IsTargetLaserThick);
+    UIControls.TargetLaserColor = ini.Get_RGB(INGAME, "TargetLaserColor", UIControls.TargetLaserColor);
+    UIControls.TargetLaserDropShadowColor = ini.Get_RGB(INGAME, "TargetLaserDropShadowColor", UIControls.TargetLaserDropShadowColor);
+    UIControls.TargetLaserTime = ini.Get_Int(INGAME, "TargetLaserTime", UIControls.TargetLaserTime);
 
     return true;
 }
@@ -560,6 +566,12 @@ bool RulesClassExtension::Init_UI_Controls()
     UIControls.IsTargetLineThick = false;
     UIControls.TargetLineColor = RGBStruct{173,0,0}; // COLOR_RED
     UIControls.TargetLineDropShadowColor = RGBStruct{0,0,0};
+    UIControls.IsTargetLaserDashed = true;
+    UIControls.IsTargetLaserDropShadow = false;
+    UIControls.IsTargetLaserThick = false;
+    UIControls.TargetLaserColor = RGBStruct{173,0,0}; // COLOR_RED
+    UIControls.TargetLaserDropShadowColor = RGBStruct{0,0,0};
+    UIControls.TargetLaserTime = 15;
 
     return false;
 }
