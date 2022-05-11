@@ -519,6 +519,12 @@ bool RulesClassExtension::Read_UI_INI()
     UIControls.TargetLaserColor = ini.Get_RGB(INGAME, "TargetLaserColor", UIControls.TargetLaserColor);
     UIControls.TargetLaserDropShadowColor = ini.Get_RGB(INGAME, "TargetLaserDropShadowColor", UIControls.TargetLaserDropShadowColor);
     UIControls.TargetLaserTime = ini.Get_Int(INGAME, "TargetLaserTime", UIControls.TargetLaserTime);
+    UIControls.IsShowNavComQueueLines = ini.Get_Bool(INGAME, "ShowNavComQueueLines", UIControls.IsShowNavComQueueLines);
+    UIControls.IsNavComQueueLineDashed = ini.Get_Bool(INGAME, "NavComQueueLineDashed", UIControls.IsNavComQueueLineDashed);
+    UIControls.IsNavComQueueLineDropShadow = ini.Get_Bool(INGAME, "NavComQueueLineDropShadow", UIControls.IsNavComQueueLineDropShadow);
+    UIControls.IsNavComQueueLineThick = ini.Get_Bool(INGAME, "NavComQueueLineThick", UIControls.IsNavComQueueLineThick);
+    UIControls.NavComQueueLineColor = ini.Get_RGB(INGAME, "NavComQueueLineColor", UIControls.NavComQueueLineColor);
+    UIControls.NavComQueueLineDropShadowColor = ini.Get_RGB(INGAME, "NavComQueueLineDropShadowColor", UIControls.NavComQueueLineDropShadowColor);
 
     return true;
 }
@@ -572,6 +578,12 @@ bool RulesClassExtension::Init_UI_Controls()
     UIControls.TargetLaserColor = RGBStruct{173,0,0}; // COLOR_RED
     UIControls.TargetLaserDropShadowColor = RGBStruct{0,0,0};
     UIControls.TargetLaserTime = 15;
+    UIControls.IsShowNavComQueueLines = false;
+    UIControls.IsNavComQueueLineDashed = false;
+    UIControls.IsNavComQueueLineDropShadow = false;
+    UIControls.IsNavComQueueLineThick = false;
+    UIControls.NavComQueueLineColor = RGBStruct{173,0,0}; // COLOR_LTBLUE
+    UIControls.NavComQueueLineDropShadowColor = RGBStruct{0,0,0};
 
     return false;
 }

@@ -168,6 +168,20 @@ class RulesClassExtension final : public GlobalExtensionClass<RulesClass>
              */
             unsigned TargetLaserTime;
 
+            /**
+             *  
+             */
+            bool IsShowNavComQueueLines;
+
+            /**
+             *  
+             */
+            bool IsNavComQueueLineDashed;
+            bool IsNavComQueueLineDropShadow;
+            bool IsNavComQueueLineThick;
+            RGBStruct NavComQueueLineColor;
+            RGBStruct NavComQueueLineDropShadowColor;
+
         } UIControlsStruct;
 
         static UIControlsStruct UIControls;
