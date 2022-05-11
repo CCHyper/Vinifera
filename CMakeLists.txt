@@ -293,7 +293,7 @@ FetchContent_Declare(
 	TSpp
 	GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
 	GIT_REPOSITORY https://github.com/Vinifera-Developers/TSpp.git
-	GIT_TAG        origin/master
+	GIT_TAG        origin/astar
 )
 
 FetchContent_GetProperties(TSpp)

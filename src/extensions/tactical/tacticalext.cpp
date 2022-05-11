@@ -391,6 +391,193 @@ void TacticalMapExtension::Draw_FrameStep_Overlay()
 }
 
 
+
+#include "astarpath.h"
+bool TacticalMapExtension::Draw_Debug_AStarPathFinder()
+{
+    ASSERT(ThisPtr != nullptr);
+
+    TextPrintType style = TPF_FULLSHADOW|TPF_6POINT;
+    WWFontClass *font = Font_Ptr(style);
+
+
+
+
+    // use these this block to get the screen position of the selected unit.
+#if 0
+    if (CurrentObjects.Count() != 1) {
+        return false;
+    }
+
+    ObjectClass *object = CurrentObjects.Fetch_Head();
+    if (object->What_Am_I() != RTTI_UNIT) {
+        return false;
+    }
+
+    FootClass *foot = reinterpret_cast<FootClass *>(object);
+
+    Point3D lept = foot->Class_Of()->Lepton_Dimensions();
+    Point3D lept_center = Point3D(lept.X/2, lept.Y/2, lept.Z/2);
+
+    Point3D pix = foot->Class_Of()->Pixel_Dimensions();
+    Point3D pixel_center = Point3D(pix.X/2, pix.Y/2, pix.Z/2);
+
+    Coordinate coord = foot->Center_Coord();
+
+    Point2D screen = TacticalMap->func_60F150(coord);
+
+    screen.X -= TacticalMap->field_5C.X;
+    screen.Y -= TacticalMap->field_5C.Y;
+
+    screen.X += TacticalRect.X;
+    screen.Y += TacticalRect.Y;
+#endif
+
+
+
+
+
+    // top left of tactical display.
+    Point2D screen = TacticalRect.Top_Left();
+
+    Fancy_Text_Print(
+            "bool_0: %s",
+            TempSurface,
+            &TacticalRect,
+            &screen,
+            ColorScheme::As_Pointer("White"),
+            COLOR_BLACK,
+            style,
+            AStarPathFinder.bool_0 ? "true" : "false");
+
+    screen.Y += font->Get_Char_Height()+1;
+    Fancy_Text_Print(
+            "bool_1: %s",
+            TempSurface,
+            &TacticalRect,
+            &screen,
+            ColorScheme::As_Pointer("White"),
+            COLOR_BLACK,
+            style,
+            AStarPathFinder.bool_1 ? "true" : "false");
+
+    screen.Y += font->Get_Char_Height()+1;
+    Fancy_Text_Print(
+            "bool_2: %s",
+            TempSurface,
+            &TacticalRect,
+            &screen,
+            ColorScheme::As_Pointer("White"),
+            COLOR_BLACK,
+            style,
+            AStarPathFinder.bool_2 ? "true" : "false");
+
+    screen.Y += font->Get_Char_Height()+1;
+    Fancy_Text_Print(
+            "boolchar_3: %s",
+            TempSurface,
+            &TacticalRect,
+            &screen,
+            ColorScheme::As_Pointer("White"),
+            COLOR_BLACK,
+            style,
+            AStarPathFinder.boolchar_3 ? "true" : "false");
+
+    screen.Y += font->Get_Char_Height()+1;
+    Fancy_Text_Print(
+            "float_4: %f",
+            TempSurface,
+            &TacticalRect,
+            &screen,
+            ColorScheme::As_Pointer("White"),
+            COLOR_BLACK,
+            style,
+            AStarPathFinder.float_4);
+
+    screen.Y += font->Get_Char_Height()+1;
+    Fancy_Text_Print(
+            "initedcount: %d",
+            TempSurface,
+            &TacticalRect,
+            &screen,
+            ColorScheme::As_Pointer("White"),
+            COLOR_BLACK,
+            style,
+            AStarPathFinder.initedcount);
+
+    screen.Y += font->Get_Char_Height()+1;
+    Fancy_Text_Print(
+            "Speed: %d",
+            TempSurface,
+            &TacticalRect,
+            &screen,
+            ColorScheme::As_Pointer("White"),
+            COLOR_BLACK,
+            style,
+            AStarPathFinder.Speed);
+
+    screen.Y += font->Get_Char_Height()+1;
+    Fancy_Text_Print(
+            "StartCellLevel: %d",
+            TempSurface,
+            &TacticalRect,
+            &screen,
+            ColorScheme::As_Pointer("White"),
+            COLOR_BLACK,
+            style,
+            AStarPathFinder.StartCellLevel);
+
+    screen.Y += font->Get_Char_Height()+1;
+    Fancy_Text_Print(
+            "EndCellLevel: %d",
+            TempSurface,
+            &TacticalRect,
+            &screen,
+            ColorScheme::As_Pointer("White"),
+            COLOR_BLACK,
+            style,
+            AStarPathFinder.EndCellLevel);
+
+    screen.Y += font->Get_Char_Height()+1;
+    Fancy_Text_Print(
+            "__PathsNeedProcessing: %d",
+            TempSurface,
+            &TacticalRect,
+            &screen,
+            ColorScheme::As_Pointer("White"),
+            COLOR_BLACK,
+            style,
+            AStarPathFinder.__PathsNeedProcessing);
+
+    screen.Y += font->Get_Char_Height()+1;
+    Fancy_Text_Print(
+            "dword_6C: %d",
+            TempSurface,
+            &TacticalRect,
+            &screen,
+            ColorScheme::As_Pointer("White"),
+            COLOR_BLACK,
+            style,
+            AStarPathFinder.dword_6C);
+
+    screen.Y += font->Get_Char_Height()+1;
+    Fancy_Text_Print(
+            "__OriginCell: %d,%d",
+            TempSurface,
+            &TacticalRect,
+            &screen,
+            ColorScheme::As_Pointer("White"),
+            COLOR_BLACK,
+            style,
+            AStarPathFinder.__OriginCell.X, AStarPathFinder.__OriginCell.Y);
+
+
+
+    return true;
+}
+
+
+
 /**
  *  Draw the overlay information text if set.
  * 

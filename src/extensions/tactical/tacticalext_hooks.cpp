@@ -288,8 +288,11 @@ DECLARE_PATCH(_Tactical_Render_Overlay_Patch)
             if (Vinifera_Developer_FrameStep) {
                 TacticalExtension->Draw_FrameStep_Overlay();
             }
+            
+            TacticalExtension->Draw_Debug_AStarPathFinder();
 
         }
+
     }
 
 #ifndef NDEBUG

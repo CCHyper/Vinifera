@@ -127,8 +127,51 @@
 #include "hooker_macros.h"
 
 
+
+
+#include "astarpath.h"
+class AStarPathFinderClassExt final : AStarPathFinderClass
+{
+    public:
+        void _Optimize_Final_Path(PathType *path, FootClass *object);
+        PathType * _Find_Path_Regular(Cell *from, Cell *to, FootClass *object, FacingType *final_moves, int max_loops, bool a6 = false);
+        bool _Find_Path_Hierarchical(Cell *from, Cell *to, MZoneType mzone, FootClass *object);
+};
+
+PathType * AStarPathFinderClassExt::_Find_Path_Regular(Cell *from, Cell *to, FootClass *object, FacingType *final_moves, int max_loops, bool a6)
+{
+    DEBUG_INFO("Before Find_Path_Regular - from: %d,%d  to: %d,%d  object: %s  max_loops: %d\n", from->X, from->Y, to->X, to->Y, object->Name(), max_loops, max_loops);
+    return Find_Path_Regular(from, to, object, final_moves, max_loops, a6);
+}
+
+bool AStarPathFinderClassExt::_Find_Path_Hierarchical(Cell *from, Cell *to, MZoneType mzone, FootClass *object)
+{
+    DEBUG_INFO("Before Find_Path_Hierarchical - from: %d,%d  to: %d,%d  mzone: %d,  object: %s\n", from->X, from->Y, to->X, to->Y, mzone, object->Name());
+    return Find_Path_Hierarchical(from, to, mzone, object);
+}
+
+void AStarPathFinderClassExt::_Optimize_Final_Path(PathType *path, FootClass *object)
+{
+    DEBUG_INFO("Before Optimize_Final_Path - Start: %d,%d  Cost: %d  Length: %d\n", path->Start.X, path->Start.Y, path->Cost, path->Length);
+    Optimize_Final_Path(path, object);
+    DEBUG_INFO("After Optimize_Final_Path - Start: %d,%d  Cost: %d  Length: %d\n", path->Start.X, path->Start.Y, path->Cost, path->Length);
+}
+
+
+
+
 void Extension_Hooks()
 {
+    Patch_Call(0x0041B20D, &AStarPathFinderClassExt::_Optimize_Final_Path);
+    Patch_Call(0x0041D9CC, &AStarPathFinderClassExt::_Find_Path_Regular);
+    Patch_Call(0x0041D070, &AStarPathFinderClassExt::_Find_Path_Hierarchical);
+
+
+
+
+
+
+
     /**
      *  Hook the new save and load system in.
      */

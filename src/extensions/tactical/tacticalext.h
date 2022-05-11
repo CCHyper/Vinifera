@@ -66,6 +66,7 @@ class TacticalMapExtension final : public Extension<Tactical>
 
         void Draw_Debug_Overlay();
         void Draw_FrameStep_Overlay();
+        bool Draw_Debug_AStarPathFinder();
 
         void Draw_Information_Text();
         void Draw_Super_Timers();
