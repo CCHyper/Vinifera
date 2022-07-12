@@ -556,8 +556,6 @@ bool Vinifera_Shutdown()
     EBoltClass::Clear_All();
     TheaterTypes.Clear();
 
-    DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
-
     return true;
 }
 

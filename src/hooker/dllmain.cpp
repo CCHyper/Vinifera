@@ -35,6 +35,14 @@
 
 #include "miscutil.h"
 #include "vinifera_util.h"
+#include "vinifera_globals.h"
+
+
+/**
+ *  Forward declare the memory manager function as we can't include the header
+ *  before the function body of DllMain just in case it uses operator new/delete.
+ */
+void Init_Vinifera_Memory_Manager();
 
 
 /**

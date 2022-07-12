@@ -85,3 +85,9 @@ namespace std
     }
 }
 #endif
+
+
+/**
+ *  Pulls in the memory manager for all modules.
+ */
+#include "vinifera_memmgr.h"

@@ -44,6 +44,14 @@
 #include "asserthandler.h"
 
 
+extern int Execute_Day;
+extern int Execute_Month;
+extern int Execute_Year;
+extern int Execute_Hour;
+extern int Execute_Min;
+extern int Execute_Sec;
+
+
 /**
  *  Draws the version text on the main menu.
  * 

@@ -4,11 +4,12 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          VINIFERA_NEW_OFF.H
  *
- *  @author        CCHyper
+ *  @author        Peter Dalton, Game Programming Gems 2, 2001.
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         This header allows for the Memory Manager to be turned on/off
+ *                 seamlessly. Including this header will turn the Memory Manager off.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,26 +26,16 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+
 
 /**
- *  Include the hook headers here.
+ *  Undefine all symbols defined by the Memory Manager.  This is important when including 
+ *  header files that also overwrite the new/delete operators to avoid circular definitions
+ *  that will result in unexpected behavior and syntax errors from the compiler.
  */
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "ext_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-
-
-void Setup_Hooks()
-{
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    Extension_Hooks();
-
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
-}
+#undef new
+#undef delete
+#undef malloc
+#undef calloc
+#undef realloc
+#undef free
