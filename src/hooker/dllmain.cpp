@@ -133,10 +133,10 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved
             return TRUE;
         }
             
-        case DLL_THREAD_ATTACH:
-        case DLL_THREAD_DETACH:
-            OutputDebugString(VINIFERA_DLL " is not allowed to be loaded within a thread!\n");
-            return FALSE;
+        //case DLL_THREAD_ATTACH:
+        //case DLL_THREAD_DETACH:
+        //    OutputDebugString(VINIFERA_DLL " is not allowed to be loaded within a thread!\n");
+        //    return FALSE;
 
         default:
             return FALSE;

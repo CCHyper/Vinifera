@@ -41,6 +41,7 @@
 #include "vinifera_gitinfo.h"
 #include "tspp_gitinfo.h"
 #include "resource.h"
+#include "audio_util.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <Windows.h>

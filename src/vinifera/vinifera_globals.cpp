@@ -47,6 +47,12 @@ char Vinifera_ProjectVersion[64] = { '\0' };
 char Vinifera_IconName[64] = { '\0' };
 char Vinifera_CursorName[64] = { '\0' };
 
+char Vinifera_MusicPath_EnvVar[PATH_MAX];
+char Vinifera_MusicPath[PATH_MAX];
+
+char Vinifera_SoundsPath_EnvVar[PATH_MAX];
+char Vinifera_SoundsPath[PATH_MAX];
+
 bool Vinifera_Developer_InstantBuild = false;
 bool Vinifera_Developer_AIInstantBuild = false;
 bool Vinifera_Developer_InstantSuperRecharge = false;

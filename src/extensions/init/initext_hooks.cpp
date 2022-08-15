@@ -29,17 +29,53 @@
 #include "initext_functions.h"
 #include "vinifera_globals.h"
 #include "tibsun_globals.h"
+#include "tibsun_functions.h"
 #include "special.h"
 #include "playmovie.h"
 #include "cd.h"
 #include "newmenu.h"
 #include "addon.h"
 #include "command.h"
+#include "ttimer.h"
+#include "stimer.h"
+#include "audio_manager.h"
+#include "audio_util.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  Patch to remove the Play_Song as the new audio engine(s) will start
+ *  themes instantly, and this request interferes with the new menu system
+ *  play request.
+ * 
+ *  @author: CCHyper
+ */
+static bool Is_GMenu_Available() { return CCFileClass("GMENU.MIX").Is_Available(); }
+DECLARE_PATCH(_Select_Game_Skip_Intro_Play_Patch)
+{
+    if (!Is_GMenu_Available()) {
+        Theme_Play_Song(Get_Intro_Theme());
+    }
+
+    JMP(0x004E1FA7);
+}
+
+
+/**
+ *  Removes a inlined instance of Focus_Loss in Main_Window_Procedure.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Main_Window_Procedure_Inlined_Focus_Loss_Patch)
+{
+    Focus_Loss();
+
+    JMP(0x00685F10);
+}
 
 
 /**
@@ -161,6 +197,7 @@ static bool CCFile_Validate_Is_Available(const char *filename, int size)
  */
 static bool Vinifera_Play_Startup_Movies()
 {
+    static const int FMOD_VQA_SIZE = 73217;
     static const int VINIFERA_VQA_SIZE = 704889;
     static const int WWLOGO_VQA_SIZE = 2415362;
 
@@ -171,6 +208,11 @@ static bool Vinifera_Play_Startup_Movies()
 
     if (!Vinifera_SkipLogoMovies) {
         DEBUG_INFO("Playing logo movies.\n");
+        if (!CCFile_Validate_Is_Available("FMOD.VQA", FMOD_VQA_SIZE)) {
+            DEBUG_ERROR("Failed to find FMOD.VQA!\n");
+            return false;
+        }
+        Play_Movie("FMOD.VQA");
         if (!CCFile_Validate_Is_Available("VINIFERA.VQA", VINIFERA_VQA_SIZE)) {
             DEBUG_ERROR("Failed to find VINIFERA.VQA!\n");
             return false;
@@ -291,6 +333,7 @@ void GameInit_Hooks()
     Patch_Call(0x004E8735, &Addon_Enabled);
 
     Patch_Jump(0x00685F69, &_Main_Window_Procedure_Scroll_Sidebar_Check_Patch);
+    Patch_Jump(0x00685E91, &_Main_Window_Procedure_Inlined_Focus_Loss_Patch);
 
 #if defined(TS_CLIENT)
     /**
@@ -298,4 +341,6 @@ void GameInit_Hooks()
      */
     //Patch_Jump(0x00407050, &Vinifera_Addon_Present);
 #endif
+
+    Patch_Jump(0x004E1F6B, &_Select_Game_Skip_Intro_Play_Patch);
 }

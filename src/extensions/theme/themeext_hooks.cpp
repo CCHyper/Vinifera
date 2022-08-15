@@ -26,6 +26,9 @@
  *
  ******************************************************************************/
 #include "themeext_hooks.h"
+
+#ifdef USE_FMOD_AUDIO
+
 #include "themeext_init.h"
 #include "themeext.h"
 #include "theme.h"
@@ -126,16 +129,23 @@ bool ThemeClassExt::_Is_Allowed(ThemeType index) const
     return true;
 }
 
+#endif // USE_FMOD_AUDIO
+
 
 /**
  *  Main function for patching the hooks.
  */
 void ThemeClassExtension_Hooks()
 {
+#ifndef USE_FMOD_AUDIO
     /**
      *  Initialises the extended class.
      */
     ThemeClassExtension_Init();
 
     Patch_Jump(0x00644300, &ThemeClassExt::_Is_Allowed);
+
+    Patch_Jump(0x00643C70, &ThemeClassExt::_Scan);
+    Patch_Jump(0x00643FE0, &ThemeClassExt::_Play_Song);
+#endif // USE_FMOD_AUDIO
 }

@@ -49,6 +49,8 @@
 #include "extension.h"
 #include "theatertype.h"
 #include "uicontrol.h"
+#include "miscutil.h"
+#include "audio_manager.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <string>
@@ -409,6 +411,44 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
             continue;
         }
 
+#ifdef USE_FMOD_AUDIO
+        /**
+         *  Enable audio manager debug logging?
+         */
+        if (stricmp(string, "-AUDIO_DEBUG") == 0) {
+            DEBUG_INFO("  - Audio manager debug logging enabled.\n");
+            AudioManager.Enable_Debug_Logging(true);
+            continue;
+        }
+
+        /**
+         *  Enable audio manager memory debug logging?
+         */
+        if (stricmp(string, "-AUDIO_MEMORY_DEBUG") == 0) {
+            DEBUG_INFO("  - Audio manager memory debug logging enabled.\n");
+            AudioManager.Enable_Memory_Debug_Logging(true);
+            continue;
+        }
+
+        /**
+         *  Enable audio manager file debug logging?
+         */
+        if (stricmp(string, "-AUDIO_FILE_DEBUG") == 0) {
+            DEBUG_INFO("  - Audio manager file debug logging enabled.\n");
+            AudioManager.Enable_File_Debug_Logging(true);
+            continue;
+        }
+
+        /**
+         *  Enable audio manager codec debug logging?
+         */
+        if (stricmp(string, "-AUDIO_CODEC_DEBUG") == 0) {
+            DEBUG_INFO("  - Audio manager codec debug logging enabled.\n");
+            AudioManager.Enable_Codec_Debug_Logging(true);
+            continue;
+        }
+#endif
+
     }
 
     if (argc > 1) {
@@ -445,6 +485,13 @@ bool Vinifera_Startup()
     DWORD rc;
 
     ViniferaSearchPaths.Clear();
+
+#if !defined(NDEBUG) && defined(USE_FMOD_AUDIO)
+    /**
+     *  Debug path for HQ audio files.
+     */
+    ViniferaSearchPaths.Add("HQ");
+#endif
     
 #ifndef NDEBUG
     /**

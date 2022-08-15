@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          COMMANDEXT_FUNCTIONS.H
+ *  @file          FMOD_GLOBALS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for the extended command class.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,7 +27,7 @@
  ******************************************************************************/
 #pragma once
 
+#include "fmod_globals.h"
 
-bool Prev_Theme_Command();
-bool Next_Theme_Command();
-bool Play_Pause_Theme_Command();
+
+//DEF_FUNC_PTR(FMOD_Memory_Initialize);

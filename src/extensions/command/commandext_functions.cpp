@@ -33,8 +33,15 @@
 #include "tacticalext.h"
 #include "tactical.h"
 #include "extension_globals.h"
+#include "audio_util.h"
 #include "asserthandler.h"
 #include "debughandler.h"
+
+
+/**
+ *  
+ */
+static CDTimerClass<MSTimerClass> _theme_command_cooldown = SECONDS_TO_MILLISECONDS(2);
 
 
 /**
@@ -44,7 +51,11 @@
  */
 bool Prev_Theme_Command()
 {
-    ThemeType theme = Theme.What_Is_Playing();
+    if (!_theme_command_cooldown.Expired()) {
+        return false;
+    }
+
+    ThemeType theme = Theme_What_Is_Playing();
 
     /**
      *  Iterate backward from the current theme and find the next available
@@ -55,10 +66,10 @@ bool Prev_Theme_Command()
         --theme;
 
         if (theme < THEME_FIRST) {
-            theme = ThemeType(Theme.Max_Themes());
+            theme = ThemeType(Theme_Max_Themes())-1;
         }
 
-        if (Theme.Is_Allowed(theme)) {
+        if (Theme_Is_Allowed(theme)) {
             break;
         }
 
@@ -68,8 +79,8 @@ bool Prev_Theme_Command()
      *  Queue the track for playback. We need to stop the track first
      *  otherwise Queue_Song() will fade the track out.
      */
-    Theme.Stop();
-    Theme.Queue_Song(theme);
+    Theme_Stop();
+    Theme_Queue_Song(theme);
 
     /**
      *  Print the chosen music track name on the screen.
@@ -77,7 +88,7 @@ bool Prev_Theme_Command()
     TacticalMapExtension->InfoTextTimer.Stop();
 
     char buffer[256];
-    std::snprintf(buffer, sizeof(buffer), "Now Playing: %s", Theme.ThemeClass::Full_Name(theme));
+    std::snprintf(buffer, sizeof(buffer), "Now Playing: %s", Theme_Full_Name(theme));
 
     TacticalMapExtension->Set_Info_Text(buffer);
     TacticalMapExtension->IsInfoTextSet = true;
@@ -90,6 +101,8 @@ bool Prev_Theme_Command()
     TacticalMapExtension->InfoTextTimer = SECONDS_TO_MILLISECONDS(4);
     TacticalMapExtension->InfoTextTimer.Start();
 
+    _theme_command_cooldown = SECONDS_TO_MILLISECONDS(2);
+    
     return true;
 }
 
@@ -101,21 +114,25 @@ bool Prev_Theme_Command()
  */
 bool Next_Theme_Command()
 {
-    ThemeType theme = Theme.What_Is_Playing();
+    if (!_theme_command_cooldown.Expired()) {
+        return false;
+    }
+
+    ThemeType theme = Theme_What_Is_Playing();
 
     /**
      *  Iterate forward from the current theme and find the next available
      *  music track we can play.
      */
-    while (theme < ThemeType(Theme.Max_Themes())) {
+    while (theme < ThemeType(Theme_Max_Themes())) {
 
         ++theme;
 
-        if (theme >= ThemeType(Theme.Max_Themes())) {
+        if (theme >= ThemeType(Theme_Max_Themes())) {
             theme = ThemeType(THEME_FIRST);
         }
 
-        if (Theme.Is_Allowed(theme)) {
+        if (Theme_Is_Allowed(theme)) {
             break;
         }
 
@@ -125,8 +142,8 @@ bool Next_Theme_Command()
      *  Queue the track for playback. We need to stop the track first
      *  otherwise Queue_Song() will fade the track out.
      */
-    Theme.Stop();
-    Theme.Queue_Song(theme);
+    Theme_Stop();
+    Theme_Queue_Song(theme);
 
     /**
      *  Print the chosen music track name on the screen.
@@ -134,11 +151,60 @@ bool Next_Theme_Command()
     TacticalMapExtension->InfoTextTimer.Stop();
 
     char buffer[256];
-    std::snprintf(buffer, sizeof(buffer), "Now Playing: %s", Theme.ThemeClass::Full_Name(theme));
+    std::snprintf(buffer, sizeof(buffer), "Now Playing: %s", Theme_Full_Name(theme));
 
     TacticalMapExtension->Set_Info_Text(buffer);
     TacticalMapExtension->IsInfoTextSet = true;
     
+    TacticalMapExtension->InfoTextPosition = InfoTextPosType::BOTTOM_LEFT;
+
+    //TacticalMapExtension->InfoTextNotifySound = Rule->OptionsChanged;
+    //TacticalMapExtension->InfoTextNotifySoundVolume = 0.5f;
+
+    TacticalMapExtension->InfoTextTimer = SECONDS_TO_MILLISECONDS(4);
+    TacticalMapExtension->InfoTextTimer.Start();
+
+    _theme_command_cooldown = SECONDS_TO_MILLISECONDS(2);
+
+    return true;
+}
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool Play_Pause_Theme_Command()
+{
+    static bool _is_paused = false;
+
+    Wstring msg = "";
+
+    if (!_is_paused) {
+        Theme_Suspend();
+        msg = "Music: Pause";
+
+    } else {
+        Theme_Resume();
+
+        //ThemeType theme = Theme_What_Is_Playing();
+
+        //char buffer[256];
+        //std::snprintf(buffer, sizeof(buffer), "Music: Resume : %s", Theme_Full_Name(theme));
+
+        msg = "Music: Resume";
+    }
+
+    _is_paused = !_is_paused;
+
+    /**
+     *  Print the chosen music track name on the screen.
+     */
+    TacticalMapExtension->InfoTextTimer.Stop();
+
+    TacticalMapExtension->Set_Info_Text(msg.Peek_Buffer());
+    TacticalMapExtension->IsInfoTextSet = true;
+
     TacticalMapExtension->InfoTextPosition = InfoTextPosType::BOTTOM_LEFT;
 
     //TacticalMapExtension->InfoTextNotifySound = Rule->OptionsChanged;

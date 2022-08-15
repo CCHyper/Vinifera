@@ -153,6 +153,8 @@ endif()
 
 option(OPTION_CHECK_TARGET_BINARIES "This option controls if the launcher should check target binaries before injection." ON)
 
+option(OPTION_FMOD_SOUND "Enable the FMOD audio system." ON)
+
 
 ################################################################################
 # Some general Windows definitions to keep the MSVC compiler happy with our code.
@@ -299,7 +301,33 @@ FetchContent_Declare(
 FetchContent_GetProperties(TSpp)
 if(NOT tspp_POPULATED)
 	FetchContent_Populate(TSpp)
+	message(STATUS "  Source: ${tspp_SOURCE_DIR}")
+	message(STATUS "  Build: ${tspp_BINARY_DIR}")
 	add_subdirectory(${tspp_SOURCE_DIR} ${tspp_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+
+################################################################################
+# Fetch the latest FMOD source code and binaries
+################################################################################
+if (OPTION_FMOD_SOUND)
+	FetchContent_Declare(
+		fmod
+		GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+		GIT_REPOSITORY https://github.com/Vinifera-Developers/Vinifera-FMOD.git
+		GIT_TAG        origin/master
+	)
+
+	FetchContent_GetProperties(fmod)
+	if(NOT fmod_POPULATED)
+		message(STATUS "Fetching FMOD sources and binaries...")
+		FetchContent_Populate(fmod)
+		message(STATUS "  Source: ${fmod_SOURCE_DIR}")
+		message(STATUS "  Build: ${fmod_BINARY_DIR}")
+		#add_subdirectory(${fmod_SOURCE_DIR} ${fmod_BINARY_DIR} EXCLUDE_FROM_ALL)
+	else()
+		message(STATUS "Found FMOD.")
+	endif()
 endif()
 
 
@@ -412,7 +440,14 @@ target_include_directories(${PROJECT_NAME} BEFORE PUBLIC
 		${VINIFERA_INCLUDE_DIRS}
 		${PROJECT_SOURCE_DIR}/hooker/
 		${CMAKE_SOURCE_DIR}/res
+		${fmod_SOURCE_DIR}/inc
 )
+
+if(OPTION_FMOD_SOUND)
+	target_include_directories(${PROJECT_NAME} BEFORE PUBLIC
+		${fmod_SOURCE_DIR}/inc
+	)
+endif()
 
 # Set custom debugging target name (only works if the custom path option has been set!).
 if(NOT ${OPTION_CUSTOM_DEBUGGER_DIRECTORY_PATH} STREQUAL " " AND
@@ -524,7 +559,14 @@ message(STATUS "Build: Preview")
 else()
 message(STATUS "Build: Unofficial")
 endif()
+if(OPTION_FMOD_SOUND)
+message(STATUS "Build: FMOD Sound System Enabled")
+endif()
 
+# Enable the FMOD Audio System sources to be compiled.
+if(OPTION_FMOD_SOUND)
+target_compile_definitions(${PROJECT_NAME} PUBLIC USE_FMOD_AUDIO=1)
+endif()
 
 #
 # Add/Remove flags required for trying matching pre-compiled game code.
@@ -617,6 +659,15 @@ target_link_libraries(${PROJECT_NAME} ${REQUIRED_LIBRARIES})
 
 # Make build check state of git to check for uncommitted changes.
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_check_git)
+
+if(OPTION_FMOD_SOUND)
+	# Link to the FMOD static library.
+	target_link_libraries(${PROJECT_NAME} 
+			$<$<CONFIG:Debug>:${fmod_SOURCE_DIR}/lib/x86/fmodL_vc.lib>
+			$<$<CONFIG:Release>:${fmod_SOURCE_DIR}/lib/x86/fmod_vc.lib>
+			$<$<CONFIG:RelWithDebInfo>:${fmod_SOURCE_DIR}/lib/x86/fmod_vc.lib>
+			$<$<CONFIG:MinSizeRel>:${fmod_SOURCE_DIR}/lib/x86/fmod_vc.lib>)
+endif()
 
 
 ################################################################################

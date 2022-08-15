@@ -629,6 +629,7 @@ void Debug_Hooks()
     DeleteFilesOlderThan(5, Vinifera_DebugDirectory, "EXCEPT_*");
     DeleteFilesOlderThan(5, Vinifera_DebugDirectory, "CRASHDUMP_*");
     DeleteFilesOlderThan(5, Vinifera_DebugDirectory, "MINIDUMP_*");
+    DeleteFilesOlderThan(5, Vinifera_DebugDirectory, "AUDIO_DBG_*");
     DeleteFilesOlderThan(5, Vinifera_DebugDirectory, "DEBUG_*.ZIP");
 
     DisableDebuggerOutput = false;

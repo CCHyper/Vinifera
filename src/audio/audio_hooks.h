@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          COMMANDEXT_FUNCTIONS.H
+ *  @file          AUDIO_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for the extended command class.
+ *  @brief         Contains the hooks for the new audio driver interface.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -28,6 +28,4 @@
 #pragma once
 
 
-bool Prev_Theme_Command();
-bool Next_Theme_Command();
-bool Play_Pause_Theme_Command();
+void Audio_Hooks();

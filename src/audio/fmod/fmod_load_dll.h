@@ -4,11 +4,12 @@
  *
  *  @project       Vinifera
  *
- *  @file          COMMANDEXT_FUNCTIONS.H
+ *  @file          FMOD_LOAD_DLL.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for the extended command class.
+ *  @brief         Utility functions for performing one-time loading of
+ *                 Vorbis library functions from the DLL.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,7 +28,14 @@
  ******************************************************************************/
 #pragma once
 
+#include "always.h"
 
-bool Prev_Theme_Command();
-bool Next_Theme_Command();
-bool Play_Pause_Theme_Command();
+
+/**
+ *  Are all the required imports loaded?
+ */
+extern bool FMODImportsLoaded;
+
+
+bool Load_FMOD_DLL();
+void Unload_FMOD_DLL();

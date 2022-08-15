@@ -135,6 +135,13 @@ static bool Main_Loop_Intercept()
 {
     bool ret = false;
 
+    HWND hWnd = GetForegroundWindow();
+    if (hWnd == MainWindow) {
+        GameInFocus = true;
+    } else {
+        GameInFocus = false;
+    }
+
     /**
      *  Frame step mode enabled but no frames to process, so just perform
      *  a basic redraw and update of the screen, no game logic.

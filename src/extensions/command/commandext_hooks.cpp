@@ -219,6 +219,9 @@ void Init_Vinifera_Commands()
     cmdptr = new NextThemeCommandClass;
     Commands.Add(cmdptr);
 
+    cmdptr = new PlayPauseThemeCommandClass;
+    Commands.Add(cmdptr);
+
     cmdptr = new ScrollNECommandClass;
     Commands.Add(cmdptr);
 
@@ -458,6 +461,14 @@ static void Process_Vinifera_Hotkeys()
 
     if (!ini.Is_Present("Hotkey", "NextTheme")) {
         cmdptr = CommandClass::From_Name("NextTheme");
+        if (cmdptr) {
+            key = reinterpret_cast<ViniferaCommandClass *>(cmdptr)->Default_Key();
+            HotkeyIndex.Add_Index(key, cmdptr);
+        }
+    }
+
+    if (!ini.Is_Present("Hotkey", "PlayPauseTheme")) {
+        cmdptr = CommandClass::From_Name("PlayPauseTheme");
         if (cmdptr) {
             key = reinterpret_cast<ViniferaCommandClass *>(cmdptr)->Default_Key();
             HotkeyIndex.Add_Index(key, cmdptr);
