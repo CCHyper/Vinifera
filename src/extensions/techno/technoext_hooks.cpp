@@ -67,7 +67,30 @@ class TechnoClassExt final : public TechnoClass
 {
     public:
         void _Draw_Target_Laser() const;
+        bool _Is_Allowed_To_Retaliate_Can_Retaliate(const TechnoClass *source, const WarheadTypeClass *weapon) const;
 };
+
+
+bool TechnoClassExt::_Is_Allowed_To_Retaliate_Can_Retaliate(const TechnoClass *source, const WarheadTypeClass *weapon) const
+{
+    /**
+     *  Possible bug fix from RA2/YR. Sanity check on the source.
+     */
+    if (!source) {
+        return false;
+    }
+
+    TechnoTypeClassExtension *technotypeext = technotypeext = Extension::Fetch<TechnoTypeClassExtension>(Techno_Type_Class());
+
+    /**
+     *  If this unit is flagged as no being allowed to retaliate to attacks, return false.
+     */
+    if (technotypeext && !technotypeext->IsCanRetaliate) {
+        return false;
+    }
+
+    return TechnoClass::Is_Allowed_To_Retaliate(source, weapon);
+}
 
 
 /**
@@ -904,7 +927,9 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x00631661, &_TechnoClass_Player_Assign_Mission_Response_Patch);
     Patch_Jump(0x00630390, &_TechnoClass_Fire_At_Suicide_Patch);
     Patch_Jump(0x00631223, &_TechnoClass_Fire_At_Electric_Bolt_Patch);
-    Patch_Jump(0x00636F09, &_TechnoClass_Is_Allowed_To_Retaliate_Can_Retaliate_Patch);
+
+    Patch_Call(0x00633386, &TechnoClassExt::_Is_Allowed_To_Retaliate_Can_Retaliate);
+    //Patch_Jump(0x00636F09, &_TechnoClass_Is_Allowed_To_Retaliate_Can_Retaliate_Patch);
 
     Patch_Call(0x00653ECD, &TechnoClassExt::_Draw_Target_Laser);
 }
