@@ -30,9 +30,13 @@
 #include "warheadtype.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,12 +52,10 @@ DECLARE_PATCH(_WarheadTypeClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0x14); // ini name.
     static WarheadTypeClassExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating WarheadTypeClassExtension instance for \"%s\".\n", ini_name);
-
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = WarheadTypeClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<WarheadTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create WarheadTypeClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -112,15 +114,14 @@ DECLARE_PATCH(_WarheadTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    WarheadTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<WarheadTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x0074C798 } // WarheadTypes.vtble
+    JMP_REG(eax, 0x0066EF7E);
 }
 
 
@@ -138,16 +139,14 @@ DECLARE_PATCH(_WarheadTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    WarheadTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<WarheadTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov edx, ds:0x0074C798 } // WarheadTypes.vtble
+    JMP_REG(eax, 0x0066FA9E);
 }
 
 
@@ -160,19 +159,15 @@ original_code:
  */
 DECLARE_PATCH(_WarheadTypeClass_Detach_Patch)
 {
-    GET_REGISTER_STATIC(WarheadTypeClass *, this_ptr, esi);
+    GET_REGISTER_STATIC(WarheadTypeClass *, this_ptr, ecx);
     GET_STACK_STATIC(TARGET, target, esp, 0x8);
     GET_STACK_STATIC8(bool, all, esp, 0xC);
     static WarheadTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance. Flag that failures are Ok as the
-     *  class may not have 
+     *  Fetch the extension instance.
      */
-    exttype_ptr = WarheadTypeClassExtensions.find(this_ptr, false);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<WarheadTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -183,8 +178,10 @@ DECLARE_PATCH(_WarheadTypeClass_Detach_Patch)
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { ret 8 }
+    _asm { push esi }
+    _asm { mov ecx, this_ptr } // restore "this".
+    _asm { lea esi, [ecx+0x9C] }
+    JMP_REG(ecx, 0x0066F9BF);
 }
 
 
@@ -202,12 +199,9 @@ DECLARE_PATCH(_WarheadTypeClass_Compute_CRC_Patch)
     static WarheadTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = WarheadTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<WarheadTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -241,12 +235,9 @@ DECLARE_PATCH(_WarheadTypeClass_Read_INI_Patch)
     static WarheadTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = WarheadTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<WarheadTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -274,9 +265,9 @@ void WarheadTypeClassExtension_Init()
 {
     Patch_Jump(0x0066EEF4, &_WarheadTypeClass_Constructor_Patch);
     Patch_Jump(0x0066EF4F, &_WarheadTypeClass_NoInit_Constructor_Patch);
-    //Patch_Jump(0x0066F053, &_WarheadTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
-    Patch_Jump(0x0066FB83, &_WarheadTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x0066F9F5, &_WarheadTypeClass_Detach_Patch);
+    //Patch_Jump(0x0066EF78, &_WarheadTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
+    Patch_Jump(0x0066FA98, &_WarheadTypeClass_Scalar_Destructor_Patch);
+    Patch_Jump(0x0066F9B8, &_WarheadTypeClass_Detach_Patch);
     Patch_Jump(0x0066F6A4, &_WarheadTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x0066F566, &_WarheadTypeClass_Read_INI_Patch);
 }

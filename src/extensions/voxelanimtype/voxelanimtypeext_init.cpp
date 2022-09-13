@@ -30,9 +30,13 @@
 #include "voxelanimtype.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,12 +52,12 @@ DECLARE_PATCH(_VoxelAnimTypeClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0xC); // ini name.
     static VoxelAnimTypeClassExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating VoxelAnimTypeClassExtension instance for \"%s\".\n", ini_name);
+    //EXT_DEBUG_TRACE("Creating VoxelAnimTypeClassExtension instance for \"%s\".\n", ini_name);
 
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = VoxelAnimTypeClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<VoxelAnimTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create VoxelAnimTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -110,15 +114,14 @@ DECLARE_PATCH(_VoxelAnimTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    VoxelAnimTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<VoxelAnimTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x007E46F0 } // VoxelAnimTypes.vtble
+    JMP_REG(eax, 0x0065F5F7);
 }
 
 
@@ -136,16 +139,14 @@ DECLARE_PATCH(_VoxelAnimTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    VoxelAnimTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<VoxelAnimTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov edx, ds:0x007E46F0 } // VoxelAnimTypes.vtble
+    JMP_REG(eax, 0x006600E7);
 }
 
 
@@ -164,12 +165,9 @@ DECLARE_PATCH(_VoxelAnimTypeClass_Detach_Patch)
     static VoxelAnimTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = VoxelAnimTypeClassExtensions.find(this_ptr, false);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<VoxelAnimTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -198,12 +196,9 @@ DECLARE_PATCH(_VoxelAnimTypeClass_Compute_CRC_Patch)
     static VoxelAnimTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = VoxelAnimTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<VoxelAnimTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -234,12 +229,9 @@ DECLARE_PATCH(_VoxelAnimTypeClass_Read_INI_Patch)
     static VoxelAnimTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = VoxelAnimTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<VoxelAnimTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -267,13 +259,13 @@ void VoxelAnimTypeClassExtension_Init()
 {
     Patch_Jump(0x0065F584, &_VoxelAnimTypeClass_Constructor_Patch);
     //Patch_Jump(0x, &_VoxelAnimTypeClass_NoInit_Constructor_Patch);
-    //Patch_Jump(0x0065F653, &_VoxelAnimTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
-    Patch_Jump(0x00660153, &_VoxelAnimTypeClass_Scalar_Destructor_Patch);
+    //Patch_Jump(0x0065F5F1, &_VoxelAnimTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
+    Patch_Jump(0x006600E1, &_VoxelAnimTypeClass_Scalar_Destructor_Patch);
     Patch_Jump(0x0065FFA0, &_VoxelAnimTypeClass_Detach_Patch);
     Patch_Jump(0x0065FE22, &_VoxelAnimTypeClass_Compute_CRC_Patch);
-    Patch_Jump(0x0065FB54, &_VoxelAnimTypeClass_Read_INI_Patch);
-    Patch_Jump(0x0065FB76, &_VoxelAnimTypeClass_Read_INI_Patch);
-    Patch_Jump(0x0065FB9F, &_VoxelAnimTypeClass_Read_INI_Patch);
-    Patch_Jump(0x0065FBB0, &_VoxelAnimTypeClass_Read_INI_Patch);
+    Patch_Jump(0x0065FB54, 0x0065FC53); // Patch out multiple returns to just use 0x0065FC53
+    Patch_Jump(0x0065FB76, 0x0065FC53);
+    Patch_Jump(0x0065FB9F, 0x0065FC53);
+    Patch_Jump(0x0065FBB0, 0x0065FC53);
     Patch_Jump(0x0065FC53, &_VoxelAnimTypeClass_Read_INI_Patch);
 }

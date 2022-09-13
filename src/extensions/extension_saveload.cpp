@@ -347,7 +347,7 @@ static bool Vinifera_Load_TacticalExtension(IStream *pStm)
  */
 bool Vinifera_Put_All(IStream *pStm)
 {
-#if 0
+#if 1
     /**
      *  Save the Vinifera data marker which can be used to verify
      *  the state of the data to follow on load.
@@ -363,29 +363,29 @@ bool Vinifera_Put_All(IStream *pStm)
      */
     DEBUG_INFO("Saving extended class data...\n");
 
-    DEBUG_INFO("Saving RulesExtension\n");
-    if (!Vinifera_Save_RulesExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
-    DEBUG_INFO("Saving SessionExtension\n");
-    if (!Vinifera_Save_SessionExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
-    DEBUG_INFO("Saving ScenarioExtension\n");
-    if (!Vinifera_Save_ScenarioExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
-    DEBUG_INFO("Saving TacticalExtension\n");
-    if (!Vinifera_Save_TacticalExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
+//    DEBUG_INFO("Saving RulesExtension\n");
+//    if (!Vinifera_Save_RulesExtension(pStm)) {
+//        DEBUG_ERROR("\t***** FAILED!\n");
+//        return false;
+//    }
+//
+//    DEBUG_INFO("Saving SessionExtension\n");
+//    if (!Vinifera_Save_SessionExtension(pStm)) {
+//        DEBUG_ERROR("\t***** FAILED!\n");
+//        return false;
+//    }
+//
+//    DEBUG_INFO("Saving ScenarioExtension\n");
+//    if (!Vinifera_Save_ScenarioExtension(pStm)) {
+//        DEBUG_ERROR("\t***** FAILED!\n");
+//        return false;
+//    }
+//
+//    DEBUG_INFO("Saving TacticalExtension\n");
+//    if (!Vinifera_Save_TacticalExtension(pStm)) {
+//        DEBUG_ERROR("\t***** FAILED!\n");
+//        return false;
+//    }
 
     DEBUG_INFO("Saving class extensions\n");
     if (!Save_Extensions(pStm)) {
@@ -409,7 +409,7 @@ bool Vinifera_Put_All(IStream *pStm)
  */
 bool Vinifera_Load_All(IStream *pStm)
 {
-#if 0
+#if 1
     /**
      *  Load the Vinifera data marker which can be used to verify
      *  the state of the data to follow.
@@ -447,29 +447,29 @@ bool Vinifera_Load_All(IStream *pStm)
      */
     DEBUG_INFO("Loading extended class data...\n");
 
-    DEBUG_INFO("Loading RulesExtension\n");
-    if (!Vinifera_Load_RulesExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
-    DEBUG_INFO("Loading SessionExtension\n");
-    if (!Vinifera_Load_SessionExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
-    DEBUG_INFO("Loading ScenarioExtension\n");
-    if (!Vinifera_Load_ScenarioExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
-    DEBUG_INFO("Loading TacticalExtension\n");
-    if (!Vinifera_Load_TacticalExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
+//    DEBUG_INFO("Loading RulesExtension\n");
+//    if (!Vinifera_Load_RulesExtension(pStm)) {
+//        DEBUG_ERROR("\t***** FAILED!\n");
+//        return false;
+//    }
+//
+//    DEBUG_INFO("Loading SessionExtension\n");
+//    if (!Vinifera_Load_SessionExtension(pStm)) {
+//        DEBUG_ERROR("\t***** FAILED!\n");
+//        return false;
+//    }
+//
+//    DEBUG_INFO("Loading ScenarioExtension\n");
+//    if (!Vinifera_Load_ScenarioExtension(pStm)) {
+//        DEBUG_ERROR("\t***** FAILED!\n");
+//        return false;
+//    }
+//
+//    DEBUG_INFO("Loading TacticalExtension\n");
+//    if (!Vinifera_Load_TacticalExtension(pStm)) {
+//        DEBUG_ERROR("\t***** FAILED!\n");
+//        return false;
+//    }
 
     DEBUG_INFO("Loading class extensions\n");
     if (!Load_Extensions(pStm)) {

@@ -27,8 +27,8 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
 #include "command.h"
+#include "tibsun_defines.h"
 
 
 class BuildingClass;

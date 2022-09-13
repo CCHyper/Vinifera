@@ -39,6 +39,9 @@
 #include "debughandler.h"
 #include "asserthandler.h"
 
+#include "hooker.h"
+#include "hooker_macros.h"
+
 
 /**
  *  A fake class for implementing new member functions which allow
@@ -47,7 +50,7 @@
  *  @note: This must not contain a constructor or deconstructor!
  *  @note: All functions must be prefixed with "_" to prevent accidental virtualization.
  */
-static class ThemeClassFake final : public ThemeClass
+static class ThemeClassExt final : public ThemeClass
 {
     public:
         bool _Is_Allowed(ThemeType index) const;
@@ -60,7 +63,7 @@ static class ThemeClassFake final : public ThemeClass
  *  @author: 07/04/1996 JLB - Red Alert source code.
  *           CCHyper - Adjustments for Tiberian Sun.
  */
-bool ThemeClassFake::_Is_Allowed(ThemeType index) const
+bool ThemeClassExt::_Is_Allowed(ThemeType index) const
 {
     if (index == THEME_QUIET || index == THEME_PICK_ANOTHER) {
         return true;
@@ -84,6 +87,7 @@ bool ThemeClassFake::_Is_Allowed(ThemeType index) const
         return false;
     }
 
+#if 0
     /**
      *  #issue-764
      * 
@@ -97,6 +101,7 @@ bool ThemeClassFake::_Is_Allowed(ThemeType index) const
             return false;
         }
     }
+#endif
 
     /**
      *  If the theme is not allowed to be played by the player's house, then don't allow
@@ -133,5 +138,5 @@ void ThemeClassExtension_Hooks()
      */
     ThemeClassExtension_Init();
 
-    Patch_Jump(0x00644300, &ThemeClassFake::_Is_Allowed);
+    Patch_Jump(0x00644300, &ThemeClassExt::_Is_Allowed);
 }

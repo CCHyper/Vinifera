@@ -30,9 +30,13 @@
 #include "terraintype.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -51,7 +55,7 @@ DECLARE_PATCH(_TerrainTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = TerrainTypeClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<TerrainTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create TerrainTypeClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -108,15 +112,14 @@ DECLARE_PATCH(_TerrainTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    TerrainTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<TerrainTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x007E3FE0 } // TerrainTypes.vtble
+    JMP_REG(eax, 0x0064165E);
 }
 
 
@@ -134,16 +137,14 @@ DECLARE_PATCH(_TerrainTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    TerrainTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<TerrainTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov edx, ds:0x007E3FE0 } // TerrainTypes.vtble
+    JMP_REG(eax, 0x00641D8E);
 }
 
 
@@ -161,12 +162,9 @@ DECLARE_PATCH(_TerrainTypeClass_Compute_CRC_Patch)
     static TerrainTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = TerrainTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<TerrainTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -197,12 +195,9 @@ DECLARE_PATCH(_TerrainTypeClass_Read_INI_Patch)
     static TerrainTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = TerrainTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<TerrainTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -229,8 +224,8 @@ void TerrainTypeClassExtension_Init()
 {
     Patch_Jump(0x00641619, &_TerrainTypeClass_Constructor_Patch);
     Patch_Jump(0x0064163A, &_TerrainTypeClass_NoInit_Constructor_Patch);
-    //Patch_Jump(0x006416A8, &_TerrainTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
-    Patch_Jump(0x00641DE8, &_TerrainTypeClass_Scalar_Destructor_Patch);
+    //Patch_Jump(0x00641658, &_TerrainTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
+    Patch_Jump(0x00641D88, &_TerrainTypeClass_Scalar_Destructor_Patch);
     Patch_Jump(0x00641B6E, &_TerrainTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x00641A63, &_TerrainTypeClass_Read_INI_Patch);
 }

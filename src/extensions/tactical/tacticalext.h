@@ -27,16 +27,17 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
 #include "ttimer.h"
 #include "stimer.h"
 #include "wstring.h"
 #include "point.h"
 #include "textprint.h"
+#include <objidl.h>
 
 
 class Tactical;
 class HouseClass;
+class WWCRCEngine;
 
 
 enum InfoTextPosType {
@@ -50,19 +51,19 @@ enum InfoTextPosType {
 /**
  *  Extension to Tactical.
  */
-class TacticalMapExtension final : public Extension<Tactical>
+class TacticalMapExtension final
 {
     public:
-        TacticalMapExtension(Tactical *this_ptr);
+        TacticalMapExtension(const Tactical *this_ptr);
         TacticalMapExtension(const NoInitClass &noinit);
         ~TacticalMapExtension();
 
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
+        HRESULT Load(IStream *pStm);
+        HRESULT Save(IStream *pStm, BOOL fClearDirty);
+        int Size_Of() const;
 
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+        void Detach(TARGET target, bool all = true);
+        void Compute_CRC(WWCRCEngine &crc) const;
 
         void Draw_Debug_Overlay();
         void Draw_FrameStep_Overlay();

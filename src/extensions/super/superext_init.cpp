@@ -27,10 +27,15 @@
  ******************************************************************************/
 #include "superext.h"
 #include "super.h"
+#include "tibsun_globals.h"
+#include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 #include "vinifera_util.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,7 +53,7 @@ DECLARE_PATCH(_SuperClass_Default_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = SuperClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<SuperClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create SuperClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -83,7 +88,7 @@ DECLARE_PATCH(_SuperClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = SuperClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<SuperClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create SuperClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -118,15 +123,14 @@ DECLARE_PATCH(_SuperClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    SuperClassExtensions.remove(this_ptr);
+    Destroy_Extension<SuperClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x0080F588 } // Neuron vector.vtble
+    JMP_REG(eax, 0x0060B520);
 }
 
 
@@ -144,16 +148,14 @@ DECLARE_PATCH(_SuperClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    SuperClassExtensions.remove(this_ptr);
+    Destroy_Extension<SuperClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov edx, ds:0x0080F588 } // Neuron vector.vtble
+    JMP_REG(eax, 0x0060CC30);
 }
 
 
@@ -172,12 +174,9 @@ DECLARE_PATCH(_SuperClass_Detach_Patch)
     static SuperClassExtension *ext_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    ext_ptr = SuperClassExtensions.find(this_ptr);
-    if (!ext_ptr) {
-        goto original_code;
-    }
+    ext_ptr = Fetch_Extension<SuperClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -203,12 +202,9 @@ DECLARE_PATCH(_SuperClass_Compute_CRC_Patch)
     static SuperClassExtension *ext_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    ext_ptr = SuperClassExtensions.find(this_ptr);
-    if (!ext_ptr) {
-        goto original_code;
-    }
+    ext_ptr = Fetch_Extension<SuperClassExtension>(this_ptr);
 
     ext_ptr->Compute_CRC(*crc);
 
@@ -229,8 +225,8 @@ void SuperClassExtension_Init()
 {
     Patch_Jump(0x0060B352, &_SuperClass_Default_Constructor_Patch);
     Patch_Jump(0x0060B4AB, &_SuperClass_Constructor_Patch);
-    Patch_Jump(0x0060B5B3, &_SuperClass_Destructor_Patch);
-    Patch_Jump(0x0060CCD3, &_SuperClass_Scalar_Destructor_Patch);
+    Patch_Jump(0x0060B51A, &_SuperClass_Destructor_Patch);
+    Patch_Jump(0x0060CC2A, &_SuperClass_Scalar_Destructor_Patch);
     Patch_Jump(0x0060C81C, &_SuperClass_Detach_Patch);
     Patch_Jump(0x0060C870, &_SuperClass_Compute_CRC_Patch);
 }

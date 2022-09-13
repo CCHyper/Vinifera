@@ -29,10 +29,15 @@
 #include "unittypeext.h"
 #include "unit.h"
 #include "unittype.h"
+#include "tibsun_globals.h"
+#include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
-#include "vinifera_util.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -50,7 +55,7 @@ DECLARE_PATCH(_UnitClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = UnitClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<UnitClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create UnitClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -110,18 +115,14 @@ DECLARE_PATCH(_UnitClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    UnitClassExtensions.remove(this_ptr);
+    Destroy_Extension<UnitClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebp }
-    _asm { pop ebx }
-    _asm { add esp, 0x8 }
-    _asm { ret }
+    _asm { mov edx, ds:0x007B3458 } // Units.vtble
+    JMP_REG(ecx, 0x0064D8B4);
 }
 
 
@@ -140,12 +141,9 @@ DECLARE_PATCH(_UnitClass_Detach_Patch)
     static UnitClassExtension *ext_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    ext_ptr = UnitClassExtensions.find(this_ptr);
-    if (!ext_ptr) {
-        goto original_code;
-    }
+    ext_ptr = Fetch_Extension<UnitClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -173,12 +171,9 @@ DECLARE_PATCH(_UnitClass_Compute_CRC_Patch)
     static UnitClassExtension *ext_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    ext_ptr = UnitClassExtensions.find(this_ptr);
-    if (!ext_ptr) {
-        goto original_code;
-    }
+    ext_ptr = Fetch_Extension<UnitClassExtension>(this_ptr);
 
     ext_ptr->Compute_CRC(*crc);
 
@@ -199,7 +194,7 @@ void UnitClassExtension_Init()
 {
     Patch_Jump(0x0064D7B4, &_UnitClass_Constructor_Patch);
     Patch_Jump(0x0065967A, &_UnitClass_NoInit_Constructor_Patch);
-    Patch_Jump(0x0064D9C0, &_UnitClass_Destructor_Patch);
+    Patch_Jump(0x0064D8AE, &_UnitClass_Destructor_Patch);
     Patch_Jump(0x00659863, &_UnitClass_Detach_Patch);
     Patch_Jump(0x00659825, &_UnitClass_Compute_CRC_Patch);
 }

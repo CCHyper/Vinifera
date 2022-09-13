@@ -30,9 +30,13 @@
 #include "side.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,12 +52,12 @@ DECLARE_PATCH(_SideClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0x10); // ini name.
     static SideClassExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating SideClassExtension instance for \"%s\".\n", ini_name);
+    //EXT_DEBUG_TRACE("Creating SideClassExtension instance for \"%s\".\n", ini_name);
 
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = SideClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<SideClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create SideClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -88,15 +92,14 @@ DECLARE_PATCH(_SideClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    SideClassExtensions.remove(this_ptr);
+    Destroy_Extension<SideClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x007B3470 } // Sides.vtble
+    JMP_REG(eax, 0x005F1AEE);
 }
 
 
@@ -114,16 +117,14 @@ DECLARE_PATCH(_SideClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    SideClassExtensions.remove(this_ptr);
+    Destroy_Extension<SideClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov edx, ds:0x007B3470 } // Sides.vtble
+    JMP_REG(eax, 0x005F1D9E);
 }
 
 
@@ -141,12 +142,9 @@ DECLARE_PATCH(_SideClass_Compute_CRC_Patch)
     static SideClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = SideClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<SideClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -169,7 +167,7 @@ original_code:
 void SideClassExtension_Init()
 {
     Patch_Jump(0x005F1AC6, &_SideClass_Constructor_Patch);
-    //Patch_Jump(0x005F1B68, &_SideClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
-    Patch_Jump(0x005F1E28, &_SideClass_Scalar_Destructor_Patch);
+    //Patch_Jump(0x005F1AE8, &_SideClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
+    Patch_Jump(0x005F1D98, &_SideClass_Scalar_Destructor_Patch);
     Patch_Jump(0x005F1BC9, &_SideClass_Compute_CRC_Patch);
 }

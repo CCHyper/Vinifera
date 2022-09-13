@@ -27,22 +27,18 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
 #include "theme.h"
 
 
 class CCINIClass;
 
 
-class ThemeControlExtension final : public Extension<ThemeClass::ThemeControl>
+class ThemeControlExtension final
 {
     public:
-        ThemeControlExtension(ThemeClass::ThemeControl *this_ptr);
+        ThemeControlExtension(const ThemeClass::ThemeControl *this_ptr);
         ThemeControlExtension(const NoInitClass &noinit);
         ~ThemeControlExtension();
-
-        virtual int Size_Of() const override;
 
         bool Read_INI(CCINIClass &ini);
 
@@ -52,6 +48,3 @@ class ThemeControlExtension final : public Extension<ThemeClass::ThemeControl>
          */
         AddonType RequiredAddon;
 };
-
-
-extern ExtensionMap<ThemeClass::ThemeControl, ThemeControlExtension> ThemeControlExtensions;

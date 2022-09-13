@@ -27,30 +27,32 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
 
-#include "noinit.h"
+#include "always.h"
+#include "tibsun_defines.h"
 #include "tpoint.h"
+#include <objidl.h>
 
 
-class CCINIClass;
 class RulesClass;
+class NoInitClass;
+class CCINIClass;
+class WWCRCEngine;
 
 
-class RulesClassExtension final : public Extension<RulesClass>
+class RulesClassExtension final
 {
     public:
-        RulesClassExtension(RulesClass *this_ptr);
+        RulesClassExtension(const RulesClass *this_ptr);
         RulesClassExtension(const NoInitClass &noinit);
         ~RulesClassExtension();
 
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
+        HRESULT Load(IStream *pStm);
+        HRESULT Save(IStream *pStm, BOOL fClearDirty);
+        int Size_Of() const;
 
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+        void Detach(TARGET target, bool all = true);
+        void Compute_CRC(WWCRCEngine &crc) const;
 
         void Process(CCINIClass &ini);
         void Initialize(CCINIClass &ini);
@@ -65,6 +67,12 @@ class RulesClassExtension final : public Extension<RulesClass>
 
     private:
         void Check();
+
+    private:
+        /**
+         *  x
+         */
+        RulesClass *This;
 
     public:
         typedef struct UIControlsStruct

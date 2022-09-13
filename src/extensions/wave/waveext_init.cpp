@@ -28,10 +28,15 @@
 #include "waveext.h"
 #include "wave.h"
 #include "techno.h"
+#include "tibsun_globals.h"
+#include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
-#include "vinifera_util.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 #if 0
@@ -50,7 +55,7 @@ DECLARE_PATCH(_WaveClass_Default_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = WaveClassExtensions.find_or_create(this_ptr);
+    ext_ptr = Find_Or_Make_Extension<WaveClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -94,7 +99,7 @@ DECLARE_PATCH(_WaveClass_Default_Constructor_Before_Init_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = WaveClassExtensions.find_or_create(this_ptr);
+    ext_ptr = Find_Or_Make_Extension<WaveClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -131,7 +136,7 @@ DECLARE_PATCH(_WaveClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = WaveClassExtensions.find_or_create(this_ptr);
+    ext_ptr = Find_Or_Make_Extension<WaveClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -174,7 +179,7 @@ DECLARE_PATCH(_WaveClass_Constructor_Before_Init_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = WaveClassExtensions.find_or_create(this_ptr);
+    ext_ptr = Find_Or_Make_Extension<WaveClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -209,16 +214,14 @@ DECLARE_PATCH(_WaveClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    WaveClassExtensions.remove(this_ptr);
+    Destroy_Extension<WaveClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x007E47E8 } // Waves.vtble
+    JMP_REG(eax, 0x006702DF);
 }
 
 
@@ -236,16 +239,14 @@ DECLARE_PATCH(_WaveClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    WaveClassExtensions.remove(this_ptr);
+    Destroy_Extension<WaveClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop edi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov edx, ds:0x007E47E8 } // Waves.vtble
+    JMP_REG(eax, 0x00672E7E);
 }
 
 
@@ -264,12 +265,9 @@ DECLARE_PATCH(_WaveClass_Detach_Patch)
     static WaveClassExtension *ext_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    ext_ptr = WaveClassExtensions.find(this_ptr);
-    if (!ext_ptr) {
-        goto original_code;
-    }
+    ext_ptr = Fetch_Extension<WaveClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -292,7 +290,7 @@ void WaveClassExtension_Init()
     Patch_Jump(0x00670189, &_WaveClass_Default_Constructor_Before_Init_Patch);
     //Patch_Jump(0x006700A2, &_WaveClass_Constructor_Patch);
     Patch_Jump(0x0066FECF, &_WaveClass_Constructor_Before_Init_Patch);
-    Patch_Jump(0x00670369, &_WaveClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
-    Patch_Jump(0x00672F1B, &_WaveClass_Scalar_Destructor_Patch);
+    Patch_Jump(0x006702D9, &_WaveClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
+    Patch_Jump(0x00672E78, &_WaveClass_Scalar_Destructor_Patch);
     Patch_Jump(0x00670B3D, &_WaveClass_Detach_Patch);
 }

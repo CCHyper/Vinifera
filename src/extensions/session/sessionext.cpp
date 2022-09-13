@@ -33,6 +33,8 @@
 #include "rawfile.h"
 #include "voc.h"
 #include "rules.h"
+#include "swizzle.h"
+#include "vinifera_saveload.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -46,11 +48,9 @@ SessionClassExtension *SessionExtension = nullptr;
  *  @author: CCHyper
  */
 SessionClassExtension::SessionClassExtension(SessionClass *this_ptr) :
-    Extension(this_ptr)
+    ExtOptions()
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("SessionClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("SessionClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("SessionClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
 
    /**
      *  Initialises the default game options.
@@ -58,8 +58,6 @@ SessionClassExtension::SessionClassExtension(SessionClass *this_ptr) :
     ExtOptions.IsAutoDeployMCV = false;
     ExtOptions.IsPrePlacedConYards = false;
     ExtOptions.IsBuildOffAlly = true;
-    
-    IsInitialized = true;
 }
 
 
@@ -68,10 +66,8 @@ SessionClassExtension::SessionClassExtension(SessionClass *this_ptr) :
  *  
  *  @author: CCHyper
  */
-SessionClassExtension::SessionClassExtension(const NoInitClass &noinit) :
-    Extension(noinit)
+SessionClassExtension::SessionClassExtension(const NoInitClass &noinit)
 {
-    IsInitialized = false;
 }
 
 
@@ -82,10 +78,72 @@ SessionClassExtension::SessionClassExtension(const NoInitClass &noinit) :
  */
 SessionClassExtension::~SessionClassExtension()
 {
-    //EXT_DEBUG_TRACE("SessionClassExtension destructor - 0x%08X\n", (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("SessionClassExtension destructor - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("SessionClassExtension destructor - 0x%08X\n", (uintptr_t)(This()));
+}
 
-    IsInitialized = false;
+
+HRESULT SessionClassExtension::Load(IStream *pStm)
+{
+    //EXT_DEBUG_TRACE("SessionClassExtension::Load - 0x%08X\n", (uintptr_t)(This()));
+
+    if (!pStm) {
+        return E_POINTER;
+    }
+
+    /**
+     *  Load the unique id for this class.
+     */
+    ULONG id = 0;
+    HRESULT hr = pStm->Read(&id, sizeof(ULONG), nullptr);
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    new (this) SessionClassExtension(NoInitClass());
+
+    /**
+     *  x
+     */
+    VINIFERA_SWIZZLE_REGISTER_POINTER(id, this, "this");
+
+    /**
+     *  Read this classes instance binary blob data.
+     */
+    hr = pStm->Read(this, Size_Of(), nullptr);
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    return hr;
+}
+
+
+HRESULT SessionClassExtension::Save(IStream *pStm, BOOL fClearDirty)
+{
+    //EXT_DEBUG_TRACE("SessionClassExtension::Save - 0x%08X\n", (uintptr_t)(This()));
+
+    if (!pStm) {
+        return E_POINTER;
+    }
+
+    /**
+     *  x
+     */
+    ULONG id = (ULONG)this;
+    HRESULT hr = pStm->Write(&id, sizeof(id), nullptr);
+    if (FAILED(hr)) {
+        return hr;
+    }
+    
+    /**
+     *  Write this class instance as a binary blob.
+     */
+    hr = pStm->Write(this, Size_Of(), nullptr);
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    return hr;
 }
 
 
@@ -96,10 +154,14 @@ SessionClassExtension::~SessionClassExtension()
  */
 int SessionClassExtension::Size_Of() const
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("SessionClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("SessionClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(This()));
 
     return sizeof(*this);
+}
+
+
+void SessionClassExtension::Compute_CRC(WWCRCEngine &crc) const
+{
 }
 
 
@@ -110,9 +172,7 @@ int SessionClassExtension::Size_Of() const
  */
 void SessionClassExtension::Read_MultiPlayer_Settings()
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("SessionClassExtension::Read_MultiPlayer_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("SessionClassExtension::Read_MultiPlayer_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("SessionClassExtension::Read_MultiPlayer_Settings - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -123,7 +183,5 @@ void SessionClassExtension::Read_MultiPlayer_Settings()
  */
 void SessionClassExtension::Write_MultiPlayer_Settings()
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("SessionClassExtension::Write_MultiPlayer_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("SessionClassExtension::Write_MultiPlayer_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("SessionClassExtension::Write_MultiPlayer_Settings - 0x%08X\n", (uintptr_t)(This()));
 }

@@ -30,9 +30,13 @@
 #include "tiberium.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,12 +52,12 @@ DECLARE_PATCH(_TiberiumClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0x10); // ini name.
     static TiberiumClassExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating TiberiumClassExtension instance for \"%s\".\n", ini_name);
+    //EXT_DEBUG_TRACE("Creating TiberiumClassExtension instance for \"%s\".\n", ini_name);
 
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = TiberiumClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<TiberiumClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create TiberiumClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -89,17 +93,14 @@ DECLARE_PATCH(_TiberiumClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    TiberiumClassExtensions.remove(this_ptr);
+    Destroy_Extension<TiberiumClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x0080F408 } // Tiberiums.vtble
+    JMP_REG(eax, 0x00644A99);
 }
 
 
@@ -118,12 +119,9 @@ DECLARE_PATCH(_TiberiumClass_Detach_Patch)
     static TiberiumClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = TiberiumClassExtensions.find(this_ptr, false);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<TiberiumClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -152,12 +150,9 @@ DECLARE_PATCH(_TiberiumClass_Compute_CRC_Patch)
     static TiberiumClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = TiberiumClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<TiberiumClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -188,12 +183,9 @@ DECLARE_PATCH(_TiberiumClass_Read_INI_Patch)
     static TiberiumClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = TiberiumClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<TiberiumClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -218,7 +210,7 @@ original_code:
 void TiberiumClassExtension_Init()
 {
     Patch_Jump(0x00644A20, &_TiberiumClass_Constructor_Patch);
-    Patch_Jump(0x00644BE1, &_TiberiumClass_Destructor_Patch);
+    Patch_Jump(0x00644A93, &_TiberiumClass_Destructor_Patch);
     Patch_Jump(0x00645326, &_TiberiumClass_Detach_Patch);
     Patch_Jump(0x00644FCA, &_TiberiumClass_Compute_CRC_Patch);
     Patch_Jump(0x00644E74, &_TiberiumClass_Read_INI_Patch);

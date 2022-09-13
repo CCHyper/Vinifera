@@ -30,9 +30,13 @@
 #include "aircrafttype.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,12 +52,12 @@ DECLARE_PATCH(_AircraftTypeClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0x0C); // ini name.
     static AircraftTypeClassExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating AircraftTypeClassExtension instance for \"%s\".\n", ini_name);
+    //EXT_DEBUG_TRACE("Creating AircraftTypeClassExtension instance for \"%s\".\n", ini_name);
 
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = AircraftTypeClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<AircraftTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create AircraftTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -129,15 +133,14 @@ DECLARE_PATCH(_AircraftTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    AircraftTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<AircraftTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x007E2420 } // AircraftTypes.vtble
+    JMP_REG(eax, 0x0040FCDE);
 }
 
 
@@ -155,16 +158,14 @@ DECLARE_PATCH(_AircraftTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    AircraftTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<AircraftTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov edx, ds:0x007E2420 } // AircraftTypes.vtble
+    JMP_REG(eax, 0x0041022E);
 }
 
 
@@ -182,12 +183,9 @@ DECLARE_PATCH(_AircraftTypeClass_Compute_CRC_Patch)
     static AircraftTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = AircraftTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<AircraftTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -218,12 +216,9 @@ DECLARE_PATCH(_AircraftTypeClass_Read_INI_Patch)
     static AircraftTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = AircraftTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<AircraftTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -250,8 +245,8 @@ void AircraftTypeClassExtension_Init()
     Patch_Jump(0x0040FC8F, &_AircraftTypeClass_Constructor_Patch);
     Patch_Jump(0x0041009C, &_AircraftTypeClass_Find_Or_Make_Patch); // Constructor is also inlined in AircraftTypeClass::Find_Or_Make!
     Patch_Jump(0x0040FCBA, &_AircraftTypeClass_NoInit_Constructor_Patch);
-    //Patch_Jump(0x0040FD28, &_AircraftTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
-    Patch_Jump(0x00410288, &_AircraftTypeClass_Scalar_Destructor_Patch);
+    //Patch_Jump(0x0040FCD8, &_AircraftTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
+    Patch_Jump(0x00410228, &_AircraftTypeClass_Scalar_Destructor_Patch);
     Patch_Jump(0x0040FF66, &_AircraftTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x0040FF0E, &_AircraftTypeClass_Read_INI_Patch);
 }

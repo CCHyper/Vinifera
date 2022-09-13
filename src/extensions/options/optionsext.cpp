@@ -44,14 +44,9 @@ OptionsClassExtension *OptionsExtension = nullptr;
  *  
  *  @author: CCHyper
  */
-OptionsClassExtension::OptionsClassExtension(OptionsClass *this_ptr) :
-    Extension(this_ptr)
+OptionsClassExtension::OptionsClassExtension(OptionsClass *this_ptr)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("OptionsClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("OptionsClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
-
-    IsInitialized = true;
+    //EXT_DEBUG_TRACE("OptionsClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -60,10 +55,8 @@ OptionsClassExtension::OptionsClassExtension(OptionsClass *this_ptr) :
  *  
  *  @author: CCHyper
  */
-OptionsClassExtension::OptionsClassExtension(const NoInitClass &noinit) :
-    Extension(noinit)
+OptionsClassExtension::OptionsClassExtension(const NoInitClass &noinit)
 {
-    IsInitialized = false;
 }
 
 
@@ -74,24 +67,7 @@ OptionsClassExtension::OptionsClassExtension(const NoInitClass &noinit) :
  */
 OptionsClassExtension::~OptionsClassExtension()
 {
-    //EXT_DEBUG_TRACE("OptionsClassExtension destructor - 0x%08X\n", (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("OptionsClassExtension destructor - 0x%08X\n", (uintptr_t)(ThisPtr));
-
-    IsInitialized = false;
-}
-
-
-/**
- *  Return the raw size of class data for save/load purposes.
- *  
- *  @author: CCHyper
- */
-int OptionsClassExtension::Size_Of() const
-{
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("OptionsClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(ThisPtr));
-
-    return sizeof(*this);
+    //EXT_DEBUG_TRACE("OptionsClassExtension destructor - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -102,9 +78,7 @@ int OptionsClassExtension::Size_Of() const
  */
 void OptionsClassExtension::Load_Settings()
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(This()));
     
     RawFileClass file("SUN.INI");
 }
@@ -117,9 +91,7 @@ void OptionsClassExtension::Load_Settings()
  */
 void OptionsClassExtension::Load_Init_Settings()
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(This()));
     
     RawFileClass file("SUN.INI");
 }
@@ -132,9 +104,7 @@ void OptionsClassExtension::Load_Init_Settings()
  */
 void OptionsClassExtension::Save_Settings()
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(This()));
     
     RawFileClass file("SUN.INI");
 }
@@ -147,8 +117,6 @@ void OptionsClassExtension::Save_Settings()
  */
 void OptionsClassExtension::Set()
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(This()));
 
 }

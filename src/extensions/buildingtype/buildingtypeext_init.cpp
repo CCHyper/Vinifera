@@ -30,9 +30,13 @@
 #include "buildingtype.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,12 +52,12 @@ DECLARE_PATCH(_BuildingTypeClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0x4); // ini name.
     static BuildingTypeClassExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating BuildingTypeClassExtension instance for \"%s\".\n", ini_name);
+    //EXT_DEBUG_TRACE("Creating BuildingTypeClassExtension instance for \"%s\".\n", ini_name);
 
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = BuildingTypeClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<BuildingTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create BuildingTypeClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -112,15 +116,14 @@ DECLARE_PATCH(_BuildingTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    BuildingTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<BuildingTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x007E21A0 } // BuildingTypes.vtble
+    JMP_REG(eax, 0x0043F958);
 }
 
 
@@ -138,15 +141,14 @@ DECLARE_PATCH(_BuildingTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    BuildingTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<BuildingTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov edx, ds:0x007E21A0 } // BuildingTypes.vtble
+    JMP_REG(eax, 0x00444088);
 }
 
 
@@ -164,12 +166,9 @@ DECLARE_PATCH(_BuildingTypeClass_Compute_CRC_Patch)
     static BuildingTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = BuildingTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<BuildingTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -200,12 +199,9 @@ DECLARE_PATCH(_BuildingTypeClass_Read_INI_Patch)
     static BuildingTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = BuildingTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<BuildingTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -233,8 +229,8 @@ void BuildingTypeClassExtension_Init()
 {
     Patch_Jump(0x0043F8B1, &_BuildingTypeClass_Constructor_Patch);
     Patch_Jump(0x0043F8E4, &_BuildingTypeClass_NoInit_Constructor_Patch);
-    //Patch_Jump(0x0043F9A2, &_BuildingTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
-    Patch_Jump(0x004440E2, &_BuildingTypeClass_Scalar_Destructor_Patch);
+    //Patch_Jump(0x0043F952, &_BuildingTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
+    Patch_Jump(0x00444082, &_BuildingTypeClass_Scalar_Destructor_Patch);
     Patch_Jump(0x00443349, &_BuildingTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x00442E29, &_BuildingTypeClass_Read_INI_Patch);
 }

@@ -29,10 +29,15 @@
 #include "infantrytypeext.h"
 #include "infantry.h"
 #include "infantrytype.h"
+#include "vinifera_util.h"
+#include "tibsun_globals.h"
+#include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
-#include "vinifera_util.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -50,7 +55,7 @@ DECLARE_PATCH(_InfantryClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = InfantryClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<InfantryClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create InfantryClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -108,17 +113,14 @@ DECLARE_PATCH(_InfantryClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    InfantryClassExtensions.remove(this_ptr);
+    Destroy_Extension<InfantryTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { add esp, 0x8 }
-    _asm { ret }
+    _asm { mov eax, ds:0x007E2300 } // Infantry.vtble
+    JMP_REG(edx, 0x004D22E6);
 }
 
 
@@ -137,12 +139,9 @@ DECLARE_PATCH(_InfantryClass_Detach_Patch)
     static InfantryClassExtension *ext_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    ext_ptr = InfantryClassExtensions.find(this_ptr);
-    if (!ext_ptr) {
-        goto original_code;
-    }
+    ext_ptr = Fetch_Extension<InfantryClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -170,12 +169,9 @@ DECLARE_PATCH(_InfantryClass_Compute_CRC_Patch)
     static InfantryClassExtension *ext_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    ext_ptr = InfantryClassExtensions.find(this_ptr);
-    if (!ext_ptr) {
-        goto original_code;
-    }
+    ext_ptr = Fetch_Extension<InfantryClassExtension>(this_ptr);
 
     ext_ptr->Compute_CRC(*crc);
 
@@ -196,7 +192,7 @@ void InfantryClassExtension_Init()
 {
     Patch_Jump(0x004D21E1, &_InfantryClass_Constructor_Patch);
     Patch_Jump(0x004D940F, &_InfantryClass_NoInit_Constructor_Patch);
-    Patch_Jump(0x004D23F2, &_InfantryClass_Destructor_Patch);
+    Patch_Jump(0x004D22E1, &_InfantryClass_Destructor_Patch);
     Patch_Jump(0x004D40E5, &_InfantryClass_Detach_Patch);
     Patch_Jump(0x004D96DB, &_InfantryClass_Compute_CRC_Patch);
 }

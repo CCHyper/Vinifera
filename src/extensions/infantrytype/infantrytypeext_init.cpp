@@ -30,9 +30,13 @@
 #include "infantrytype.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,12 +52,12 @@ DECLARE_PATCH(_InfantryTypeClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0x0C); // ini name.
     static InfantryTypeClassExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating InfantryTypeClassExtension instance for \"%s\".\n", ini_name);
+    //EXT_DEBUG_TRACE("Creating InfantryTypeClassExtension instance for \"%s\".\n", ini_name);
 
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = InfantryTypeClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<InfantryTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create InfantryTypeClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -110,16 +114,14 @@ DECLARE_PATCH(_InfantryTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    InfantryTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<InfantryTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x007E4010 } // InfantryType.vtble
+    JMP_REG(eax, 0x004DA3BF);
 }
 
 
@@ -137,16 +139,14 @@ DECLARE_PATCH(_InfantryTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    InfantryTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<InfantryTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov edx, ds:0x007E4010 } // InfantryType.vtble
+    JMP_REG(eax, 0x004DB13E);
 }
 
 
@@ -164,12 +164,9 @@ DECLARE_PATCH(_InfantryTypeClass_Compute_CRC_Patch)
     static InfantryTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = InfantryTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<InfantryTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -200,12 +197,9 @@ DECLARE_PATCH(_InfantryTypeClass_Read_INI_Patch)
     static InfantryTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = InfantryTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<InfantryTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -233,8 +227,8 @@ void InfantryTypeClassExtension_Init()
 {
     Patch_Jump(0x004DA360, &_InfantryTypeClass_Constructor_Patch);
     Patch_Jump(0x004DA394, &_InfantryTypeClass_NoInit_Constructor_Patch);
-    //Patch_Jump(0x004DA457, &_InfantryTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
-    Patch_Jump(0x004DB1E9, &_InfantryTypeClass_Scalar_Destructor_Patch);
+    //Patch_Jump(0x004DA3B9, &_InfantryTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
+    Patch_Jump(0x004DB138, &_InfantryTypeClass_Scalar_Destructor_Patch);
     Patch_Jump(0x004DAE11, &_InfantryTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x004DAC2F, &_InfantryTypeClass_Read_INI_Patch);
 }

@@ -31,8 +31,13 @@
 #include "animtype.h"
 #include "fatal.h"
 #include "vinifera_util.h"
+#include "tibsun_globals.h"
+#include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -51,7 +56,7 @@ DECLARE_PATCH(_AnimClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = AnimClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<AnimClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create AnimClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -87,10 +92,8 @@ DECLARE_PATCH(_AnimClass_Constructor_Patch)
      *  @author: CCHyper
      */
     if (!this_ptr->ZAdjust) {
-        animtypeext = AnimTypeClassExtensions.find(this_ptr->Class);
-        if (animtypeext) {
-            this_ptr->ZAdjust = animtypeext->ZAdjust;
-        }
+        animtypeext = Fetch_Extension<AnimTypeClassExtension>(this_ptr->Class);
+        this_ptr->ZAdjust = animtypeext->ZAdjust;
     }
 
 original_code:
@@ -139,7 +142,7 @@ DECLARE_PATCH(_AnimClass_Default_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = AnimClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<AnimClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create AnimClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -196,16 +199,14 @@ DECLARE_PATCH(_AnimClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    AnimClassExtensions.remove(this_ptr);
+    Destroy_Extension<AnimClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { add esp, 0x10 }
-    _asm { ret }
+    _asm { mov eax, ds:0x007E4580 } // GameActive
+    JMP_REG(ebx, 0x004142D0);
 }
 
 
@@ -224,12 +225,9 @@ DECLARE_PATCH(_AnimClass_Detach_Patch)
     static AnimClassExtension *ext_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    ext_ptr = AnimClassExtensions.find(this_ptr);
-    if (!ext_ptr) {
-        goto original_code;
-    }
+    ext_ptr = Fetch_Extension<AnimClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -257,12 +255,9 @@ DECLARE_PATCH(_AnimClass_Compute_CRC_Patch)
     static AnimClassExtension *ext_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    ext_ptr = AnimClassExtensions.find(this_ptr);
-    if (!ext_ptr) {
-        goto original_code;
-    }
+    ext_ptr = Fetch_Extension<AnimClassExtension>(this_ptr);
 
     ext_ptr->Compute_CRC(*crc);
 
@@ -285,7 +280,7 @@ void AnimClassExtension_Init()
     Patch_Jump(0x004142A6, &_AnimClass_Default_Constructor_Patch);
     Patch_Jump(0x004164D7, &_AnimClass_NoInit_Constructor_Patch);
     Patch_Jump(0x0041441F, 0x00414475); // This jump goes from duplicate code in the destructor to our patch, removing the need for two hooks.
-    Patch_Jump(0x0041447C, &_AnimClass_Destructor_Patch);
+    Patch_Jump(0x004142CB, &_AnimClass_Destructor_Patch);
     Patch_Jump(0x004163D9, &_AnimClass_Detach_Patch);
     Patch_Jump(0x00416626, &_AnimClass_Compute_CRC_Patch);
 }

@@ -29,10 +29,15 @@
 #include "aircrafttypeext.h"
 #include "aircraft.h"
 #include "aircrafttype.h"
+#include "tibsun_globals.h"
+#include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 #include "vinifera_util.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -50,7 +55,7 @@ DECLARE_PATCH(_AircraftClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = AircraftClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<AircraftClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create AircraftClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -109,17 +114,14 @@ DECLARE_PATCH(_AircraftClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    AircraftClassExtensions.remove(this_ptr);
+    Destroy_Extension<AircraftClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { add esp, 0x8 }
-    _asm { ret }
+    _asm { mov edx, ds:0x007E4058 } // Aircraft.vtble
+    JMP_REG(eax, 0x0040DBBE);
 }
 
 
@@ -138,12 +140,9 @@ DECLARE_PATCH(_AircraftClass_Detach_Patch)
     static AircraftClassExtension *ext_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    ext_ptr = AircraftClassExtensions.find(this_ptr);
-    if (!ext_ptr) {
-        goto original_code;
-    }
+    ext_ptr = Fetch_Extension<AircraftClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -171,12 +170,9 @@ DECLARE_PATCH(_AircraftClass_Compute_CRC_Patch)
     static AircraftClassExtension *ext_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    ext_ptr = AircraftClassExtensions.find(this_ptr);
-    if (!ext_ptr) {
-        goto original_code;
-    }
+    ext_ptr = Fetch_Extension<AircraftClassExtension>(this_ptr);
 
     ext_ptr->Compute_CRC(*crc);
 
@@ -197,7 +193,7 @@ void AircraftClassExtension_Init()
 {
     Patch_Jump(0x0040880C, &_AircraftClass_Constructor_Patch);
     Patch_Jump(0x0040EB81, &_AircraftClass_NoInit_Constructor_Patch);
-    Patch_Jump(0x0040DCCA, &_AircraftClass_Destructor_Patch);
+    Patch_Jump(0x0040DBB8, &_AircraftClass_Destructor_Patch);
     Patch_Jump(0x0040EDC5, &_AircraftClass_Detach_Patch);
     Patch_Jump(0x0040ED91, &_AircraftClass_Compute_CRC_Patch);
 }

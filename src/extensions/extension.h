@@ -8,7 +8,7 @@
  *
  *  @author        CCHyper
  *
- *  @brief         Base class for declaring extended class instances.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -28,22 +28,14 @@
 #pragma once
 
 #include "always.h"
-#include "tibsun_defines.h"
-#include "tibsun_globals.h"
-#include "swizzle.h"
-#include "noinit.h"
 #include "debughandler.h"
+#include "asserthandler.h"
 
-/**
- *  Included here so all extended classes don't have to.
- */
-#include "hooker.h"
-#include "hooker_macros.h"
-
-#include <unknwn.h> // for IStream.
+#include <objidl.h> // for IStream.
 
 
-class WWCRCEngine;
+class AbstractClass;
+class AbstractClassExtension;
 
 
 /**
@@ -67,180 +59,66 @@ class WWCRCEngine;
 
 
 /**
- *  The base class for the extension class which implements save/load.
+ *  Do not call these directly! Use the template functions below.
  */
-class ExtensionBase
-{
-    public:
-        ExtensionBase() :
-            IsDirty(false)
-        {
-        }
-
-        ExtensionBase(const NoInitClass &noinit)
-        {
-        }
-
-        virtual ~ExtensionBase()
-        {
-        }
-
-        /**
-         *  Initializes an object from the stream where it was saved previously.
-         */
-        virtual HRESULT Load(IStream *pStm);
-
-        /**
-         *  Saves an object to the specified stream.
-         */
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty);
-
-        /**
-         *  Return the raw size of class data for save/load purposes.
-         *  
-         *  @note: This must be overridden by the extended class!
-         */
-        virtual int Size_Of() const { return -1; }
-
-    private:
-        /**
-         *  Has the object changed since the last save?
-         */
-        bool IsDirty;
-};
+AbstractClassExtension *Find_Or_Make_Extension_Internal(const AbstractClass *abstract, bool allow_make = true);
+AbstractClassExtension *Fetch_Extension_Internal(const AbstractClass *abstract);
+bool Destroy_Extension_Internal(const AbstractClass *abstract);
 
 
 /**
- *  This is the main base class for all class extensions.
+ *  x
  */
-template<class T>
-class Extension : public ExtensionBase
-{
-    public:
-        Extension(T *this_ptr) :
-            ExtensionBase(),
-            IsInitialized(false),
-            ThisPtr(this_ptr)
-        {
-        }
-
-        Extension(const NoInitClass &noinit) :
-            ExtensionBase(noinit)
-        {
-        }
-
-        virtual ~Extension()
-        {
-            IsInitialized = false;
-            ThisPtr = nullptr;
-        }
-
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-
-        /**
-         *  Removes the specified target from any targeting and reference trackers.
-         */
-        virtual void Detach(TARGET target, bool all = true) {}
-
-        /**
-         *  Compute a unique crc value for this instance.
-         */
-        virtual void Compute_CRC(WWCRCEngine &crc) const {}
-
-    protected:
-        /**
-         *  Is this instance extended and valid?
-         */
-        bool IsInitialized;
-
-    public:
-        /**
-         *  Pointer to the class we are extending.
-         */
-        T *ThisPtr;
-
-    private:
-        Extension(const Extension &) = delete;
-        void operator = (const Extension &) = delete;
-};
+bool Register_Extension_Class_Factories();
 
 
 /**
- *  Loads the object from the stream and requests a new pointer to
- *  the class we extended post-load.
+ *  Save and load interface.
+ */
+bool Save_Extensions(IStream *pStm);
+bool Load_Extensions(IStream *pStm);
+
+//HRESULT AbstractClassExtension_Load(AbstractClass *abstract, IStream *pStm);
+//HRESULT AbstractClassExtension_Save(AbstractClass *abstract, IStream *pStm, BOOL fClearDirty);
+
+//bool Request_Extension_Pointer_Remap();
+
+
+/**
+ *  x
  * 
  *  @author: CCHyper
  */
 template<class T>
-HRESULT Extension<T>::Load(IStream *pStm)
+T *Find_Or_Make_Extension(const AbstractClass *abstract, bool allow_make = true)
 {
-    HRESULT hr = ExtensionBase::Load(pStm);
-    if (FAILED(hr)) {
-        return E_FAIL;
-    }
-
-    LONG id;
-    hr = pStm->Read(&id, sizeof(id), nullptr);
-    if (FAILED(hr)) {
-        return E_FAIL;
-    }
-
-    ULONG size = Size_Of();
-    hr = pStm->Read(this, size, nullptr);
-    if (FAILED(hr)) {
-        return E_FAIL;
-    }
-
-    new (this) Extension(NoInitClass());
-
-    /**
-     *  Announce ourself to the swizzle manager.
-     */
-    SWIZZLE_REGISTER_POINTER(id, this);
-
-    /**
-     *  Request the pointer to the base class be remapped.
-     */
-    SWIZZLE_REQUEST_POINTER_REMAP(ThisPtr);
-
-#ifndef NDEBUG
-    EXT_DEBUG_INFO("Ext Load: ID 0x%08X Ptr 0x%08X ThisPtr 0x%08X\n", id, this, ThisPtr);
-#endif
-
-    return S_OK;
+    return (T *)Find_Or_Make_Extension_Internal(abstract, allow_make);
 }
 
 
 /**
- *  Saves the object to the stream.
+ *  x
  * 
  *  @author: CCHyper
  */
 template<class T>
-HRESULT Extension<T>::Save(IStream *pStm, BOOL fClearDirty)
+T *Fetch_Extension(const AbstractClass *abstract)
 {
-    HRESULT hr = ExtensionBase::Save(pStm, fClearDirty);
-    if (FAILED(hr)) {
-        return E_FAIL;
-    }
+    ASSERT(abstract != nullptr);
 
-    LONG id;
-    SWIZZLE_FETCH_POINTER_ID(this, &id);
-    hr = pStm->Write(&id, sizeof(id), nullptr);
-    if (FAILED(hr)) {
-        return E_FAIL;
-    }
+    return (T *)Fetch_Extension_Internal(abstract);
+}
 
-    ULONG size = Size_Of();
-    hr = pStm->Write(this, size, nullptr);
-    if (FAILED(hr)) {
-        return E_FAIL;
-    }
-    
-#ifndef NDEBUG
-    EXT_DEBUG_INFO("Ext Save: ID 0x%08X Ptr 0x%08X ThisPtr 0x%08X\n", id, this, ThisPtr);
-#endif
 
-    return S_OK;
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+template<class T>
+bool Destroy_Extension(const AbstractClass *abstract)
+{
+    ASSERT(abstract != nullptr);
+
+    return Destroy_Extension_Internal(abstract);
 }

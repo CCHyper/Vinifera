@@ -124,6 +124,9 @@
 
 #include "filepcx_hooks.h"
 
+#include "extension.h"
+#include "swizzle.h"
+
 #include "hooker.h"
 #include "hooker_macros.h"
 
@@ -131,70 +134,161 @@
 extern bool Vinifera_ClassExtensionsDisabled;
 
 
+/**
+ *  This patch clears the DWORD at 0x10 (0x10 is "bool IsDirty") to use the space
+ *  for storing a pointer to the extension class instance for this AbstractClass.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_AbstractClass_Constructor_Extension)
+{
+    _asm { mov eax, ecx }
+    _asm { xor ecx, ecx }
+
+    _asm { mov [eax+0x8], 0xFFFFFFFF } // ID
+    _asm { mov [eax+0x0C], ecx } // HeapID
+
+    _asm { mov [eax+0x10], ecx } // IsDirty, now reused as a extension pointer, so we need to clear the DWORD.
+
+    _asm { mov [eax+0x0], 0x006CAA6C } // offset const AbstractClass::`vftable'
+    _asm { mov [eax+0x4], 0x006CAA54 } // offset const AbstractClass::`vftable' for IRTTITypeInfo
+
+    _asm { retn }
+}
+
+
+/**
+ *  A fake class for implementing new member functions which allow
+ *  access to the "this" pointer of the intended class.
+ * 
+ *  @note: This must not contain a constructor or deconstructor.
+ * 
+ *  @note: All functions must not be virtual and must also be prefixed
+ *         with "_" to prevent accidental virtualization.
+ */
+class AbstractClassExt : public AbstractClass
+{
+    public:
+        IFACEMETHOD_(LONG, IsDirty)();
+};
+
+
+/**
+ *  This patch forces AbstractClass::IsDirty() to return true.
+ * 
+ *  @author: CCHyper
+ */
+LONG STDMETHODCALLTYPE AbstractClassExt::IsDirty()
+{
+    return TRUE;
+}
+
+
+static void Extension_Abstract_Hooks()
+{
+    Patch_Jump(0x00405B50, &_AbstractClass_Constructor_Extension);
+
+    Patch_Jump(0x00405E00, &AbstractClassExt::Is_Dirty);
+
+    /**
+     *  Removes the branch from AbstractClass::Abstract_Save which clears IsDirty.
+     */
+    Patch_Byte_Range(0x00405CF8, 0x90, 12);
+}
+
+
 void Extension_Hooks()
 {
     if (!Vinifera_ClassExtensionsDisabled) {
+
         /**
          *  All game class extensions here.
          */
+        Extension_Abstract_Hooks();
+
         ObjectTypeClassExtension_Hooks();
         TechnoTypeClassExtension_Hooks();
-        BuildingTypeClassExtension_Hooks();
-        UnitTypeClassExtension_Hooks();
-        InfantryTypeClassExtension_Hooks();
-        AircraftTypeClassExtension_Hooks();
-        WarheadTypeClassExtension_Hooks();
-        WeaponTypeClassExtension_Hooks();
-        BulletTypeClassExtension_Hooks();
-        SuperWeaponTypeClassExtension_Hooks();
-        VoxelAnimTypeClassExtension_Hooks();
-        AnimTypeClassExtension_Hooks();
-        ParticleTypeClassExtension_Hooks();
-        ParticleSystemTypeClassExtension_Hooks();
-        IsometricTileTypeClassExtension_Hooks();
-        OverlayTypeClassExtension_Hooks();
-        SmudgeTypeClassExtension_Hooks();
-        TerrainTypeClassExtension_Hooks();
-        HouseTypeClassExtension_Hooks();
-        SideClassExtension_Hooks();
-        CampaignClassExtension_Hooks();
-        TiberiumClassExtension_Hooks();
-        //TaskForceClassExtension_Hooks();
-        //AITriggerTypeClassExtension_Hooks();
-        //ScriptTypeClassExtension_Hooks();
-        //TagTypeClassExtension_Hooks();
-        //TriggerTypeClassExtension_Hooks();
-        TechnoClassExtension_Hooks();
-        UnitClassExtension_Hooks();
-        AircraftClassExtension_Hooks();
-        InfantryClassExtension_Hooks();
-        BuildingClassExtension_Hooks();
-        CellClassExtension_Hooks();
-        HouseClassExtension_Hooks();
-        TeamClassExtension_Hooks();
-        TActionClassExtension_Hooks();
-        FactoryClassExtension_Hooks();
+
         TechnoClassExtension_Hooks();
         FootClassExtension_Hooks();
-        AnimClassExtension_Hooks();
-        BulletClassExtension_Hooks();
-        TerrainClassExtension_Hooks();
-        SuperClassExtension_Hooks();
-        ParticleSystemClassExtension_Hooks();
-        EMPulseClassExtension_Hooks();
-        WaveClassExtension_Hooks();
+
+        /**
+         *  All game class extensions here.
+         */
+//        UnitClassExtension_Hooks();
+//        AircraftClassExtension_Hooks();
+//        AircraftTypeClassExtension_Hooks();
+//        AnimClassExtension_Hooks();
+//        AnimTypeClassExtension_Hooks();
+        BuildingClassExtension_Hooks();
+        BuildingTypeClassExtension_Hooks();
+//        BulletClassExtension_Hooks();
+//        BulletTypeClassExtension_Hooks();
+//        CampaignClassExtension_Hooks();
+//        CellClassExtension_Hooks();
+//        FactoryClassExtension_Hooks();
+//        HouseClassExtension_Hooks();
+//        HouseTypeClassExtension_Hooks();
+//        InfantryClassExtension_Hooks();
+//        InfantryTypeClassExtension_Hooks();
+        //EXT_RTTI_ISOTILE
+//        IsometricTileTypeClassExtension_Hooks();
+        //EXT_RTTI_LIGHT
+        //EXT_RTTI_OVERLAY
+//        OverlayTypeClassExtension_Hooks();
+        //EXT_RTTI_PARTICLE
+//        ParticleTypeClassExtension_Hooks();
+//        ParticleSystemClassExtension_Hooks();
+//        ParticleSystemTypeClassExtension_Hooks();
+        //EXT_RTTI_SCRIPT
+        //ScriptTypeClassExtension_Hooks();
+//        SideClassExtension_Hooks();
+        //EXT_RTTI_SMUDGE
+//        SmudgeTypeClassExtension_Hooks();
+        //EXT_RTTI_SPECIAL
+//        SuperWeaponTypeClassExtension_Hooks();
+        //TaskForceClassExtension_Hooks();
+//        TeamClassExtension_Hooks();
+        //EXT_RTTI_TEAMTYPE
+//        TerrainClassExtension_Hooks();
+//        TerrainTypeClassExtension_Hooks();
+        //EXT_RTTI_TRIGGER
+        //TriggerTypeClassExtension_Hooks();
+//        UnitTypeClassExtension_Hooks();
+        //EXT_RTTI_VOXELANIM
+//        VoxelAnimTypeClassExtension_Hooks();
+//        WaveClassExtension_Hooks();
+        //EXT_RTTI_TAG
+        //TagTypeClassExtension_Hooks();
+//        TiberiumClassExtension_Hooks();
+//        TActionClassExtension_Hooks();
+        //EXT_RTTI_EVENT
+//        WeaponTypeClassExtension_Hooks();
+//        WarheadTypeClassExtension_Hooks();
+        //EXT_RTTI_WAYPOINT
+        //EXT_RTTI_TUBE
+        //EXT_RTTI_LIGHTSOURCE
+//        EMPulseClassExtension_Hooks();
+        //EXT_RTTI_TACTICALMAP
+//        SuperClassExtension_Hooks();
+        //EXT_RTTI_AITRIGGER
+        //AITriggerTypeClassExtension_Hooks();
+        //EXT_RTTI_NEURON
+        //EXT_RTTI_FOGGEDOBJECT
+        //EXT_RTTI_ALPHASHAPE
+        //EXT_RTTI_VEINHOLEMONSTER
 
         /**
          *  All global class extensions here.
          */
-        RulesClassExtension_Hooks();
-        TacticalExtension_Hooks();
-        ScenarioClassExtension_Hooks();
-        DisplayClassExtension_Hooks();
-        SidebarClassExtension_Hooks();
-        OptionsClassExtension_Hooks();
-        SessionClassExtension_Hooks();
-        ThemeClassExtension_Hooks();
+//        RulesClassExtension_Hooks();
+//        TacticalExtension_Hooks();
+//        ScenarioClassExtension_Hooks();
+//        DisplayClassExtension_Hooks();
+//        SidebarClassExtension_Hooks();
+//        OptionsClassExtension_Hooks();
+//        SessionClassExtension_Hooks();
+//        ThemeClassExtension_Hooks();
     }
 
     /**

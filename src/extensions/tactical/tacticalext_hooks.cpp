@@ -39,6 +39,9 @@
 #include "asserthandler.h"
 #include <timeapi.h>
 
+#include "hooker.h"
+#include "hooker_macros.h"
+
 
 /**
  *  #issue-315

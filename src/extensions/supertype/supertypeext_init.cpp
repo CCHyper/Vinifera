@@ -30,9 +30,13 @@
 #include "supertype.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,12 +52,12 @@ DECLARE_PATCH(_SuperWeaponTypeClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0x14); // ini name.
     static SuperWeaponTypeClassExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating SuperWeaponTypeClassExtension instance for \"%s\".\n", ini_name);
+    //EXT_DEBUG_TRACE("Creating SuperWeaponTypeClassExtension instance for \"%s\".\n", ini_name);
 
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = SuperWeaponTypeClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<SuperWeaponTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create SuperWeaponTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -112,15 +116,16 @@ DECLARE_PATCH(_SuperWeaponTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    SuperWeaponTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<SuperWeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov ecx, esi }
+    _asm { mov eax, 0x00406330 } // AbstractTypeClass::~AbstractTypeClass()
+    _asm { call eax }
+    JMP_REG(ecx, 0x0060D0F1);
 }
 
 
@@ -138,16 +143,16 @@ DECLARE_PATCH(_SuperWeaponTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    SuperWeaponTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<SuperWeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov ecx, esi }
+    _asm { mov eax, 0x00406330 } // AbstractTypeClass::~AbstractTypeClass()
+    _asm { call eax }
+    JMP_REG(ecx, 0x0060D881);
 }
 
 
@@ -165,12 +170,9 @@ DECLARE_PATCH(_SuperWeaponTypeClass_Compute_CRC_Patch)
     static SuperWeaponTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = SuperWeaponTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<SuperWeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -201,12 +203,9 @@ DECLARE_PATCH(_SuperWeaponTypeClass_Read_INI_Patch)
     static SuperWeaponTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = SuperWeaponTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<SuperWeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -232,8 +231,8 @@ void SuperWeaponTypeClassExtension_Init()
 {
     Patch_Jump(0x0060D04A, &_SuperWeaponTypeClass_Constructor_Patch);
     Patch_Jump(0x0060D084, &_SuperWeaponTypeClass_NoInit_Constructor_Patch);
-    //Patch_Jump(0x0060D0F1, &_SuperWeaponTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
-    Patch_Jump(0x0060D891, &_SuperWeaponTypeClass_Scalar_Destructor_Patch);
+    //Patch_Jump(0x0060D0EA, &_SuperWeaponTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
+    Patch_Jump(0x0060D87A, &_SuperWeaponTypeClass_Scalar_Destructor_Patch);
     Patch_Jump(0x0060D2D3, &_SuperWeaponTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x0060D57A, &_SuperWeaponTypeClass_Read_INI_Patch);
 }

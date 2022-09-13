@@ -30,9 +30,13 @@
 #include "smudgetype.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,12 +52,12 @@ DECLARE_PATCH(_SmudgeTypeClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0xC); // ini name.
     static SmudgeTypeClassExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating SmudgeTypeClassExtension instance for \"%s\".\n", ini_name);
+    //EXT_DEBUG_TRACE("Creating SmudgeTypeClassExtension instance for \"%s\".\n", ini_name);
 
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = SmudgeTypeClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<SmudgeTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create SmudgeTypeClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -110,15 +114,14 @@ DECLARE_PATCH(_SmudgeTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    SmudgeTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<SmudgeTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x007B3470 } // SmudgeTypes.vtble
+    JMP_REG(eax, 0x005FB31E);
 }
 
 
@@ -136,16 +139,14 @@ DECLARE_PATCH(_SmudgeTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    SmudgeTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<SmudgeTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov edx, ds:0x007B3470 } // SmudgeTypes.vtble
+    JMP_REG(eax, 0x005FC02E);
 }
 
 
@@ -163,12 +164,9 @@ DECLARE_PATCH(_SmudgeTypeClass_Compute_CRC_Patch)
     static SmudgeTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = SmudgeTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<SmudgeTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -199,12 +197,9 @@ DECLARE_PATCH(_SmudgeTypeClass_Read_INI_Patch)
     static SmudgeTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = SmudgeTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<SmudgeTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -231,8 +226,8 @@ void SmudgeTypeClassExtension_Init()
     Patch_Jump(0x005FB2CC, &_SmudgeTypeClass_Constructor_Patch);
     Patch_Jump(0x005FB2D9, &_SmudgeTypeClass_Constructor_Patch);
     Patch_Jump(0x005FB2FA, &_SmudgeTypeClass_NoInit_Constructor_Patch);
-    //Patch_Jump(0x005FB368, &_SmudgeTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
-    Patch_Jump(0x005FC088, &_SmudgeTypeClass_Scalar_Destructor_Patch);
+    //Patch_Jump(0x005FB318, &_SmudgeTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
+    Patch_Jump(0x005FC028, &_SmudgeTypeClass_Scalar_Destructor_Patch);
     Patch_Jump(0x005FB724, &_SmudgeTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x005FB6A7, &_SmudgeTypeClass_Read_INI_Patch);
 }

@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          TECHNOTYPEEXT_INIT.H
+ *  @file          BUILDINGEXT.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for initialising the extended TechnoTypeClass.
+ *  @brief         Extended AircraftClass class.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,5 +27,33 @@
  ******************************************************************************/
 #pragma once
 
+#include "abstractext.h"
+#include "object.h"
 
-void TechnoTypeClassExtension_Init();
+
+class AircraftClass;
+class HouseClass;
+
+
+class ObjectClassExtension : public AbstractClassExtension
+{
+    public:
+        /**
+         *  IPersistStream
+         */
+        IFACEMETHOD(Load)(IStream *pStm);
+        IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
+
+    public:
+        ObjectClassExtension(const ObjectClass *this_ptr);
+        ObjectClassExtension(const NoInitClass &noinit);
+        virtual ~ObjectClassExtension();
+
+        virtual void Detach(TARGET target, bool all = true) override;
+        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+
+        virtual const char *Name() const override;
+        virtual const char *Full_Name() const override;
+
+    public:
+};

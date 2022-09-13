@@ -26,10 +26,16 @@
  *
  ******************************************************************************/
 #include "rulesext.h"
+#include "tibsun_globals.h"
+#include "ccfile.h"
 #include "ccini.h"
 #include "rules.h"
 #include "tiberium.h"
 #include "weapontype.h"
+#include "wwcrc.h"
+#include "noinit.h"
+#include "swizzle.h"
+#include "vinifera_saveload.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -43,18 +49,14 @@ RulesClassExtension::UIControlsStruct RulesClassExtension::UIControls;
  *  
  *  @author: CCHyper
  */
-RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
-    Extension(this_ptr),
+RulesClassExtension::RulesClassExtension(const RulesClass *this_ptr) :
+    This(const_cast<RulesClass *>(this_ptr)),
     IsMPAutoDeployMCV(false),
     IsMPPrePlacedConYards(false),
     IsBuildOffAlly(true),
     IsShowSuperWeaponTimers(true)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
-
-    IsInitialized = true;
+    //EXT_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -63,10 +65,8 @@ RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
  *  
  *  @author: CCHyper
  */
-RulesClassExtension::RulesClassExtension(const NoInitClass &noinit) :
-    Extension(noinit)
+RulesClassExtension::RulesClassExtension(const NoInitClass &noinit)
 {
-    IsInitialized = false;
 }
 
 
@@ -77,10 +77,7 @@ RulesClassExtension::RulesClassExtension(const NoInitClass &noinit) :
  */
 RulesClassExtension::~RulesClassExtension()
 {
-    //EXT_DEBUG_TRACE("RulesClassExtension destructor - 0x%08X\n", (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("RulesClassExtension destructor - 0x%08X\n", (uintptr_t)(ThisPtr));
-
-    IsInitialized = false;
+    //EXT_DEBUG_TRACE("RulesClassExtension destructor - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -94,35 +91,37 @@ RulesClassExtension::~RulesClassExtension()
  */
 HRESULT RulesClassExtension::Load(IStream *pStm)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::Load - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("RulesClassExtension::Load - 0x%08X\n", (uintptr_t)(This()));
 
-    HRESULT hr = ExtensionBase::Load(pStm);
-    if (FAILED(hr)) {
-        return E_FAIL;
+    if (!pStm) {
+        return E_POINTER;
     }
 
-    LONG id;
-    hr = pStm->Read(&id, sizeof(id), nullptr);
+    /**
+     *  Load the unique id for this class.
+     */
+    ULONG id = 0;
+    HRESULT hr = pStm->Read(&id, sizeof(ULONG), nullptr);
     if (FAILED(hr)) {
-        return E_FAIL;
-    }
-
-    ULONG size = Size_Of();
-    hr = pStm->Read(this, size, nullptr);
-    if (FAILED(hr)) {
-        return E_FAIL;
+        return hr;
     }
 
     new (this) RulesClassExtension(NoInitClass());
 
-    SWIZZLE_REGISTER_POINTER(id, this);
+    /**
+     *  x
+     */
+    VINIFERA_SWIZZLE_REGISTER_POINTER(id, this, "this");
 
-#ifndef NDEBUG
-    EXT_DEBUG_INFO("RulesExt Load: ID 0x%08X Ptr 0x%08X\n", id, this);
-#endif
+    /**
+     *  Read this classes instance binary blob data.
+     */
+    hr = pStm->Read(this, Size_Of(), nullptr);
+    if (FAILED(hr)) {
+        return hr;
+    }
 
-    return S_OK;
+    return hr;
 }
 
 
@@ -133,10 +132,25 @@ HRESULT RulesClassExtension::Load(IStream *pStm)
  */
 HRESULT RulesClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::Save - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("RulesClassExtension::Save - 0x%08X\n", (uintptr_t)(This()));
 
-    HRESULT hr = Extension::Save(pStm, fClearDirty);
+    if (!pStm) {
+        return E_POINTER;
+    }
+
+    /**
+     *  x
+     */
+    ULONG id = (ULONG)this;
+    HRESULT hr = pStm->Write(&id, sizeof(id), nullptr);
+    if (FAILED(hr)) {
+        return hr;
+    }
+    
+    /**
+     *  Write this class instance as a binary blob.
+     */
+    hr = pStm->Write(this, Size_Of(), nullptr);
     if (FAILED(hr)) {
         return hr;
     }
@@ -152,8 +166,7 @@ HRESULT RulesClassExtension::Save(IStream *pStm, BOOL fClearDirty)
  */
 int RulesClassExtension::Size_Of() const
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(This()));
 
     return sizeof(*this);
 }
@@ -166,9 +179,7 @@ int RulesClassExtension::Size_Of() const
  */
 void RulesClassExtension::Detach(TARGET target, bool all)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(ThisPtr));
-
+    //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -179,8 +190,7 @@ void RulesClassExtension::Detach(TARGET target, bool all)
  */
 void RulesClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(This()));
 
     crc(IsMPAutoDeployMCV);
     crc(IsMPPrePlacedConYards);
@@ -196,18 +206,17 @@ void RulesClassExtension::Compute_CRC(WWCRCEngine &crc) const
  */
 void RulesClassExtension::Process(CCINIClass &ini)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::Process - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("RulesClassExtension::Process - 0x%08X\n", (uintptr_t)(This()));
 
     /**
      *  This function replaces the original rules process, so we need to duplicate
      *  the its behaviour here first.
      */
 
-    ThisPtr->Colors(ini);
-    ThisPtr->Houses(ini);
-    ThisPtr->Sides(ini);
-    ThisPtr->Overlays(ini);
+    This->Colors(ini);
+    This->Houses(ini);
+    This->Sides(ini);
+    This->Overlays(ini);
 
     /**
      *  #issue-117
@@ -219,31 +228,31 @@ void RulesClassExtension::Process(CCINIClass &ini)
      */
     Weapons(ini);
 
-    ThisPtr->SuperWeapons(ini);
-    ThisPtr->Warheads(ini);
-    ThisPtr->Smudges(ini);
-    ThisPtr->Terrains(ini);
-    ThisPtr->Buildings(ini);
-    ThisPtr->Vehicles(ini);
-    ThisPtr->Aircraft(ini);
-    ThisPtr->Infantry(ini);
-    ThisPtr->Animations(ini);
-    ThisPtr->VoxelAnims(ini);
-    ThisPtr->Particles(ini);
-    ThisPtr->ParticleSystems(ini);
-    ThisPtr->JumpjetControls(ini);
-    ThisPtr->MPlayer(ini);
-    ThisPtr->AI(ini);
-    ThisPtr->Powerups(ini);
-    ThisPtr->Land_Types(ini);
-    ThisPtr->IQ(ini);
-    ThisPtr->General(ini);
-    ThisPtr->Objects(ini);
-    ThisPtr->Difficulty(ini);
-    ThisPtr->CrateRules(ini);
-    ThisPtr->CombatDamage(ini);
-    ThisPtr->AudioVisual(ini);
-    ThisPtr->SpecialWeapons(ini);
+    This->SuperWeapons(ini);
+    This->Warheads(ini);
+    This->Smudges(ini);
+    This->Terrains(ini);
+    This->Buildings(ini);
+    This->Vehicles(ini);
+    This->Aircraft(ini);
+    This->Infantry(ini);
+    This->Animations(ini);
+    This->VoxelAnims(ini);
+    This->Particles(ini);
+    This->ParticleSystems(ini);
+    This->JumpjetControls(ini);
+    This->MPlayer(ini);
+    This->AI(ini);
+    This->Powerups(ini);
+    This->Land_Types(ini);
+    This->IQ(ini);
+    This->General(ini);
+    This->Objects(ini);
+    This->Difficulty(ini);
+    This->CrateRules(ini);
+    This->CombatDamage(ini);
+    This->AudioVisual(ini);
+    This->SpecialWeapons(ini);
     TiberiumClass::Process(ini);
 
     /**
@@ -269,9 +278,7 @@ void RulesClassExtension::Process(CCINIClass &ini)
  */
 void RulesClassExtension::Initialize(CCINIClass &ini)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(ThisPtr));
-
+    //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -282,8 +289,7 @@ void RulesClassExtension::Initialize(CCINIClass &ini)
  */
 bool RulesClassExtension::General(CCINIClass &ini)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::General - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("RulesClassExtension::General - 0x%08X\n", (uintptr_t)(This()));
 
     static char const * const GENERAL = "General";
 
@@ -302,8 +308,7 @@ bool RulesClassExtension::General(CCINIClass &ini)
  */
 bool RulesClassExtension::AudioVisual(CCINIClass &ini)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::General - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("RulesClassExtension::General - 0x%08X\n", (uintptr_t)(This()));
 
     static char const * const AUDIOVISUAL = "AudioVisual";
 
@@ -324,8 +329,7 @@ bool RulesClassExtension::AudioVisual(CCINIClass &ini)
  */
 bool RulesClassExtension::MPlayer(CCINIClass &ini)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::MPlayer - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("RulesClassExtension::MPlayer - 0x%08X\n", (uintptr_t)(This()));
 
     static char const * const MPLAYER = "MultiplayerDefaults";
 
@@ -348,8 +352,7 @@ bool RulesClassExtension::MPlayer(CCINIClass &ini)
  */
 bool RulesClassExtension::Weapons(CCINIClass &ini)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("RulesClassExtension::Weapons - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("RulesClassExtension::Weapons - 0x%08X\n", (uintptr_t)(This()));
 
     static const char * const WEAPONS = "Weapons";
 
@@ -446,5 +449,5 @@ bool RulesClassExtension::Init_UI_Controls()
  */
 void RulesClassExtension::Check()
 {
-    ASSERT_PRINT(ThisPtr->CreditTicks.Count() == 2, "CreditTicks must contain 2 valid entries!");
+    ASSERT_PRINT(This->CreditTicks.Count() == 2, "CreditTicks must contain 2 valid entries!");
 }

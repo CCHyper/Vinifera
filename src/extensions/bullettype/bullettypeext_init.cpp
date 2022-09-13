@@ -30,9 +30,13 @@
 #include "bullettype.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,12 +52,12 @@ DECLARE_PATCH(_BulletTypeClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0xC); // ini name.
     static BulletTypeClassExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating BulletTypeClassExtension instance for \"%s\".\n", ini_name);
+    //EXT_DEBUG_TRACE("Creating BulletTypeClassExtension instance for \"%s\".\n", ini_name);
 
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = BulletTypeClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<BulletTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create BulletTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -110,15 +114,14 @@ DECLARE_PATCH(_BulletTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    BulletTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<BulletTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x007E21B8 } // BulletTypes.vtble
+    JMP_REG(eax, 0x00447E17);
 }
 
 
@@ -136,16 +139,14 @@ DECLARE_PATCH(_BulletTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    BulletTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<BulletTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov edx, ds:0x007E21B8 } // BulletTypes.vtble
+    JMP_REG(eax, 0x00448777);
 }
 
 
@@ -164,12 +165,9 @@ DECLARE_PATCH(_BulletTypeClass_Detach_Patch)
     static BulletTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = BulletTypeClassExtensions.find(this_ptr, false);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<BulletTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -198,12 +196,9 @@ DECLARE_PATCH(_BulletTypeClass_Compute_CRC_Patch)
     static BulletTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = BulletTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<BulletTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -234,12 +229,9 @@ DECLARE_PATCH(_BulletTypeClass_Read_INI_Patch)
     static BulletTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = BulletTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<BulletTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -265,8 +257,8 @@ void BulletTypeClassExtension_Init()
 {
     Patch_Jump(0x00447D86, &_BulletTypeClass_Constructor_Patch);
     Patch_Jump(0x00447DAA, &_BulletTypeClass_NoInit_Constructor_Patch);
-    //Patch_Jump(0x00447E61, &_BulletTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
-    Patch_Jump(0x004487D1, &_BulletTypeClass_Scalar_Destructor_Patch);
+    //Patch_Jump(0x00447E11, &_BulletTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
+    Patch_Jump(0x00448771, &_BulletTypeClass_Scalar_Destructor_Patch);
     Patch_Jump(0x004486B8, &_BulletTypeClass_Detach_Patch);
     Patch_Jump(0x004484DD, &_BulletTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x00448275, &_BulletTypeClass_Read_INI_Patch);

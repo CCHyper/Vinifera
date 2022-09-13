@@ -30,9 +30,13 @@
 #include "overlaytype.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,12 +52,12 @@ DECLARE_PATCH(_OverlayTypeClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0xC); // ini name.
     static OverlayTypeClassExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating OverlayTypeClassExtension instance for \"%s\".\n", ini_name);
+    //EXT_DEBUG_TRACE("Creating OverlayTypeClassExtension instance for \"%s\".\n", ini_name);
 
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = OverlayTypeClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<OverlayTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create OverlayTypeClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -110,15 +114,14 @@ DECLARE_PATCH(_OverlayTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    OverlayTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<OverlayTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x007E22A0 } // OverlayTypes.vtble
+    JMP_REG(eax, 0x0058D1A1);
 }
 
 
@@ -136,16 +139,14 @@ DECLARE_PATCH(_OverlayTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    OverlayTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<OverlayTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { pop ecx }
-    _asm { ret 4 }
+    _asm { mov edx, ds:0x007E22A0 } // OverlayTypes.vtble
+    JMP_REG(eax, 0x0058DC91);
 }
 
 
@@ -163,12 +164,9 @@ DECLARE_PATCH(_OverlayTypeClass_Compute_CRC_Patch)
     static OverlayTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = OverlayTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<OverlayTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -200,12 +198,9 @@ DECLARE_PATCH(_OverlayTypeClass_Read_INI_Patch)
     static OverlayTypeClassExtension *exttype_ptr;
 
     /**
-     *  Find the extension instance.
+     *  Fetch the extension instance.
      */
-    exttype_ptr = OverlayTypeClassExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Fetch_Extension<OverlayTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -236,8 +231,8 @@ void OverlayTypeClassExtension_Init()
     Patch_Jump(0x0058D120, &_OverlayTypeClass_Constructor_Patch);
     Patch_Jump(0x0058D12D, &_OverlayTypeClass_Constructor_Patch);
     Patch_Jump(0x0058D15A, &_OverlayTypeClass_NoInit_Constructor_Patch);
-    //Patch_Jump(0x0058D1EB, &_OverlayTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
-    Patch_Jump(0x0058DCEB, &_OverlayTypeClass_Scalar_Destructor_Patch);
+    //Patch_Jump(0x0058D19B, &_OverlayTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
+    Patch_Jump(0x0058DC8B, &_OverlayTypeClass_Scalar_Destructor_Patch);
     Patch_Jump(0x0058D7EA, &_OverlayTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x0058D709, &_OverlayTypeClass_Read_INI_Patch);
 }

@@ -28,6 +28,7 @@
 #include "vinifera_functions.h"
 #include "vinifera_globals.h"
 #include "vinifera_newdel.h"
+#include "tibsun_globals.h"
 #include "cncnet4.h"
 #include "cncnet4_globals.h"
 #include "cncnet5_globals.h"
@@ -45,8 +46,10 @@
 #include "tacticalext.h"
 #include "tclassfactory.h"
 #include "testlocomotion.h"
+#include "extension.h"
 #include "theatertype.h"
 #include "debughandler.h"
+#include "asserthandler.h"
 #include <string>
 
 
@@ -646,10 +649,20 @@ bool Vinifera_Register_Com_Objects()
 {
     DEBUG_INFO("Registering new com objects...\n");
 
-    DEBUG_INFO("  TestLocomotionClass\n");
+    //DEBUG_INFO("  TestLocomotionClass\n");
     REGISTER_CLASS(TestLocomotionClass);
+    
+    /**
+     *  Command line option to disable class extensions.
+     */
+    const char *cmdline = GetCommandLineA();
+    bool no_class_extensions = (std::strstr(cmdline, "-NO_CLASS_EXT") != nullptr);
+    if (!no_class_extensions) {
+        //DEBUG_INFO("  Extension classes\n");
+        Register_Extension_Class_Factories();
+    }
 
-    DEBUG_INFO("  ...OK!\n");
+    //DEBUG_INFO("  ...OK!\n");
 
     return true;
 }
