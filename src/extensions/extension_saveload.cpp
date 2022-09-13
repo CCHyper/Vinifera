@@ -347,7 +347,7 @@ static bool Vinifera_Load_TacticalExtension(IStream *pStm)
  */
 bool Vinifera_Put_All(IStream *pStm)
 {
-#if 0
+#if 1
     /**
      *  Save the Vinifera data marker which can be used to verify
      *  the state of the data to follow on load.
@@ -409,7 +409,7 @@ bool Vinifera_Put_All(IStream *pStm)
  */
 bool Vinifera_Load_All(IStream *pStm)
 {
-#if 0
+#if 1
     /**
      *  Load the Vinifera data marker which can be used to verify
      *  the state of the data to follow.

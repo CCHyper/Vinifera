@@ -238,7 +238,7 @@ void Extension_Hooks()
     MainLoop_Hooks();
     NewMenuExtension_Hooks();
 
-#if 0
+#if 1
     /**
      *  All game class extensions here.
      */
