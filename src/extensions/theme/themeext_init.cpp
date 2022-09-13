@@ -34,6 +34,10 @@
 #include "debughandler.h"
 #include "asserthandler.h"
 
+#include "hooker.h"
+#include "hooker_macros.h"
+
+#if 0
 
 /**
  *  Patch for including the extended class members in the creation process.
@@ -47,12 +51,12 @@ DECLARE_PATCH(_ThemeClass_ThemeControl_Constructor_Patch)
     GET_REGISTER_STATIC(ThemeClass::ThemeControl *, this_ptr, eax); // "this" pointer.
     static ThemeControlExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating ThemeClass_ThemeControlExtension.\n");
+    //EXT_DEBUG_TRACE("Creating ThemeClass_ThemeControlExtension.\n");
 
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = ThemeControlExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<ThemeControlExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create ThemeControlExtension instance!\n");
         ShowCursor(TRUE);
@@ -125,15 +129,15 @@ original_code:
     _asm { pop esi }
     _asm { ret 4 }
 }
-
+#endif
 
 /**
  *  Main function for patching the hooks.
  */
 void ThemeClassExtension_Init()
 {
-    Patch_Jump(0x006439E5, &_ThemeClass_ThemeControl_Constructor_Patch);
-    Patch_Jump(0x00643B45, &_ThemeClass_ThemeControl_Inlined_Constructor_Patch);
-    //Patch_Jump(0x, &_ThemeClass_ThemeControl_Destructor_Patch); // No destructor to hook, extension should clean up on exit.
-    Patch_Jump(0x00643AAB, &_ThemeClass_ThemeControl_Read_INI_Patch);
+//    Patch_Jump(0x006439E5, &_ThemeClass_ThemeControl_Constructor_Patch);
+//    Patch_Jump(0x00643B45, &_ThemeClass_ThemeControl_Inlined_Constructor_Patch);
+//    //Patch_Jump(0x, &_ThemeClass_ThemeControl_Destructor_Patch); // No destructor to hook, extension should clean up on exit.
+//    Patch_Jump(0x00643AAB, &_ThemeClass_ThemeControl_Read_INI_Patch);
 }

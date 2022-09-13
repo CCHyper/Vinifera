@@ -30,9 +30,13 @@
 #include "campaign.h"
 #include "campaignext.h"
 #include "addon.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,7 +52,7 @@ DECLARE_PATCH(_Choose_Campaign_Debug_Only_Patch)
     GET_REGISTER_STATIC(int, index, edi);
     static CampaignClassExtension *campaignext;
 
-    campaignext = CampaignClassExtensions.find(campaign);
+    campaignext = Fetch_Extension<CampaignClassExtension>(campaign);
 
     /**
      *  Is this a debug campaign? Make sure the developer mode is enabled

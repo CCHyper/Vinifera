@@ -29,9 +29,11 @@
 #include "technoext.h"
 #include "technotypeext.h"
 #include "techno.h"
+#include "tibsun_globals.h"
 #include "ebolt.h"
 #include "target.h"
 #include "tactical.h"
+#include "extension.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
@@ -96,7 +98,7 @@ EBoltClass *TechnoClassExtension_Electric_Bolt(TechnoClass *this_ptr, TARGET tar
         if (this_ptr->IsActive) {
 
             TechnoClassExtension *technoext;
-            technoext = TechnoClassExtensions.find(this_ptr);
+            technoext = Fetch_Extension<TechnoClassExtension>(this_ptr);
             if (technoext) {
 
                 /**

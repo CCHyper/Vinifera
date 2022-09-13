@@ -36,6 +36,7 @@
 #include "unittypeext.h"
 #include "technotype.h"
 #include "technotypeext.h"
+#include "extension.h"
 #include "voc.h"
 #include "fatal.h"
 #include "debughandler.h"
@@ -66,7 +67,7 @@ DECLARE_PATCH(_AircraftClass_Mission_Unload_Transport_Detach_Sound_Patch)
         /**
          *  Do we have a sound to play when passengers leave us? If so, play it now.
          */
-        radio_technotypeext = TechnoTypeClassExtensions.find(this_ptr->Techno_Type_Class());
+        radio_technotypeext = Fetch_Extension<TechnoTypeClassExtension>(this_ptr->Techno_Type_Class());
         if (radio_technotypeext && radio_technotypeext->LeaveTransportSound != VOC_NONE) {
             Sound_Effect(radio_technotypeext->LeaveTransportSound, this_ptr->Coord);
         }
@@ -168,7 +169,7 @@ DECLARE_PATCH(_AircraftClass_What_Action_Is_Totable_Patch)
             /**
              *  Fetch the unit type extension instance if available.
              */
-            unittypeext = UnitTypeClassExtensions.find(target_unit->Class);
+            unittypeext = Fetch_Extension<UnitTypeClassExtension>(target_unit->Class);
             if (unittypeext) {
 
                 /**

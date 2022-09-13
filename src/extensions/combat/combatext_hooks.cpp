@@ -31,6 +31,7 @@
 #include "overlaytype.h"
 #include "warheadtype.h"
 #include "warheadtypeext.h"
+#include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -76,7 +77,7 @@ DECLARE_PATCH(_Explosion_Damage_IsWallAbsoluteDestroyer_Patch)
          *  of damage? If so, then pass -1 into Reduce_Wall to remove the wall
          *  section from the cell.
          */
-        warheadtypeext = WarheadTypeClassExtensions.find(warhead);
+        warheadtypeext = Fetch_Extension<WarheadTypeClassExtension>(warhead);
         if (warheadtypeext && warheadtypeext->IsWallAbsoluteDestroyer) {
             cellptr->Reduce_Wall(-1);
 
@@ -111,7 +112,7 @@ DECLARE_PATCH(_Do_Flash_CombatLightSize_Patch)
     /**
      *  Fetch the warhead type extension instance if it exists.
      */
-    warheadtypeext = WarheadTypeClassExtensions.find(warhead);
+    warheadtypeext = Fetch_Extension<WarheadTypeClassExtension>(warhead);
 
     /**
      *  If extension instance is not found, or no custom light size

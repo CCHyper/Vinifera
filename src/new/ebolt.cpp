@@ -41,6 +41,7 @@
 #include "random.h"
 #include "wwmath.h"
 #include "clipline.h"
+#include "extension.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
@@ -91,7 +92,7 @@ void EBoltClass::Clear()
     if (Source) {
 
         TechnoClassExtension *technoext;
-        technoext = TechnoClassExtensions.find(Source);
+        technoext = Fetch_Extension<TechnoClassExtension>(Source);
         if (technoext) {
             technoext->ElectricBolt = nullptr;
         }
@@ -215,7 +216,7 @@ void EBoltClass::Set_Properties(TechnoClass *techno, const WeaponTypeClass *weap
                  *  Copy the color overrides from the firing objects weapon.
                  */
                 WeaponTypeClassExtension *weapontypeext;
-                weapontypeext = WeaponTypeClassExtensions.find(weapon);
+                weapontypeext = Fetch_Extension<WeaponTypeClassExtension>(weapon);
                 if (weapontypeext) {
                     LineColor1 = weapontypeext->ElectricBoltColor1;
                     LineColor2 = weapontypeext->ElectricBoltColor2;

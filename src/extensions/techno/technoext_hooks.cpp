@@ -26,7 +26,6 @@
  *
  ******************************************************************************/
 #include "technoext_hooks.h"
-#include "technoext_init.h"
 #include "technoext_functions.h"
 #include "technoext.h"
 #include "techno.h"
@@ -45,8 +44,9 @@
 #include "infantrytype.h"
 #include "infantrytypeext.h"
 #include "voc.h"
-#include "fatal.h"
 #include "vinifera_util.h"
+#include "extension.h"
+#include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -66,7 +66,7 @@ DECLARE_PATCH(_TechnoClass_Is_Allowed_To_Retaliate_Can_Retaliate_Patch)
     GET_REGISTER_STATIC(TechnoClass *, this_ptr, esi);
     static TechnoTypeClassExtension *technotypeext;
 
-    technotypeext = TechnoTypeClassExtensions.find(this_ptr->Techno_Type_Class());
+    technotypeext = Fetch_Extension<TechnoTypeClassExtension>(this_ptr->Techno_Type_Class());
 
     /**
      *  If this unit is flagged as no being allowed to retaliate to attacks, return false.
@@ -112,7 +112,7 @@ DECLARE_PATCH(_TechnoClass_Fire_At_Electric_Bolt_Patch)
     /**
      *  Spawn the electric bolt.
      */
-    weapontypeext = WeaponTypeClassExtensions.find(weapon);
+    weapontypeext = Fetch_Extension<WeaponTypeClassExtension>(weapon);
     if (weapontypeext) {
         if (weapontypeext->IsElectricBolt) {
             TechnoClassExtension_Electric_Bolt(this_ptr, target);
@@ -149,7 +149,7 @@ DECLARE_PATCH(_TechnoClass_Fire_At_Suicide_Patch)
     /**
      *  Fetch the extended data for the firing weapon.
      */
-    weapontypeext = WeaponTypeClassExtensions.find(weap);
+    weapontypeext = Fetch_Extension<WeaponTypeClassExtension>(weap);
     if (weapontypeext) {
 
         /**
@@ -221,7 +221,7 @@ static void Techno_Player_Assign_Mission_Response_Switch(TechnoClass *this_ptr, 
     }
 
     TechnoClassExtension *technoext;
-    technoext = TechnoClassExtensions.find(this_ptr);
+    technoext = Fetch_Extension<TechnoClassExtension>(this_ptr);
 
     switch (mission) {
 
@@ -314,7 +314,7 @@ DECLARE_PATCH(_TechnoClass_Refund_Amount_Soylent_Patch)
     /**
      *  Fetch the techno type extension.
      */
-    technotypext = TechnoTypeClassExtensions.find(technotype);
+    technotypext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
 
     /**
      *  If the object has a soylent value defined, return this.
@@ -363,7 +363,7 @@ DECLARE_PATCH(_TechnoClass_Greatest_Threat_Infantry_Mechanic_Patch)
      *  #NOTE: Removed THREAT_AIR for IsMechanic and IsOmniHealer infantry and it causes
      *         them to chase down damaged friendly aircraft in the air.
      */
-    infantrytypeext = InfantryTypeClassExtensions.find(infantry_this_ptr->Class);
+    infantrytypeext = Fetch_Extension<InfantryTypeClassExtension>(infantry_this_ptr->Class);
     if (infantrytypeext && infantrytypeext->IsOmniHealer) {
         method = method|(THREAT_INFANTRY|THREAT_VEHICLES/*|THREAT_AIR*/|THREAT_4000);
     } else if (infantrytypeext && infantrytypeext->IsMechanic) {
@@ -451,7 +451,7 @@ DECLARE_PATCH(_TechnoClass_Take_Damage_IsAffectsAllies_Patch)
         /**
          *  Is the warhead that hit us one that affects units allied with its firing owner?
          */
-        warheadtypeext = WarheadTypeClassExtensions.find(warhead);
+        warheadtypeext = Fetch_Extension<WarheadTypeClassExtension>(warhead);
         if (warheadtypeext && !warheadtypeext->IsAffectsAllies) {
 
             /**
@@ -610,7 +610,7 @@ DECLARE_PATCH(_TechnoClass_Do_Cloak_Cloak_Sound_Patch)
     /**
      *  Fetch the class extension if it exists.
      */
-    technotypeext = TechnoTypeClassExtensions.find(technotype);
+    technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
     if (technotypeext) {
 
         /**
@@ -655,7 +655,7 @@ DECLARE_PATCH(_TechnoClass_Do_Uncloak_Uncloak_Sound_Patch)
     /**
      *  Fetch the class extension if it exists.
      */
-    technotypeext = TechnoTypeClassExtensions.find(technotype);
+    technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
     if (technotypeext) {
 
         /**
@@ -709,11 +709,6 @@ DECLARE_PATCH(_TechnoClass_Null_House_Warning_Patch)
  */
 void TechnoClassExtension_Hooks()
 {
-    /**
-     *  Initialises the extended class.
-     */
-    TechnoClassExtension_Init();
-
     Patch_Jump(0x00633C78, &_TechnoClass_Do_Cloak_Cloak_Sound_Patch);
     Patch_Jump(0x00633BD4, &_TechnoClass_Do_Uncloak_Uncloak_Sound_Patch);
     Patch_Jump(0x0063105C, &_TechnoClass_Fire_At_Weapon_Anim_Patch);

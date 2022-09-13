@@ -34,7 +34,7 @@
 #include "crt_hooks.h"
 #include "debug_hooks.h"
 #include "vinifera_hooks.h"
-#include "ext_hooks.h"
+#include "extension_hooks.h"
 #include "cncnet4_hooks.h"
 #include "cncnet5_hooks.h"
 

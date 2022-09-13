@@ -32,6 +32,7 @@
 #include "warheadtype.h"
 #include "warheadtypeext.h"
 #include "iomap.h"
+#include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -55,7 +56,7 @@ DECLARE_PATCH(_BulletClass_AI_SpawnDelay_Patch)
     /**
      *  Find the extended bullet type data.
      */
-    bullettypeext = BulletTypeClassExtensions.find(this_ptr->Class);
+    bullettypeext = Fetch_Extension<BulletTypeClassExtension>(this_ptr->Class);
 
     /**
      *  If this bullet has a custom spawn delay, perform that check first.
@@ -97,7 +98,7 @@ DECLARE_PATCH(_BulletClass_Logic_ShakeScreen_Patch)
     /**
      *  Fetch the extended warhead type instance if it exists.
      */
-    warheadext = WarheadTypeClassExtensions.find(warhead);
+    warheadext = Fetch_Extension<WarheadTypeClassExtension>(warhead);
     if (warheadext) {
 
         /**

@@ -26,7 +26,6 @@
  *
  ******************************************************************************/
 #include "objecttypeext_hooks.h"
-#include "objecttypeext_init.h"
 #include "objecttypeext.h"
 #include "objecttype.h"
 #include "theatertype.h"
@@ -36,6 +35,9 @@
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -123,11 +125,6 @@ const ShapeFileStruct * ObjectTypeClassFake::_Get_Image_Data() const
  */
 void ObjectTypeClassExtension_Hooks()
 {
-    /**
-     *  Initialises the extended class.
-     */
-    ObjectTypeClassExtension_Init();
-
     //Patch_Jump(0x004101A0, &ObjectTypeClassFake::_Get_Image_Data);
     Patch_Jump(0x00588D00, &ObjectTypeClassFake::_Assign_Theater_Name);
     Patch_Jump(0x0058891D, &_ObjectTypeClass_Load_Theater_Art_Assign_Theater_Name_Theater_Patch);

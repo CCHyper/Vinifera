@@ -30,9 +30,13 @@
 #include "isotiletype.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**
@@ -48,12 +52,12 @@ DECLARE_PATCH(_IsometricTileTypeClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0x50); // ini name.
     static IsometricTileTypeClassExtension *exttype_ptr;
 
-    //EXT_DEBUG_WARNING("Creating IsometricTileTypeClassExtension instance for \"%s\".\n", ini_name);
+    //EXT_DEBUG_TRACE("Creating IsometricTileTypeClassExtension instance for \"%s\".\n", ini_name);
 
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = IsometricTileTypeClassExtensions.find_or_create(this_ptr);
+    exttype_ptr = Find_Or_Make_Extension<IsometricTileTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create IsometricTileTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -112,16 +116,14 @@ DECLARE_PATCH(_IsometricTileTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    IsometricTileTypeClassExtensions.remove(this_ptr);
+    Destroy_Extension<IsometricTileTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
      */
 original_code:
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { pop ecx }
-    _asm { ret }
+    _asm { mov edx, ds:0x007E48C8 } // IsoTileTypes.vtble
+    JMP_REG(eax, 0x004F3387);
 }
 
 
@@ -142,7 +144,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Detach_Patch)
     /**
      *  Find the extension instance.
      */
-    exttype_ptr = IsometricTileTypeClassExtensions.find(this_ptr, false);
+    exttype_ptr = Fetch_Extension<IsometricTileTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         goto original_code;
     }
@@ -176,7 +178,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Compute_CRC_Patch)
     /**
      *  Find the extension instance.
      */
-    exttype_ptr = IsometricTileTypeClassExtensions.find(this_ptr);
+    exttype_ptr = Fetch_Extension<IsometricTileTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         goto original_code;
     }
@@ -246,7 +248,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Read_INI_Patch_1)
     /**
      *  Find the extension instance.
      */
-    exttype_ptr = IsometricTileTypeClassExtensions.find(this_ptr);
+    exttype_ptr = Fetch_Extension<IsometricTileTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         goto original_code;
     }
@@ -295,7 +297,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Read_INI_Patch_2)
     /**
      *  Find the extension instance.
      */
-    exttype_ptr = IsometricTileTypeClassExtensions.find(this_ptr);
+    exttype_ptr = Fetch_Extension<IsometricTileTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         goto original_code;
     }
@@ -322,7 +324,7 @@ void IsometricTileTypeClassExtension_Init()
 {
     Patch_Jump(0x004F32C4, &_IsometricTileTypeClass_Constructor_Patch);
     Patch_Jump(0x004F331F, &_IsometricTileTypeClass_NoInit_Constructor_Patch);
-    Patch_Jump(0x004F34A2, &_IsometricTileTypeClass_Destructor_Patch);
+    Patch_Jump(0x004F3381, &_IsometricTileTypeClass_Destructor_Patch);
     //Patch_Jump(0x004F872E, &_IsometricTileTypeClass_Detach_Patch);
     Patch_Jump(0x004F85AA, &_IsometricTileTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x004F55F2, &_IsometricTileTypeClass_Init_Patch);

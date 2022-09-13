@@ -28,14 +28,10 @@
 #include "infantrytypeext.h"
 #include "infantrytype.h"
 #include "ccini.h"
+#include "wwcrc.h"
+#include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
-
-
-/**
- *  Provides the map for all InfantryTypeClass extension instances.
- */
-ExtensionMap<InfantryTypeClass, InfantryTypeClassExtension> InfantryTypeClassExtensions;
 
 
 /**
@@ -43,16 +39,12 @@ ExtensionMap<InfantryTypeClass, InfantryTypeClassExtension> InfantryTypeClassExt
  *  
  *  @author: CCHyper
  */
-InfantryTypeClassExtension::InfantryTypeClassExtension(InfantryTypeClass *this_ptr) :
-    Extension(this_ptr),
+InfantryTypeClassExtension::InfantryTypeClassExtension(const InfantryTypeClass *this_ptr) :
+    TechnoTypeClassExtension(this_ptr),
     IsMechanic(false),
     IsOmniHealer(false)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("InfantryTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
-
-    IsInitialized = true;
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -62,9 +54,8 @@ InfantryTypeClassExtension::InfantryTypeClassExtension(InfantryTypeClass *this_p
  *  @author: CCHyper
  */
 InfantryTypeClassExtension::InfantryTypeClassExtension(const NoInitClass &noinit) :
-    Extension(noinit)
+    TechnoTypeClassExtension(noinit)
 {
-    IsInitialized = false;
 }
 
 
@@ -75,10 +66,26 @@ InfantryTypeClassExtension::InfantryTypeClassExtension(const NoInitClass &noinit
  */
 InfantryTypeClassExtension::~InfantryTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension destructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("InfantryTypeClassExtension destructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+}
 
-    IsInitialized = false;
+
+/**
+ *  Retrieves the class identifier (CLSID) of the object.
+ *  
+ *  @author: CCHyper
+ */
+HRESULT InfantryTypeClassExtension::GetClassID(CLSID *lpClassID)
+{
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::GetClassID - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    if (lpClassID == nullptr) {
+        return E_POINTER;
+    }
+
+    *lpClassID = __uuidof(this);
+
+    return S_OK;
 }
 
 
@@ -89,10 +96,9 @@ InfantryTypeClassExtension::~InfantryTypeClassExtension()
  */
 HRESULT InfantryTypeClassExtension::Load(IStream *pStm)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
-    HRESULT hr = Extension::Load(pStm);
+    HRESULT hr = TechnoTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
         return E_FAIL;
     }
@@ -110,10 +116,9 @@ HRESULT InfantryTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT InfantryTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
-    HRESULT hr = Extension::Save(pStm, fClearDirty);
+    HRESULT hr = TechnoTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
     }
@@ -129,8 +134,7 @@ HRESULT InfantryTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
  */
 int InfantryTypeClassExtension::Size_Of() const
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     return sizeof(*this);
 }
@@ -143,8 +147,7 @@ int InfantryTypeClassExtension::Size_Of() const
  */
 void InfantryTypeClassExtension::Detach(TARGET target, bool all)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Detach - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Detach - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -155,8 +158,7 @@ void InfantryTypeClassExtension::Detach(TARGET target, bool all)
  */
 void InfantryTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     crc(IsMechanic);
     crc(IsOmniHealer);
@@ -170,15 +172,13 @@ void InfantryTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
  */
 bool InfantryTypeClassExtension::Read_INI(CCINIClass &ini)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
-    EXT_DEBUG_WARNING("InfantryTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
-    const char *ini_name = ThisPtr->Name();
-
-    if (!ini.Is_Present(ini_name)) {
+    if (!TechnoTypeClassExtension::Read_INI(ini)) {
         return false;
     }
+
+    const char *ini_name = Name();
 
     IsMechanic = ini.Get_Bool(ini_name, "Mechanic", IsMechanic);
     IsOmniHealer = ini.Get_Bool(ini_name, "OmniHealer", IsOmniHealer);

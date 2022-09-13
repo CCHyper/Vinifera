@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OBJECTTYPEEXT_INIT.H
+ *  @file          NEWSWIZZLE_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for initialising the extended ObjectTypeClass.
+ *  @brief         Contains the hooks for implementing the new swizzle manager.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -28,4 +28,4 @@
 #pragma once
 
 
-void ObjectTypeClassExtension_Init();
+void NewSwizzle_Hooks();

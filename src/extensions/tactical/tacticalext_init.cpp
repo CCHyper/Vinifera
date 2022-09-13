@@ -29,9 +29,11 @@
 #include "tacticalext.h"
 #include "tactical.h"
 #include "fatal.h"
+#include "tibsun_globals.h"
 #include "vinifera_util.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
 #include "hooker.h"
 #include "hooker_macros.h"
 

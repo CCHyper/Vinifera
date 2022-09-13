@@ -33,6 +33,9 @@
 #include "debughandler.h"
 #include "asserthandler.h"
 
+#include "hooker.h"
+#include "hooker_macros.h"
+
 
 /**
  *  A fake class for implementing new member functions which allow
@@ -79,7 +82,7 @@ void IsometricTileTypeClassExtension_Hooks()
     /**
      *  Initialises the extended class.
      */
-    IsometricTileTypeClassExtension_Init();
+    // BROKEN IsometricTileTypeClassExtension_Init();
 
     Patch_Jump(0x004F3570, &IsometricTileTypeClassFake::_Get_Image_Data);
 }

@@ -27,27 +27,18 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
-
 
 class OptionsClass;
+class NoInitClass;
 class CCINIClass;
 
 
-class OptionsClassExtension final : public Extension<OptionsClass>
+class OptionsClassExtension
 {
     public:
         OptionsClassExtension(OptionsClass *this_ptr);
         OptionsClassExtension(const NoInitClass &noinit);
         ~OptionsClassExtension();
-
-        virtual HRESULT Load(IStream *pStm) override { return S_OK; }
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override { return S_OK; }
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override {}
-        virtual void Compute_CRC(WWCRCEngine &crc) const override {}
 
         void Load_Settings();
         void Load_Init_Settings();

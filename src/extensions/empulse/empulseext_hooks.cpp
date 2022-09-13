@@ -30,6 +30,7 @@
 #include "techno.h"
 #include "building.h"
 #include "foot.h"
+#include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -51,7 +52,7 @@ DECLARE_PATCH(_EMPulseClass_Create_Building_EMPImmune_Patch)
     GET_REGISTER_STATIC(BuildingTypeClass *, buildingtype, eax);
     static TechnoTypeClassExtension *exttype_ptr;
 
-    exttype_ptr = TechnoTypeClassExtensions.find(buildingtype);
+    exttype_ptr = Fetch_Extension<TechnoTypeClassExtension>(buildingtype);
     if (exttype_ptr) {
 
         /**
@@ -96,7 +97,7 @@ DECLARE_PATCH(_EMPulseClass_Create_Foot_EMPImmune_Patch)
     static ILocomotion *loco;
     static TechnoTypeClassExtension *exttype_ptr;
 
-    exttype_ptr = TechnoTypeClassExtensions.find(foot->Techno_Type_Class());
+    exttype_ptr = Fetch_Extension<TechnoTypeClassExtension>(foot->Techno_Type_Class());
     if (exttype_ptr) {
 
         /**

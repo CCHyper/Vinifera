@@ -36,6 +36,7 @@
 #include "playmovie.h"
 #include "cd.h"
 #include "wstring.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -190,7 +191,7 @@ static bool Play_Intro_Movie(CampaignType campaign_id)
      * 
      *  @author: CCHyper
      */
-    CampaignClassExtension *campaignext = CampaignClassExtensions.find(campaign);
+    CampaignClassExtension *campaignext = Fetch_Extension<CampaignClassExtension>(campaign);
     if (campaignext && campaignext->IntroMovie[0] != '\0') {
         std::snprintf(movie_filename, sizeof(movie_filename), "%s.VQA", campaignext->IntroMovie);
         DEBUG_INFO("About to play \"%s\".\n", movie_filename);

@@ -32,10 +32,11 @@
 #include "terrain.h"
 #include "terraintype.h"
 #include "lightsource.h"
+#include "vinifera_util.h"
+#include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
-#include "vinifera_util.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
@@ -59,8 +60,8 @@ static LightSourceClass *Terrain_New_LightSource(TerrainClass *this_ptr)
     /**
      *  Fetch the extended class instances if they exist.
      */
-    terrainext = TerrainClassExtensions.find(this_ptr);
-    terraintypeext = TerrainTypeClassExtensions.find(this_ptr->Class);
+    terrainext = Fetch_Extension<TerrainClassExtension>(this_ptr);
+    terraintypeext = Fetch_Extension<TerrainTypeClassExtension>(this_ptr->Class);
 
     /**
      *  Create the light source object at the terrain coord.
@@ -100,8 +101,8 @@ DECLARE_PATCH(_TerrainClass_Unlimbo_LightSource_Patch)
     /**
      *  Fetch the extended class instances if they exist.
      */
-    terrainext = TerrainClassExtensions.find(this_ptr);
-    terraintypeext = TerrainTypeClassExtensions.find(terraintype);
+    terrainext = Fetch_Extension<TerrainClassExtension>(this_ptr);
+    terraintypeext = Fetch_Extension<TerrainTypeClassExtension>(terraintype);
 
     if (terraintypeext && terraintypeext->IsLightEnabled && terraintypeext->LightIntensity > 0) {
 
@@ -155,7 +156,7 @@ DECLARE_PATCH(_TerrainClass_Take_Damage_LightSource_Patch)
     /**
      *  Fetch the extended class instance if it exists.
      */
-    terrainext = TerrainClassExtensions.find(this_ptr);
+    terrainext = Fetch_Extension<TerrainClassExtension>(this_ptr);
     if (terrainext && terrainext->LightSource) {
 
         /**

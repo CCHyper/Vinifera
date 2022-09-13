@@ -40,6 +40,7 @@
 #include "rules.h"
 #include "iomap.h"
 #include "voc.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -189,8 +190,8 @@ DECLARE_PATCH(_UnitClass_Draw_Shape_IdleRate_Patch)
     static int frame;
 
     unittype = this_ptr->Class;
-    technotypeext = TechnoTypeClassExtensions.find(this_ptr->Techno_Type_Class());
-    unittypeext = UnitTypeClassExtensions.find(unittype);
+    technotypeext = Fetch_Extension<TechnoTypeClassExtension>(this_ptr->Techno_Type_Class());
+    unittypeext = Fetch_Extension<UnitTypeClassExtension>(unittype);
 
     if (!Locomotion_Is_Moving(this_ptr)) {
         if (this_ptr->FiringSyncDelay >= 0) {
@@ -274,7 +275,7 @@ DECLARE_PATCH(_UnitClass_Mission_Unload_Transport_Detach_Sound_Patch)
     /**
      *  Do we have a sound to play when passengers leave us? If so, play it now.
      */
-    radio_technotypeext = TechnoTypeClassExtensions.find(this_ptr->Techno_Type_Class());
+    radio_technotypeext = Fetch_Extension<TechnoTypeClassExtension>(this_ptr->Techno_Type_Class());
     if (radio_technotypeext && radio_technotypeext->LeaveTransportSound != VOC_NONE) {
         Sound_Effect(radio_technotypeext->LeaveTransportSound, this_ptr->Coord);
     }
@@ -351,7 +352,7 @@ DECLARE_PATCH(_UnitClass_Draw_It_Unloading_Harvester_Patch)
             /**
              *  Fetch the unloading class from the extended class instance if it exists.
              */
-            technotypext = TechnoTypeClassExtensions.find(unittype);
+            technotypext = Fetch_Extension<TechnoTypeClassExtension>(unittype);
             if (technotypext) {
                 if (technotypext->UnloadingClass) {
                     if (technotypext->UnloadingClass->Kind_Of() == RTTI_UNITTYPE) {
@@ -484,7 +485,7 @@ DECLARE_PATCH(_UnitClass_Draw_Shape_Turret_Facing_Patch)
      */
     start_turret_frame = unittype->Facings * unittype->WalkFrames;
 
-    unittypeext = UnitTypeClassExtensions.find(unittype);
+    unittypeext = Fetch_Extension<UnitTypeClassExtension>(unittype);
     if (unittypeext) {
 
         /**
@@ -553,7 +554,7 @@ static void UnitClass_Shake_Screen(UnitClass *unit)
      *  Fetch the extended techno type instance if it exists.
      */
     technotype = unit->Techno_Type_Class();
-    technotypeext = TechnoTypeClassExtensions.find(technotype);
+    technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
 
     /**
      *  #issue-414

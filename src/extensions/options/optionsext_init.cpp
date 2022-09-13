@@ -27,12 +27,16 @@
  ******************************************************************************/
 #include "optionsext_hooks.h"
 #include "optionsext.h"
+#include "tibsun_globals.h"
 #include "vinifera_util.h"
 #include "options.h"
 #include "techno.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+#include "hooker.h"
+#include "hooker_macros.h"
 
 
 /**

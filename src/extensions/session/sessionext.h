@@ -27,27 +27,26 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
+#include "always.h"
+#include <objidl.h>
 
 
 class SessionClass;
-class CCINIClass;
+class NoInitClass;
+class WWCRCEngine;
 
 
-class SessionClassExtension final : public Extension<SessionClass>
+class SessionClassExtension final
 {
     public:
         SessionClassExtension(SessionClass *this_ptr);
         SessionClassExtension(const NoInitClass &noinit);
         ~SessionClassExtension();
 
-        virtual HRESULT Load(IStream *pStm) override { return S_OK; }
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override { return S_OK; }
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override {}
-        virtual void Compute_CRC(WWCRCEngine &crc) const override {}
+        HRESULT Load(IStream *pStm);
+        HRESULT Save(IStream *pStm, BOOL fClearDirty);
+        int Size_Of() const;
+        void Compute_CRC(WWCRCEngine &crc) const;
 
         void Read_MultiPlayer_Settings();
         void Write_MultiPlayer_Settings();

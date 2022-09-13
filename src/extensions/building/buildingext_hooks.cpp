@@ -47,6 +47,7 @@
 #include "voc.h"
 #include "iomap.h"
 #include "spritecollection.h"
+#include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -70,7 +71,7 @@ DECLARE_PATCH(_BuildingClass_AI_ProduceCash_Patch)
     /**
      *  Find the extension instances.
      */
-    ext_ptr = BuildingClassExtensions.find(this_ptr);
+    ext_ptr = Fetch_Extension<BuildingClassExtension>(this_ptr);
     if (ext_ptr) {
         ext_ptr->Produce_Cash_AI();
     }
@@ -106,8 +107,8 @@ DECLARE_PATCH(_BuildingClass_Captured_ProduceCash_Patch)
     /**
      *  Find the extension instances.
      */
-    ext_ptr = BuildingClassExtensions.find(this_ptr);
-    exttype_ptr = BuildingTypeClassExtensions.find(this_ptr->Class);
+    ext_ptr = Fetch_Extension<BuildingClassExtension>(this_ptr);
+    exttype_ptr = Fetch_Extension<BuildingTypeClassExtension>(this_ptr->Class);
     if (!ext_ptr || !exttype_ptr) {
         goto original_code;
     }
@@ -194,8 +195,8 @@ DECLARE_PATCH(_BuildingClass_Grand_Opening_ProduceCash_Patch)
     /**
      *  Find the extension instances.
      */
-    ext_ptr = BuildingClassExtensions.find(this_ptr);
-    exttype_ptr = BuildingTypeClassExtensions.find(this_ptr->Class);
+    ext_ptr = Fetch_Extension<BuildingClassExtension>(this_ptr);
+    exttype_ptr = Fetch_Extension<BuildingTypeClassExtension>(this_ptr->Class);
     if (!ext_ptr || !exttype_ptr) {
         goto continue_function;
     }
@@ -258,7 +259,7 @@ DECLARE_PATCH(_BuildingClass_Mission_Open_Gate_Open_Sound_Patch)
     /**
      *  Fetch the class extension if it exists.
      */
-    buildingtypeext = BuildingTypeClassExtensions.find(buildingtype);
+    buildingtypeext = Fetch_Extension<BuildingTypeClassExtension>(buildingtype);
     if (buildingtypeext) {
 
         /**
@@ -295,7 +296,7 @@ DECLARE_PATCH(_BuildingClass_Mission_Open_Gate_Close_Sound_Patch)
     /**
      *  Fetch the class extension if it exists.
      */
-    buildingtypeext = BuildingTypeClassExtensions.find(buildingtype);
+    buildingtypeext = Fetch_Extension<BuildingTypeClassExtension>(buildingtype);
     if (buildingtypeext) {
 
         /**
@@ -335,7 +336,7 @@ static void BuildingClass_Shake_Screen(BuildingClass *building)
      *  Fetch the extended techno type instance if it exists.
      */
     technotype = building->Techno_Type_Class();
-    technotypeext = TechnoTypeClassExtensions.find(technotype);
+    technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
 
     /**
      *  #issue-414
@@ -446,7 +447,7 @@ DECLARE_PATCH(_BuildingClass_Draw_Spied_Cameo_Palette_Patch)
      * 
      *  @author: CCHyper
      */
-    technotypeext = TechnoTypeClassExtensions.find(technotype);
+    technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
     if (technotypeext->CameoImageSurface) {
 
         /**

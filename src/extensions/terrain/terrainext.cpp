@@ -34,26 +34,15 @@
 
 
 /**
- *  Provides the map for all TerrainClass extension instances.
- */
-ExtensionMap<TerrainClass, TerrainClassExtension> TerrainClassExtensions;
-
-
-/**
  *  Class constructor.
  *  
  *  @author: CCHyper
  */
-TerrainClassExtension::TerrainClassExtension(TerrainClass *this_ptr) :
-    Extension(this_ptr),
-
+TerrainClassExtension::TerrainClassExtension(const TerrainClass *this_ptr) :
+    ObjectClassExtension(this_ptr),
     LightSource(nullptr)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("TerrainClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("TerrainClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
-
-    IsInitialized = true;
+    //EXT_DEBUG_TRACE("TerrainClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -63,9 +52,8 @@ TerrainClassExtension::TerrainClassExtension(TerrainClass *this_ptr) :
  *  @author: CCHyper
  */
 TerrainClassExtension::TerrainClassExtension(const NoInitClass &noinit) :
-    Extension(noinit)
+    ObjectClassExtension(noinit)
 {
-    IsInitialized = false;
 }
 
 
@@ -76,16 +64,32 @@ TerrainClassExtension::TerrainClassExtension(const NoInitClass &noinit) :
  */
 TerrainClassExtension::~TerrainClassExtension()
 {
-    //EXT_DEBUG_TRACE("TerrainClassExtension destructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
-    //EXT_DEBUG_WARNING("TerrainClassExtension destructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("TerrainClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     if (LightSource) {
         LightSource->Disable();
         delete LightSource;
         LightSource = nullptr;
     }
+}
 
-    IsInitialized = false;
+
+/**
+ *  Retrieves the class identifier (CLSID) of the object.
+ *  
+ *  @author: CCHyper
+ */
+HRESULT TerrainClassExtension::GetClassID(CLSID *lpClassID)
+{
+    //EXT_DEBUG_TRACE("TerrainClassExtension::GetClassID - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    if (lpClassID == nullptr) {
+        return E_POINTER;
+    }
+
+    *lpClassID = __uuidof(this);
+
+    return S_OK;
 }
 
 
@@ -96,10 +100,9 @@ TerrainClassExtension::~TerrainClassExtension()
  */
 HRESULT TerrainClassExtension::Load(IStream *pStm)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("TerrainClassExtension::Size_Of - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("TerrainClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
-    HRESULT hr = Extension::Load(pStm);
+    HRESULT hr = ObjectClassExtension::Load(pStm);
     if (FAILED(hr)) {
         return E_FAIL;
     }
@@ -119,10 +122,9 @@ HRESULT TerrainClassExtension::Load(IStream *pStm)
  */
 HRESULT TerrainClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("TerrainClassExtension::Size_Of - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("TerrainClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
-    HRESULT hr = Extension::Save(pStm, fClearDirty);
+    HRESULT hr = ObjectClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
     }
@@ -138,8 +140,7 @@ HRESULT TerrainClassExtension::Save(IStream *pStm, BOOL fClearDirty)
  */
 int TerrainClassExtension::Size_Of() const
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("TerrainClassExtension::Size_Of - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("TerrainClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     return sizeof(*this);
 }
@@ -152,8 +153,7 @@ int TerrainClassExtension::Size_Of() const
  */
 void TerrainClassExtension::Detach(TARGET target, bool all)
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("TerrainClassExtension::Detach - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("TerrainClassExtension::Detach - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -164,6 +164,5 @@ void TerrainClassExtension::Detach(TARGET target, bool all)
  */
 void TerrainClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
-    ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("TerrainClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("TerrainClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }

@@ -27,28 +27,26 @@
  ******************************************************************************/
 #pragma once
 
-#include "extension.h"
-#include "container.h"
-
-#include "noinit.h"
+#include "always.h"
+#include <objidl.h>
 
 
 class ScenarioClass;
+class NoInitClass;
+class WWCRCEngine;
 
 
-class ScenarioClassExtension final : public Extension<ScenarioClass>
+class ScenarioClassExtension final
 {
     public:
         ScenarioClassExtension(ScenarioClass *this_ptr);
         ScenarioClassExtension(const NoInitClass &noinit);
         ~ScenarioClassExtension();
 
-        virtual HRESULT Load(IStream *pStm) override;
-        virtual HRESULT Save(IStream *pStm, BOOL fClearDirty) override;
-        virtual int Size_Of() const override;
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+        HRESULT Load(IStream *pStm);
+        HRESULT Save(IStream *pStm, BOOL fClearDirty);
+        int Size_Of() const;
+        void Compute_CRC(WWCRCEngine &crc) const;
 
         void Init_Clear();
 

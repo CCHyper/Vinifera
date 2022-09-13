@@ -39,6 +39,9 @@
 #include "debughandler.h"
 #include "asserthandler.h"
 
+#include "hooker.h"
+#include "hooker_macros.h"
+
 
 /**
  *  A fake class for implementing new member functions which allow
@@ -84,6 +87,7 @@ bool ThemeClassFake::_Is_Allowed(ThemeType index) const
         return false;
     }
 
+#if 0
     /**
      *  #issue-764
      * 
@@ -97,6 +101,7 @@ bool ThemeClassFake::_Is_Allowed(ThemeType index) const
             return false;
         }
     }
+#endif
 
     /**
      *  If the theme is not allowed to be played by the player's house, then don't allow
