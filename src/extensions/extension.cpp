@@ -182,22 +182,6 @@ static void Clear_Extension_Pointer(const AbstractClass *abstract)
 
 
 /**
- *  Request_Extension_Pointer_Remap
- * 
- *  @author: CCHyper
- */
-//static void Request_Extension_Pointer_Remap(const AbstractClass *abstract)
-//{
-//    if (!Get_Extension_Pointer(abstract)) {
-//        DEV_DEBUG_ERROR("Extension pointer was null!\n");
-//        return;
-//    }
-//
-//    SWIZZLE_REQUEST_POINTER_REMAP(  (*(uintptr_t *)((char *)abstract + 0x10))  );
-//}
-
-
-/**
  *  Supports_Extension_For
  * 
  *  @author: CCHyper
@@ -444,7 +428,6 @@ static bool Extension_Load(IStream *pStm, DynamicVectorClass<EXT_CLASS *> &list)
 }
 
 
-#if 0
 /**
  *  x
  * 
@@ -474,7 +457,6 @@ static void Extension_Register_Ext_Pointers(const DynamicVectorClass<BASE_CLASS 
         }
     }
 }
-#endif
 
 
 /**
@@ -1073,12 +1055,12 @@ bool Load_Extensions(IStream *pStm)
     /**
      *  x
      */
-    //DEBUG_INFO("Annoucing extension pointers for remapping...\n");
+    DEBUG_INFO("Registering extension pointers for remapping...\n");
 
-    // AbstractClassExtension::Internal_Load does the annoucing now...
+    // NOTE AbstractClassExtension::Internal_Load does the annoucing now...
     Extension_Register_Ext_Pointers<AircraftClass, AircraftClassExtension>(Aircrafts);
     Extension_Register_Ext_Pointers<AircraftTypeClass, AircraftTypeClassExtension>(AircraftTypes);
-    Extension_Register_Ext_Pointers<AnimClass, AnimClassExtension>(Anims);
+    //Extension_Register_Ext_Pointers<AnimClass, AnimClassExtension>(Anims);
     Extension_Register_Ext_Pointers<AnimTypeClass, AnimTypeClassExtension>(AnimTypes);
     Extension_Register_Ext_Pointers<BuildingClass, BuildingClassExtension>(Buildings);
     Extension_Register_Ext_Pointers<BuildingTypeClass, BuildingTypeClassExtension>(BuildingTypes);
@@ -1089,7 +1071,7 @@ bool Load_Extensions(IStream *pStm)
     Extension_Register_Ext_Pointers<HouseTypeClass, HouseTypeClassExtension>(HouseTypes);
     Extension_Register_Ext_Pointers<InfantryClass, InfantryClassExtension>(Infantry);
     Extension_Register_Ext_Pointers<InfantryTypeClass, InfantryTypeClassExtension>(InfantryTypes);
-    Extension_Register_Ext_Pointers<IsometricTileTypeClass, IsometricTileTypeClassExtension>(IsoTileTypes);
+    //Extension_Register_Ext_Pointers<IsometricTileTypeClass, IsometricTileTypeClassExtension>(IsoTileTypes);
     Extension_Register_Ext_Pointers<OverlayTypeClass, OverlayTypeClassExtension>(OverlayTypes);
     Extension_Register_Ext_Pointers<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(ParticleSystemTypes);
     Extension_Register_Ext_Pointers<ParticleTypeClass, ParticleTypeClassExtension>(ParticleTypes);
@@ -1105,6 +1087,7 @@ bool Load_Extensions(IStream *pStm)
     Extension_Register_Ext_Pointers<WarheadTypeClass, WarheadTypeClassExtension>(WarheadTypes);
     Extension_Register_Ext_Pointers<WaveClass, WaveClassExtension>(Waves);
     Extension_Register_Ext_Pointers<WeaponTypeClass, WeaponTypeClassExtension>(WeaponTypes);
+#endif
 
     /**
      *  Request pointer remap on all extension pointers.
@@ -1113,7 +1096,7 @@ bool Load_Extensions(IStream *pStm)
 
     Extension_Request_Pointer_Remap<AircraftClass, AircraftClassExtension>(Aircrafts);
     Extension_Request_Pointer_Remap<AircraftTypeClass, AircraftTypeClassExtension>(AircraftTypes);
-    Extension_Request_Pointer_Remap<AnimClass, AnimClassExtension>(Anims);
+    //Extension_Request_Pointer_Remap<AnimClass, AnimClassExtension>(Anims);
     Extension_Request_Pointer_Remap<AnimTypeClass, AnimTypeClassExtension>(AnimTypes);
     Extension_Request_Pointer_Remap<BuildingClass, BuildingClassExtension>(Buildings);
     Extension_Request_Pointer_Remap<BuildingTypeClass, BuildingTypeClassExtension>(BuildingTypes);
@@ -1124,7 +1107,7 @@ bool Load_Extensions(IStream *pStm)
     Extension_Request_Pointer_Remap<HouseTypeClass, HouseTypeClassExtension>(HouseTypes);
     Extension_Request_Pointer_Remap<InfantryClass, InfantryClassExtension>(Infantry);
     Extension_Request_Pointer_Remap<InfantryTypeClass, InfantryTypeClassExtension>(InfantryTypes);
-    Extension_Request_Pointer_Remap<IsometricTileTypeClass, IsometricTileTypeClassExtension>(IsoTileTypes);
+    //Extension_Request_Pointer_Remap<IsometricTileTypeClass, IsometricTileTypeClassExtension>(IsoTileTypes);
     Extension_Request_Pointer_Remap<OverlayTypeClass, OverlayTypeClassExtension>(OverlayTypes);
     Extension_Request_Pointer_Remap<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(ParticleSystemTypes);
     Extension_Request_Pointer_Remap<ParticleTypeClass, ParticleTypeClassExtension>(ParticleTypes);
@@ -1140,194 +1123,11 @@ bool Load_Extensions(IStream *pStm)
     Extension_Request_Pointer_Remap<WarheadTypeClass, WarheadTypeClassExtension>(WarheadTypes);
     Extension_Request_Pointer_Remap<WaveClass, WaveClassExtension>(Waves);
     Extension_Request_Pointer_Remap<WeaponTypeClass, WeaponTypeClassExtension>(WeaponTypes);
-#endif
 
     DEBUG_INFO("Load_Extensions(exit)\n");
 
     return true;
 }
-
-
-#if 0
-/**
- *  x
- * 
- *  @author: CCHyper
- */
-HRESULT AbstractClassExtension_Load(AbstractClass *abstract, IStream *pStm)
-{
-    if (!pStm) {
-        return E_POINTER;
-    }
-
-    /**
-     *  Check that we support extensions for this class.
-     */
-    if (!Supports_Extension_For(abstract)) {
-        DEV_DEBUG_INFO("AbstractClassExt_Load: No extension support for %s.\n", Get_Abstract_Name(abstract));
-        return S_OK;
-    }
-
-    /**
-     *  x
-     */
-    uintptr_t extension_id = 0x00000000;
-    HRESULT hr = pStm->Read(&extension_id, sizeof(extension_id), nullptr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-    
-    /**
-     *  x
-     */
-    AbstractClassExtension *ext_ptr = reinterpret_cast<AbstractClassExtension *>(extension_id);
-    //if (Is_Valid_Extension_Pointer(ext_ptr)) {
-    //    return E_FAIL;
-    //}
-    
-    /**
-     *  Request the extension pointer is remap on Swizzle process.
-     */
-    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ext_ptr);
-    //DEV_DEBUG_INFO("AbstractClassExt_Load: %s -> 0x%08X.\n", Get_Abstract_Name(abstract), (uintptr_t)ext_ptr);
-
-    return hr;
-}
-#endif
-
-
-#if 0
-/**
- *  x
- * 
- *  @author: CCHyper
- */
-HRESULT AbstractClassExtension_Save(AbstractClass *abstract, IStream *pStm, BOOL fClearDirty)
-{
-    if (!pStm) {
-        return E_POINTER;
-    }
-    
-    /**
-     *  Check that we support extensions for this class.
-     */
-    if (!Supports_Extension_For(abstract)) {
-
-        /**
-         *  To be safe, clear the extension pointer in the abstract class.
-         */
-        //Clear_Extension_Pointer(abstract);
-
-        //DEV_DEBUG_INFO("AbstractClassExt_Save: No extension support for %s.\n", Get_Abstract_Name(abstract));
-
-        return S_OK;
-    }
-
-    LONG extension_id = 0x00000000;
-    HRESULT hr = pStm->Write(&extension_id, sizeof(extension_id), nullptr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-
-    //DEV_DEBUG_INFO("AbstractClassExt_Save: %s -> 0x%08X.\n", Get_Abstract_Name(abstract), Get_Extension_Pointer(abstract));
-
-    return hr;
-}
-#endif
-
-
-#if 0
-/**
- *  x
- * 
- *  @author: CCHyper
- */
-bool Swizzle_Request_Extension_Pointer_Remap()
-{
-    DEBUG_INFO("Swizzle_Request_Extension_Pointer_Remap(enter)\n");
-
-    Extension_Request_Pointer_Remap<AircraftClass, AircraftClassExtension>(Aircrafts);
-    Extension_Request_Pointer_Remap<AircraftTypeClass, AircraftTypeClassExtension>(AircraftTypes);
-    Extension_Request_Pointer_Remap<AnimClass, AnimClassExtension>(Anims);
-    Extension_Request_Pointer_Remap<AnimTypeClass, AnimTypeClassExtension>(AnimTypes);
-    Extension_Request_Pointer_Remap<BuildingClass, BuildingClassExtension>(Buildings);
-    Extension_Request_Pointer_Remap<BuildingTypeClass, BuildingTypeClassExtension>(BuildingTypes);
-    Extension_Request_Pointer_Remap<BulletTypeClass, BulletTypeClassExtension>(BulletTypes);
-    Extension_Request_Pointer_Remap<CampaignClass, CampaignClassExtension>(Campaigns);
-    Extension_Request_Pointer_Remap<SideClass, SideClassExtension>(Sides);
-    Extension_Request_Pointer_Remap<HouseClass, HouseClassExtension>(Houses);
-    Extension_Request_Pointer_Remap<HouseTypeClass, HouseTypeClassExtension>(HouseTypes);
-    Extension_Request_Pointer_Remap<InfantryClass, InfantryClassExtension>(Infantry);
-    Extension_Request_Pointer_Remap<InfantryTypeClass, InfantryTypeClassExtension>(InfantryTypes);
-    Extension_Request_Pointer_Remap<IsometricTileTypeClass, IsometricTileTypeClassExtension>(IsoTileTypes);
-    Extension_Request_Pointer_Remap<OverlayTypeClass, OverlayTypeClassExtension>(OverlayTypes);
-    Extension_Request_Pointer_Remap<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(ParticleSystemTypes);
-    Extension_Request_Pointer_Remap<ParticleTypeClass, ParticleTypeClassExtension>(ParticleTypes);
-    Extension_Request_Pointer_Remap<SmudgeTypeClass, SmudgeTypeClassExtension>(SmudgeTypes);
-    Extension_Request_Pointer_Remap<SuperClass, SuperClassExtension>(Supers);
-    Extension_Request_Pointer_Remap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(SuperWeaponTypes);
-    Extension_Request_Pointer_Remap<TerrainClass, TerrainClassExtension>(Terrains);
-    Extension_Request_Pointer_Remap<TerrainTypeClass, TerrainTypeClassExtension>(TerrainTypes);
-    Extension_Request_Pointer_Remap<TiberiumClass, TiberiumClassExtension>(Tiberiums);
-    Extension_Request_Pointer_Remap<UnitClass, UnitClassExtension>(Units);
-    Extension_Request_Pointer_Remap<UnitTypeClass, UnitTypeClassExtension>(UnitTypes);
-    Extension_Request_Pointer_Remap<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(VoxelAnimTypes);
-    Extension_Request_Pointer_Remap<WarheadTypeClass, WarheadTypeClassExtension>(WarheadTypes);
-    Extension_Request_Pointer_Remap<WaveClass, WaveClassExtension>(Waves);
-    Extension_Request_Pointer_Remap<WeaponTypeClass, WeaponTypeClassExtension>(WeaponTypes);
-
-    DEBUG_INFO("Swizzle_Request_Extension_Pointer_Remap(exit)\n");
-
-    return true;
-}
-#endif
-
-
-#if 0
-/**
- *  x
- * 
- *  @author: CCHyper
- */
-bool Swizzle_Annouce_Extension_Pointers_To()
-{
-    DEBUG_INFO("Swizzle_Annouce_Extension_Pointers_To(enter)\n");
-
-    Extension_Register_Ext_Pointers<AircraftClass, AircraftClassExtension>(Aircrafts);
-    Extension_Register_Ext_Pointers<AircraftTypeClass, AircraftTypeClassExtension>(AircraftTypes);
-    Extension_Register_Ext_Pointers<AnimClass, AnimClassExtension>(Anims);
-    Extension_Register_Ext_Pointers<AnimTypeClass, AnimTypeClassExtension>(AnimTypes);
-    Extension_Register_Ext_Pointers<BuildingClass, BuildingClassExtension>(Buildings);
-    Extension_Register_Ext_Pointers<BuildingTypeClass, BuildingTypeClassExtension>(BuildingTypes);
-    Extension_Register_Ext_Pointers<BulletTypeClass, BulletTypeClassExtension>(BulletTypes);
-    Extension_Register_Ext_Pointers<CampaignClass, CampaignClassExtension>(Campaigns);
-    Extension_Register_Ext_Pointers<SideClass, SideClassExtension>(Sides);
-    Extension_Register_Ext_Pointers<HouseClass, HouseClassExtension>(Houses);
-    Extension_Register_Ext_Pointers<HouseTypeClass, HouseTypeClassExtension>(HouseTypes);
-    Extension_Register_Ext_Pointers<InfantryClass, InfantryClassExtension>(Infantry);
-    Extension_Register_Ext_Pointers<InfantryTypeClass, InfantryTypeClassExtension>(InfantryTypes);
-    Extension_Register_Ext_Pointers<IsometricTileTypeClass, IsometricTileTypeClassExtension>(IsoTileTypes);
-    Extension_Register_Ext_Pointers<OverlayTypeClass, OverlayTypeClassExtension>(OverlayTypes);
-    Extension_Register_Ext_Pointers<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(ParticleSystemTypes);
-    Extension_Register_Ext_Pointers<ParticleTypeClass, ParticleTypeClassExtension>(ParticleTypes);
-    Extension_Register_Ext_Pointers<SmudgeTypeClass, SmudgeTypeClassExtension>(SmudgeTypes);
-    Extension_Register_Ext_Pointers<SuperClass, SuperClassExtension>(Supers);
-    Extension_Register_Ext_Pointers<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(SuperWeaponTypes);
-    Extension_Register_Ext_Pointers<TerrainClass, TerrainClassExtension>(Terrains);
-    Extension_Register_Ext_Pointers<TerrainTypeClass, TerrainTypeClassExtension>(TerrainTypes);
-    Extension_Register_Ext_Pointers<TiberiumClass, TiberiumClassExtension>(Tiberiums);
-    Extension_Register_Ext_Pointers<UnitClass, UnitClassExtension>(Units);
-    Extension_Register_Ext_Pointers<UnitTypeClass, UnitTypeClassExtension>(UnitTypes);
-    Extension_Register_Ext_Pointers<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(VoxelAnimTypes);
-    Extension_Register_Ext_Pointers<WarheadTypeClass, WarheadTypeClassExtension>(WarheadTypes);
-    Extension_Register_Ext_Pointers<WaveClass, WaveClassExtension>(Waves);
-    Extension_Register_Ext_Pointers<WeaponTypeClass, WeaponTypeClassExtension>(WeaponTypes);
-
-    DEBUG_INFO("Swizzle_Annouce_Extension_Pointers_To(exit)\n");
-
-    return true;
-}
-#endif
 
 
 /**

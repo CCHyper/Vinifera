@@ -43,7 +43,7 @@
  *  Uncomment this to enable the debug printing in debug builds.
  */
 #ifndef NDEBUG
-//#define SWIZZLE_DEBUG_PRINT 1
+#define SWIZZLE_DEBUG_PRINT 1
 #endif
 
 
@@ -57,7 +57,7 @@
  *  For printing out swizzle debug info.
  */
 #ifndef NDEBUG
-#define SWIZZLE_DEBUG_INFO(x, ...) DEBUG_DBG_OUTPUT(x, ##__VA_ARGS__)
+#define SWIZZLE_DEBUG_INFO(x, ...) DEV_DEBUG_INFO(x, ##__VA_ARGS__)
 #define SWIZZLE_DEBUG_WARNING(x, ...) DEV_DEBUG_WARNING(x, ##__VA_ARGS__)
 #define SWIZZLE_DEBUG_ERROR(x, ...) DEV_DEBUG_ERROR(x, ##__VA_ARGS__)
 #define SWIZZLE_DEBUG_FATAL(x, ...) DEV_DEBUG_FATAL(x, ##__VA_ARGS__)
@@ -311,10 +311,10 @@ ViniferaSwizzleManagerClass::ViniferaSwizzleManagerClass() :
  * 
  *  @author: CCHyper
  */
- ViniferaSwizzleManagerClass::~ViniferaSwizzleManagerClass()
- {
-     Process_Tables();
- }
+ViniferaSwizzleManagerClass::~ViniferaSwizzleManagerClass()
+{
+    Process_Tables();
+}
 
 
 /**
@@ -355,8 +355,9 @@ void ViniferaSwizzleManagerClass::Process_Tables()
         int pointer_count = PointerTable.Count();
 
 #ifdef SWIZZLE_DEBUG_PRINT
-        SWIZZLE_DEBUG_INFO("SwizzleManager::Process_Tables() - RequestTable.Count %d.\n", request_count);
-        SWIZZLE_DEBUG_INFO("SwizzleManager::Process_Tables() - PointerTable.Count %d.\n", pointer_count);
+        SWIZZLE_DEBUG_INFO("SwizzleManager::Process_Tables(enter)\n");
+        SWIZZLE_DEBUG_INFO("  RequestTable.Count %d.\n", request_count);
+        SWIZZLE_DEBUG_INFO("  PointerTable.Count %d.\n", pointer_count);
 #endif
 
         while (request_count > 0) {
@@ -365,7 +366,7 @@ void ViniferaSwizzleManagerClass::Process_Tables()
             int ptr_id = PointerTable[pointer_index].ID;
             
 #ifdef SWIZZLE_DEBUG_PRINT
-            SWIZZLE_DEBUG_INFO("SwizzleManager::Process_Tables() - Processing request \"%s\" from %s.\n", RequestTable[request_index].Variable, RequestTable[request_index].Function);
+            //SWIZZLE_DEBUG_INFO("SwizzleManager::Process_Tables() - Processing request \"%s\" from %s.\n", RequestTable[request_index].Variable, RequestTable[request_index].Function);
 #endif
 
             if (pre_search_id == ptr_id) {
@@ -465,6 +466,10 @@ void ViniferaSwizzleManagerClass::Process_Tables()
          */
         RequestTable.Clear();
         PointerTable.Clear();
+
+#ifdef SWIZZLE_DEBUG_PRINT
+        SWIZZLE_DEBUG_INFO("SwizzleManager::Process_Tables(exit)\n");
+#endif
     }
 
 }
@@ -518,17 +523,7 @@ LONG STDAPICALLTYPE ViniferaSwizzleManagerClass::Fetch_Swizzle_ID_Dbg(void *poin
     *id = reinterpret_cast<uintptr_t>(pointer);
 
 #ifdef SWIZZLE_DEBUG_PRINT
-    SWIZZLE_DEBUG_INFO("SwizzleManager::Fetch_Swizzle_ID() - ID: 0x%08X.\n", *id);
-    SWIZZLE_DEBUG_INFO("SwizzleManager::Fetch_Swizzle_ID() - File: %s.\n", file);
-    if (line != -1) {
-        SWIZZLE_DEBUG_INFO("SwizzleManager::Fetch_Swizzle_ID() - Line: %d.\n", line);
-    }
-    if (func) {
-        SWIZZLE_DEBUG_INFO("SwizzleManager::Fetch_Swizzle_ID() - Func: %s.\n", func);
-    }
-    if (var) {
-        SWIZZLE_DEBUG_INFO("SwizzleManager::Fetch_Swizzle_ID() - Var: %s.\n", var);
-    }
+    SWIZZLE_DEBUG_INFO("SwizzleManager::Fetch_Swizzle_ID() - ID: 0x%08X File: %s Func: %s Var: %s.\n", *id, file, func, var);
 #endif
 
     return S_OK;
@@ -549,7 +544,7 @@ LONG STDAPICALLTYPE ViniferaSwizzleManagerClass::Here_I_Am_Dbg(LONG id, void *po
     ASSERT(added);
 
 #ifdef SWIZZLE_DEBUG_PRINT
-    SWIZZLE_DEBUG_INFO("SwizzleManager::Here_I_Am() - PointerTable.Count = %d.\n", PointerTable.Count());
+    //SWIZZLE_DEBUG_INFO("SwizzleManager::Here_I_Am() - PointerTable.Count = %d.\n", PointerTable.Count());
     SWIZZLE_DEBUG_INFO("SwizzleManager::Here_I_Am() - Informed swizzler of \"%s\" (0x%08X) in %s.\n", var, id, func);
 #endif
 

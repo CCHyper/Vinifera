@@ -58,8 +58,8 @@ void Vinifera_Swizzle_Here_I_Am(LONG id, void *pointer, const char *file, const 
 /**
  *  Wrappers for the new swizzle manager for providing debug information.
  */
-#define VINIFERA_SWIZZLE_RESET(func)                                      Vinifera_Swizzle_Reset(__FILE__, __LINE__, __FUNCTION__ "()");
-#define VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(pointer, variable)         Vinifera_Swizzle_Request_Pointer_Remap((void **)&pointer, __FILE__, __LINE__, __FUNCTION__ "()", variable);
-#define VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP_VECTOR(vector, variable)   Vinifera_Swizzle_Request_Pointer_Remap_Vector(vector, __FILE__, __LINE__, __FUNCTION__ "()", variable);
-#define VINIFERA_SWIZZLE_FETCH_SWIZZLE_ID(pointer, id, variable)          Vinifera_Swizzle_Fetch_Swizzle_ID((void *)pointer, &id, __FILE__, __LINE__, __FUNCTION__ "()", variable);
-#define VINIFERA_SWIZZLE_REGISTER_POINTER(id, pointer, variable)          Vinifera_Swizzle_Here_I_Am(id, (void *)pointer, __FILE__, __LINE__, __FUNCTION__ "()", variable);
+#define VINIFERA_SWIZZLE_RESET(func)                                      Vinifera_Swizzle_Reset(__FILE__, __LINE__, __FUNCTION__);
+#define VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(pointer, variable)         Vinifera_Swizzle_Request_Pointer_Remap((void **)&pointer, __FILE__, __LINE__, __FUNCTION__, variable);
+#define VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP_VECTOR(vector, variable)   Vinifera_Swizzle_Request_Pointer_Remap_Vector(vector, __FILE__, __LINE__, __FUNCTION__, variable);
+#define VINIFERA_SWIZZLE_FETCH_SWIZZLE_ID(pointer, id, variable)          Vinifera_Swizzle_Fetch_Swizzle_ID((void *)pointer, &id, __FILE__, __LINE__, __FUNCTION__, variable);
+#define VINIFERA_SWIZZLE_REGISTER_POINTER(id, pointer, variable)          Vinifera_Swizzle_Here_I_Am(id, (void *)pointer, __FILE__, __LINE__, __FUNCTION__, variable);

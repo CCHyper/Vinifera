@@ -143,7 +143,7 @@ static void Add_Swizzle_Database_Entry(uint32_t retaddr, char *function,  char *
 static void Build_Swizzle_Address_Database()
 {
     // Here_I_Am
-    Add_Swizzle_Database_Entry(0x00405D4C, STRINGIZE(AbstractClass::Abstract_Load()), "this", "Abstract.cpp");
+    Add_Swizzle_Database_Entry(0x00405D4C, STRINGIZE(AbstractClass::Internal_Load()), "this", "Abstract.cpp");
     Add_Swizzle_Database_Entry(0x004CE38C, STRINGIZE(HouseTypeClass::Load()), "this", "HouseType.cpp");
     Add_Swizzle_Database_Entry(0x0050662C, STRINGIZE(LocomotionClass::Load()), "this", "Locomotion.cpp");
     Add_Swizzle_Database_Entry(0x0061F433, STRINGIZE(TagTypeClass::Read_Scenario_INI()), "tagtypeptr", "TagType.cpp");
