@@ -47,6 +47,15 @@
 #include "supertypeext.h"
 #include "rules.h"
 #include "rulesext.h"
+#include "drivelocomotion.h"
+#include "flylocomotion.h"
+#include "jumpjetlocomotion.h"
+#include "levitatelocomotion.h"
+#include "teleportlocomotion.h"
+#include "tunnellocomotion.h"
+#include "walklocomotion.h"
+#include "mechlocomotion.h"
+#include "hoverlocomotion.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -336,6 +345,305 @@ bool TacticalMapExtension::Debug_Draw_Facings()
 
     screen.Y += 10;
     Simple_Text_Print(buffer2, TempSurface, &TacticalRect, &screen, ColorScheme::As_Pointer("White"), style);
+
+    return true;
+}
+
+
+static const char * Get_Locomotor_Name(CLSID &clsid)
+{
+    if (clsid == __uuidof(DriveLocomotionClass)) {
+        return "Drive";
+    } else if (clsid == __uuidof(FlyLocomotionClass)) {
+        return "Sly";
+    } else if (clsid == __uuidof(JumpjetLocomotionClass)) {
+        return "Jumpjet";
+    } else if (clsid == __uuidof(LevitateLocomotionClass)) {
+        return "Levitate";
+    } else if (clsid == __uuidof(TunnelLocomotionClass)) {
+        return "Tunnel";
+    } else if (clsid == __uuidof(WalkLocomotionClass)) {
+        return "Walk";
+    } else if (clsid == __uuidof(MechLocomotionClass)) {
+        return "Mech";
+    } else {
+        return "<unknown>";
+    }
+}
+
+/**
+ *  Draws the information on the current objects locomotor.
+ * 
+ *  @author: CCHyper
+ */
+bool TacticalMapExtension::Debug_Draw_Locomotor()
+{
+    ASSERT(ThisPtr != nullptr);
+
+    if (CurrentObjects.Count() != 1) {
+        return false;
+    }
+
+    ObjectClass *object = CurrentObjects.Fetch_Head();
+    if (!object->Is_Foot()) {
+        return false;
+    }
+
+    char buffer[64];
+
+    ColorScheme *color_white = ColorScheme::As_Pointer("White");
+    ColorScheme *color_ltblue = ColorScheme::As_Pointer("LightBlue");
+    ColorType backcolor = COLOR_BLACK;
+
+    Point3D lept = object->Class_Of()->Lepton_Dimensions();
+    Point3D lept_center = Point3D(lept.X/2, lept.Y/2, lept.Z/2);
+
+    Point3D pix = object->Class_Of()->Pixel_Dimensions();
+    Point3D pixel_center = Point3D(pix.X/2, pix.Y/2, pix.Z/2);
+
+    Coordinate coord = object->Center_Coord();
+
+    Point2D screen = TacticalMap->func_60F150(coord);
+
+    screen.X -= TacticalMap->field_5C.X;
+    screen.Y -= TacticalMap->field_5C.Y;
+
+    screen.X += TacticalRect.X;
+    screen.Y += TacticalRect.Y;
+
+    TempSurface->Fill_Rect(TacticalRect, Rect(screen.X, screen.Y, 2, 2), DSurface::RGB_To_Pixel(0,255,0));
+
+    TextPrintType style = TPF_CENTER|TPF_FULLSHADOW|TPF_6POINT;
+    WWFontClass *font = Font_Ptr(style);
+
+    screen.Y -= font->Get_Char_Height()/2;
+
+    // Query the locomotor
+    // This would have been inlined within WWComPtr perhaps? there should not be access to _com_issue_error outside of com_ptr.
+    IPersistPtr loco(reinterpret_cast<FootClass *>(object)->Locomotion);
+    CLSID clsid;
+    loco->GetClassID(&clsid);
+
+    if (clsid == __uuidof(DriveLocomotionClass)) {
+
+        Fancy_Text_Print("Drive", TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        // There must be a cleaner way of doing this?
+        DriveLocomotionClass * driveloco = reinterpret_cast<DriveLocomotionClass *>(loco.GetInterfacePtr());
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%d", driveloco->CurrentRamp);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%d", driveloco->PreviousRamp);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", driveloco->RampTransitionTimer.Percent_Expired());
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", driveloco->field_50);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        if (driveloco->Is_Piggybacking()) {
+
+            CLSID piggy_clsid;
+            driveloco->Piggyback_CLSID(&piggy_clsid);
+
+            //OLECHAR *clsid_str = new OLECHAR [64];
+            //StringFromCLSID(piggy_clsid, &clsid_str);
+            //
+            //screen.Y += 10;
+            //std::snprintf(buffer, sizeof(buffer), "%ls", clsid_str);
+            //Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+            
+            screen.Y += 10;
+            std::snprintf(buffer, sizeof(buffer), "Piggybacking -> %s", Get_Locomotor_Name(piggy_clsid));
+            Fancy_Text_Print(Get_Locomotor_Name(piggy_clsid), TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+            //delete [] clsid_str;
+        }
+
+    } else if (clsid == __uuidof(FlyLocomotionClass)) {
+
+        Fancy_Text_Print("Fly", TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        FlyLocomotionClass * flyloco = reinterpret_cast<FlyLocomotionClass *>(loco.GetInterfacePtr());
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%s", flyloco->field_4B ? "TRUE" : "FALSE");
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%d", flyloco->field_4C);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%d", flyloco->field_50);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+    } else if (clsid == __uuidof(JumpjetLocomotionClass)) {
+
+        Fancy_Text_Print("Jumpjet", TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        JumpjetLocomotionClass * jjloco = reinterpret_cast<JumpjetLocomotionClass *>(loco.GetInterfacePtr());
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%d", jjloco->CurrentState);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", jjloco->CurrentSpeed);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", jjloco->TargetSpeed);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%d", jjloco->FlightLevel);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", jjloco->CurrentWobble);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%s", jjloco->IsLanding ? "TRUE" : "FALSE");
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+    } else if (clsid == __uuidof(LevitateLocomotionClass)) {
+
+        Fancy_Text_Print("Levitate", TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        LevitateLocomotionClass * levitateloco = reinterpret_cast<LevitateLocomotionClass *>(loco.GetInterfacePtr());
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%d", levitateloco->field_14);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", levitateloco->field_18);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", levitateloco->field_20);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", levitateloco->field_28);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", levitateloco->field_30);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", levitateloco->field_38);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%d", levitateloco->field_40);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%d", levitateloco->field_44);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", levitateloco->field_48);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", levitateloco->field_50);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", levitateloco->field_58);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+    } else if (clsid == __uuidof(TunnelLocomotionClass)) {
+
+        Fancy_Text_Print("Tunnel", TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        TunnelLocomotionClass * tunnelloco = reinterpret_cast<TunnelLocomotionClass *>(loco.GetInterfacePtr());
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%d", tunnelloco->CurrentState);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+        
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", tunnelloco->DigTimer.Percent_Expired());
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+    } else if (clsid == __uuidof(WalkLocomotionClass)) {
+
+        Fancy_Text_Print("Walk", TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        WalkLocomotionClass * walkloco = reinterpret_cast<WalkLocomotionClass *>(loco.GetInterfacePtr());
+
+        if (walkloco->Is_Piggybacking()) {
+
+            CLSID piggy_clsid;
+            walkloco->Piggyback_CLSID(&piggy_clsid);
+
+            //OLECHAR *clsid_str = new OLECHAR [64];
+            //StringFromCLSID(piggy_clsid, &clsid_str);
+            //
+            //screen.Y += 10;
+            //std::snprintf(buffer, sizeof(buffer), "%ls", clsid_str);
+            //Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+            
+            screen.Y += 10;
+            std::snprintf(buffer, sizeof(buffer), "Piggybacking -> %s", Get_Locomotor_Name(piggy_clsid));
+            Fancy_Text_Print(Get_Locomotor_Name(piggy_clsid), TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+            //delete [] clsid_str;
+        }
+
+    } else if (clsid == __uuidof(MechLocomotionClass)) {
+
+        Fancy_Text_Print("Mech", TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        MechLocomotionClass * mechloco = reinterpret_cast<MechLocomotionClass *>(loco.GetInterfacePtr());
+
+    } else if (clsid == __uuidof(HoverLocomotionClass)) {
+
+        Fancy_Text_Print("Hover", TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        HoverLocomotionClass * hoverloco = reinterpret_cast<HoverLocomotionClass *>(loco.GetInterfacePtr());
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", hoverloco->field_48);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", hoverloco->field_50);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", hoverloco->field_58);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%f", hoverloco->field_60);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%s", hoverloco->field_68 ? "TRUE" : "FALSE");
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%d", hoverloco->field_6C);
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+        screen.Y += 10;
+        std::snprintf(buffer, sizeof(buffer), "%s", hoverloco->field_70 ? "TRUE" : "FALSE");
+        Fancy_Text_Print(buffer, TempSurface, &TacticalRect, &screen, color_white, backcolor, style);
+
+    }
 
     return true;
 }

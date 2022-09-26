@@ -74,6 +74,7 @@ class TacticalMapExtension final : public Extension<Tactical>
 
 #ifndef NDEBUG
         bool Debug_Draw_Facings();
+        bool Debug_Draw_Locomotor();
 #endif
 
     private:
