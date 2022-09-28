@@ -26,6 +26,7 @@
  *
  ******************************************************************************/
 #include "scenarioext.h"
+#include "ccini.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -49,6 +50,15 @@ ScenarioClassExtension::ScenarioClassExtension(ScenarioClass *this_ptr) :
      *  This copies the behavior of the games ScenarioClass.
      */
     Init_Clear();
+
+    RankingParTime[DIFF_EASY] = TIMER_MINUTE;
+    RankingParTime[DIFF_NORMAL] = TIMER_MINUTE;
+    RankingParTime[DIFF_HARD] = TIMER_MINUTE;
+
+    RankingUnderParTitle[0] = '\0';
+    RankingUnderParMessage[0] = '\0';
+    RankingOverParTitle[0] = '\0';
+    RankingOverParMessage[0] = '\0';
 
     IsInitialized = true;
 }
@@ -191,4 +201,62 @@ void ScenarioClassExtension::Init_Clear()
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("ScenarioClassExtension::Init - 0x%08X\n", (uintptr_t)(ThisPtr));
 
+}
+
+
+/**
+ *  x
+ *  
+ *  @author: CCHyper
+ */
+void ScenarioClassExtension::Reset_Ranking_Values()
+{
+    RankingParTime[DIFF_EASY] = TIMER_MINUTE;
+    RankingParTime[DIFF_NORMAL] = TIMER_MINUTE;
+    RankingParTime[DIFF_HARD] = TIMER_MINUTE;
+
+    RankingUnderParTitle[0] = '\0';
+    RankingUnderParMessage[0] = '\0';
+    RankingOverParTitle[0] = '\0';
+    RankingOverParMessage[0] = '\0';
+}
+
+
+/**
+ *  Read the scenario data from the INI file.
+ *  
+ *  @author: CCHyper
+ */
+bool ScenarioClassExtension::Read_INI(CCINIClass &ini)
+{
+    RankingParTime[DIFF_EASY] = ini.Get_Time("Ranking", "ParTimeEasy", RankingParTime[DIFF_EASY]);
+    RankingParTime[DIFF_NORMAL] = ini.Get_Time("Ranking", "ParTimeMedium", RankingParTime[DIFF_NORMAL]);
+    RankingParTime[DIFF_HARD] = ini.Get_Time("Ranking", "ParTimeHard", RankingParTime[DIFF_HARD]);
+
+    ini.Get_String("Ranking", "UnderParTitle", "NOTE: Missing under par title.", RankingUnderParTitle, sizeof(RankingUnderParTitle)-1);
+    ini.Get_String("Ranking", "UnderParMessage", "NOTE: Missing under par message.", RankingUnderParMessage, sizeof(RankingUnderParMessage)-1);
+    ini.Get_String("Ranking", "OverParTitle", "NOTE: Missing over par title.", RankingOverParTitle, sizeof(RankingOverParTitle)-1);
+    ini.Get_String("Ranking", "OverParMessage", "NOTE: Missing over par message.", RankingOverParMessage, sizeof(RankingOverParMessage)-1);
+
+    return true;
+}
+
+
+/**
+ *  Write the scenario data to the INI file.
+ *  
+ *  @author: CCHyper
+ */
+bool ScenarioClassExtension::Write_INI(CCINIClass &ini)
+{
+    ini.Put_Time("Ranking", "ParTimeEasy", RankingParTime[DIFF_EASY]);
+    ini.Put_Time("Ranking", "ParTimeMedium", RankingParTime[DIFF_NORMAL]);
+    ini.Put_Time("Ranking", "ParTimeHard", RankingParTime[DIFF_HARD]);
+
+    ini.Put_String("Ranking", "UnderParTitle", RankingUnderParTitle);
+    ini.Put_String("Ranking", "UnderParMessage", RankingUnderParMessage);
+    ini.Put_String("Ranking", "OverParTitle", RankingOverParTitle);
+    ini.Put_String("Ranking", "OverParMessage", RankingOverParMessage);
+
+    return true;
 }

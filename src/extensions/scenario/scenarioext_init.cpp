@@ -29,6 +29,7 @@
 #include "scenarioext.h"
 #include "scenario.h"
 #include "tibsun_globals.h"
+#include "tibsun_functions.h"
 #include "vinifera_util.h"
 #include "fatal.h"
 #include "debughandler.h"
@@ -236,6 +237,81 @@ original_code:
 
 
 /**
+ *  x
+ * 
+ *  @warning: Do not touch this unless you know what you are doing!
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_ScenarioClass_Read_INI_Patch)
+{
+    GET_REGISTER_STATIC(ScenarioClass *, this_ptr, esi);
+    GET_REGISTER_STATIC(CCINIClass *, ini, edi);
+    
+    /**
+     *  Stolen code here.
+     */
+    Call_Back();
+
+    /**
+     *  Find the extension instance.
+     */
+    if (!ScenarioExtension) {
+        goto original_code;
+    }
+
+    /**
+     *  Read the extension class ini data.
+     */
+    ScenarioExtension->Read_INI(*ini);
+
+    /**
+     *  Stolen bytes here.
+     */
+original_code:
+    JMP_REG(edi, 0x005E0941);
+}
+
+
+/**
+ *  x
+ * 
+ *  @warning: Do not touch this unless you know what you are doing!
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_ScenarioClass_Write_INI_Patch)
+{
+    GET_REGISTER_STATIC(ScenarioClass *, this_ptr, ebx);
+    GET_REGISTER_STATIC(CCINIClass *, ini, esi);
+
+    /**
+     *  Find the extension instance.
+     */
+    if (!ScenarioExtension) {
+        goto original_code;
+    }
+    
+    /**
+     *  Write the extension class ini data.
+     */
+    ScenarioExtension->Write_INI(*ini);
+
+    /**
+     *  Stolen bytes here.
+     */
+original_code:
+    _asm { mov al, 1 }
+    _asm { pop edi }
+    _asm { pop esi }
+    _asm { pop ebx }
+    _asm { mov esp, ebp }
+    _asm { pop ebp }
+    _asm { retn 8 }
+}
+
+
+/**
  *  Main function for patching the hooks.
  */
 void ScenarioClassExtension_Init()
@@ -245,4 +321,6 @@ void ScenarioClassExtension_Init()
     Patch_Jump(0x006023CC, &_ScenarioClass_Destructor_Patch); // Inlined in game shutdown.
     Patch_Jump(0x005DB166, &_ScenarioClass_Init_Clear_Patch);
     Patch_Jump(0x005E1440, &_ScenarioClass_Compute_CRC_Patch);
+    Patch_Jump(0x005E093C, &_ScenarioClass_Read_INI_Patch);
+    Patch_Jump(0x005E101A, &_ScenarioClass_Write_INI_Patch);
 }

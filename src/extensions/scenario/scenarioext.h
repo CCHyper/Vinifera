@@ -29,11 +29,11 @@
 
 #include "extension.h"
 #include "container.h"
-
 #include "noinit.h"
 
 
 class ScenarioClass;
+class CCINIClass;
 
 
 class ScenarioClassExtension final : public Extension<ScenarioClass>
@@ -51,9 +51,41 @@ class ScenarioClassExtension final : public Extension<ScenarioClass>
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
         void Init_Clear();
+        void Reset_Ranking_Values();
+
+        bool Read_INI(CCINIClass &ini);
+        bool Write_INI(CCINIClass &ini);
 
     public:
+        /**
+         *  These specify the 'par' times (raw H, M, S), against which the player
+         *  is measured on respective skill level setting.
+         */
+        unsigned RankingParTime[DIFF_COUNT];
 
+        /**
+         *  The title that the player is awarded if they finish the mission better
+         *  than the par time for their chosen skill level. 
+         */
+        char RankingOverParTitle[64];
+
+        /**
+         *  The message that the player is given if they finish the mission better
+         *  than the par time for their chosen skill level. 
+         */
+        char RankingOverParMessage[64];
+
+        /**
+         *  The title that the player is awarded if they finish the mission worse
+         *  than the par time for their chosen skill level. 
+         */
+        char RankingUnderParTitle[64];
+
+        /**
+         *  The message that the player is given if they finish the mission worse
+         *  than the par time for their chosen skill level. 
+         */
+        char RankingUnderParMessage[64];
 };
 
 
