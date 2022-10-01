@@ -39,6 +39,38 @@
 #define STRINGIZE_JOIN(str1, str2) STRINGIZE_HELPER(str1 ## str2)
 #endif // STRINGIZE
 
+// Macros for easily disallowing implict constructors and copy operators.
+#if __cplusplus >= 201103L
+
+    // A macro to disallow the copy constructor and operator= functions
+    // This should be used in the private: declarations for a class.
+    #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
+        TypeName(const TypeName&) = delete; \
+        void operator=(const TypeName&) = delete
+
+
+    // A macro to disallow all the implicit constructors, namely the
+    // default constructor, copy constructor and operator= functions.
+    //
+    // This should be used in the private: declarations for a class
+    // that wants to prevent anyone from instantiating it. This is
+    // especially useful for classes containing only static methods.
+    #define DISALLOW_IMPLICIT_CONSTRUCTORS(TypeName) \
+        TypeName() = delete; \
+        DISALLOW_COPY_AND_ASSIGN(TypeName)
+
+#else
+
+    #define DISALLOW_COPY_AND_ASSIGN(TypeName) \
+        TypeName(const TypeName&); \
+        void operator=(const TypeName&)
+
+    #define DISALLOW_IMPLICIT_CONSTRUCTORS(TypeName) \
+        TypeName(); \
+        DISALLOW_COPY_AND_ASSIGN(TypeName)
+
+#endif
+
 // Define some C++ keywords when standard is less than C++11, mainly for watcom support
 #if __cplusplus <= 199711L && (!defined _MSC_VER || _MSC_VER < 1600)
 #define nullptr NULL

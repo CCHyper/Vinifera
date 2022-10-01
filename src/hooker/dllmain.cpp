@@ -33,6 +33,7 @@
 #include "hooker.h"
 #include "setup_hooks.h"
 
+#include "crashpadhandler.h"
 #include "miscutil.h"
 #include "vinifera_util.h"
 
@@ -41,6 +42,9 @@
  *  DLL module instance for fetching resources from ourself.
  */
 HMODULE DLLInstance = nullptr;
+
+
+static bool IsAttached = false;
 
 
 /**
@@ -66,6 +70,13 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved
         case DLL_PROCESS_ATTACH:
         {
             /**
+             *  Gate to stop additional attachments.
+             */
+            if (IsAttached) {
+                return TRUE;
+            }
+        
+            /**
              *  Give the user time to attach the debugger if one is not already present.
              */
 #if !defined(NDEBUG) && defined(TS_CLIENT)
@@ -88,6 +99,17 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved
 
             OutputDebugString(VINIFERA_DLL " attached to " VINIFERA_TARGET_EXE ".\n");
 
+#ifdef CRASHPAD_ENABLED
+            /**
+             *  Install and setup the Crashpad handler.
+             */
+            IsCrashpadEnabled = Crashpad_Setup();
+            //if (!IsCrashpadEnabled) {
+            //    OutputDebugString("Failed to setup crash handler!\n\n");
+            //    return FALSE;
+            //}
+#endif
+
             OutputDebugString("About to call StartHooking()...\n\n");
 
             if (!StartHooking()) {
@@ -109,6 +131,8 @@ BOOL WINAPI DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved
             OutputDebugString("\n\nSetup_Hooks() done!\n\n");
 
             DLLInstance = hModule;
+
+            IsAttached = true;
 
             return TRUE;
         }

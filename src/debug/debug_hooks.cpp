@@ -564,12 +564,20 @@ static void Assert_Handler_Hooks()
  */
 static LONG __stdcall _Top_Level_Exception_Filter(EXCEPTION_POINTERS *e_info)
 {
+#ifdef CRASHPAD_ENABLED
     return Vinifera_Exception_Handler(e_info->ExceptionRecord->ExceptionCode, e_info);
+#else
+    return Crashpad::Handler(e_info->ExceptionRecord->ExceptionCode, e_info);
+#endif
 }
 
-static void __cdecl _Structured_Exception_Translator(unsigned int code, EXCEPTION_POINTERS *e_info)
+static void __cdecl _Structured_Exception_Translator(unsigned int e_code, EXCEPTION_POINTERS *e_info)
 {
-    Vinifera_Exception_Handler(code, e_info);
+#ifdef CRASHPAD_ENABLED
+    Vinifera_Exception_Handler(e_code, e_info);
+#else
+    Crashpad::Handler(e_code, e_info);
+#endif
 }
 
 

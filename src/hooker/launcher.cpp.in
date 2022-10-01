@@ -88,6 +88,11 @@ char *DLLName = "@PROJECT_DLL@";
 char *PDBName = "@PROJECT_NAME@.pdb";
 char *EXEPDBName = "@TARGET_PDB@";
 
+/**
+ *  The name of the exception crash handler.
+ */
+char *CrashHandlerName = "@CRASH_HANDLER_EXE@";
+
 
 static STARTUPINFOA StartupInfo = {0};
 static PROCESS_INFORMATION ProcessInformation;
@@ -277,7 +282,7 @@ bool Inject_Loader(const char *path, const char *dllname, char *args)
             }
 			
 #ifndef NDEBUG
-            if (IsDebuggerPresent()) {
+            if (!IsDebuggerPresent()) {
 				/**
 				 *  Give the user time to attach the debugger if one is not already present.
 				 */
@@ -402,6 +407,23 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	if (tok != nullptr) {
 		DLLName = (char *)(tok+5); // Fetch the custom DLL name.
 	}
+	
+#ifdef CRASHPAD_ENABLED
+	/**
+	 *  Check the Crashhandler exists before we attempt injection (required for correct exception handling).
+	 */
+    if (!File_Exists(CrashHandlerName)) {
+		char buff[1024];
+		std::snprintf(buff, sizeof(buff),
+            "Unable to find %s !\n\n"
+            "Please check you have the correct version of " PROJECT_NAME " installed\n"
+			"or reinstall the latest version.\n",
+			CrashHandlerName
+		);
+		MessageBoxA(NULL, buff, "Error!", MB_OK|MB_ICONEXCLAMATION);
+        return EXIT_FAILURE;
+    }
+#endif
 	
 	/**
 	 *  Check the target binary exists before we attempt injection.

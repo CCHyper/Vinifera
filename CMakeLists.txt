@@ -153,6 +153,8 @@ endif()
 
 option(OPTION_CHECK_TARGET_BINARIES "This option controls if the launcher should check target binaries before injection." ON)
 
+option(OPTION_BUILD_WITH_CRASHPAD "Enable the use of the Crashpad library for crash handling and reporting." ON)
+
 
 ################################################################################
 # Some general Windows definitions to keep the MSVC compiler happy with our code.
@@ -233,6 +235,7 @@ set(TARGET_EXE "GAME.EXE") # Define the EXE to launch.
 set(TARGET_PDB "GAME.PDB") # Define the PDB for the target.
 set(TARGET_EDB "GAME.EDB") # Define the EDB (exception database) for the target.
 set(TARGET_NAME "Tiberian Sun")
+set(CRASH_HANDLER_EXE "${PROJECT_NAME}CrashHandler.exe")
 
 # Standard TS203EN 'GAME.EXE'.
 set(TARGET_SIZE 3457296)
@@ -300,6 +303,32 @@ FetchContent_GetProperties(TSpp)
 if(NOT tspp_POPULATED)
 	FetchContent_Populate(TSpp)
 	add_subdirectory(${tspp_SOURCE_DIR} ${tspp_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+
+################################################################################
+# Fetch Crashpad library if enabled.
+################################################################################
+if(OPTION_BUILD_WITH_CRASHPAD)
+    include(FetchContent)
+    FetchContent_Declare(
+        crashpad
+        GIT_REPOSITORY https://github.com/Vinifera-Developers/vinifera-crashpad-cmake.git
+    )
+
+    # We don't use FetchContent_MakeAvailable here because we don't want all crashpad targets including, just our dependencies.
+    FetchContent_GetProperties(crashpad)
+    if(NOT crashpad_POPULATED)
+		message(STATUS "Fetching Crashpad...")
+        FetchContent_Populate(crashpad)
+		message(STATUS "  Source: ${crashpad_SOURCE_DIR}")
+		message(STATUS "  Build: ${crashpad_BINARY_DIR}")
+        add_subdirectory(${crashpad_SOURCE_DIR} ${crashpad_BINARY_DIR} EXCLUDE_FROM_ALL)
+	else()
+		message(STATUS "Found Crashpad.")
+	endif()
+	
+	set_target_properties(crashpad_handler PROPERTIES OUTPUT_NAME ViniferaCrashHandler)
 endif()
 
 
@@ -374,6 +403,16 @@ if(NOT ${OPTION_CUSTOM_DEBUGGER_DIRECTORY_PATH} STREQUAL " ")
 	set_target_properties(${LAUNCHER_NAME} PROPERTIES
 			VS_DEBUGGER_WORKING_DIRECTORY "${OPTION_CUSTOM_DEBUGGER_DIRECTORY_PATH}")
 #		message(STATUS "Custom VS_DEBUGGER_WORKING_DIRECTORY set to '${OPTION_CUSTOM_DEBUGGER_DIRECTORY_PATH}'")
+endif()
+
+# Use the Crashpad library if enabled.
+if(OPTION_BUILD_WITH_CRASHPAD)
+target_compile_definitions(${LAUNCHER_NAME} PUBLIC CRASHPAD_ENABLED=1)
+endif()
+
+# Enable any TS Client specific code within the launcher.
+if(OPTION_TS_CLIENT_BUILD)
+target_compile_definitions(${LAUNCHER_NAME} PUBLIC TS_CLIENT=1)
 endif()
 
 # Create post build script to copy the DLL to the custom debugger directory.
@@ -489,6 +528,14 @@ if(NOT ${OPTION_CUSTOM_DEBUGGER_DIRECTORY_PATH} STREQUAL " ")
 		${COPY_DESTINATION_PATH}
 		"${TARGET_EDB}"
 	)
+
+	# Create the post build script.
+	include(WindowsCopyFiles)
+	PostBuild_WindowsCopyFiles(${PROJECT_NAME}
+		${COPY_SOURCE_FILE_PATH}
+		${COPY_DESTINATION_PATH}
+		"${CRASH_HANDLER_EXE}"
+	)
 endif()
 
 
@@ -523,6 +570,12 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC "$<$<CONFIG:RelWithDebInfo>:PR
 message(STATUS "Build: Preview")
 else()
 message(STATUS "Build: Unofficial")
+endif()
+
+
+# Use the Crashpad library if enabled.
+if(OPTION_BUILD_WITH_CRASHPAD)
+target_compile_definitions(${PROJECT_NAME} PUBLIC CRASHPAD_ENABLED=1)
 endif()
 
 
@@ -609,6 +662,13 @@ add_dependencies(${PROJECT_NAME} TSpp)
 
 # Ensure the launcher is built with the main project.
 add_dependencies(${PROJECT_NAME} Launch${PROJECT_NAME})
+
+# Ensure the Crashpad handler is built with the main project.
+if(OPTION_BUILD_WITH_CRASHPAD)
+add_dependencies(${PROJECT_NAME} crashpad_handler) # The crashpad external binary.
+add_dependencies(${PROJECT_NAME} crashpad_client) # The DLL's client interface.
+target_link_libraries(${PROJECT_NAME} crashpad_client)
+endif()
 
 set(REQUIRED_LIBRARIES ws2_32 dbghelp shlwapi version comctl32)
 
