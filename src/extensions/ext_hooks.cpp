@@ -79,6 +79,7 @@
 //#include "scripttypeext_hooks.h"
 //#include "tagtypeext_hooks.h"
 //#include "triggertypeext_hooks.h"
+#include "teamtypeext_hooks.h"
 
 #include "technoext_hooks.h"
 #include "footext_hooks.h"
@@ -188,6 +189,7 @@ void Extension_Hooks()
         //ScriptTypeClassExtension_Hooks();
         //TagTypeClassExtension_Hooks();
         //TriggerTypeClassExtension_Hooks();
+        TeamTypeClassExtension_Hooks();
 
         TechnoClassExtension_Hooks();
         UnitClassExtension_Hooks();
