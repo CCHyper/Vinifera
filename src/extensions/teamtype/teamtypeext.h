@@ -51,7 +51,18 @@ class TeamTypeClassExtension final : public Extension<TeamTypeClass>
 
         bool Read_INI(CCINIClass &ini);
 
+        Cell Get_Transport_Origin() const;
+
     public:
+        /**
+         *  x
+         */
+        bool IsUseTransportOrigin;
+
+        /**
+         *  x
+         */
+        int TransportOrigin;
 };
 
 

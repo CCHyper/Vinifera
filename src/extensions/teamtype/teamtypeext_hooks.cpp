@@ -34,6 +34,21 @@
 #include "asserthandler.h"
 
 
+DECLARE_PATCH(_Do_Reinforcements_UseTransportOrigin_Patch)
+{
+    GET_REGISTER_STATIC(TeamTypeClass *, teamtype, esi); // "this" pointer.
+    static TeamTypeClassExtension *teamtypeext;
+
+    teamtypeext = TeamTypeClassExtensions.find(teamtype);
+
+    if (teamtypeext && !teamtypeext->IsUseTransportOrigin) {
+        goto x;
+    }
+
+    JMP();
+}
+
+
 /**
  *  Main function for patching the hooks.
  */
@@ -43,4 +58,6 @@ void TeamTypeClassExtension_Hooks()
      *  Initialises the extended class.
      */
     TeamTypeClassExtension_Init();
+
+    Patch_Jump(0x, &_Do_Reinforcements_UseTransportOrigin_Patch);
 }

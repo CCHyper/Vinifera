@@ -28,6 +28,9 @@
 #include "teamtypeext.h"
 #include "teamtype.h"
 #include "ccini.h"
+#include "tibsun_globals.h"
+#include "waypoint.h"
+#include "scenario.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -44,7 +47,9 @@ ExtensionMap<TeamTypeClass, TeamTypeClassExtension> TeamTypeClassExtensions;
  *  @author: CCHyper
  */
 TeamTypeClassExtension::TeamTypeClassExtension(TeamTypeClass *this_ptr) :
-    Extension(this_ptr)
+    Extension(this_ptr),
+    IsUseTransportOrigin(false),
+    TransportOrigin(-1)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TeamTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -155,6 +160,9 @@ void TeamTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("TeamTypeClassExtension::Compute_CRC - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    crc(IsUseTransportOrigin);
+    crc(TransportOrigin);
 }
 
 
@@ -169,11 +177,40 @@ bool TeamTypeClassExtension::Read_INI(CCINIClass &ini)
     //EXT_DEBUG_TRACE("TeamTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
     EXT_DEBUG_WARNING("TeamTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
+    char buffer[256];
+
     const char *ini_name = ThisPtr->Name();
 
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
 
+    ini.Get_Bool(ini_name, "UseTransportOrigin", IsUseTransportOrigin);
+
+    if (ini.Get_String(ini_name, "TransportWaypoint", Waypoint_As_String(TransportOrigin), buffer, sizeof(buffer)) > 0 ) {
+        TransportOrigin = Waypoint_From_String(buffer);
+    }
+
     return true;
+}
+
+
+/**
+ *  x 
+ *  
+ *  @author: CCHyper
+ */
+Cell TeamTypeClassExtension::Get_Transport_Origin() const
+{
+    ASSERT(ThisPtr != nullptr);
+    //EXT_DEBUG_TRACE("TeamTypeClassExtension::Get_Transport_Origin - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+    EXT_DEBUG_WARNING("TeamTypeClassExtension::Get_Transport_Origin - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
+
+    Cell origin(0,0);
+
+    if (TransportOrigin != -1) {
+        origin = Scen->Get_Waypoint_Location(TransportOrigin);
+    }
+
+    return origin;
 }
