@@ -79,6 +79,7 @@
 //#include "scripttypeext_hooks.h"
 //#include "tagtypeext_hooks.h"
 //#include "triggertypeext_hooks.h"
+#include "tactionext_hooks.h"
 
 #include "technoext_hooks.h"
 #include "footext_hooks.h"
@@ -90,7 +91,6 @@
 #include "cellext_hooks.h"
 #include "houseext_hooks.h"
 #include "teamext_hooks.h"
-#include "tactionext_hooks.h"
 #include "factoryext_hooks.h"
 #include "animext_hooks.h"
 #include "bulletext_hooks.h"
@@ -188,6 +188,7 @@ void Extension_Hooks()
         //ScriptTypeClassExtension_Hooks();
         //TagTypeClassExtension_Hooks();
         //TriggerTypeClassExtension_Hooks();
+        TActionClassExtension_Hooks();
 
         TechnoClassExtension_Hooks();
         UnitClassExtension_Hooks();
@@ -197,7 +198,6 @@ void Extension_Hooks()
         CellClassExtension_Hooks();
         HouseClassExtension_Hooks();
         TeamClassExtension_Hooks();
-        TActionClassExtension_Hooks();
         FactoryClassExtension_Hooks();
         TechnoClassExtension_Hooks();
         FootClassExtension_Hooks();
