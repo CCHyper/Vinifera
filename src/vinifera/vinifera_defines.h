@@ -44,14 +44,14 @@
 
 
 /**
- *  Extension of the TActionType enum.
+ *  Extension of the ScriptMissionType enum.
  */
-typedef enum ExtTActionType
+typedef enum ExtScriptMissionType
 {
-    EXT_TACTION_PAD = TACTION_TALK_BUBBLE, // The last TActionType
+    EXT_SMISSION_PAD = SMISSION_TALK_BUBBLE, // The last ScriptMissionType
 
     /**
-     *  Add new ExtTActionType's from here, do not reorder these!
+     *  Add new ExtScriptMissionType's from here, do not reorder these!
      */
 
 
@@ -59,5 +59,5 @@ typedef enum ExtTActionType
     /**
      *  The new total ExtTActionType count.
      */
-    EXT_TACTION_COUNT
+    EXT_SMISSION_COUNT
 } ExtTActionType;
