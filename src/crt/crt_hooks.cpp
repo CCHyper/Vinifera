@@ -36,6 +36,15 @@
 
 
 /**
+ *  Redirect atexit() to use use the DLL's instance of std::atexit.
+ */
+static int __cdecl vinifera_atexit(void (__cdecl *Func)(void))
+{
+    return std::atexit(Func);
+}
+
+
+/**
  *  Redirect msize() to use HeapSize as we now control all memory allocations.
  */
 static unsigned int __cdecl vinifera_msize(void *ptr)
@@ -104,6 +113,7 @@ void CRT_Hooks()
      *  They call __onexit, so we need to patch this.
      */
     Hook_Function(0x006B80AA, &vinifera_msize);
+    Hook_Function(0x006B4E5C, &vinifera_atexit);
 
     /**
      *  Standard functions.
