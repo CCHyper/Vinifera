@@ -184,7 +184,8 @@ void BuildingClassExtension::Produce_Cash_AI()
 {
     //EXT_DEBUG_TRACE("BuildingClassExtension::Produce_Cash_AI - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
-    const BuildingTypeClass *buildingtype = reinterpret_cast<const BuildingTypeClass *>(This()->Class_Of());
+    const BuildingClass *this_building = reinterpret_cast<const BuildingClass *>(ThisPtr);
+    const BuildingTypeClass *buildingtype = reinterpret_cast<const BuildingTypeClass *>(this_building->Class_Of());
 
     /**
      *  Fetch the extension instance.

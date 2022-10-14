@@ -118,7 +118,7 @@ class AbstractClassExtension : public IPersistStream
          */
         virtual const char *Full_Name() const = 0;
 
-    private:
+    //private:
         /**
          *  Pointer to the class we are extending. This provides us with a way of
          *  quickly referencing the base class without doing a look-up each time.
