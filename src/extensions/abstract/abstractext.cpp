@@ -187,12 +187,12 @@ HRESULT AbstractClassExtension::Internal_Load(IStream *pStm)
     /**
      *  Read this classes binary blob data directly into this instance.
      */
-    hr = pStm->Read(this, Size_Of(), nullptr);
+    hr = pStm->Read(this, sizeof(this), nullptr);
     if (FAILED(hr)) {
         return hr;
     }
 
-    DEV_DEBUG_INFO("Read Size_Of = %d.\n", Size_Of());
+    DEV_DEBUG_INFO("Read Size_Of = %d.\n", sizeof(this));
     
     VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ThisPtr, "ThisPtr");
 
