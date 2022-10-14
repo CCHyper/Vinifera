@@ -598,7 +598,7 @@ void Vinifera_Printf(DebugType type, const char *file, const char *function, int
             std::snprintf(tmpbuff, sizeof(tmpbuff), AICLI_STRONG_WHITE "%s", tracebuff);
             Output_To_Console(tmpbuff);
 
-            Debug_Console_Wait_For_Input();
+            //Debug_Console_Wait_For_Input();
 
             break;
         }

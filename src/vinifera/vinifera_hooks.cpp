@@ -631,33 +631,26 @@ retry_dialog:
         {
 #if !defined(RELEASE) && defined(NDEBUG)
             /**
-             *  We disable loading in non-release builds or if extensions are disabled.
+             *  We disable loading in non-release.
              */
-            if (!Vinifera_ClassExtensionsDisabled) {
-                Vinifera_Do_WWMessageBox("Saving and Loading is disabled for non-release builds.", Text_String(TXT_OK));
+            Vinifera_Do_WWMessageBox("Saving and Loading is disabled for non-release builds.", Text_String(TXT_OK));
+#else
+            /**
+             *  If no save games are available, notify the user and return back
+             *  and reissue the main dialog.
+             */
+            if (!_Save_Games_Available()) {
+                Vinifera_Do_WWMessageBox("No saved games available.", Text_String(TXT_OK));
+                goto retry_dialog;
+            }
 
-            } else {
-#endif
-
-                /**
-                 *  If no save games are available, notify the user and return back
-                 *  and reissue the main dialog.
-                 */
-                if (!_Save_Games_Available()) {
-                    Vinifera_Do_WWMessageBox("No saved games available.", Text_String(TXT_OK));
-                    goto retry_dialog;
-                }
-
-                /**
-                 *  Show the load game dialog.
-                 */
-                ret = _Do_Load_Dialog();
-                if (ret) {
-                    Theme.Stop();
-                    JMP(0x005DCE48);
-                }
-
-#if !defined(RELEASE) && defined(NDEBUG)
+            /**
+             *  Show the load game dialog.
+             */
+            ret = _Do_Load_Dialog();
+            if (ret) {
+                Theme.Stop();
+                JMP(0x005DCE48);
             }
 #endif
 
@@ -779,16 +772,16 @@ void Vinifera_Hooks()
     Patch_Jump(0x0060DBFF, &_SwizzleManagerClass_Process_Tables_Remap_Failed_Error);
 
     /**
-     *  Enable and hook the new save and load system only if extensions are disabled.
+     *  Enable and hook the new save and load system for class extensions.
      */
-    if (Vinifera_ClassExtensionsDisabled) {
-        Patch_Jump(0x005D68F7, &_Put_All_Vinifera_Data);
-        Patch_Jump(0x005D78ED, &_Load_All_Vinifera_Data);
+    Patch_Jump(0x005D68F7, &_Put_All_Vinifera_Data);
+    Patch_Jump(0x005D78ED, &_Load_All_Vinifera_Data);
 
-        Patch_Jump(0x004B6D96, &_SaveLoad_Disable_Buttons);
-        Patch_Jump(0x0057FF8B, &_NewMenuClass_Process_Disable_Load_Button_Firestorm);
-        Patch_Jump(0x0058004D, &_NewMenuClass_Process_Disable_Load_Button_TiberianSun);
-    }
+#if 0
+    Patch_Jump(0x004B6D96, &_SaveLoad_Disable_Buttons);
+    Patch_Jump(0x0057FF8B, &_NewMenuClass_Process_Disable_Load_Button_Firestorm);
+    Patch_Jump(0x0058004D, &_NewMenuClass_Process_Disable_Load_Button_TiberianSun);
+#endif
 
     Patch_Jump(0x005DCDFD, &_Do_Lose_Create_Lose_WWMessageBox);
 

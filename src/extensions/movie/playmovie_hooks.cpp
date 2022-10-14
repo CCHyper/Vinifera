@@ -188,6 +188,7 @@ static bool Play_Intro_Movie(CampaignType campaign_id)
     bool is_original_gdi = (cd_num == DISK_GDI && (Wstring(campaign->IniName) == "GDI1" || Wstring(campaign->IniName) == "GDI1A") && Wstring(campaign->Scenario) == "GDI1A.MAP");
     bool is_original_nod = (cd_num == DISK_NOD && (Wstring(campaign->IniName) == "NOD1" || Wstring(campaign->IniName) == "NOD1A") && Wstring(campaign->Scenario) == "NOD1A.MAP");
     
+#if 0
     /**
      *  #issue-762
      * 
@@ -237,6 +238,7 @@ static bool Play_Intro_Movie(CampaignType campaign_id)
     } else {
         DEBUG_WARNING("No campaign intro movie defined.\n");
     }
+#endif
 
     return true;
 }
