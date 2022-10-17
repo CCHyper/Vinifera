@@ -192,7 +192,7 @@ HRESULT AbstractClassExtension::Internal_Load(IStream *pStm)
         return hr;
     }
 
-    DEV_DEBUG_INFO("Read Size_Of = %d.\n", sizeof(this));
+    DEV_DEBUG_INFO("Read Size_Of = %d.\n", sizeof(*this));
     
     VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ThisPtr, "ThisPtr");
 

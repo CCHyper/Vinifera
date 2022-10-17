@@ -497,7 +497,7 @@ static void Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
              *  
              */
             uintptr_t **ext_ptr_addr = ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(object);
-            VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ext_ptr_addr, "AbstractClass::ExtPtr");
+            VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(*ext_ptr_addr, "AbstractClass::ExtPtr");
 
             DEV_DEBUG_INFO("  Requested remap of %s's extension pointer.\n", Get_Abstract_Name(object));
         }
