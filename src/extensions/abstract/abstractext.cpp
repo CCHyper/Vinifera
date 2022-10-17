@@ -187,7 +187,7 @@ HRESULT AbstractClassExtension::Internal_Load(IStream *pStm)
     /**
      *  Read this classes binary blob data directly into this instance.
      */
-    hr = pStm->Read(this, sizeof(this), nullptr);
+    hr = pStm->Read(this, Size_Of(), nullptr);
     if (FAILED(hr)) {
         return hr;
     }

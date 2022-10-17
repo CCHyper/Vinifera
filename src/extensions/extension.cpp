@@ -139,7 +139,12 @@ static DynamicVectorClass<WeaponTypeClassExtension *> WeaponTypeExtensions;
 /**
  *  x
  */
-#define ABSTRACT_POINTER_MACRO(ptr)    (*(uintptr_t *)((char *)ptr + 0x10))
+#define ABSTRACT_EXTENSION_POINTER_CAST_MACRO(ptr)    (*(uintptr_t *)(((unsigned char *)ptr) + 0x10))
+
+/**
+ *  x
+ */
+#define ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(ptr)    (uintptr_t **)(((unsigned char *)ptr) + 0x10);
 
 
 /**
@@ -152,7 +157,7 @@ static void Set_Extension_Pointer(const AbstractClass *abstract, const AbstractC
     ASSERT(abstract != nullptr);
     ASSERT(abstract_extension != nullptr);
 
-    ABSTRACT_POINTER_MACRO(abstract) = (uintptr_t)abstract_extension;
+    ABSTRACT_EXTENSION_POINTER_CAST_MACRO(abstract) = (uintptr_t)abstract_extension;
 }
 
 
@@ -163,7 +168,7 @@ static void Set_Extension_Pointer(const AbstractClass *abstract, const AbstractC
  */
 static AbstractClassExtension *Get_Extension_Pointer(const AbstractClass *abstract)
 {
-    uintptr_t abstract_extension_address = ABSTRACT_POINTER_MACRO(abstract);
+    uintptr_t abstract_extension_address = ABSTRACT_EXTENSION_POINTER_CAST_MACRO(abstract);
     AbstractClassExtension *abstract_extension = (AbstractClassExtension *)abstract_extension_address;
     return abstract_extension;
 }
@@ -176,7 +181,7 @@ static AbstractClassExtension *Get_Extension_Pointer(const AbstractClass *abstra
  */
 static void Clear_Extension_Pointer(const AbstractClass *abstract)
 {
-    ABSTRACT_POINTER_MACRO(abstract) = (uintptr_t)0x00000000;
+    ABSTRACT_EXTENSION_POINTER_CAST_MACRO(abstract) = (uintptr_t)0x00000000;
 }
 
 
@@ -491,7 +496,7 @@ static void Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
             /**
              *  
              */
-            uintptr_t ext_ptr_addr = (*(uintptr_t *)((char *)object + 0x10));
+            uintptr_t **ext_ptr_addr = ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(object);
             VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ext_ptr_addr, "AbstractClass::ExtPtr");
 
             DEV_DEBUG_INFO("  Requested remap of %s's extension pointer.\n", Get_Abstract_Name(object));
@@ -530,9 +535,7 @@ AbstractClassExtension *Find_Or_Make_Extension_Internal(const AbstractClass *abs
 
         case RTTI_ANIM:
         {
-            break; // BROKEN
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const AnimClass *>(abstract), AnimExtensions, created, allow_make);
-            break;
+            break; // BROKEN extptr = Extension_Find_Or_Make(reinterpret_cast<const AnimClass *>(abstract), AnimExtensions, created, allow_make);
         }
 
         case RTTI_ANIMTYPE:
@@ -597,9 +600,7 @@ AbstractClassExtension *Find_Or_Make_Extension_Internal(const AbstractClass *abs
 
         case RTTI_ISOTILETYPE:
         {
-            break; // BROKEN
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const IsometricTileTypeClass *>(abstract), IsometricTileTypeExtensions, created, allow_make);
-            break;
+            break; // BROKEN extptr = Extension_Find_Or_Make(reinterpret_cast<const IsometricTileTypeClass *>(abstract), IsometricTileTypeExtensions, created, allow_make);
         }
 
         case RTTI_OVERLAYTYPE:
@@ -775,9 +776,7 @@ bool Destroy_Extension_Internal(const AbstractClass *abstract)
 
         case RTTI_ANIM:
         {
-            break; // BROKEN
-            removed = Extension_Destroy(reinterpret_cast<const AnimClass *>(abstract), AnimExtensions);
-            break;
+            break; // BROKEN removed = Extension_Destroy(reinterpret_cast<const AnimClass *>(abstract), AnimExtensions);
         }
 
         case RTTI_ANIMTYPE:
@@ -842,9 +841,7 @@ bool Destroy_Extension_Internal(const AbstractClass *abstract)
 
         case RTTI_ISOTILETYPE:
         {
-            break; // BROKEN
-            removed = Extension_Destroy(reinterpret_cast<const IsometricTileTypeClass *>(abstract), IsometricTileTypeExtensions);
-            break;
+            break; // BROKEN removed = Extension_Destroy(reinterpret_cast<const IsometricTileTypeClass *>(abstract), IsometricTileTypeExtensions);
         }
 
         case RTTI_OVERLAYTYPE:
