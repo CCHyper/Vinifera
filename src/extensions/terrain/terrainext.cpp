@@ -42,7 +42,7 @@ TerrainClassExtension::TerrainClassExtension(const TerrainClass *this_ptr) :
     ObjectClassExtension(this_ptr),
     LightSource(nullptr)
 {
-    //EXT_DEBUG_TRACE("TerrainClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("TerrainClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -54,6 +54,7 @@ TerrainClassExtension::TerrainClassExtension(const TerrainClass *this_ptr) :
 TerrainClassExtension::TerrainClassExtension(const NoInitClass &noinit) :
     ObjectClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("TerrainClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

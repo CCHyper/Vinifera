@@ -44,7 +44,7 @@
 AbstractClassExtension::AbstractClassExtension(const AbstractClass *this_ptr) :
     ThisPtr(this_ptr)
 {
-    EXT_DEBUG_TRACE("AbstractClassExtension::AbstractClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //if (this_ptr) EXT_DEBUG_TRACE("AbstractClassExtension::AbstractClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
     //ASSERT(ThisPtr != nullptr);      // NULL ThisPtr is valid when performing a Load state operation.
 }
 
@@ -56,7 +56,7 @@ AbstractClassExtension::AbstractClassExtension(const AbstractClass *this_ptr) :
  */
 AbstractClassExtension::AbstractClassExtension(const NoInitClass &noinit)
 {
-    EXT_DEBUG_TRACE("AbstractClassExtension::AbstractClassExtension(NoInitClass) - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("AbstractClassExtension::AbstractClassExtension(NoInitClass) - 0x%08X\n", (uintptr_t)(ThisPtr));
 }
 
 
@@ -67,7 +67,7 @@ AbstractClassExtension::AbstractClassExtension(const NoInitClass &noinit)
  */
 AbstractClassExtension::~AbstractClassExtension()
 {
-    EXT_DEBUG_TRACE("AbstractClassExtension::~AbstractClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
+    //EXT_DEBUG_TRACE("AbstractClassExtension::~AbstractClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 
     ThisPtr = nullptr;
 }
@@ -175,14 +175,14 @@ HRESULT AbstractClassExtension::Internal_Load(IStream *pStm)
         return hr;
     }
 
-    DEV_DEBUG_INFO("Read id = 0x%08X.\n", id);
+    //DEV_DEBUG_INFO("Read id = 0x%08X.\n", id);
 
     /**
      *  x
      */
     VINIFERA_SWIZZLE_REGISTER_POINTER(id, this, "this");
 
-    DEV_DEBUG_INFO("Registering pointer id = 0x%08X, this = 0x%08X.\n", id, (uintptr_t)(this));
+    //DEV_DEBUG_INFO("Registering pointer id = 0x%08X, this = 0x%08X.\n", id, (uintptr_t)(this));
 
     /**
      *  Read this classes binary blob data directly into this instance.
@@ -192,11 +192,11 @@ HRESULT AbstractClassExtension::Internal_Load(IStream *pStm)
         return hr;
     }
 
-    DEV_DEBUG_INFO("Read Size_Of = %d.\n", sizeof(*this));
+    //DEV_DEBUG_INFO("Read Size_Of = %d.\n", sizeof(*this));
     
     VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ThisPtr, "ThisPtr");
 
-    DEV_DEBUG_INFO("Requested remap of ThisPtr.\n");
+    //DEV_DEBUG_INFO("Requested remap of ThisPtr.\n");
 
     return hr;
 }
@@ -221,14 +221,14 @@ HRESULT AbstractClassExtension::Internal_Save(IStream *pStm, BOOL fClearDirty)
     LONG id;
     VINIFERA_SWIZZLE_FETCH_SWIZZLE_ID(this, id, "this");
 
-    DEV_DEBUG_INFO("Writing id = 0x%08X.\n", id);
+    //DEV_DEBUG_INFO("Writing id = 0x%08X.\n", id);
 
     HRESULT hr = pStm->Write(&id, sizeof(id), nullptr);
     if (FAILED(hr)) {
         return hr;
     }
 
-    DEV_DEBUG_INFO("Writing Size_Of = %d.\n", Size_Of());
+    //DEV_DEBUG_INFO("Writing Size_Of = %d.\n", Size_Of());
     
     /**
      *  Write this class instance as a binary blob.

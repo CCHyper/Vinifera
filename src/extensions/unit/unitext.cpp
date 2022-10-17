@@ -40,7 +40,7 @@
 UnitClassExtension::UnitClassExtension(const UnitClass *this_ptr) :
     FootClassExtension(this_ptr)
 {
-    //EXT_DEBUG_TRACE("UnitClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("UnitClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -52,6 +52,7 @@ UnitClassExtension::UnitClassExtension(const UnitClass *this_ptr) :
 UnitClassExtension::UnitClassExtension(const NoInitClass &noinit) :
     FootClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("UnitClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

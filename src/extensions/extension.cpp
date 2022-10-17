@@ -197,7 +197,7 @@ static bool Supports_Extension_For(const AbstractClass *abstract)
     switch (abstract->What_Am_I()) {
         case RTTI_AIRCRAFT:
         case RTTI_AIRCRAFTTYPE:
-        // BROKEN case RTTI_ANIM:
+        case RTTI_ANIM:
         case RTTI_ANIMTYPE:
         case RTTI_BUILDING:
         case RTTI_BUILDINGTYPE:
@@ -208,7 +208,7 @@ static bool Supports_Extension_For(const AbstractClass *abstract)
         case RTTI_HOUSETYPE:
         case RTTI_INFANTRY:
         case RTTI_INFANTRYTYPE:
-        // BROKEN case RTTI_ISOTILETYPE:
+        case RTTI_ISOTILETYPE:
         case RTTI_OVERLAYTYPE:
         case RTTI_PARTICLESYSTEMTYPE:
         case RTTI_PARTICLETYPE:
@@ -253,35 +253,37 @@ static bool Is_Valid_Extension_Pointer(const AbstractClassExtension *abstract_ex
  */
 static const char *Get_Abstract_Name(const AbstractClass *abstract)
 {
-    //if (abstract) {
-    //    if (Is_Object(abstract)) {
-    //        return reinterpret_cast<const ObjectClass *>(abstract)->Name();
-    //    }
-    //    if (Is_TypeClass(abstract)) {
-    //        return reinterpret_cast<const ObjectTypeClass *>(abstract)->Name();
-    //    }
-    //    //switch (abstract->What_Am_I()) {
-    //    //    case RTTI_HOUSE:
-    //    //    {
-    //    //        /**
-    //    //         *  In most cases Class is null, so we use IniName as the default.
-    //    //         */
-    //    //        const char *name = reinterpret_cast<const HouseClass *>(abstract)->IniName;
-    //    //
-    //    //        HouseTypeClass *htptr = reinterpret_cast<const HouseClass *>(abstract)->Class;
-    //    //        if (htptr) {
-    //    //            name = htptr->Name(); // IHouse interface's Name() returns BSTR (wide), so call the Class one instead.
-    //    //        }
-    //    //        return name;
-    //    //    }
-    //    //    case RTTI_SUPERWEAPON:
-    //    //        return reinterpret_cast<const SuperClass *>(abstract)->Name();
-    //    //    default:
-    //    //        break;
-    //    //};
-    //}
+#if 0
+    if (abstract) {
+        if (Is_Object(abstract)) {
+            return reinterpret_cast<const ObjectClass *>(abstract)->Name();
+        }
+        if (Is_TypeClass(abstract)) {
+            return reinterpret_cast<const ObjectTypeClass *>(abstract)->Name();
+        }
+        //switch (abstract->What_Am_I()) {
+        //    case RTTI_HOUSE:
+        //    {
+        //        /**
+        //         *  In most cases Class is null, so we use IniName as the default.
+        //         */
+        //        const char *name = reinterpret_cast<const HouseClass *>(abstract)->IniName;
+        //
+        //        HouseTypeClass *htptr = reinterpret_cast<const HouseClass *>(abstract)->Class;
+        //        if (htptr) {
+        //            name = htptr->Name(); // IHouse interface's Name() returns BSTR (wide), so call the Class one instead.
+        //        }
+        //        return name;
+        //    }
+        //    case RTTI_SUPERWEAPON:
+        //        return reinterpret_cast<const SuperClass *>(abstract)->Name();
+        //    default:
+        //        break;
+        //};
+    }
 
-    //return "<unknown>";
+    return "<unknown>";
+#endif
     return "<DONT USE>";
 }
 
@@ -341,7 +343,13 @@ static bool Extension_Destroy(const BASE_CLASS *abstract_ptr, DynamicVectorClass
 
         removed = list.Delete(ext_ptr);
 
+#ifndef NDEBUG
         ASSERT_FATAL_PRINT(removed, "Failed to destroy %s extension \"%s\"!\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(abstract_ptr));
+#endif
+
+        if (!removed) {
+            return false;
+        }
 
         EXT_DEBUG_INFO("Destroyed %s extension for \"%s\".\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(abstract_ptr));
 
@@ -367,6 +375,11 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
     HRESULT hr = pStm->Write(&count, sizeof(count), nullptr);
     if (FAILED(hr)) {
         return false;
+    }
+
+    if (list.Count() <= 0) {
+        DEBUG_INFO("Extension_Save -> list has a count of zero, skipping save.\n");
+        return true;
     }
 
     DEBUG_INFO("Saving %s extensions (Count: %d)\n", typeid(EXT_CLASS).name(), list.Count());
@@ -410,6 +423,10 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
 template<class BASE_CLASS, class EXT_CLASS>
 static bool Extension_Load(IStream *pStm, DynamicVectorClass<EXT_CLASS *> &list)
 {
+    if (list.Count() > 0) {
+        DEBUG_WARNING("Extension_Load -> list already has a count of \"%d\"!\n", list.Count());
+    }
+
     int count = 0;
     HRESULT hr = pStm->Read(&count, sizeof(count), nullptr);
     if (FAILED(hr)) {
@@ -432,6 +449,7 @@ static bool Extension_Load(IStream *pStm, DynamicVectorClass<EXT_CLASS *> &list)
 }
 
 
+#if 0
 /**
  *  x
  * 
@@ -456,13 +474,14 @@ static void Extension_Register_Ext_Pointers(const DynamicVectorClass<BASE_CLASS 
             }
 
             LONG id = 0;
-            VINIFERA_SWIZZLE_FETCH_SWIZZLE_ID(  ABSTRACT_POINTER_MACRO(object)  , id, "AbstractClass::ExtPtr")
-            VINIFERA_SWIZZLE_REGISTER_POINTER(id,  ABSTRACT_POINTER_MACRO(object)  , "AbstractClass::ExtPtr");
+            VINIFERA_SWIZZLE_FETCH_SWIZZLE_ID(ABSTRACT_POINTER_MACRO(object), id, "AbstractClass::ExtPtr")
+            VINIFERA_SWIZZLE_REGISTER_POINTER(id, ABSTRACT_POINTER_MACRO(object), "AbstractClass::ExtPtr");
 
             DEV_DEBUG_INFO("  Requested remap of %s's extension pointer.\n", Get_Abstract_Name(object));
         }
     }
 }
+#endif
 
 
 /**
@@ -962,6 +981,9 @@ bool Save_Extensions(IStream *pStm)
         return false;
     }
 
+    /**
+     *  Save all the extension class data to the stream.
+     */
     DEBUG_INFO("Save_Extensions(enter)\n");
 
 //    Extension_Save<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions);
@@ -1013,11 +1035,11 @@ bool Load_Extensions(IStream *pStm)
         return false;
     }
 
-    DEBUG_INFO("Load_Extensions(enter)\n");
-
     /**
      *  Load all the extension class data from the stream.
      */
+    DEBUG_INFO("Load_Extensions(enter)\n");
+
 //    if (!Extension_Load<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions)) { return false; }
 //    if (!Extension_Load<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions)) { return false; }
 //    if (!Extension_Load<AnimClass, AnimClassExtension>(pStm, AnimExtensions)) { return false; }
@@ -1047,45 +1069,22 @@ bool Load_Extensions(IStream *pStm)
 //    if (!Extension_Load<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
 //    if (!Extension_Load<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
 //    if (!Extension_Load<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
-   
-#if 0
-    /**
-     *  x
-     */
-    DEBUG_INFO("Registering extension pointers for remapping...\n");
 
-    // NOTE AbstractClassExtension::Internal_Load does the annoucing now...
-    Extension_Register_Ext_Pointers<AircraftClass, AircraftClassExtension>(Aircrafts);
-    Extension_Register_Ext_Pointers<AircraftTypeClass, AircraftTypeClassExtension>(AircraftTypes);
-    //Extension_Register_Ext_Pointers<AnimClass, AnimClassExtension>(Anims);
-    Extension_Register_Ext_Pointers<AnimTypeClass, AnimTypeClassExtension>(AnimTypes);
-    Extension_Register_Ext_Pointers<BuildingClass, BuildingClassExtension>(Buildings);
-    Extension_Register_Ext_Pointers<BuildingTypeClass, BuildingTypeClassExtension>(BuildingTypes);
-    Extension_Register_Ext_Pointers<BulletTypeClass, BulletTypeClassExtension>(BulletTypes);
-    Extension_Register_Ext_Pointers<CampaignClass, CampaignClassExtension>(Campaigns);
-    Extension_Register_Ext_Pointers<SideClass, SideClassExtension>(Sides);
-    Extension_Register_Ext_Pointers<HouseClass, HouseClassExtension>(Houses);
-    Extension_Register_Ext_Pointers<HouseTypeClass, HouseTypeClassExtension>(HouseTypes);
-    Extension_Register_Ext_Pointers<InfantryClass, InfantryClassExtension>(Infantry);
-    Extension_Register_Ext_Pointers<InfantryTypeClass, InfantryTypeClassExtension>(InfantryTypes);
-    //Extension_Register_Ext_Pointers<IsometricTileTypeClass, IsometricTileTypeClassExtension>(IsoTileTypes);
-    Extension_Register_Ext_Pointers<OverlayTypeClass, OverlayTypeClassExtension>(OverlayTypes);
-    Extension_Register_Ext_Pointers<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(ParticleSystemTypes);
-    Extension_Register_Ext_Pointers<ParticleTypeClass, ParticleTypeClassExtension>(ParticleTypes);
-    Extension_Register_Ext_Pointers<SmudgeTypeClass, SmudgeTypeClassExtension>(SmudgeTypes);
-    Extension_Register_Ext_Pointers<SuperClass, SuperClassExtension>(Supers);
-    Extension_Register_Ext_Pointers<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(SuperWeaponTypes);
-    Extension_Register_Ext_Pointers<TerrainClass, TerrainClassExtension>(Terrains);
-    Extension_Register_Ext_Pointers<TerrainTypeClass, TerrainTypeClassExtension>(TerrainTypes);
-    Extension_Register_Ext_Pointers<TiberiumClass, TiberiumClassExtension>(Tiberiums);
-    Extension_Register_Ext_Pointers<UnitClass, UnitClassExtension>(Units);
-    Extension_Register_Ext_Pointers<UnitTypeClass, UnitTypeClassExtension>(UnitTypes);
-    Extension_Register_Ext_Pointers<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(VoxelAnimTypes);
-    Extension_Register_Ext_Pointers<WarheadTypeClass, WarheadTypeClassExtension>(WarheadTypes);
-    Extension_Register_Ext_Pointers<WaveClass, WaveClassExtension>(Waves);
-    Extension_Register_Ext_Pointers<WeaponTypeClass, WeaponTypeClassExtension>(WeaponTypes);
-#endif
+    DEBUG_INFO("Load_Extensions(exit)\n");
 
+    Request_Extension_Pointer_Remap();
+
+    return true;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool Request_Extension_Pointer_Remap()
+{
     /**
      *  Request pointer remap on all extension pointers.
      */
@@ -1121,7 +1120,7 @@ bool Load_Extensions(IStream *pStm)
 //    Extension_Request_Pointer_Remap<WaveClass, WaveClassExtension>(Waves);
 //    Extension_Request_Pointer_Remap<WeaponTypeClass, WeaponTypeClassExtension>(WeaponTypes);
 
-    DEBUG_INFO("Load_Extensions(exit)\n");
+    DEBUG_INFO("Request_Extension_Pointer_Remap(exit)\n");
 
     return true;
 }
@@ -1134,35 +1133,35 @@ bool Load_Extensions(IStream *pStm)
  */
 bool Register_Extension_Class_Factories()
 {
-    //REGISTER_CLASS(AircraftClassExtension);
-    //REGISTER_CLASS(AircraftTypeClassExtension);
-    //REGISTER_CLASS(AnimClassExtension);
-    //REGISTER_CLASS(AnimTypeClassExtension);
+    REGISTER_CLASS(AircraftClassExtension);
+    REGISTER_CLASS(AircraftTypeClassExtension);
+    REGISTER_CLASS(AnimClassExtension);
+    REGISTER_CLASS(AnimTypeClassExtension);
     REGISTER_CLASS(BuildingClassExtension);
     REGISTER_CLASS(BuildingTypeClassExtension);
-    //REGISTER_CLASS(BulletTypeClassExtension);
-    //REGISTER_CLASS(CampaignClassExtension);
-    //REGISTER_CLASS(SideClassExtension);
-    //REGISTER_CLASS(HouseClassExtension);
-    //REGISTER_CLASS(HouseTypeClassExtension);
-    //REGISTER_CLASS(InfantryClassExtension);
-    //REGISTER_CLASS(InfantryTypeClassExtension);
-    //REGISTER_CLASS(IsometricTileTypeClassExtension);
-    //REGISTER_CLASS(OverlayTypeClassExtension);
-    //REGISTER_CLASS(ParticleSystemTypeClassExtension);
-    //REGISTER_CLASS(ParticleTypeClassExtension);
-    //REGISTER_CLASS(SmudgeTypeClassExtension);
-    //REGISTER_CLASS(SuperClassExtension);
-    //REGISTER_CLASS(SuperWeaponTypeClassExtension);
-    //REGISTER_CLASS(TerrainClassExtension);
-    //REGISTER_CLASS(TerrainTypeClassExtension);
-    //REGISTER_CLASS(TiberiumClassExtension);
-    //REGISTER_CLASS(UnitClassExtension);
-    //REGISTER_CLASS(UnitTypeClassExtension);
-    //REGISTER_CLASS(VoxelAnimTypeClassExtension);
-    //REGISTER_CLASS(WarheadTypeClassExtension);
-    //REGISTER_CLASS(WaveClassExtension);
-    //REGISTER_CLASS(WeaponTypeClassExtension);
+    REGISTER_CLASS(BulletTypeClassExtension);
+    REGISTER_CLASS(CampaignClassExtension);
+    REGISTER_CLASS(SideClassExtension);
+    REGISTER_CLASS(HouseClassExtension);
+    REGISTER_CLASS(HouseTypeClassExtension);
+    REGISTER_CLASS(InfantryClassExtension);
+    REGISTER_CLASS(InfantryTypeClassExtension);
+    REGISTER_CLASS(IsometricTileTypeClassExtension);
+    REGISTER_CLASS(OverlayTypeClassExtension);
+    REGISTER_CLASS(ParticleSystemTypeClassExtension);
+    REGISTER_CLASS(ParticleTypeClassExtension);
+    REGISTER_CLASS(SmudgeTypeClassExtension);
+    REGISTER_CLASS(SuperClassExtension);
+    REGISTER_CLASS(SuperWeaponTypeClassExtension);
+    REGISTER_CLASS(TerrainClassExtension);
+    REGISTER_CLASS(TerrainTypeClassExtension);
+    REGISTER_CLASS(TiberiumClassExtension);
+    REGISTER_CLASS(UnitClassExtension);
+    REGISTER_CLASS(UnitTypeClassExtension);
+    REGISTER_CLASS(VoxelAnimTypeClassExtension);
+    REGISTER_CLASS(WarheadTypeClassExtension);
+    REGISTER_CLASS(WaveClassExtension);
+    REGISTER_CLASS(WeaponTypeClassExtension);
 
     return true;
 }

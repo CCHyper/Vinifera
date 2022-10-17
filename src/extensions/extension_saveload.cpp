@@ -347,7 +347,6 @@ static bool Vinifera_Load_TacticalExtension(IStream *pStm)
  */
 bool Vinifera_Put_All(IStream *pStm)
 {
-#if 1
     /**
      *  Save the Vinifera data marker which can be used to verify
      *  the state of the data to follow on load.
@@ -397,7 +396,7 @@ bool Vinifera_Put_All(IStream *pStm)
      *  Save global data and values here.
      */
     DEBUG_INFO("Saving global data...\n");
-#endif
+
     return true;
 }
 
@@ -409,7 +408,6 @@ bool Vinifera_Put_All(IStream *pStm)
  */
 bool Vinifera_Load_All(IStream *pStm)
 {
-#if 1
     /**
      *  Load the Vinifera data marker which can be used to verify
      *  the state of the data to follow.
@@ -481,6 +479,24 @@ bool Vinifera_Load_All(IStream *pStm)
      *  Load global data and values here.
      */
     DEBUG_INFO("Loading global data...\n");
-#endif
+
+    return true;
+}
+
+
+/**
+ *  Request remapping of all the extension pointers so the swizzle manager
+ *  can fix up any reference to extension classes.
+ * 
+ *  @author: CCHyper
+ */
+bool Vinifera_Remap_Extension_Pointers()
+{
+    DEBUG_INFO("Remapping extension pointers\n");
+    if (!Request_Extension_Pointer_Remap()) {
+        DEBUG_ERROR("\t***** FAILED!\n");
+        return false;
+    }
+
     return true;
 }

@@ -40,7 +40,7 @@
 SideClassExtension::SideClassExtension(const SideClass *this_ptr) :
     AbstractTypeClassExtension(this_ptr)
 {
-    //EXT_DEBUG_TRACE("SideClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("SideClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -52,6 +52,7 @@ SideClassExtension::SideClassExtension(const SideClass *this_ptr) :
 SideClassExtension::SideClassExtension(const NoInitClass &noinit) :
     AbstractTypeClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("SideClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

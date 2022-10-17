@@ -32,6 +32,8 @@
 
 bool Vinifera_DeveloperMode = false;
 
+bool Vinifera_PerformingLoad = false;
+
 bool Vinifera_PrintFileErrors = true;
 bool Vinifera_FatalFileErrors = false;
 bool Vinifera_AssertFileErrors = false;

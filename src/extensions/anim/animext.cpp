@@ -40,7 +40,7 @@
 AnimClassExtension::AnimClassExtension(const AnimClass *this_ptr) :
     ObjectClassExtension(this_ptr)
 {
-    //EXT_DEBUG_TRACE("AnimClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("AnimClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

@@ -364,6 +364,8 @@ DECLARE_PATCH(_Load_Game_Check_Return_Value)
 {
     GET_REGISTER_STATIC(const char *, filename, esi);
 
+    Vinifera_PerformingLoad = true;
+
     _asm { mov ecx, [esp+0x20] }
     _asm { xor dl, dl }
     _asm { mov eax, 0x005D6BE0 }
@@ -566,6 +568,8 @@ DECLARE_PATCH(_Load_All_Vinifera_Data)
         goto failed;
     }
 
+    Vinifera_PerformingLoad = false;
+
     /**
      *  Stolen bytes/code.
      */
@@ -589,6 +593,28 @@ failed:
     _asm { pop ebx }
     _asm { add esp, 0xB0 }
     _asm { ret }
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Remap_Extension_Pointers)
+{
+    /**
+     *  Call to the Vinifera extension pointer request function.
+     */
+    Vinifera_Remap_Extension_Pointers();
+    
+    /**
+     *  Stolen bytes/code.
+     */
+    _asm { mov eax, 0x005DC470 }
+    _asm { call eax } // Post_Load_Game
+
+    JMP(0x005D6B48)
 }
 
 
@@ -776,6 +802,7 @@ void Vinifera_Hooks()
      */
     Patch_Jump(0x005D68F7, &_Put_All_Vinifera_Data);
     Patch_Jump(0x005D78ED, &_Load_All_Vinifera_Data);
+    //Patch_Jump(0x005D6B43, &_Remap_Extension_Pointers);
 
 #if 0
     Patch_Jump(0x004B6D96, &_SaveLoad_Disable_Buttons);

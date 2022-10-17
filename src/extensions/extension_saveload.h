@@ -35,3 +35,4 @@ extern unsigned ViniferaSaveGameVersion;
 
 bool Vinifera_Put_All(IStream *pStm);
 bool Vinifera_Load_All(IStream *pStm);
+bool Vinifera_Remap_Extension_Pointers();

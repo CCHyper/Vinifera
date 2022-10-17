@@ -78,10 +78,7 @@ bool Register_Extension_Class_Factories();
 bool Save_Extensions(IStream *pStm);
 bool Load_Extensions(IStream *pStm);
 
-//HRESULT AbstractClassExtension_Load(AbstractClass *abstract, IStream *pStm);
-//HRESULT AbstractClassExtension_Save(AbstractClass *abstract, IStream *pStm, BOOL fClearDirty);
-
-//bool Request_Extension_Pointer_Remap();
+bool Request_Extension_Pointer_Remap();
 
 
 /**

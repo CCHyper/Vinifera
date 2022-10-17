@@ -41,7 +41,7 @@
 SmudgeTypeClassExtension::SmudgeTypeClassExtension(const SmudgeTypeClass *this_ptr) :
     ObjectTypeClassExtension(this_ptr)
 {
-    //EXT_DEBUG_TRACE("SmudgeTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("SmudgeTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -53,6 +53,7 @@ SmudgeTypeClassExtension::SmudgeTypeClassExtension(const SmudgeTypeClass *this_p
 SmudgeTypeClassExtension::SmudgeTypeClassExtension(const NoInitClass &noinit) :
     ObjectTypeClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("SmudgeTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

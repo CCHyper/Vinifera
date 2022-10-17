@@ -48,7 +48,7 @@ TerrainTypeClassExtension::TerrainTypeClassExtension(const TerrainTypeClass *thi
     LightGreenTint(1000000),
     LightBlueTint(1000000)
 {
-    //EXT_DEBUG_TRACE("TerrainTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("TerrainTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -60,6 +60,7 @@ TerrainTypeClassExtension::TerrainTypeClassExtension(const TerrainTypeClass *thi
 TerrainTypeClassExtension::TerrainTypeClassExtension(const NoInitClass &noinit) :
     ObjectTypeClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("TerrainTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

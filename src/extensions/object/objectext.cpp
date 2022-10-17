@@ -39,6 +39,7 @@
 ObjectClassExtension::ObjectClassExtension(const ObjectClass *this_ptr) :
     AbstractClassExtension(this_ptr)
 {
+    //if (this_ptr) EXT_DEBUG_TRACE("ObjectClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -50,6 +51,7 @@ ObjectClassExtension::ObjectClassExtension(const ObjectClass *this_ptr) :
 ObjectClassExtension::ObjectClassExtension(const NoInitClass &noinit) :
     AbstractClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("ObjectClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -60,6 +62,7 @@ ObjectClassExtension::ObjectClassExtension(const NoInitClass &noinit) :
  */
 ObjectClassExtension::~ObjectClassExtension()
 {
+    //EXT_DEBUG_TRACE("ObjectClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -122,6 +125,11 @@ void ObjectClassExtension::Compute_CRC(WWCRCEngine &crc) const
 }
 
 
+/**
+ *  x
+ *  
+ *  @author: CCHyper
+ */
 const char *ObjectClassExtension::Name() const
 {
     //EXT_DEBUG_TRACE("ObjectClassExtension::Name - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
@@ -130,6 +138,11 @@ const char *ObjectClassExtension::Name() const
 }
 
 
+/**
+ *  x
+ *  
+ *  @author: CCHyper
+ */
 const char *ObjectClassExtension::Full_Name() const
 {
     //EXT_DEBUG_TRACE("ObjectClassExtension::Full_Name - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));

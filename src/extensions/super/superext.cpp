@@ -42,7 +42,7 @@ SuperClassExtension::SuperClassExtension(const SuperClass *this_ptr) :
     FlashTimeEnd(0),
     TimerFlashState(false)
 {
-    //EXT_DEBUG_TRACE("SuperClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("SuperClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -54,6 +54,7 @@ SuperClassExtension::SuperClassExtension(const SuperClass *this_ptr) :
 SuperClassExtension::SuperClassExtension(const NoInitClass &noinit) :
     AbstractClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("SuperClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

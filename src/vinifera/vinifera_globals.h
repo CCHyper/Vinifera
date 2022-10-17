@@ -38,6 +38,8 @@ class TheaterTypeClass;
 
 extern bool Vinifera_DeveloperMode;
 
+extern bool Vinifera_PerformingLoad;
+
 extern bool Vinifera_PrintFileErrors;
 extern bool Vinifera_FatalFileErrors;
 extern bool Vinifera_AssertFileErrors;

@@ -43,7 +43,7 @@ BulletTypeClassExtension::BulletTypeClassExtension(const BulletTypeClass *this_p
     ObjectTypeClassExtension(this_ptr),
     SpawnDelay(3)           // Default hardcoded value.
 {
-    //EXT_DEBUG_TRACE("BulletTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("BulletTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

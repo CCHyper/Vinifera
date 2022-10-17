@@ -44,7 +44,7 @@ InfantryTypeClassExtension::InfantryTypeClassExtension(const InfantryTypeClass *
     IsMechanic(false),
     IsOmniHealer(false)
 {
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("InfantryTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

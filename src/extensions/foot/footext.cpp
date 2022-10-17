@@ -38,7 +38,7 @@
 FootClassExtension::FootClassExtension(const FootClass *this_ptr) :
     TechnoClassExtension(this_ptr)
 {
-    //EXT_DEBUG_TRACE("FootClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("FootClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

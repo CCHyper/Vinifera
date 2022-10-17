@@ -40,7 +40,7 @@
 WaveClassExtension::WaveClassExtension(const WaveClass *this_ptr) :
     ObjectClassExtension(this_ptr)
 {
-    //EXT_DEBUG_TRACE("WaveClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("WaveClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -52,6 +52,7 @@ WaveClassExtension::WaveClassExtension(const WaveClass *this_ptr) :
 WaveClassExtension::WaveClassExtension(const NoInitClass &noinit) :
     ObjectClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("WaveClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

@@ -32,6 +32,7 @@
 #include "house.h"
 #include "housetype.h"
 #include "vinifera_util.h"
+#include "vinifera_globals.h"
 #include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
@@ -52,6 +53,10 @@ DECLARE_PATCH(_BuildingClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(BuildingClass *, this_ptr, esi); // Current "this" pointer.
     static BuildingClassExtension *exttype_ptr;
+
+    if (Vinifera_PerformingLoad) {
+        goto original_code;
+    }
 
     /**
      *  Find existing or create an extended class instance.

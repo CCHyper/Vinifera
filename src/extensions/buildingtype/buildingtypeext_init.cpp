@@ -30,6 +30,7 @@
 #include "buildingtype.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "vinifera_globals.h"
 #include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
@@ -51,6 +52,10 @@ DECLARE_PATCH(_BuildingTypeClass_Constructor_Patch)
     GET_REGISTER_STATIC(BuildingTypeClass *, this_ptr, esi); // "this" pointer.
     GET_STACK_STATIC(const char *, ini_name, esp, 0x4); // ini name.
     static BuildingTypeClassExtension *exttype_ptr;
+
+    if (Vinifera_PerformingLoad) {
+        goto original_code;
+    }
 
     //EXT_DEBUG_TRACE("Creating BuildingTypeClassExtension instance for \"%s\".\n", ini_name);
 
