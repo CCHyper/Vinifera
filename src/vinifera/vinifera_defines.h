@@ -163,7 +163,7 @@ typedef enum ExtensionRTTIType
     EXT_RTTI_SIDE,
     EXT_RTTI_SMUDGE,
     EXT_RTTI_SMUDGETYPE,
-    EXT_RTTI_SPECIAL,
+    //EXT_RTTI_SPECIAL,         // Sidebar cameos.
     EXT_RTTI_SUPERWEAPONTYPE,
     EXT_RTTI_TASKFORCE,
     EXT_RTTI_TEAM,

@@ -28,6 +28,7 @@
 #pragma once
 
 #include "always.h"
+#include "vinifera_defines.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
@@ -64,6 +65,9 @@ class AbstractClassExtension;
 AbstractClassExtension *Find_Or_Make_Extension_Internal(const AbstractClass *abstract, bool allow_make = true);
 AbstractClassExtension *Fetch_Extension_Internal(const AbstractClass *abstract);
 bool Destroy_Extension_Internal(const AbstractClass *abstract);
+
+
+bool Is_Extension_Support_Enabled(ExtensionRTTIType rtti);
 
 
 /**
