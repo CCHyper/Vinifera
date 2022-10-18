@@ -49,7 +49,7 @@ BuildingClassExtension::BuildingClassExtension(const BuildingClass *this_ptr) :
     IsCaptureOneTimeCashGiven(false),
     IsBudgetDepleted(false)
 {
-    if (this_ptr) EXT_DEBUG_TRACE("BuildingClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("BuildingClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -61,6 +61,7 @@ BuildingClassExtension::BuildingClassExtension(const BuildingClass *this_ptr) :
 BuildingClassExtension::BuildingClassExtension(const NoInitClass &noinit) :
     TechnoClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("BuildingClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

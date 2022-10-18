@@ -56,6 +56,7 @@ IsometricTileTypeClassExtension::IsometricTileTypeClassExtension(const Isometric
 IsometricTileTypeClassExtension::IsometricTileTypeClassExtension(const NoInitClass &noinit) :
     ObjectTypeClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("IsometricTileTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

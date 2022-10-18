@@ -56,6 +56,7 @@ InfantryTypeClassExtension::InfantryTypeClassExtension(const InfantryTypeClass *
 InfantryTypeClassExtension::InfantryTypeClassExtension(const NoInitClass &noinit) :
     TechnoTypeClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

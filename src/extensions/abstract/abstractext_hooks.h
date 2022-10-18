@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          EXTENSION_HOOKS.H
+ *  @file          ABSTRACTEXT_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for implementing all the extended classes.
+ *  @brief         Contains the hooks for the extended AbstractClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -28,4 +28,4 @@
 #pragma once
 
 
-void Extension_Hooks();
+void AbstractClassExtension_Hooks();

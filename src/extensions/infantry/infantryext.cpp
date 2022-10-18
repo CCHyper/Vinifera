@@ -52,6 +52,7 @@ InfantryClassExtension::InfantryClassExtension(const InfantryClass *this_ptr) :
 InfantryClassExtension::InfantryClassExtension(const NoInitClass &noinit) :
     FootClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("InfantryClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

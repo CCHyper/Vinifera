@@ -52,6 +52,7 @@ AircraftClassExtension::AircraftClassExtension(const AircraftClass *this_ptr) :
 AircraftClassExtension::AircraftClassExtension(const NoInitClass &noinit) :
     FootClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("AircraftClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

@@ -253,7 +253,6 @@ static bool Is_Valid_Extension_Pointer(const AbstractClassExtension *abstract_ex
  */
 static const char *Get_Abstract_Name(const AbstractClass *abstract)
 {
-#if 0
     if (abstract) {
         if (Is_Object(abstract)) {
             return reinterpret_cast<const ObjectClass *>(abstract)->Name();
@@ -283,8 +282,6 @@ static const char *Get_Abstract_Name(const AbstractClass *abstract)
     }
 
     return "<unknown>";
-#endif
-    return "<DONT USE>";
 }
 
 
@@ -305,7 +302,7 @@ static EXT_CLASS * Extension_Find_Or_Make(const BASE_CLASS *abstract_ptr, Dynami
     int found_index = list.ID(ext_ptr);
     if (found_index != -1) {
         ext_ptr = list[found_index];
-        EXT_DEBUG_INFO("%s extension found for \"%s\".\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(abs_ptr));
+        EXT_DEBUG_INFO("\"%s\" extension found for \"%s\".\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(abs_ptr));
         return ext_ptr;
     }
 
@@ -314,14 +311,14 @@ static EXT_CLASS * Extension_Find_Or_Make(const BASE_CLASS *abstract_ptr, Dynami
         bool added = list.Add(ext_ptr);
         ASSERT(added);
         if (added) {
-            EXT_DEBUG_INFO("%s extension created for \"%s\".\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(abs_ptr));
+            EXT_DEBUG_INFO("\"%s\" extension created for \"%s\".\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(abs_ptr));
             created = true;
             return ext_ptr;
         }
         return ext_ptr;
     }
 
-    EXT_DEBUG_WARNING("Failed to find or make %s extension for \"%s\"!\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(abs_ptr));
+    EXT_DEBUG_WARNING("Failed to find or make \"%s\" extension for \"%s\"!\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(abs_ptr));
 
     return nullptr;
 }
@@ -344,14 +341,14 @@ static bool Extension_Destroy(const BASE_CLASS *abstract_ptr, DynamicVectorClass
         removed = list.Delete(ext_ptr);
 
 #ifndef NDEBUG
-        ASSERT_FATAL_PRINT(removed, "Failed to destroy %s extension \"%s\"!\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(abstract_ptr));
+        ASSERT_FATAL_PRINT(removed, "Failed to destroy \"%s\" extension \"%s\"!\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(abstract_ptr));
 #endif
 
         if (!removed) {
             return false;
         }
 
-        EXT_DEBUG_INFO("Destroyed %s extension for \"%s\".\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(abstract_ptr));
+        EXT_DEBUG_INFO("Destroyed \"%s\" extension for \"%s\".\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(abstract_ptr));
 
         /**
          *  x
@@ -378,11 +375,11 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
     }
 
     if (list.Count() <= 0) {
-        DEBUG_INFO("Extension_Save -> list has a count of zero, skipping save.\n");
+        DEBUG_INFO("Extension_Save: List for \"%s\" has a count of zero, skipping save.\n", typeid(EXT_CLASS).name());
         return true;
     }
 
-    DEBUG_INFO("Saving %s extensions (Count: %d)\n", typeid(EXT_CLASS).name(), list.Count());
+    DEBUG_INFO("Saving \"%s\" extensions (Count: %d)\n", typeid(EXT_CLASS).name(), list.Count());
 
     for (int index = 0; index < count; ++index) {
 
@@ -394,19 +391,19 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
         IPersistStream *lpPS = nullptr;
         hr = ptr->QueryInterface(__uuidof(IPersistStream), (LPVOID *)&lpPS);
         if (FAILED(hr)) {
-            DEBUG_ERROR("Extension class does not support IPersistStream!\n");
+            DEBUG_ERROR("Extension \"%s\" does not support IPersistStream!\n", typeid(EXT_CLASS).name());
             return false;
         }
 
         hr = OleSaveToStream(lpPS, pStm);
         if (FAILED(hr)) {
-            DEBUG_ERROR("OleSaveToStream failed for extension '%s' (Index: %d)!\n", typeid(EXT_CLASS).name(), index);
+            DEBUG_ERROR("OleSaveToStream failed for extension \"%s\" (Index: %d)!\n", typeid(EXT_CLASS).name(), index);
             return false;
         }
 
         hr = lpPS->Release();
         if (FAILED(hr)) {
-            DEBUG_ERROR("Failed to release extension class stream!\n");
+            DEBUG_ERROR("Failed to release extension \"%s\" stream!\n", typeid(EXT_CLASS).name());
             return false;
         }
     }
@@ -423,65 +420,30 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
 template<class BASE_CLASS, class EXT_CLASS>
 static bool Extension_Load(IStream *pStm, DynamicVectorClass<EXT_CLASS *> &list)
 {
-    if (list.Count() > 0) {
-        DEBUG_WARNING("Extension_Load -> list already has a count of \"%d\"!\n", list.Count());
-    }
-
     int count = 0;
     HRESULT hr = pStm->Read(&count, sizeof(count), nullptr);
     if (FAILED(hr)) {
         return false;
     }
 
-    DEBUG_INFO("Loading %s extensions (Count: %d)\n", typeid(BASE_CLASS).name(), count);
+    if (count <= 0) {
+        DEBUG_INFO("Extension_Save: Block for \"%s\" has a count of zero, skipping load.\n", typeid(EXT_CLASS).name());
+        return true;
+    }
+    DEBUG_INFO("Loading \"%s\" extensions (Count: %d)\n", typeid(BASE_CLASS).name(), count);
     
     for (int index = 0; index < count; ++index) {
         
         IUnknown *spUnk = nullptr;
         hr = OleLoadFromStream(pStm, __uuidof(IUnknown), (LPVOID *)&spUnk);
         if (FAILED(hr)) {
-            DEBUG_ERROR("OleLoadFromStream failed for extension '%s' (Index: %d)!\n", typeid(EXT_CLASS).name(), index);
+            DEBUG_ERROR("OleLoadFromStream failed for extension \"%s\" (Index: %d)!\n", typeid(EXT_CLASS).name(), index);
             return false;
         }
     }
 
     return true;
 }
-
-
-#if 0
-/**
- *  x
- * 
- *  @author: CCHyper
- */
-template<class BASE_CLASS, class EXT_CLASS>
-static void Extension_Register_Ext_Pointers(const DynamicVectorClass<BASE_CLASS *> &list)
-{
-    DEBUG_INFO("Annoucing pointers for %s extensions (Count %d)... ", typeid(BASE_CLASS).name(), list.Count());
-
-    for (int index = 0; index < list.Count(); ++index) {
-        if (index == 0) {
-            DEBUG_INFO("\n");
-        }
-
-        const BASE_CLASS *object = list[index];
-        if (object) {
-
-            if (!Get_Extension_Pointer(object)) {
-                DEV_DEBUG_ERROR("%s extension pointer for \"%s\" is null!\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(object));
-                return;
-            }
-
-            LONG id = 0;
-            VINIFERA_SWIZZLE_FETCH_SWIZZLE_ID(ABSTRACT_POINTER_MACRO(object), id, "AbstractClass::ExtPtr")
-            VINIFERA_SWIZZLE_REGISTER_POINTER(id, ABSTRACT_POINTER_MACRO(object), "AbstractClass::ExtPtr");
-
-            DEV_DEBUG_INFO("  Requested remap of %s's extension pointer.\n", Get_Abstract_Name(object));
-        }
-    }
-}
-#endif
 
 
 /**
@@ -492,7 +454,7 @@ static void Extension_Register_Ext_Pointers(const DynamicVectorClass<BASE_CLASS 
 template<class BASE_CLASS, class EXT_CLASS>
 static void Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS *> &list)
 {
-    DEBUG_INFO("Requesting remap of %s extension pointers (Count %d)... ", typeid(BASE_CLASS).name(), list.Count());
+    DEBUG_INFO("Requesting remap of \"%s\" extension pointers (Count %d)... ", typeid(BASE_CLASS).name(), list.Count());
 
     if (!list.Count()) {
         DEBUG_INFO("(List empty)\n");
@@ -508,7 +470,7 @@ static void Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
         if (object) {
 
             if (!Get_Extension_Pointer(object)) {
-                DEV_DEBUG_ERROR("%s extension pointer for \"%s\" is null!\n", typeid(BASE_CLASS).name(), Get_Abstract_Name(object));
+                DEV_DEBUG_ERROR("\"%s\" extension pointer for is null!\n", typeid(BASE_CLASS).name());
                 return;
             }
 
@@ -518,7 +480,7 @@ static void Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
             uintptr_t **ext_ptr_addr = ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(object);
             VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(*ext_ptr_addr, "AbstractClass::ExtPtr");
 
-            DEV_DEBUG_INFO("  Requested remap of %s's extension pointer.\n", Get_Abstract_Name(object));
+            DEV_DEBUG_INFO("  Requested remap of index %d extension pointer.\n", index);
         }
     }
 
@@ -554,7 +516,8 @@ AbstractClassExtension *Find_Or_Make_Extension_Internal(const AbstractClass *abs
 
         case RTTI_ANIM:
         {
-            break; // BROKEN extptr = Extension_Find_Or_Make(reinterpret_cast<const AnimClass *>(abstract), AnimExtensions, created, allow_make);
+            extptr = Extension_Find_Or_Make(reinterpret_cast<const AnimClass *>(abstract), AnimExtensions, created, allow_make);
+            break;
         }
 
         case RTTI_ANIMTYPE:
@@ -619,7 +582,8 @@ AbstractClassExtension *Find_Or_Make_Extension_Internal(const AbstractClass *abs
 
         case RTTI_ISOTILETYPE:
         {
-            break; // BROKEN extptr = Extension_Find_Or_Make(reinterpret_cast<const IsometricTileTypeClass *>(abstract), IsometricTileTypeExtensions, created, allow_make);
+            extptr = Extension_Find_Or_Make(reinterpret_cast<const IsometricTileTypeClass *>(abstract), IsometricTileTypeExtensions, created, allow_make);
+            break;
         }
 
         case RTTI_OVERLAYTYPE:
@@ -741,8 +705,7 @@ AbstractClassExtension *Fetch_Extension_Internal(const AbstractClass *abstract)
     AbstractClassExtension *ext_ptr = Get_Extension_Pointer(abstract);
 
     if (!ext_ptr) {
-        //if (Wstring(Get_Abstract_Name(abstract)) == Wstring("GASPOT")) { __debugbreak(); }
-        //DEBUG_ERROR("Fetch_Extension: Extension for \"%s\" is null!\n", Get_Abstract_Name(abstract));
+        DEBUG_ERROR("Fetch_Extension: Extension for \"%s\" is null!\n", Get_Abstract_Name(abstract));
         return nullptr;
     }
 
@@ -795,7 +758,8 @@ bool Destroy_Extension_Internal(const AbstractClass *abstract)
 
         case RTTI_ANIM:
         {
-            break; // BROKEN removed = Extension_Destroy(reinterpret_cast<const AnimClass *>(abstract), AnimExtensions);
+            removed = Extension_Destroy(reinterpret_cast<const AnimClass *>(abstract), AnimExtensions);
+            break;
         }
 
         case RTTI_ANIMTYPE:
@@ -860,7 +824,8 @@ bool Destroy_Extension_Internal(const AbstractClass *abstract)
 
         case RTTI_ISOTILETYPE:
         {
-            break; // BROKEN removed = Extension_Destroy(reinterpret_cast<const IsometricTileTypeClass *>(abstract), IsometricTileTypeExtensions);
+            removed = Extension_Destroy(reinterpret_cast<const IsometricTileTypeClass *>(abstract), IsometricTileTypeExtensions);
+            break;
         }
 
         case RTTI_OVERLAYTYPE:
@@ -986,35 +951,35 @@ bool Save_Extensions(IStream *pStm)
      */
     DEBUG_INFO("Save_Extensions(enter)\n");
 
-//    Extension_Save<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions);
-//    Extension_Save<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions);
-//    Extension_Save<AnimClass, AnimClassExtension>(pStm, AnimExtensions);
-//    Extension_Save<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions);
+    Extension_Save<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions);
+    Extension_Save<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions);
+    Extension_Save<AnimClass, AnimClassExtension>(pStm, AnimExtensions);
+    Extension_Save<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions);
     Extension_Save<BuildingClass, BuildingClassExtension>(pStm, BuildingExtensions);
     Extension_Save<BuildingTypeClass, BuildingTypeClassExtension>(pStm, BuildingTypeExtensions);
-//    Extension_Save<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions);
-//    Extension_Save<CampaignClass, CampaignClassExtension>(pStm, CampaignExtensions);
-//    Extension_Save<SideClass, SideClassExtension>(pStm, SideExtensions);
-//    Extension_Save<HouseClass, HouseClassExtension>(pStm, HouseExtensions);
-//    Extension_Save<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions);
-//    Extension_Save<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions);
-//    Extension_Save<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions);
-//    Extension_Save<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions);
-//    Extension_Save<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions);
-//    Extension_Save<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions);
-//    Extension_Save<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions);
-//    Extension_Save<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions);
-//    Extension_Save<SuperClass, SuperClassExtension>(pStm, SuperExtensions);
-//    Extension_Save<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions);
-//    Extension_Save<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions);
-//    Extension_Save<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions);
-//    Extension_Save<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions);
-//    Extension_Save<UnitClass, UnitClassExtension>(pStm, UnitExtensions);
-//    Extension_Save<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions);
-//    Extension_Save<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions);
-//    Extension_Save<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions);
-//    Extension_Save<WaveClass, WaveClassExtension>(pStm, WaveExtensions);
-//    Extension_Save<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions);
+    Extension_Save<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions);
+    Extension_Save<CampaignClass, CampaignClassExtension>(pStm, CampaignExtensions);
+    Extension_Save<SideClass, SideClassExtension>(pStm, SideExtensions);
+    Extension_Save<HouseClass, HouseClassExtension>(pStm, HouseExtensions);
+    Extension_Save<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions);
+    Extension_Save<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions);
+    Extension_Save<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions);
+    Extension_Save<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions);
+    Extension_Save<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions);
+    Extension_Save<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions);
+    Extension_Save<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions);
+    Extension_Save<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions);
+    Extension_Save<SuperClass, SuperClassExtension>(pStm, SuperExtensions);
+    Extension_Save<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions);
+    Extension_Save<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions);
+    Extension_Save<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions);
+    Extension_Save<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions);
+    Extension_Save<UnitClass, UnitClassExtension>(pStm, UnitExtensions);
+    Extension_Save<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions);
+    Extension_Save<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions);
+    Extension_Save<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions);
+    Extension_Save<WaveClass, WaveClassExtension>(pStm, WaveExtensions);
+    Extension_Save<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions);
 
     DEBUG_INFO("Save_Extensions(exit)\n");
 
@@ -1040,35 +1005,35 @@ bool Load_Extensions(IStream *pStm)
      */
     DEBUG_INFO("Load_Extensions(enter)\n");
 
-//    if (!Extension_Load<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions)) { return false; }
-//    if (!Extension_Load<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions)) { return false; }
-//    if (!Extension_Load<AnimClass, AnimClassExtension>(pStm, AnimExtensions)) { return false; }
-//    if (!Extension_Load<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions)) { return false; }
+    if (!Extension_Load<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions)) { return false; }
+    if (!Extension_Load<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions)) { return false; }
+    if (!Extension_Load<AnimClass, AnimClassExtension>(pStm, AnimExtensions)) { return false; }
+    if (!Extension_Load<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions)) { return false; }
     if (!Extension_Load<BuildingClass, BuildingClassExtension>(pStm, BuildingExtensions)) { return false; }
     if (!Extension_Load<BuildingTypeClass, BuildingTypeClassExtension>(pStm, BuildingTypeExtensions)) { return false; }
-//    if (!Extension_Load<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
-//    if (!Extension_Load<CampaignClass, CampaignClassExtension>(pStm, CampaignExtensions)) { return false; }
-//    if (!Extension_Load<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
-//    if (!Extension_Load<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
-//    if (!Extension_Load<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
-//    if (!Extension_Load<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
-//    if (!Extension_Load<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
-//    if (!Extension_Load<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions)) { return false; }
-//    if (!Extension_Load<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
-//    if (!Extension_Load<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
-//    if (!Extension_Load<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
-//    if (!Extension_Load<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
-//    if (!Extension_Load<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
-//    if (!Extension_Load<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
-//    if (!Extension_Load<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions)) { return false; }
-//    if (!Extension_Load<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions)) { return false; }
-//    if (!Extension_Load<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions)) { return false; }
-//    if (!Extension_Load<UnitClass, UnitClassExtension>(pStm, UnitExtensions)) { return false; }
-//    if (!Extension_Load<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions)) { return false; }
-//    if (!Extension_Load<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions)) { return false; }
-//    if (!Extension_Load<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
-//    if (!Extension_Load<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
-//    if (!Extension_Load<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
+    if (!Extension_Load<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
+    if (!Extension_Load<CampaignClass, CampaignClassExtension>(pStm, CampaignExtensions)) { return false; }
+    if (!Extension_Load<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
+    if (!Extension_Load<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
+    if (!Extension_Load<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
+    if (!Extension_Load<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
+    if (!Extension_Load<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
+    if (!Extension_Load<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions)) { return false; }
+    if (!Extension_Load<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
+    if (!Extension_Load<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
+    if (!Extension_Load<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
+    if (!Extension_Load<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
+    if (!Extension_Load<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
+    if (!Extension_Load<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
+    if (!Extension_Load<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions)) { return false; }
+    if (!Extension_Load<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions)) { return false; }
+    if (!Extension_Load<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions)) { return false; }
+    if (!Extension_Load<UnitClass, UnitClassExtension>(pStm, UnitExtensions)) { return false; }
+    if (!Extension_Load<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions)) { return false; }
+    if (!Extension_Load<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions)) { return false; }
+    if (!Extension_Load<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
+    if (!Extension_Load<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
+    if (!Extension_Load<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
 
     DEBUG_INFO("Load_Extensions(exit)\n");
 

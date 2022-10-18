@@ -55,6 +55,7 @@ CampaignClassExtension::CampaignClassExtension(const CampaignClass *this_ptr) :
 CampaignClassExtension::CampaignClassExtension(const NoInitClass &noinit) :
     AbstractTypeClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("CampaignClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

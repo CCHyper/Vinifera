@@ -53,6 +53,7 @@ HouseTypeClassExtension::HouseTypeClassExtension(const HouseTypeClass *this_ptr)
 HouseTypeClassExtension::HouseTypeClassExtension(const NoInitClass &noinit) :
     AbstractTypeClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("HouseTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

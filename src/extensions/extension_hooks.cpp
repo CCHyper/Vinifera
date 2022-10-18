@@ -4,7 +4,7 @@
  *
  *  @project       Vinifera
  *
- *  @file          EXT_HOOKS.CPP
+ *  @file          EXTENSION_HOOKS.CPP
  *
  *  @author        CCHyper
  *
@@ -27,11 +27,81 @@
  ******************************************************************************/
 #include "extension_hooks.h"
 
-#include "iomap.h"
+#include "abstractext_hooks.h"
+#include "technoext_hooks.h"
+#include "footext_hooks.h"
 
-/**
- *  Extended classes here.
- */
+#include "objecttypeext_hooks.h"
+#include "technotypeext_hooks.h"
+
+#include "unitext_hooks.h"
+#include "aircraftext_hooks.h"
+#include "aircrafttypeext_hooks.h"
+#include "animext_hooks.h"
+#include "animtypeext_hooks.h"
+#include "buildingext_hooks.h"
+#include "buildingtypeext_hooks.h"
+#include "bulletext_hooks.h"
+#include "bullettypeext_hooks.h"
+#include "campaignext_hooks.h"
+#include "cellext_hooks.h"
+#include "factoryext_hooks.h"
+#include "houseext_hooks.h"
+#include "housetypeext_hooks.h"
+#include "infantryext_hooks.h"
+#include "infantrytypeext_hooks.h"
+//EXT_RTTI_ISOTILE
+#include "isotiletypeext_hooks.h"
+//EXT_RTTI_LIGHT
+//EXT_RTTI_OVERLAY
+#include "overlaytypeext_hooks.h"
+//EXT_RTTI_PARTICLE
+#include "particletypeext_hooks.h"
+#include "particlesysext_hooks.h"
+#include "particlesystypeext_hooks.h"
+//EXT_RTTI_SCRIPT
+//EXT_RTTI_SCRIPTTYPE
+#include "sideext_hooks.h"
+//EXT_RTTI_SMUDGE
+#include "smudgetypeext_hooks.h"
+#include "supertypeext_hooks.h"
+//EXT_RTTI_TASKFORCE
+#include "teamext_hooks.h"
+//EXT_RTTI_TEAMTYPE
+#include "terrainext_hooks.h"
+#include "terraintypeext_hooks.h"
+//EXT_RTTI_TRIGGER
+//EXT_RTTI_TRIGGERTYPE
+#include "unittypeext_hooks.h"
+//EXT_RTTI_VOXELANIM
+#include "voxelanimtypeext_hooks.h"
+#include "waveext_hooks.h"
+//EXT_RTTI_TAG
+//EXT_RTTI_TAGTYPE
+#include "tiberiumext_hooks.h"
+#include "tactionext_hooks.h"
+//EXT_RTTI_EVENT
+#include "weapontypeext_hooks.h"
+#include "warheadtypeext_hooks.h"
+//EXT_RTTI_WAYPOINT
+//EXT_RTTI_TUBE
+//EXT_RTTI_LIGHTSOURCE
+#include "empulseext_hooks.h"
+//EXT_RTTI_TACTICALMAP
+#include "superext_hooks.h"
+//EXT_RTTI_AITRIGGER
+//EXT_RTTI_AITRIGGERTYPE
+//EXT_RTTI_NEURON
+//EXT_RTTI_FOGGEDOBJECT
+//EXT_RTTI_ALPHASHAPE
+//EXT_RTTI_VEINHOLEMONSTER
+
+
+
+
+
+
+
 #include "initext_hooks.h"
 #include "mainloopext_hooks.h"
 #include "newmenuext_hooks.h"
@@ -52,51 +122,12 @@
 #include "vqaext_hooks.h"
 #include "themeext_hooks.h"
 
-#include "objecttypeext_hooks.h"
-#include "technotypeext_hooks.h"
-#include "buildingtypeext_hooks.h"
-#include "unittypeext_hooks.h"
-#include "infantrytypeext_hooks.h"
-#include "aircrafttypeext_hooks.h"
-#include "warheadtypeext_hooks.h"
-#include "weapontypeext_hooks.h"
-#include "bullettypeext_hooks.h"
-#include "supertypeext_hooks.h"
-#include "voxelanimtypeext_hooks.h"
-#include "animtypeext_hooks.h"
-#include "particletypeext_hooks.h"
-#include "particlesystypeext_hooks.h"
-#include "isotiletypeext_hooks.h"
-#include "overlaytypeext_hooks.h"
-#include "smudgetypeext_hooks.h"
-#include "terraintypeext_hooks.h"
-#include "housetypeext_hooks.h"
-#include "sideext_hooks.h"
-#include "campaignext_hooks.h"
-#include "tiberiumext_hooks.h"
-//#include "taskforceext_hooks.h"
-//#include "aitrigtypeext_hooks.h"
-//#include "scripttypeext_hooks.h"
-//#include "tagtypeext_hooks.h"
-//#include "triggertypeext_hooks.h"
 
-#include "technoext_hooks.h"
-#include "footext_hooks.h"
 
-#include "unitext_hooks.h"
-#include "buildingext_hooks.h"
-#include "aircraftext_hooks.h"
-#include "infantryext_hooks.h"
-#include "cellext_hooks.h"
-#include "houseext_hooks.h"
-#include "teamext_hooks.h"
-#include "tactionext_hooks.h"
-#include "factoryext_hooks.h"
-#include "animext_hooks.h"
-#include "bulletext_hooks.h"
-#include "terrainext_hooks.h"
-#include "superext_hooks.h"
-#include "particlesysext_hooks.h"
+
+
+
+
 
 #include "combatext_hooks.h"
 
@@ -124,6 +155,13 @@
 
 #include "filepcx_hooks.h"
 
+
+
+
+
+
+#include "iomap.h"
+
 #include "extension.h"
 #include "swizzle.h"
 
@@ -131,81 +169,21 @@
 #include "hooker_macros.h"
 
 
-/**
- *  This patch clears the DWORD at 0x10 (0x10 is "bool IsDirty") to use the space
- *  for storing a pointer to the extension class instance for this AbstractClass.
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AbstractClass_Constructor_Extension)
-{
-    _asm { mov eax, ecx }
-    _asm { xor ecx, ecx }
-
-    _asm { mov [eax+0x8], 0xFFFFFFFF } // ID
-    _asm { mov [eax+0x0C], ecx } // HeapID
-
-    _asm { mov [eax+0x10], ecx } // IsDirty, now reused as a extension pointer, so we need to clear the DWORD.
-
-    _asm { mov [eax+0x0], 0x006CAA6C } // offset const AbstractClass::`vftable'
-    _asm { mov [eax+0x4], 0x006CAA54 } // offset const AbstractClass::`vftable' for IRTTITypeInfo
-
-    _asm { retn }
-}
 
 
-/**
- *  A fake class for implementing new member functions which allow
- *  access to the "this" pointer of the intended class.
- * 
- *  @note: This must not contain a constructor or deconstructor.
- * 
- *  @note: All functions must not be virtual and must also be prefixed
- *         with "_" to prevent accidental virtualization.
- */
-class AbstractClassExt : public AbstractClass
-{
-    public:
-        IFACEMETHOD_(LONG, IsDirty)();
-};
-
-
-/**
- *  This patch forces AbstractClass::IsDirty() to return true.
- * 
- *  @author: CCHyper
- */
-LONG STDMETHODCALLTYPE AbstractClassExt::IsDirty()
-{
-    return TRUE;
-}
-
-
-static void Extension_Abstract_Hooks()
-{
-    Patch_Jump(0x00405B50, &_AbstractClass_Constructor_Extension);
-
-    Patch_Jump(0x00405E00, &AbstractClassExt::Is_Dirty);
-
-    /**
-     *  Removes the branch from AbstractClass::Abstract_Save which clears IsDirty.
-     */
-    Patch_Byte_Range(0x00405CF8, 0x90, 12);
-}
 
 
 void Extension_Hooks()
 {
     /**
-     *  All game class extensions here.
+     *  Abstract and stack class extensions here.
      */
-    Extension_Abstract_Hooks();
+    AbstractClassExtension_Hooks();
+    //TechnoClassExtension_Hooks();
+    //FootClassExtension_Hooks();
 
     //ObjectTypeClassExtension_Hooks();
     //TechnoTypeClassExtension_Hooks();
-
-    //TechnoClassExtension_Hooks();
-    //FootClassExtension_Hooks();
 
     /**
      *  All game class extensions here.
@@ -242,7 +220,7 @@ void Extension_Hooks()
 //    SmudgeTypeClassExtension_Hooks();
     //EXT_RTTI_SPECIAL
 //    SuperWeaponTypeClassExtension_Hooks();
-    //TaskForceClassExtension_Hooks();
+    //EXT_RTTI_TASKFORCE
 //    TeamClassExtension_Hooks();
     //EXT_RTTI_TEAMTYPE
 //    TerrainClassExtension_Hooks();

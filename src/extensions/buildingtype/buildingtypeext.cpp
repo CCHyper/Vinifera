@@ -52,7 +52,7 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(const BuildingTypeClass *
     IsResetBudgetOnCapture(false),
     IsEligibleForAllyBuilding(false)
 {
-    if (this_ptr) EXT_DEBUG_TRACE("BuildingTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("BuildingTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -64,6 +64,7 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(const BuildingTypeClass *
 BuildingTypeClassExtension::BuildingTypeClassExtension(const NoInitClass &noinit) :
     TechnoTypeClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("BuildingTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 

@@ -55,6 +55,7 @@ BulletTypeClassExtension::BulletTypeClassExtension(const BulletTypeClass *this_p
 BulletTypeClassExtension::BulletTypeClassExtension(const NoInitClass &noinit) :
     ObjectTypeClassExtension(noinit)
 {
+    //EXT_DEBUG_TRACE("BulletTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
