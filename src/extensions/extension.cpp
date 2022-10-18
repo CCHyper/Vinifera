@@ -27,6 +27,12 @@
  ******************************************************************************/
 #include "extension.h"
 #include "tibsun_functions.h"
+#include "vinifera_saveload.h"
+#include "wstring.h"
+#include "vector.h"
+#include "tclassfactory.h"
+#include "swizzle.h"
+#include "tracker.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
@@ -93,12 +99,6 @@
 #include "warheadtypeext.h"
 #include "waveext.h"
 #include "weapontypeext.h"
-
-#include "wstring.h"
-#include "vector.h"
-#include "tclassfactory.h"
-#include "swizzle.h"
-#include "vinifera_saveload.h"
 
 #include <iostream>
 #include <typeinfo>
@@ -216,9 +216,9 @@ bool Is_Extension_Support_Enabled(ExtensionRTTIType rtti)
         case EXT_RTTI_BUILDINGTYPE:
         //case EXT_RTTI_BULLETTYPE:
         //case EXT_RTTI_CAMPAIGN:
-        //case EXT_RTTI_SIDE:
-        //case EXT_RTTI_HOUSE:
-        //case EXT_RTTI_HOUSETYPE:
+        case EXT_RTTI_SIDE:
+        case EXT_RTTI_HOUSE:
+        case EXT_RTTI_HOUSETYPE:
         //case EXT_RTTI_INFANTRY:
         //case EXT_RTTI_INFANTRYTYPE:
         //case EXT_RTTI_ISOTILETYPE:
@@ -470,6 +470,8 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
             DEBUG_ERROR("Failed to release extension \"%s\" stream!\n", Get_TypeID_Name<EXT_CLASS>().c_str());
             return false;
         }
+
+        EXT_DEBUG_INFO("  -> %s\n", reinterpret_cast<AbstractClassExtension *>(lpPS)->Name());
     }
 
     return true;
@@ -504,6 +506,7 @@ static bool Extension_Load(IStream *pStm, DynamicVectorClass<EXT_CLASS *> &list)
             DEBUG_ERROR("OleLoadFromStream failed for extension \"%s\" (Index: %d)!\n", Get_TypeID_Name<EXT_CLASS>().c_str(), index);
             return false;
         }
+
     }
 
     return true;
@@ -973,7 +976,7 @@ bool Load_Extensions(IStream *pStm)
     if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRY) && !Extension_Load<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRYTYPE) && !Extension_Load<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_ISOTILETYPE) && !Extension_Load<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_OVERLAY) && !Extension_Load<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_OVERLAYTYPE) && !Extension_Load<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLESYSTEMTYPE) && !Extension_Load<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLETYPE) && !Extension_Load<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_SIDE) && !Extension_Load<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
@@ -1032,12 +1035,12 @@ bool Request_Extension_Pointer_Remap()
     if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLESYSTEMTYPE) && !Extension_Request_Pointer_Remap<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(ParticleSystemTypes)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLETYPE) && !Extension_Request_Pointer_Remap<ParticleTypeClass, ParticleTypeClassExtension>(ParticleTypes)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_SIDE) && !Extension_Request_Pointer_Remap<SideClass, SideClassExtension>(Sides)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SMUDGE) && !Extension_Request_Pointer_Remap<SmudgeTypeClass, SmudgeTypeClassExtension>(SmudgeTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_SMUDGETYPE) && !Extension_Request_Pointer_Remap<SmudgeTypeClass, SmudgeTypeClassExtension>(SmudgeTypes)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPONTYPE) && !Extension_Request_Pointer_Remap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(SuperWeaponTypes)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAIN) && !Extension_Request_Pointer_Remap<TerrainClass, TerrainClassExtension>(Terrains)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAINTYPE) && !Extension_Request_Pointer_Remap<TerrainTypeClass, TerrainTypeClassExtension>(TerrainTypes)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_UNITTYPE) && !Extension_Request_Pointer_Remap<UnitTypeClass, UnitTypeClassExtension>(UnitTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_VOXELANIM) && !Extension_Request_Pointer_Remap<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(VoxelAnimTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_VOXELANIMTYPE) && !Extension_Request_Pointer_Remap<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(VoxelAnimTypes)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_WAVE) && !Extension_Request_Pointer_Remap<WaveClass, WaveClassExtension>(Waves)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_WEAPONTYPE) && !Extension_Request_Pointer_Remap<WeaponTypeClass, WeaponTypeClassExtension>(WeaponTypes)) { return false; }
     if (Is_Extension_Support_Enabled(EXT_RTTI_WARHEADTYPE) && !Extension_Request_Pointer_Remap<WarheadTypeClass, WarheadTypeClassExtension>(WarheadTypes)) { return false; }
@@ -1080,12 +1083,12 @@ bool Register_Extension_Class_Factories()
     if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLESYSTEMTYPE)) { REGISTER_CLASS(ParticleSystemTypeClassExtension) }
     if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLETYPE)) { REGISTER_CLASS(ParticleTypeClassExtension) }
     if (Is_Extension_Support_Enabled(EXT_RTTI_SIDE)) { REGISTER_CLASS(SideClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SMUDGE)) { REGISTER_CLASS(SmudgeTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_SMUDGETYPE)) { REGISTER_CLASS(SmudgeTypeClassExtension) }
     if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPONTYPE)) { REGISTER_CLASS(SuperWeaponTypeClassExtension) }
     if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAIN)) { REGISTER_CLASS(TerrainClassExtension) }
     if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAINTYPE)) { REGISTER_CLASS(TerrainTypeClassExtension) }
     if (Is_Extension_Support_Enabled(EXT_RTTI_UNITTYPE)) { REGISTER_CLASS(UnitTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_VOXELANIM)) { REGISTER_CLASS(VoxelAnimTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_VOXELANIMTYPE)) { REGISTER_CLASS(VoxelAnimTypeClassExtension) }
     if (Is_Extension_Support_Enabled(EXT_RTTI_WAVE)) { REGISTER_CLASS(WaveClassExtension) }
     if (Is_Extension_Support_Enabled(EXT_RTTI_WEAPONTYPE)) { REGISTER_CLASS(WeaponTypeClassExtension) }
     if (Is_Extension_Support_Enabled(EXT_RTTI_WARHEADTYPE)) { REGISTER_CLASS(WarheadTypeClassExtension) }
@@ -1093,4 +1096,51 @@ bool Register_Extension_Class_Factories()
     if (Is_Extension_Support_Enabled(EXT_RTTI_TIBERIUM)) { REGISTER_CLASS(TiberiumClassExtension) }
 
     return true;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void Clear_Extension_Lists()
+{
+    DEBUG_INFO("Clear_Extension_Lists(enter)\n");
+
+    ++ScenarioInit;
+
+    if (Is_Extension_Support_Enabled(EXT_RTTI_UNIT)) { UnitExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFT)) { AircraftExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFTTYPE)) { AircraftTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIM)) { AnimExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIMTYPE)) { AnimTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDING)) { BuildingExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDINGTYPE)) { BuildingTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_BULLETTYPE)) { BulletTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_CAMPAIGN)) { CampaignExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSE)) { HouseExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSETYPE)) { HouseTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRY)) { InfantryExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRYTYPE)) { InfantryTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_ISOTILETYPE)) { IsometricTileTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_OVERLAYTYPE)) { OverlayTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLESYSTEMTYPE)) { ParticleSystemTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLETYPE)) { ParticleTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_SIDE)) { SideExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_SMUDGETYPE)) { SmudgeTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPONTYPE)) { SuperWeaponTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAIN)) { TerrainExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAINTYPE)) { TerrainTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_UNITTYPE)) { UnitTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_VOXELANIMTYPE)) { VoxelAnimTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_WAVE)) { WaveExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_WEAPONTYPE)) { WeaponTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_WARHEADTYPE)) { WarheadTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPON)) { SuperExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(EXT_RTTI_TIBERIUM)) { TiberiumExtensions.Clear(); }
+
+    --ScenarioInit;
+
+    DEBUG_INFO("Clear_Extension_Lists(exit)\n");
 }

@@ -30,6 +30,7 @@
 #include "campaign.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "vinifera_globals.h"
 #include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
@@ -51,6 +52,14 @@ DECLARE_PATCH(_CampaignClass_Constructor_Patch)
     GET_REGISTER_STATIC(CampaignClass *, this_ptr, ebp); // "this" pointer.
     GET_STACK_STATIC(const char *, ini_name, esp, 0x10); // ini name.
     static CampaignClassExtension *exttype_ptr;
+
+    /**
+     *  If we are performing a load operation, the Windows API will invoke the
+     *  constructors for us as part of the operation, so we can skip our hook here.
+     */
+    if (Vinifera_PerformingLoad) {
+        goto original_code;
+    }
 
     //EXT_DEBUG_TRACE("Creating CampaignClassExtension instance for \"%s\".\n", ini_name);
 

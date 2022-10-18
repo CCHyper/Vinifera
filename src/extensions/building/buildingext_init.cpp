@@ -54,6 +54,10 @@ DECLARE_PATCH(_BuildingClass_Constructor_Patch)
     GET_REGISTER_STATIC(BuildingClass *, this_ptr, esi); // Current "this" pointer.
     static BuildingClassExtension *exttype_ptr;
 
+    /**
+     *  If we are performing a load operation, the Windows API will invoke the
+     *  constructors for us as part of the operation, so we can skip our hook here.
+     */
     if (Vinifera_PerformingLoad) {
         goto original_code;
     }

@@ -30,6 +30,7 @@
 #include "theme.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "vinifera_globals.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"

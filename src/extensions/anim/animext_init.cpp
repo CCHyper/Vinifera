@@ -31,6 +31,7 @@
 #include "animtype.h"
 #include "fatal.h"
 #include "vinifera_util.h"
+#include "vinifera_globals.h"
 #include "tibsun_globals.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -52,6 +53,14 @@ DECLARE_PATCH(_AnimClass_Constructor_Patch)
     GET_REGISTER_STATIC(AnimClass *, this_ptr, esi); // Current "this" pointer.
     static AnimClassExtension *exttype_ptr;
     static AnimTypeClassExtension *animtypeext;
+
+    /**
+     *  If we are performing a load operation, the Windows API will invoke the
+     *  constructors for us as part of the operation, so we can skip our hook here.
+     */
+    if (Vinifera_PerformingLoad) {
+        goto original_code;
+    }
 
     /**
      *  Find existing or create an extended class instance.

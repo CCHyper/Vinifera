@@ -53,6 +53,10 @@ DECLARE_PATCH(_BuildingTypeClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0x4); // ini name.
     static BuildingTypeClassExtension *exttype_ptr;
 
+    /**
+     *  If we are performing a load operation, the Windows API will invoke the
+     *  constructors for us as part of the operation, so we can skip our hook here.
+     */
     if (Vinifera_PerformingLoad) {
         goto original_code;
     }

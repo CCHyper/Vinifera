@@ -30,6 +30,7 @@
 #include "techno.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "vinifera_globals.h"
 #include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
@@ -51,6 +52,14 @@ DECLARE_PATCH(_WaveClass_Default_Constructor_Patch)
 {
     GET_REGISTER_STATIC(WaveClass *, this_ptr, esi); // Current "this" pointer.
     static WaveClassExtension *ext_ptr;
+
+    /**
+     *  If we are performing a load operation, the Windows API will invoke the
+     *  constructors for us as part of the operation, so we can skip our hook here.
+     */
+    if (Vinifera_PerformingLoad) {
+        goto original_code;
+    }
 
     /**
      *  Find existing or create an extended class instance.

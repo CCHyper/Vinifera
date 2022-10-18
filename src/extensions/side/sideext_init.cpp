@@ -30,6 +30,7 @@
 #include "side.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "vinifera_globals.h"
 #include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
@@ -51,6 +52,14 @@ DECLARE_PATCH(_SideClass_Constructor_Patch)
     GET_REGISTER_STATIC(SideClass *, this_ptr, esi); // "this" pointer.
     GET_STACK_STATIC(const char *, ini_name, esp, 0x10); // ini name.
     static SideClassExtension *exttype_ptr;
+
+    /**
+     *  If we are performing a load operation, the Windows API will invoke the
+     *  constructors for us as part of the operation, so we can skip our hook here.
+     */
+    if (Vinifera_PerformingLoad) {
+        goto original_code;
+    }
 
     //EXT_DEBUG_TRACE("Creating SideClassExtension instance for \"%s\".\n", ini_name);
 

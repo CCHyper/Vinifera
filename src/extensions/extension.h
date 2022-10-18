@@ -67,22 +67,19 @@ AbstractClassExtension *Fetch_Extension_Internal(const AbstractClass *abstract);
 bool Destroy_Extension_Internal(const AbstractClass *abstract);
 
 
-bool Is_Extension_Support_Enabled(ExtensionRTTIType rtti);
-
-
-/**
- *  x
- */
-bool Register_Extension_Class_Factories();
-
-
 /**
  *  Save and load interface.
  */
+bool Is_Extension_Support_Enabled(ExtensionRTTIType rtti);
+
 bool Save_Extensions(IStream *pStm);
 bool Load_Extensions(IStream *pStm);
 
 bool Request_Extension_Pointer_Remap();
+
+bool Register_Extension_Class_Factories();
+
+void Clear_Extension_Lists();
 
 
 /**
