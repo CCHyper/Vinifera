@@ -234,9 +234,9 @@ bool Is_Extension_Support_Enabled(ExtensionRTTIType rtti)
         //case EXT_RTTI_UNIT:
         //case EXT_RTTI_UNITTYPE:
         //case EXT_RTTI_VOXELANIMTYPE:
-        //case EXT_RTTI_WARHEADTYPE:
+        case EXT_RTTI_WARHEADTYPE:
         //case EXT_RTTI_WAVE:
-        //case EXT_RTTI_WEAPONTYPE:
+        case EXT_RTTI_WEAPONTYPE:
             return true;
 
         default:
