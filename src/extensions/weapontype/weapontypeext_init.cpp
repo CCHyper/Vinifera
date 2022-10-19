@@ -252,7 +252,7 @@ original_code:
 void WeaponTypeClassExtension_Init()
 {
     Patch_Jump(0x00680BEF, &_WeaponTypeClass_Constructor_Patch);
-    Patch_Jump(0x00680C2E, &_WeaponTypeClass_NoInit_Constructor_Patch);
+    //Patch_Jump(0x00680C2E, &_WeaponTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x00680D0C, &_WeaponTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x006819AC, &_WeaponTypeClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x00681514, &_WeaponTypeClass_Compute_CRC_Patch);

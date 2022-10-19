@@ -266,7 +266,7 @@ original_code:
 void AnimTypeClassExtension_Init()
 {
     Patch_Jump(0x00418798, &_AnimTypeClass_Constructor_Patch);
-    Patch_Jump(0x004187BA, &_AnimTypeClass_NoInit_Constructor_Patch);
+    //Patch_Jump(0x004187BA, &_AnimTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x004187DB, &_AnimTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00419C22, &_AnimTypeClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x00419A18, &_AnimTypeClass_Detach_Patch);

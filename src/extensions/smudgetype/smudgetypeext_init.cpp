@@ -234,7 +234,7 @@ void SmudgeTypeClassExtension_Init()
 {
     Patch_Jump(0x005FB2CC, &_SmudgeTypeClass_Constructor_Patch);
     Patch_Jump(0x005FB2D9, &_SmudgeTypeClass_Constructor_Patch);
-    Patch_Jump(0x005FB2FA, &_SmudgeTypeClass_NoInit_Constructor_Patch);
+    //Patch_Jump(0x005FB2FA, &_SmudgeTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x005FB318, &_SmudgeTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x005FC028, &_SmudgeTypeClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x005FB724, &_SmudgeTypeClass_Compute_CRC_Patch);

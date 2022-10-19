@@ -307,7 +307,7 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
         return true;
     }
 
-    DEBUG_INFO("Saving \"%s\" extensions (Count: %d)\n", Extension_Get_TypeID_Name<EXT_CLASS>().c_str(), list.Count());
+    DEBUG_INFO("Saving \"%s\" extensions (Count: %d)\n", Extension_Get_TypeID_Name<BASE_CLASS>().c_str(), list.Count());
 
     for (int index = 0; index < count; ++index) {
 
@@ -844,7 +844,7 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         case RTTI_INFANTRY:
         case RTTI_INFANTRYTYPE:
         //case RTTI_ISOTILE:                    <- Not yet implemented
-        //case RTTI_ISOTILETYPE:        // <--- !! CRASHES
+        case RTTI_ISOTILETYPE:                  // Supported, but IsoTileTypes's are not saved to file.
         //case RTTI_LIGHT:                      <- Not yet implemented
         //case RTTI_OVERLAY:                    <- Not yet implemented
         case RTTI_OVERLAYTYPE:
@@ -949,7 +949,7 @@ bool Extension::Save(IStream *pStm)
     if (Extension::Is_Support_Enabled(RTTI_INFANTRY) && !Extension_Save<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
     if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE) && !Extension_Save<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
     if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE) && !Extension_Save<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions)) { return false; }
+    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { }                    // <- Do not save!
     if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { }                          // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { }                        // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE) && !Extension_Save<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
@@ -1037,7 +1037,7 @@ bool Extension::Load(IStream *pStm)
     if (Extension::Is_Support_Enabled(RTTI_INFANTRY) && !Extension_Load<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
     if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE) && !Extension_Load<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
     if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE) && !Extension_Load<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions)) { return false; }
+    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { }                    // <- Do not save!
     if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { }                          // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { }                        // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE) && !Extension_Load<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
@@ -1124,7 +1124,7 @@ bool Extension::Request_Pointer_Remap()
     if (Extension::Is_Support_Enabled(RTTI_INFANTRY) && !Extension_Request_Pointer_Remap<InfantryClass, InfantryClassExtension>(Infantry)) { return false; }
     if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE) && !Extension_Request_Pointer_Remap<InfantryTypeClass, InfantryTypeClassExtension>(InfantryTypes)) { return false; }
     if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE) && !Extension_Request_Pointer_Remap<IsometricTileTypeClass, IsometricTileTypeClassExtension>(IsoTileTypes)) { return false; }
+    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { }                    // Does not need to be processed.
     if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { }                          // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { }                        // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE) && !Extension_Request_Pointer_Remap<OverlayTypeClass, OverlayTypeClassExtension>(OverlayTypes)) { return false; }
@@ -1282,7 +1282,7 @@ void Extension::Clear_Vectors()
     if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE)) { BuildingTypeExtensions.Clear(); }
     if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE)) { BulletTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { }                       // Does not need to be processed.
+    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { /* CampaignExtensions.Clear(); */ } // Does not need to be processed.
     if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_HOUSE)) { HouseExtensions.Clear(); }
@@ -1290,7 +1290,7 @@ void Extension::Clear_Vectors()
     if (Extension::Is_Support_Enabled(RTTI_INFANTRY)) { InfantryExtensions.Clear(); }
     if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE)) { InfantryTypeExtensions.Clear(); }
     if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { IsometricTileTypeExtensions.Clear(); }
+    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { /* IsometricTileTypeExtensions.Clear(); */ } // Does not need to be processed.
     if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { }                          // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { }                        // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE)) { OverlayTypeExtensions.Clear(); }

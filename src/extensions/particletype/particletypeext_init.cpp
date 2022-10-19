@@ -269,7 +269,7 @@ original_code:
 void ParticleTypeClassExtension_Init()
 {
     Patch_Jump(0x005AF0CD, &_ParticleTypeClass_Constructor_Patch);
-    Patch_Jump(0x005AF12F, &_ParticleTypeClass_NoInit_Constructor_Patch);
+    //Patch_Jump(0x005AF12F, &_ParticleTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x005AF1A1, &_ParticleTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x005AFC81, &_ParticleTypeClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x005AFB98, &_ParticleTypeClass_Detach_Patch);

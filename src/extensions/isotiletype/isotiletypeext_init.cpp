@@ -53,6 +53,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Constructor_Patch)
     GET_STACK_STATIC(const char *, ini_name, esp, 0x50); // ini name.
     static IsometricTileTypeClassExtension *exttype_ptr;
 
+#if 0
     /**
      *  If we are performing a load operation, the Windows API will invoke the
      *  constructors for us as part of the operation, so we can skip our hook here.
@@ -60,6 +61,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Constructor_Patch)
     if (Vinifera_PerformingLoad) {
         goto original_code;
     }
+#endif
 
     //EXT_DEBUG_TRACE("Creating IsometricTileTypeClassExtension instance for \"%s\".\n", ini_name);
 
@@ -131,8 +133,8 @@ DECLARE_PATCH(_IsometricTileTypeClass_Destructor_Patch)
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov edx, ds:0x007E48C8 } // IsoTileTypes.vtble
-    JMP_REG(eax, 0x004F3387);
+    _asm { mov edx, ds:0x0080F588 } // Neuron vector vtble
+    JMP_REG(eax, 0x004F33CC);
 }
 
 
@@ -320,8 +322,8 @@ original_code:
 void IsometricTileTypeClassExtension_Init()
 {
     Patch_Jump(0x004F32C4, &_IsometricTileTypeClass_Constructor_Patch);
-    Patch_Jump(0x004F331F, &_IsometricTileTypeClass_NoInit_Constructor_Patch);
-    Patch_Jump(0x004F3381, &_IsometricTileTypeClass_Destructor_Patch);
+    //Patch_Jump(0x004F331F, &_IsometricTileTypeClass_NoInit_Constructor_Patch);
+    Patch_Jump(0x004F33C6, &_IsometricTileTypeClass_Destructor_Patch);
     //Patch_Jump(0x004F872E, &_IsometricTileTypeClass_Detach_Patch);
     //Patch_Jump(0x004F85AA, &_IsometricTileTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x004F55F2, &_IsometricTileTypeClass_Init_Patch);

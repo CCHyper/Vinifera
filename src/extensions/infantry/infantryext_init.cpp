@@ -200,7 +200,7 @@ original_code:
 void InfantryClassExtension_Init()
 {
     Patch_Jump(0x004D21E1, &_InfantryClass_Constructor_Patch);
-    Patch_Jump(0x004D940F, &_InfantryClass_NoInit_Constructor_Patch);
+    //Patch_Jump(0x004D940F, &_InfantryClass_NoInit_Constructor_Patch);
     Patch_Jump(0x004D22E1, &_InfantryClass_Destructor_Patch);
     //Patch_Jump(0x004D40E5, &_InfantryClass_Detach_Patch);
     //Patch_Jump(0x004D96DB, &_InfantryClass_Compute_CRC_Patch);

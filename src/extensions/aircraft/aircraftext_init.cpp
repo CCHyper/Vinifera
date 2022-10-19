@@ -201,7 +201,7 @@ original_code:
 void AircraftClassExtension_Init()
 {
     Patch_Jump(0x0040880C, &_AircraftClass_Constructor_Patch);
-    Patch_Jump(0x0040EB81, &_AircraftClass_NoInit_Constructor_Patch);
+    //Patch_Jump(0x0040EB81, &_AircraftClass_NoInit_Constructor_Patch);
     Patch_Jump(0x0040DBB8, &_AircraftClass_Destructor_Patch);
     //Patch_Jump(0x0040EDC5, &_AircraftClass_Detach_Patch);
     //Patch_Jump(0x0040ED91, &_AircraftClass_Compute_CRC_Patch);

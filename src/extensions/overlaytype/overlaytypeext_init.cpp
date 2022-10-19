@@ -239,7 +239,7 @@ void OverlayTypeClassExtension_Init()
 {
     Patch_Jump(0x0058D120, &_OverlayTypeClass_Constructor_Patch);
     Patch_Jump(0x0058D12D, &_OverlayTypeClass_Constructor_Patch);
-    Patch_Jump(0x0058D15A, &_OverlayTypeClass_NoInit_Constructor_Patch);
+    //Patch_Jump(0x0058D15A, &_OverlayTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x0058D19B, &_OverlayTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x0058DC8B, &_OverlayTypeClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x0058D7EA, &_OverlayTypeClass_Compute_CRC_Patch);

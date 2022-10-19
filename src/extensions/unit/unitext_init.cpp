@@ -202,7 +202,7 @@ original_code:
 void UnitClassExtension_Init()
 {
     Patch_Jump(0x0064D7B4, &_UnitClass_Constructor_Patch);
-    Patch_Jump(0x0065967A, &_UnitClass_NoInit_Constructor_Patch);
+    //Patch_Jump(0x0065967A, &_UnitClass_NoInit_Constructor_Patch);
     Patch_Jump(0x0064D8AE, &_UnitClass_Destructor_Patch);
     //Patch_Jump(0x00659863, &_UnitClass_Detach_Patch);
     //Patch_Jump(0x00659825, &_UnitClass_Compute_CRC_Patch);

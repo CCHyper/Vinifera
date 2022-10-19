@@ -239,7 +239,7 @@ original_code:
 void UnitTypeClassExtension_Init()
 {
     Patch_Jump(0x0065BA96, &_UnitTypeClass_Constructor_Patch);
-    Patch_Jump(0x0065BABA, &_UnitTypeClass_NoInit_Constructor_Patch);
+    //Patch_Jump(0x0065BABA, &_UnitTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x0065BAD8, &_UnitTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x0065C798, &_UnitTypeClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x0065C50A, &_UnitTypeClass_Compute_CRC_Patch);

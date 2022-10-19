@@ -237,7 +237,7 @@ original_code:
 void BuildingTypeClassExtension_Init()
 {
     Patch_Jump(0x0043F8B1, &_BuildingTypeClass_Constructor_Patch);
-    Patch_Jump(0x0043F8E4, &_BuildingTypeClass_NoInit_Constructor_Patch);
+    //Patch_Jump(0x0043F8E4, &_BuildingTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x0043F952, &_BuildingTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00444082, &_BuildingTypeClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x00443349, &_BuildingTypeClass_Compute_CRC_Patch);

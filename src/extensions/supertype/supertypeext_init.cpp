@@ -239,7 +239,7 @@ original_code:
 void SuperWeaponTypeClassExtension_Init()
 {
     Patch_Jump(0x0060D04A, &_SuperWeaponTypeClass_Constructor_Patch);
-    Patch_Jump(0x0060D084, &_SuperWeaponTypeClass_NoInit_Constructor_Patch);
+    //Patch_Jump(0x0060D084, &_SuperWeaponTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x0060D0EA, &_SuperWeaponTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x0060D87A, &_SuperWeaponTypeClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x0060D2D3, &_SuperWeaponTypeClass_Compute_CRC_Patch);
