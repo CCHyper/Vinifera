@@ -57,7 +57,7 @@ DECLARE_PATCH(_ThemeClass_ThemeControl_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<ThemeControlExtension>(this_ptr);
+    exttype_ptr = Extension::Make<ThemeControlExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create ThemeControlExtension instance!\n");
         ShowCursor(TRUE);

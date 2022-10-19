@@ -66,7 +66,7 @@ DECLARE_PATCH(_CampaignClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<CampaignClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<CampaignClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create CampaignClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -102,7 +102,7 @@ DECLARE_PATCH(_CampaignClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<CampaignClassExtension>(this_ptr);
+    Extension::Destroy<CampaignClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -149,7 +149,7 @@ DECLARE_PATCH(_CampaignClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<CampaignClassExtension>(this_ptr);
+    Extension::Destroy<CampaignClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -176,7 +176,7 @@ DECLARE_PATCH(_CampaignClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<CampaignClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<CampaignClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -215,7 +215,7 @@ DECLARE_PATCH(_CampaignClass_Read_INI_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<CampaignClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<CampaignClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.

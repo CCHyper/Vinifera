@@ -82,7 +82,7 @@ LayerType AnimClassExt::_In_Which_Layer() const
      *  @author: CCHyper
      */
     AnimTypeClassExtension *animtypeext = nullptr;
-    animtypeext = Fetch_Extension<AnimTypeClassExtension>(Class);
+    animtypeext = Extension::Fetch<AnimTypeClassExtension>(Class);
     if (animtypeext->AttachLayer != LAYER_NONE) {
         return animtypeext->AttachLayer;
     }
@@ -117,7 +117,7 @@ static void Anim_Spawn_Particles(AnimClass *this_ptr)
 {
     AnimTypeClassExtension *animtypeext;
 
-    animtypeext = Fetch_Extension<AnimTypeClassExtension>(this_ptr->Class);
+    animtypeext = Extension::Fetch<AnimTypeClassExtension>(this_ptr->Class);
     if (animtypeext->ParticleToSpawn != PARTICLE_NONE) {
 
         for (int i = 0; i < animtypeext->NumberOfParticles; ++i) {
@@ -176,7 +176,7 @@ DECLARE_PATCH(_AnimClass_Constructor_Layer_Set_Z_Height_Patch)
     GET_REGISTER_STATIC(AnimClass *, this_ptr, esi);
     static AnimTypeClassExtension *animtypeext;
     
-    animtypeext = Fetch_Extension<AnimTypeClassExtension>(this_ptr->Class);
+    animtypeext = Extension::Fetch<AnimTypeClassExtension>(this_ptr->Class);
 
     /**
      *  Set the layer to the highest level if "air" or "top".
@@ -220,7 +220,7 @@ DECLARE_PATCH(_AnimClass_Middle_Create_Crater_ForceBigCraters_Patch)
     coord.Y = tmpcoord->Y;
     coord.Z = tmpcoord->Z;
 
-    animtypeext = Fetch_Extension<AnimTypeClassExtension>(this_ptr->Class);
+    animtypeext = Extension::Fetch<AnimTypeClassExtension>(this_ptr->Class);
 
     /**
      *  Is this anim is to spawn big craters?
@@ -248,7 +248,7 @@ DECLARE_PATCH(_AnimClass_AI_Beginning_Patch)
     static CellClass *cell;
 
     animtype = this_ptr->Class;
-    animtypeext = Fetch_Extension<AnimTypeClassExtension>(animtype);
+    animtypeext = Extension::Fetch<AnimTypeClassExtension>(animtype);
 
     /**
      *  Stolen bytes/code.
@@ -315,7 +315,7 @@ DECLARE_PATCH(_AnimClass_Constructor_Init_Class_Values_Patch)
      *  @author: CCHyper
      */
     if (!this_ptr->ZAdjust) {
-        animtypeext = Fetch_Extension<AnimTypeClassExtension>(this_ptr->Class);
+        animtypeext = Extension::Fetch<AnimTypeClassExtension>(this_ptr->Class);
         this_ptr->ZAdjust = animtypeext->ZAdjust;
     }
 

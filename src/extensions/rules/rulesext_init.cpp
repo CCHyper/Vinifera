@@ -309,6 +309,6 @@ void RulesClassExtension_Init()
     Patch_Jump(0x005C6120, &_RulesClass_Destructor_Patch);
     Patch_Jump(0x005C66FF, &_RulesClass_Initialize_Patch);
     Patch_Jump(0x005C6A4D, &_RulesClass_Process_Patch);
-    Patch_Jump(0x005D17F5, &_RulesClass_Detach_Patch);
+    //Patch_Jump(0x005D17F5, &_RulesClass_Detach_Patch);
     Patch_Jump(0x005CC3BF, &_RulesClass_MPlayer_Patch);
 }

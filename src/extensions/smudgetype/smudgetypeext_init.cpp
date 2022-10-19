@@ -66,7 +66,7 @@ DECLARE_PATCH(_SmudgeTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<SmudgeTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<SmudgeTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create SmudgeTypeClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -123,7 +123,7 @@ DECLARE_PATCH(_SmudgeTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<SmudgeTypeClassExtension>(this_ptr);
+    Extension::Destroy<SmudgeTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -148,7 +148,7 @@ DECLARE_PATCH(_SmudgeTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<SmudgeTypeClassExtension>(this_ptr);
+    Extension::Destroy<SmudgeTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -175,7 +175,7 @@ DECLARE_PATCH(_SmudgeTypeClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<SmudgeTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<SmudgeTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -208,7 +208,7 @@ DECLARE_PATCH(_SmudgeTypeClass_Read_INI_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<SmudgeTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<SmudgeTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.

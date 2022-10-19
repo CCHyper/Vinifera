@@ -164,7 +164,7 @@ void TechnoClassExtension::Response_Capture()
     VocType response = VOC_NONE;
 
     const TechnoTypeClass *technotype = Techno_Type_Class();
-    const TechnoTypeClassExtension *technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
+    const TechnoTypeClassExtension *technotypeext = Extension::Fetch<TechnoTypeClassExtension>(technotype);
     if (technotypeext->VoiceCapture.Count() > 0) {
 
         response = technotypeext->VoiceCapture[Sim_Random_Pick(0, technotypeext->VoiceCapture.Count()-1)];
@@ -199,7 +199,7 @@ void TechnoClassExtension::Response_Enter()
     VocType response = VOC_NONE;
 
     const TechnoTypeClass *technotype = Techno_Type_Class();
-    const TechnoTypeClassExtension *technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
+    const TechnoTypeClassExtension *technotypeext = Extension::Fetch<TechnoTypeClassExtension>(technotype);
     if (technotypeext->VoiceEnter.Count() > 0) {
 
         response = technotypeext->VoiceEnter[Sim_Random_Pick(0, technotypeext->VoiceEnter.Count()-1)];
@@ -234,7 +234,7 @@ void TechnoClassExtension::Response_Deploy()
     VocType response = VOC_NONE;
 
     const TechnoTypeClass *technotype = Techno_Type_Class();
-    const TechnoTypeClassExtension *technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
+    const TechnoTypeClassExtension *technotypeext = Extension::Fetch<TechnoTypeClassExtension>(technotype);
     if (technotypeext->VoiceDeploy.Count() > 0) {
 
         response = technotypeext->VoiceDeploy[Sim_Random_Pick(0, technotypeext->VoiceDeploy.Count()-1)];
@@ -269,7 +269,7 @@ void TechnoClassExtension::Response_Harvest()
     VocType response = VOC_NONE;
 
     const TechnoTypeClass *technotype = Techno_Type_Class();
-    const TechnoTypeClassExtension *technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
+    const TechnoTypeClassExtension *technotypeext = Extension::Fetch<TechnoTypeClassExtension>(technotype);
     if (technotypeext->VoiceHarvest.Count() > 0) {
 
         response = technotypeext->VoiceHarvest[Sim_Random_Pick(0, technotypeext->VoiceHarvest.Count()-1)];
@@ -294,7 +294,7 @@ bool TechnoClassExtension::Can_Passive_Acquire() const
     //EXT_DEBUG_TRACE("TechnoClassExtension::Can_Passive_Acquire - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
     
     const TechnoTypeClass *technotype = Techno_Type_Class();
-    const TechnoTypeClassExtension *technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
+    const TechnoTypeClassExtension *technotypeext = Extension::Fetch<TechnoTypeClassExtension>(technotype);
 
     /**
      *  IsCanPassiveAcquire defaults to true to copy original behaviour, so all units can passive acquire unless told otherwise.

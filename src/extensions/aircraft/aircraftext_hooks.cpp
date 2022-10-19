@@ -67,7 +67,7 @@ DECLARE_PATCH(_AircraftClass_Mission_Unload_Transport_Detach_Sound_Patch)
         /**
          *  Do we have a sound to play when passengers leave us? If so, play it now.
          */
-        technotypeext = Fetch_Extension<TechnoTypeClassExtension>(this_ptr->Techno_Type_Class());
+        technotypeext = Extension::Fetch<TechnoTypeClassExtension>(this_ptr->Techno_Type_Class());
         if (technotypeext->LeaveTransportSound != VOC_NONE) {
             Sound_Effect(technotypeext->LeaveTransportSound, this_ptr->Coord);
         }
@@ -169,7 +169,7 @@ DECLARE_PATCH(_AircraftClass_What_Action_Is_Totable_Patch)
             /**
              *  Fetch the extension instance.
              */
-            unittypeext = Fetch_Extension<UnitTypeClassExtension>(target_unit->Class);
+            unittypeext = Extension::Fetch<UnitTypeClassExtension>(target_unit->Class);
 
             /**
              *  Can this unit be toted/picked up by us?

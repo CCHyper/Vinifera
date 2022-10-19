@@ -56,7 +56,7 @@ DECLARE_PATCH(_BulletClass_AI_SpawnDelay_Patch)
     /**
      *  Fetch the extension instance.
      */
-    bullettypeext = Fetch_Extension<BulletTypeClassExtension>(this_ptr->Class);
+    bullettypeext = Extension::Fetch<BulletTypeClassExtension>(this_ptr->Class);
 
     /**
      *  If this bullet has a custom spawn delay (defaults to the original delay of 3), perform that check first.
@@ -90,7 +90,7 @@ DECLARE_PATCH(_BulletClass_Logic_ShakeScreen_Patch)
     /**
      *  Fetch the extension instance.
      */
-    warheadext = Fetch_Extension<WarheadTypeClassExtension>(warhead);
+    warheadext = Extension::Fetch<WarheadTypeClassExtension>(warhead);
 
     /**
      *  If this warhead has screen shake values defined, then set the blitter

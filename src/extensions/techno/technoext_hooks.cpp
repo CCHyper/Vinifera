@@ -66,7 +66,7 @@ DECLARE_PATCH(_TechnoClass_Is_Allowed_To_Retaliate_Can_Retaliate_Patch)
     GET_REGISTER_STATIC(TechnoClass *, this_ptr, esi);
     static TechnoTypeClassExtension *technotypeext;
 
-    technotypeext = Fetch_Extension<TechnoTypeClassExtension>(this_ptr->Techno_Type_Class());
+    technotypeext = Extension::Fetch<TechnoTypeClassExtension>(this_ptr->Techno_Type_Class());
 
     /**
      *  If this unit is flagged as no being allowed to retaliate to attacks, return false.
@@ -112,7 +112,7 @@ DECLARE_PATCH(_TechnoClass_Fire_At_Electric_Bolt_Patch)
     /**
      *  Spawn the electric bolt.
      */
-    weapontypeext = Fetch_Extension<WeaponTypeClassExtension>(weapon);
+    weapontypeext = Extension::Fetch<WeaponTypeClassExtension>(weapon);
     if (weapontypeext->IsElectricBolt) {
         TechnoClassExtension_Electric_Bolt(this_ptr, target);
     }
@@ -147,7 +147,7 @@ DECLARE_PATCH(_TechnoClass_Fire_At_Suicide_Patch)
     /**
      *  Fetch the extension instance for the firing weapon.
      */
-    weapontypeext = Fetch_Extension<WeaponTypeClassExtension>(weap);
+    weapontypeext = Extension::Fetch<WeaponTypeClassExtension>(weap);
 
     /**
      *  Firing unit must be active in the game world when performing suicide.
@@ -216,7 +216,7 @@ static void Techno_Player_Assign_Mission_Response_Switch(TechnoClass *this_ptr, 
         return;
     }
 
-    TechnoClassExtension *technoext = Fetch_Extension<TechnoClassExtension>(this_ptr);
+    TechnoClassExtension *technoext = Extension::Fetch<TechnoClassExtension>(this_ptr);
 
     switch (mission) {
 
@@ -293,7 +293,7 @@ DECLARE_PATCH(_TechnoClass_Refund_Amount_Soylent_Patch)
     /**
      *  Fetch the extension instance.
      */
-    technotypext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
+    technotypext = Extension::Fetch<TechnoTypeClassExtension>(technotype);
 
     /**
      *  If the object has a soylent value defined, return this.
@@ -342,7 +342,7 @@ DECLARE_PATCH(_TechnoClass_Greatest_Threat_Infantry_Mechanic_Patch)
      *  #NOTE: Removed THREAT_AIR for IsMechanic and IsOmniHealer infantry and it causes
      *         them to chase down damaged friendly aircraft in the air.
      */
-    infantrytypeext = Fetch_Extension<InfantryTypeClassExtension>(infantry_this_ptr->Class);
+    infantrytypeext = Extension::Fetch<InfantryTypeClassExtension>(infantry_this_ptr->Class);
     if (infantrytypeext->IsOmniHealer) {
         method = method|(THREAT_INFANTRY|THREAT_VEHICLES/*|THREAT_AIR*/|THREAT_4000);
     } else if (infantrytypeext->IsMechanic) {
@@ -430,7 +430,7 @@ DECLARE_PATCH(_TechnoClass_Take_Damage_IsAffectsAllies_Patch)
         /**
          *  Is the warhead that hit us one that affects units allied with its firing owner?
          */
-        warheadtypeext = Fetch_Extension<WarheadTypeClassExtension>(warhead);
+        warheadtypeext = Extension::Fetch<WarheadTypeClassExtension>(warhead);
         if (!warheadtypeext->IsAffectsAllies) {
 
             /**
@@ -589,7 +589,7 @@ DECLARE_PATCH(_TechnoClass_Do_Cloak_Cloak_Sound_Patch)
     /**
      *  Fetch the extension instance.
      */
-    technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
+    technotypeext = Extension::Fetch<TechnoTypeClassExtension>(technotype);
 
     /**
      *  Does this object have a custom cloaking sound? If so, use it.
@@ -632,7 +632,7 @@ DECLARE_PATCH(_TechnoClass_Do_Uncloak_Uncloak_Sound_Patch)
     /**
      *  Fetch the extension instance.
      */
-    technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
+    technotypeext = Extension::Fetch<TechnoTypeClassExtension>(technotype);
 
     /**
      *  Does this object have a custom decloaking sound? If so, use it.

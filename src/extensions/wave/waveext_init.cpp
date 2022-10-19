@@ -64,7 +64,7 @@ DECLARE_PATCH(_WaveClass_Default_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Make_Extension<WaveClassExtension>(this_ptr);
+    ext_ptr = Extension::Make<WaveClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -108,7 +108,7 @@ DECLARE_PATCH(_WaveClass_Default_Constructor_Before_Init_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Make_Extension<WaveClassExtension>(this_ptr);
+    ext_ptr = Extension::Make<WaveClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -145,7 +145,7 @@ DECLARE_PATCH(_WaveClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Make_Extension<WaveClassExtension>(this_ptr);
+    ext_ptr = Extension::Make<WaveClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -188,7 +188,7 @@ DECLARE_PATCH(_WaveClass_Constructor_Before_Init_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Make_Extension<WaveClassExtension>(this_ptr);
+    ext_ptr = Extension::Make<WaveClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -223,7 +223,7 @@ DECLARE_PATCH(_WaveClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<WaveClassExtension>(this_ptr);
+    Extension::Destroy<WaveClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -248,7 +248,7 @@ DECLARE_PATCH(_WaveClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<WaveClassExtension>(this_ptr);
+    Extension::Destroy<WaveClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -276,7 +276,7 @@ DECLARE_PATCH(_WaveClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<WaveClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<WaveClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -301,5 +301,5 @@ void WaveClassExtension_Init()
     Patch_Jump(0x0066FECF, &_WaveClass_Constructor_Before_Init_Patch);
     Patch_Jump(0x006702D9, &_WaveClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00672E78, &_WaveClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x00670B3D, &_WaveClass_Detach_Patch);
+    //Patch_Jump(0x00670B3D, &_WaveClass_Detach_Patch);
 }

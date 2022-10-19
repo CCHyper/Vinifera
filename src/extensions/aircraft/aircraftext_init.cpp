@@ -64,7 +64,7 @@ DECLARE_PATCH(_AircraftClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<AircraftClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<AircraftClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create AircraftClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -123,7 +123,7 @@ DECLARE_PATCH(_AircraftClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<AircraftClassExtension>(this_ptr);
+    Extension::Destroy<AircraftClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -151,7 +151,7 @@ DECLARE_PATCH(_AircraftClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<AircraftClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<AircraftClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -181,7 +181,7 @@ DECLARE_PATCH(_AircraftClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<AircraftClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<AircraftClassExtension>(this_ptr);
 
     ext_ptr->Compute_CRC(*crc);
 
@@ -203,6 +203,6 @@ void AircraftClassExtension_Init()
     Patch_Jump(0x0040880C, &_AircraftClass_Constructor_Patch);
     Patch_Jump(0x0040EB81, &_AircraftClass_NoInit_Constructor_Patch);
     Patch_Jump(0x0040DBB8, &_AircraftClass_Destructor_Patch);
-    Patch_Jump(0x0040EDC5, &_AircraftClass_Detach_Patch);
+    //Patch_Jump(0x0040EDC5, &_AircraftClass_Detach_Patch);
     Patch_Jump(0x0040ED91, &_AircraftClass_Compute_CRC_Patch);
 }

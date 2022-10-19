@@ -66,7 +66,7 @@ DECLARE_PATCH(_SuperWeaponTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<SuperWeaponTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<SuperWeaponTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create SuperWeaponTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -125,7 +125,7 @@ DECLARE_PATCH(_SuperWeaponTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<SuperWeaponTypeClassExtension>(this_ptr);
+    Extension::Destroy<SuperWeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -152,7 +152,7 @@ DECLARE_PATCH(_SuperWeaponTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<SuperWeaponTypeClassExtension>(this_ptr);
+    Extension::Destroy<SuperWeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -181,7 +181,7 @@ DECLARE_PATCH(_SuperWeaponTypeClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<SuperWeaponTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<SuperWeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -214,7 +214,7 @@ DECLARE_PATCH(_SuperWeaponTypeClass_Read_INI_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<SuperWeaponTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<SuperWeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.

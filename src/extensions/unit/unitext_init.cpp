@@ -64,7 +64,7 @@ DECLARE_PATCH(_UnitClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<UnitClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<UnitClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create UnitClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -124,7 +124,7 @@ DECLARE_PATCH(_UnitClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<UnitClassExtension>(this_ptr);
+    Extension::Destroy<UnitClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -152,7 +152,7 @@ DECLARE_PATCH(_UnitClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<UnitClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<UnitClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -182,7 +182,7 @@ DECLARE_PATCH(_UnitClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<UnitClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<UnitClassExtension>(this_ptr);
 
     ext_ptr->Compute_CRC(*crc);
 
@@ -204,6 +204,6 @@ void UnitClassExtension_Init()
     Patch_Jump(0x0064D7B4, &_UnitClass_Constructor_Patch);
     Patch_Jump(0x0065967A, &_UnitClass_NoInit_Constructor_Patch);
     Patch_Jump(0x0064D8AE, &_UnitClass_Destructor_Patch);
-    Patch_Jump(0x00659863, &_UnitClass_Detach_Patch);
+    //Patch_Jump(0x00659863, &_UnitClass_Detach_Patch);
     Patch_Jump(0x00659825, &_UnitClass_Compute_CRC_Patch);
 }

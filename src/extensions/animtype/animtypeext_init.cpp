@@ -66,7 +66,7 @@ DECLARE_PATCH(_AnimTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<AnimTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<AnimTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create AnimTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -124,7 +124,7 @@ DECLARE_PATCH(_AnimTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<AnimTypeClassExtension>(this_ptr);
+    Extension::Destroy<AnimTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -149,7 +149,7 @@ DECLARE_PATCH(_AnimTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<AnimTypeClassExtension>(this_ptr);
+    Extension::Destroy<AnimTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -177,7 +177,7 @@ DECLARE_PATCH(_AnimTypeClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<AnimTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<AnimTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -208,7 +208,7 @@ DECLARE_PATCH(_AnimTypeClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<AnimTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<AnimTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -241,7 +241,7 @@ DECLARE_PATCH(_AnimTypeClass_Read_INI_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<AnimTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<AnimTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -269,7 +269,7 @@ void AnimTypeClassExtension_Init()
     Patch_Jump(0x004187BA, &_AnimTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x004187DB, &_AnimTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00419C22, &_AnimTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x00419A18, &_AnimTypeClass_Detach_Patch);
+    //Patch_Jump(0x00419A18, &_AnimTypeClass_Detach_Patch);
     Patch_Jump(0x00419963, &_AnimTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x00419624, &_AnimTypeClass_Read_INI_Patch);
 }

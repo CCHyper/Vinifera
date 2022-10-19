@@ -66,7 +66,7 @@ DECLARE_PATCH(_BuildingTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<BuildingTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<BuildingTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create BuildingTypeClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -125,7 +125,7 @@ DECLARE_PATCH(_BuildingTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<BuildingTypeClassExtension>(this_ptr);
+    Extension::Destroy<BuildingTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -150,7 +150,7 @@ DECLARE_PATCH(_BuildingTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<BuildingTypeClassExtension>(this_ptr);
+    Extension::Destroy<BuildingTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -177,7 +177,7 @@ DECLARE_PATCH(_BuildingTypeClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<BuildingTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<BuildingTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -210,7 +210,7 @@ DECLARE_PATCH(_BuildingTypeClass_Read_INI_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<BuildingTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<BuildingTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.

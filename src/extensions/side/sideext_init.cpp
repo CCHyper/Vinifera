@@ -66,7 +66,7 @@ DECLARE_PATCH(_SideClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<SideClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<SideClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create SideClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -101,7 +101,7 @@ DECLARE_PATCH(_SideClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<SideClassExtension>(this_ptr);
+    Extension::Destroy<SideClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -126,7 +126,7 @@ DECLARE_PATCH(_SideClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<SideClassExtension>(this_ptr);
+    Extension::Destroy<SideClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -153,7 +153,7 @@ DECLARE_PATCH(_SideClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<SideClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<SideClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.

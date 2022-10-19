@@ -787,7 +787,7 @@ void Vinifera_Hooks()
     /**
      *  Set the save game version.
      */
-    ViniferaSaveGameVersion = Get_Extension_Save_Version_Number();
+    ViniferaSaveGameVersion = Extension::Get_Save_Version_Number();
     DEBUG_INFO("Save game version number: %d\n", ViniferaSaveGameVersion);
 
 #if 0

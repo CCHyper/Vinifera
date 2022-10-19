@@ -189,7 +189,7 @@ DECLARE_PATCH(_UnitClass_Draw_Shape_IdleRate_Patch)
     static int frame;
 
     unittype = reinterpret_cast<const UnitTypeClass *>(this_ptr->Techno_Type_Class());
-    unittypeext = Fetch_Extension<UnitTypeClassExtension>(unittype);
+    unittypeext = Extension::Fetch<UnitTypeClassExtension>(unittype);
 
     if (!Locomotion_Is_Moving(this_ptr)) {
         if (this_ptr->FiringSyncDelay >= 0) {
@@ -273,7 +273,7 @@ DECLARE_PATCH(_UnitClass_Mission_Unload_Transport_Detach_Sound_Patch)
     /**
      *  Do we have a sound to play when passengers leave us? If so, play it now.
      */
-    radio_technotypeext = Fetch_Extension<TechnoTypeClassExtension>(this_ptr->Techno_Type_Class());
+    radio_technotypeext = Extension::Fetch<TechnoTypeClassExtension>(this_ptr->Techno_Type_Class());
     if (radio_technotypeext->LeaveTransportSound != VOC_NONE) {
         Sound_Effect(radio_technotypeext->LeaveTransportSound, this_ptr->Coord);
     }
@@ -350,7 +350,7 @@ DECLARE_PATCH(_UnitClass_Draw_It_Unloading_Harvester_Patch)
             /**
              *  Fetch the unloading class from the extended class instance if it exists.
              */
-            unittypeext = Fetch_Extension<UnitTypeClassExtension>(unittype);
+            unittypeext = Extension::Fetch<UnitTypeClassExtension>(unittype);
             if (unittypeext->UnloadingClass) {
                 if (unittypeext->UnloadingClass->Kind_Of() == RTTI_UNITTYPE) {
                     unloading_class = reinterpret_cast<const UnitTypeClass *>(unittypeext->UnloadingClass);
@@ -481,7 +481,7 @@ DECLARE_PATCH(_UnitClass_Draw_Shape_Turret_Facing_Patch)
      */
     start_turret_frame = unittype->Facings * unittype->WalkFrames;
 
-    unittypeext = Fetch_Extension<UnitTypeClassExtension>(unittype);
+    unittypeext = Extension::Fetch<UnitTypeClassExtension>(unittype);
 
     /**
      *  #issue-393
@@ -546,7 +546,7 @@ static void UnitClass_Shake_Screen(UnitClass *unit)
     /**
      *  Fetch the extension instance.
      */
-    unittypeext = Fetch_Extension<UnitTypeClassExtension>(unit->Techno_Type_Class());
+    unittypeext = Extension::Fetch<UnitTypeClassExtension>(unit->Techno_Type_Class());
 
     /**
      *  #issue-414

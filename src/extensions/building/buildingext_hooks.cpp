@@ -71,7 +71,7 @@ DECLARE_PATCH(_BuildingClass_AI_ProduceCash_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<BuildingClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<BuildingClassExtension>(this_ptr);
 
     ext_ptr->Produce_Cash_AI();
 
@@ -106,8 +106,8 @@ DECLARE_PATCH(_BuildingClass_Captured_ProduceCash_Patch)
     /**
      *  Fetch the extension instances.
      */
-    ext_ptr = Fetch_Extension<BuildingClassExtension>(this_ptr);
-    exttype_ptr = Fetch_Extension<BuildingTypeClassExtension>(this_ptr->Class);
+    ext_ptr = Extension::Fetch<BuildingClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<BuildingTypeClassExtension>(this_ptr->Class);
 
     /**
      *  Is the owner a passive/neutral house? Only they can provide the capture bonus.
@@ -191,8 +191,8 @@ DECLARE_PATCH(_BuildingClass_Grand_Opening_ProduceCash_Patch)
     /**
      *  Fetch the extension instances.
      */
-    ext_ptr = Fetch_Extension<BuildingClassExtension>(this_ptr);
-    exttype_ptr = Fetch_Extension<BuildingTypeClassExtension>(this_ptr->Class);
+    ext_ptr = Extension::Fetch<BuildingClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<BuildingTypeClassExtension>(this_ptr->Class);
 
     /**
      *  Start the cash delay timer.
@@ -252,7 +252,7 @@ DECLARE_PATCH(_BuildingClass_Mission_Open_Gate_Open_Sound_Patch)
     /**
      *  Fetch the extension instance.
      */
-    buildingtypeext = Fetch_Extension<BuildingTypeClassExtension>(buildingtype);
+    buildingtypeext = Extension::Fetch<BuildingTypeClassExtension>(buildingtype);
 
     /**
      *  Does this building have a custom gate lowering sound? If so, use it.
@@ -287,7 +287,7 @@ DECLARE_PATCH(_BuildingClass_Mission_Open_Gate_Close_Sound_Patch)
     /**
      *  Fetch the extension instance.
      */
-    buildingtypeext = Fetch_Extension<BuildingTypeClassExtension>(buildingtype);
+    buildingtypeext = Extension::Fetch<BuildingTypeClassExtension>(buildingtype);
 
     /**
      *  Does this building have a custom gate rising sound? If so, use it.
@@ -323,7 +323,7 @@ static void BuildingClass_Shake_Screen(BuildingClass *building)
     /**
      *  Fetch the extension instance.
      */
-    buildingtypeext = Fetch_Extension<BuildingTypeClassExtension>(building->Techno_Type_Class());
+    buildingtypeext = Extension::Fetch<BuildingTypeClassExtension>(building->Techno_Type_Class());
 
     /**
      *  #issue-414
@@ -434,7 +434,7 @@ DECLARE_PATCH(_BuildingClass_Draw_Spied_Cameo_Palette_Patch)
      * 
      *  @author: CCHyper
      */
-    technotypeext = Fetch_Extension<TechnoTypeClassExtension>(technotype);
+    technotypeext = Extension::Fetch<TechnoTypeClassExtension>(technotype);
     if (technotypeext->CameoImageSurface) {
 
         /**

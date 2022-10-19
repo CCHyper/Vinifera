@@ -170,29 +170,139 @@
 
 
 
+#include "tracker.h"
+static void _Detach_This_From_All_Intercept(TARGET target, bool all)
+{
+    Extension::Detach_This_From_All(target, all);
+
+    Detach_This_From_All(target, all);
+}
 
 
 
 void Extension_Hooks()
 {
+    Patch_Call(0x0040DBB3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0040F123, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0040FCD3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00410223, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004142C6, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00426662, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0043F94D, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0044407D, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004445F3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004474D3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00447DC3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00448723, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00448AE3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00448EF3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00456A26, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00456A58, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00456A7F, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00456AAB, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00456AD2, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004571F9, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004927D3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004931E3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00496DB3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00497AA3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004BB6DB, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004CDE93, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004CE603, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004D22DC, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004DA3B4, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004DB133, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004F2173, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004F23E3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x004F3344, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005015E3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00501DA3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00585F9E, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00586DB5, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0058B563, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0058CB13, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0058D196, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0058DC86, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005A32FA, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005A503A, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005A56D4, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005AE573, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005AEC63, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005AF153, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005AFC33, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005E78C3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005E7B83, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005E81E3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005E8293, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005F1AE3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005F1D93, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005FAAD3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005FAF03, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005FB313, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x005FC023, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00618D03, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0061DAD3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0061E4B6, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0061E73B, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0061E9AA, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0061F164, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00621503, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00621E43, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x006224E3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00627EF3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00629293, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0063F188, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00640C38, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00641653, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00641D83, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00642223, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00642F23, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00644A45, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x006491A3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00649943, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00649E03, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0064AFD3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0064B603, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0064D8A9, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0065BAD3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0065C793, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0065DF23, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0065F5A3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00660093, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00661227, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00661C00, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0066EF73, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0066FA93, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x006702D4, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00672E73, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00673563, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00673AA3, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x00680C54, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x006818F4, &_Detach_This_From_All_Intercept);
+
+
+
+
+
+
     /**
      *  Abstract and stack class extensions here.
      */
     AbstractClassExtension_Hooks();
 
-//    if (Is_Extension_Support_Enabled(RTTI_UNIT)
-//     || Is_Extension_Support_Enabled(RTTI_INFANTRY)
-//     || Is_Extension_Support_Enabled(RTTI_BUILDING)
-//     || Is_Extension_Support_Enabled(RTTI_AIRCRAFT)) {
+//    if (Extension::Is_Support_Enabled(RTTI_UNIT)
+//     || Extension::Is_Support_Enabled(RTTI_INFANTRY)
+//     || Extension::Is_Support_Enabled(RTTI_BUILDING)
+//     || Extension::Is_Support_Enabled(RTTI_AIRCRAFT)) {
 //
 //        TechnoClassExtension_Hooks();
 //        FootClassExtension_Hooks();
 //    }
 //
-//    if (Is_Extension_Support_Enabled(RTTI_UNITTYPE)
-//     || Is_Extension_Support_Enabled(RTTI_INFANTRYTYPE)
-//     || Is_Extension_Support_Enabled(RTTI_BUILDINGTYPE)
-//     || Is_Extension_Support_Enabled(RTTI_AIRCRAFTTYPE)) {
+//    if (Extension::Is_Support_Enabled(RTTI_UNITTYPE)
+//     || Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE)
+//     || Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE)
+//     || Extension::Is_Support_Enabled(RTTI_AIRCRAFTTYPE)) {
 //
 //        ObjectTypeClassExtension_Hooks();
 //        TechnoTypeClassExtension_Hooks();
@@ -201,67 +311,67 @@ void Extension_Hooks()
     /**
      *  All game class extensions here.
      */
-    if (Is_Extension_Support_Enabled(RTTI_UNIT)) { UnitClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFT)) { AircraftClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFTTYPE)) { AircraftTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_ANIM)) { AnimClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_ANIMTYPE)) { AnimTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_BUILDING)) { BuildingClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_BUILDINGTYPE)) { BuildingTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_BULLET)) { BulletClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_BULLETTYPE)) { BulletTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_CAMPAIGN)) { CampaignClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_CELL)) { CellClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_FACTORY)) { FactoryClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_HOUSE)) { HouseClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_HOUSETYPE)) { HouseTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_INFANTRY)) { InfantryClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_INFANTRYTYPE)) { InfantryTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_ISOTILE)) { EXT_RTTI_ISOTILE; }
-    if (Is_Extension_Support_Enabled(RTTI_ISOTILETYPE)) { IsometricTileTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_LIGHT)) { EXT_RTTI_LIGHT; }
-    if (Is_Extension_Support_Enabled(RTTI_OVERLAY)) { EXT_RTTI_OVERLAY; }
-    if (Is_Extension_Support_Enabled(RTTI_OVERLAYTYPE)) { OverlayTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_PARTICLE)) { EXT_RTTI_PARTICLE; }
-    if (Is_Extension_Support_Enabled(RTTI_PARTICLETYPE)) { ParticleTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_PARTICLESYSTEM)) { ParticleSystemClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_PARTICLESYSTEMTYPE)) { ParticleSystemTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_SCRIPT)) { EXT_RTTI_SCRIPT; }
-    if (Is_Extension_Support_Enabled(RTTI_SCRIPTTYPE)) { EXT_RTTI_SCRIPTTYPE; }
-    if (Is_Extension_Support_Enabled(RTTI_SIDE)) { SideClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_SMUDGE)) { EXT_RTTI_SMUDGE; }
-    if (Is_Extension_Support_Enabled(RTTI_SMUDGETYPE)) { SmudgeTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPONTYPE)) { SuperWeaponTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_TASKFORCE)) { EXT_RTTI_TASKFORCE; }
-    if (Is_Extension_Support_Enabled(RTTI_TEAM)) { TeamClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_TEAMTYPE)) { EXT_RTTI_TEAMTYPE; }
-    if (Is_Extension_Support_Enabled(RTTI_TERRAIN)) { TerrainClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_TERRAINTYPE)) { TerrainTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_TRIGGER)) { EXT_RTTI_TRIGGER; }
-    if (Is_Extension_Support_Enabled(RTTI_TRIGGERTYPE)) { EXT_RTTI_TRIGGERTYPE; }
-    if (Is_Extension_Support_Enabled(RTTI_UNITTYPE)) { UnitTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_VOXELANIM)) { EXT_RTTI_VOXELANIM; }
-    if (Is_Extension_Support_Enabled(RTTI_VOXELANIMTYPE)) { VoxelAnimTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_WAVE)) { WaveClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_TAG)) { EXT_RTTI_TAG; }
-    if (Is_Extension_Support_Enabled(RTTI_TAGTYPE)) { EXT_RTTI_TAGTYPE; }
-    if (Is_Extension_Support_Enabled(RTTI_TIBERIUM)) { TiberiumClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_ACTION)) { TActionClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_EVENT)) { EXT_RTTI_EVENT; }
-    if (Is_Extension_Support_Enabled(RTTI_WEAPONTYPE)) { WeaponTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_WARHEADTYPE)) { WarheadTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_WAYPOINT)) { EXT_RTTI_WAYPOINT; }
-    if (Is_Extension_Support_Enabled(RTTI_TUBE)) { EXT_RTTI_TUBE; }
-    if (Is_Extension_Support_Enabled(RTTI_LIGHTSOURCE)) { EXT_RTTI_LIGHTSOURCE; }
-    if (Is_Extension_Support_Enabled(RTTI_EMPULSE)) { EMPulseClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_TACTICALMAP)) { EXT_RTTI_TACTICALMAP; }
-    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPON)) { SuperClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(RTTI_AITRIGGER)) { EXT_RTTI_AITRIGGER; }
-    if (Is_Extension_Support_Enabled(RTTI_AITRIGGERTYPE)) { EXT_RTTI_AITRIGGERTYPE; }
-    if (Is_Extension_Support_Enabled(RTTI_NEURON)) { EXT_RTTI_NEURON; }
-    if (Is_Extension_Support_Enabled(RTTI_FOGGEDOBJECT)) { EXT_RTTI_FOGGEDOBJECT; }
-    if (Is_Extension_Support_Enabled(RTTI_ALPHASHAPE)) { EXT_RTTI_ALPHASHAPE; }
-    if (Is_Extension_Support_Enabled(RTTI_VEINHOLEMONSTER)) { EXT_RTTI_VEINHOLEMONSTER; }
+    if (Extension::Is_Support_Enabled(RTTI_UNIT)) { UnitClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFT)) { AircraftClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFTTYPE)) { AircraftTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_ANIM)) { AnimClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_ANIMTYPE)) { AnimTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_BUILDING)) { BuildingClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE)) { BuildingTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_BULLET)) { BulletClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE)) { BulletTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { CampaignClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_CELL)) { CellClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { FactoryClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_HOUSE)) { HouseClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_HOUSETYPE)) { HouseTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_INFANTRY)) { InfantryClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE)) { InfantryTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { EXT_RTTI_ISOTILE; }
+    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { IsometricTileTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { EXT_RTTI_LIGHT; }
+    if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { EXT_RTTI_OVERLAY; }
+    if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE)) { OverlayTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_PARTICLE)) { EXT_RTTI_PARTICLE; }
+    if (Extension::Is_Support_Enabled(RTTI_PARTICLETYPE)) { ParticleTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEM)) { ParticleSystemClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEMTYPE)) { ParticleSystemTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_SCRIPT)) { EXT_RTTI_SCRIPT; }
+    if (Extension::Is_Support_Enabled(RTTI_SCRIPTTYPE)) { EXT_RTTI_SCRIPTTYPE; }
+    if (Extension::Is_Support_Enabled(RTTI_SIDE)) { SideClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_SMUDGE)) { EXT_RTTI_SMUDGE; }
+    if (Extension::Is_Support_Enabled(RTTI_SMUDGETYPE)) { SmudgeTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPONTYPE)) { SuperWeaponTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_TASKFORCE)) { EXT_RTTI_TASKFORCE; }
+    if (Extension::Is_Support_Enabled(RTTI_TEAM)) { TeamClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_TEAMTYPE)) { EXT_RTTI_TEAMTYPE; }
+    if (Extension::Is_Support_Enabled(RTTI_TERRAIN)) { TerrainClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_TERRAINTYPE)) { TerrainTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_TRIGGER)) { EXT_RTTI_TRIGGER; }
+    if (Extension::Is_Support_Enabled(RTTI_TRIGGERTYPE)) { EXT_RTTI_TRIGGERTYPE; }
+    if (Extension::Is_Support_Enabled(RTTI_UNITTYPE)) { UnitTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_VOXELANIM)) { EXT_RTTI_VOXELANIM; }
+    if (Extension::Is_Support_Enabled(RTTI_VOXELANIMTYPE)) { VoxelAnimTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_WAVE)) { WaveClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_TAG)) { EXT_RTTI_TAG; }
+    if (Extension::Is_Support_Enabled(RTTI_TAGTYPE)) { EXT_RTTI_TAGTYPE; }
+    if (Extension::Is_Support_Enabled(RTTI_TIBERIUM)) { TiberiumClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_ACTION)) { TActionClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_EVENT)) { EXT_RTTI_EVENT; }
+    if (Extension::Is_Support_Enabled(RTTI_WEAPONTYPE)) { WeaponTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_WARHEADTYPE)) { WarheadTypeClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_WAYPOINT)) { EXT_RTTI_WAYPOINT; }
+    if (Extension::Is_Support_Enabled(RTTI_TUBE)) { EXT_RTTI_TUBE; }
+    if (Extension::Is_Support_Enabled(RTTI_LIGHTSOURCE)) { EXT_RTTI_LIGHTSOURCE; }
+    if (Extension::Is_Support_Enabled(RTTI_EMPULSE)) { EMPulseClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_TACTICALMAP)) { EXT_RTTI_TACTICALMAP; }
+    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPON)) { SuperClassExtension_Hooks(); }
+    if (Extension::Is_Support_Enabled(RTTI_AITRIGGER)) { EXT_RTTI_AITRIGGER; }
+    if (Extension::Is_Support_Enabled(RTTI_AITRIGGERTYPE)) { EXT_RTTI_AITRIGGERTYPE; }
+    if (Extension::Is_Support_Enabled(RTTI_NEURON)) { EXT_RTTI_NEURON; }
+    if (Extension::Is_Support_Enabled(RTTI_FOGGEDOBJECT)) { EXT_RTTI_FOGGEDOBJECT; }
+    if (Extension::Is_Support_Enabled(RTTI_ALPHASHAPE)) { EXT_RTTI_ALPHASHAPE; }
+    if (Extension::Is_Support_Enabled(RTTI_VEINHOLEMONSTER)) { EXT_RTTI_VEINHOLEMONSTER; }
 
     /**
      *  All global class extensions here.

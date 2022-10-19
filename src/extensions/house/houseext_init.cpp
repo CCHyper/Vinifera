@@ -66,7 +66,7 @@ DECLARE_PATCH(_HouseClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<HouseClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<HouseClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create HouseClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -130,7 +130,7 @@ DECLARE_PATCH(_HouseClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<HouseClassExtension>(this_ptr);
+    Extension::Destroy<HouseClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -158,7 +158,7 @@ DECLARE_PATCH(_HouseClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<HouseClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<HouseClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -192,7 +192,7 @@ DECLARE_PATCH(_HouseClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<HouseClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<HouseClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -217,6 +217,6 @@ void HouseClassExtension_Init()
     Patch_Jump(0x004BAEBE, &_HouseClass_Constructor_Patch);
     Patch_Jump(0x004BA0A3, &_HouseClass_NoInit_Constructor_Patch);
     Patch_Jump(0x004BB9B7, &_HouseClass_Destructor_Patch);
-    Patch_Jump(0x004BF0FA, &_HouseClass_Detach_Patch);
+    //Patch_Jump(0x004BF0FA, &_HouseClass_Detach_Patch);
     Patch_Jump(0x004C49F1, &_HouseClass_Compute_CRC_Patch);
 }

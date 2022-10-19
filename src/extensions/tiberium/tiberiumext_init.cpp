@@ -66,7 +66,7 @@ DECLARE_PATCH(_TiberiumClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<TiberiumClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<TiberiumClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create TiberiumClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -102,7 +102,7 @@ DECLARE_PATCH(_TiberiumClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<TiberiumClassExtension>(this_ptr);
+    Extension::Destroy<TiberiumClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -130,7 +130,7 @@ DECLARE_PATCH(_TiberiumClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<TiberiumClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<TiberiumClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -161,7 +161,7 @@ DECLARE_PATCH(_TiberiumClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<TiberiumClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<TiberiumClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -194,7 +194,7 @@ DECLARE_PATCH(_TiberiumClass_Read_INI_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<TiberiumClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<TiberiumClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -220,7 +220,7 @@ void TiberiumClassExtension_Init()
 {
     Patch_Jump(0x00644A20, &_TiberiumClass_Constructor_Patch);
     Patch_Jump(0x00644A93, &_TiberiumClass_Destructor_Patch);
-    Patch_Jump(0x00645326, &_TiberiumClass_Detach_Patch);
+    //Patch_Jump(0x00645326, &_TiberiumClass_Detach_Patch);
     Patch_Jump(0x00644FCA, &_TiberiumClass_Compute_CRC_Patch);
     Patch_Jump(0x00644E74, &_TiberiumClass_Read_INI_Patch);
 }

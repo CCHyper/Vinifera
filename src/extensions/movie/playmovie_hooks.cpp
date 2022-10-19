@@ -196,7 +196,7 @@ static bool Play_Intro_Movie(CampaignType campaign_id)
      * 
      *  @author: CCHyper
      */
-    CampaignClassExtension *campaignext = Fetch_Extension<CampaignClassExtension>(campaign);
+    CampaignClassExtension *campaignext = Extension::Fetch<CampaignClassExtension>(campaign);
     if (campaignext->IntroMovie[0] != '\0') {
         std::snprintf(movie_filename, sizeof(movie_filename), "%s.VQA", campaignext->IntroMovie);
         DEBUG_INFO("About to play \"%s\".\n", movie_filename);

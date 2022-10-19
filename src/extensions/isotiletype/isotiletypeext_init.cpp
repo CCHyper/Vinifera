@@ -66,7 +66,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<IsometricTileTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<IsometricTileTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create IsometricTileTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -125,7 +125,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<IsometricTileTypeClassExtension>(this_ptr);
+    Extension::Destroy<IsometricTileTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -153,7 +153,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<IsometricTileTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<IsometricTileTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -184,7 +184,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<IsometricTileTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<IsometricTileTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -251,7 +251,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Read_INI_Patch_1)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<IsometricTileTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<IsometricTileTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -297,7 +297,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Read_INI_Patch_2)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<IsometricTileTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<IsometricTileTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.

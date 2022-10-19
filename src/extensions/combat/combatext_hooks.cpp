@@ -77,7 +77,7 @@ DECLARE_PATCH(_Explosion_Damage_IsWallAbsoluteDestroyer_Patch)
          *  of damage? If so, then pass -1 into Reduce_Wall to remove the wall
          *  section from the cell.
          */
-        warheadtypeext = Fetch_Extension<WarheadTypeClassExtension>(warhead);
+        warheadtypeext = Extension::Fetch<WarheadTypeClassExtension>(warhead);
         if (warheadtypeext->IsWallAbsoluteDestroyer) {
             cellptr->Reduce_Wall(-1);
 
@@ -112,7 +112,7 @@ DECLARE_PATCH(_Do_Flash_CombatLightSize_Patch)
     /**
      *  Fetch the extension instance.
      */
-    warheadtypeext = Fetch_Extension<WarheadTypeClassExtension>(warhead);
+    warheadtypeext = Extension::Fetch<WarheadTypeClassExtension>(warhead);
 
     /**
      *  If no custom light size has been set, then just use the default code.

@@ -97,7 +97,7 @@ EBoltClass *TechnoClassExtension_Electric_Bolt(TechnoClass *this_ptr, TARGET tar
     if (ebolt) {
         if (this_ptr->IsActive) {
 
-            TechnoClassExtension *technoext = Fetch_Extension<TechnoClassExtension>(this_ptr);
+            TechnoClassExtension *technoext = Extension::Fetch<TechnoClassExtension>(this_ptr);
 
             /**
              *  Remove existing electric bolt from the object.

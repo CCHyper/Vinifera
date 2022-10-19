@@ -195,7 +195,7 @@ void BuildingClassExtension::Produce_Cash_AI()
     /**
      *  Fetch the extension instance.
      */
-    BuildingTypeClassExtension *buildingtypeext = Fetch_Extension<BuildingTypeClassExtension>(buildingtype);
+    BuildingTypeClassExtension *buildingtypeext = Extension::Fetch<BuildingTypeClassExtension>(buildingtype);
 
 #if 0
     /**

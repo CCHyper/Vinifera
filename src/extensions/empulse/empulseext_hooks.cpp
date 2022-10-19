@@ -52,7 +52,7 @@ DECLARE_PATCH(_EMPulseClass_Create_Building_EMPImmune_Patch)
     GET_REGISTER_STATIC(BuildingTypeClass *, buildingtype, eax);
     static TechnoTypeClassExtension *exttype_ptr;
 
-    exttype_ptr = Fetch_Extension<TechnoTypeClassExtension>(buildingtype);
+    exttype_ptr = Extension::Fetch<TechnoTypeClassExtension>(buildingtype);
 
     /**
      *  Is this building immune to EMP weapons?
@@ -95,7 +95,7 @@ DECLARE_PATCH(_EMPulseClass_Create_Foot_EMPImmune_Patch)
     static ILocomotion *loco;
     static TechnoTypeClassExtension *exttype_ptr;
 
-    exttype_ptr = Fetch_Extension<TechnoTypeClassExtension>(foot->Techno_Type_Class());
+    exttype_ptr = Extension::Fetch<TechnoTypeClassExtension>(foot->Techno_Type_Class());
 
     /**
      *  Is this object immune to EMP weapons?

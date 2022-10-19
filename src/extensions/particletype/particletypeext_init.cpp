@@ -66,7 +66,7 @@ DECLARE_PATCH(_ParticleTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<ParticleTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<ParticleTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create ParticleTypeClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -125,7 +125,7 @@ DECLARE_PATCH(_ParticleTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<ParticleTypeClassExtension>(this_ptr);
+    Extension::Destroy<ParticleTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -150,7 +150,7 @@ DECLARE_PATCH(_ParticleTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<ParticleTypeClassExtension>(this_ptr);
+    Extension::Destroy<ParticleTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -178,7 +178,7 @@ DECLARE_PATCH(_ParticleTypeClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<ParticleTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<ParticleTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -209,7 +209,7 @@ DECLARE_PATCH(_ParticleTypeClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<ParticleTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<ParticleTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -242,7 +242,7 @@ DECLARE_PATCH(_ParticleTypeClass_Read_INI_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<ParticleTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<ParticleTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -272,7 +272,7 @@ void ParticleTypeClassExtension_Init()
     Patch_Jump(0x005AF12F, &_ParticleTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x005AF1A1, &_ParticleTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x005AFC81, &_ParticleTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x005AFB98, &_ParticleTypeClass_Detach_Patch);
+    //Patch_Jump(0x005AFB98, &_ParticleTypeClass_Detach_Patch);
     Patch_Jump(0x005AF8F1, &_ParticleTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x005AF6EC, &_ParticleTypeClass_Read_INI_Patch);
 }

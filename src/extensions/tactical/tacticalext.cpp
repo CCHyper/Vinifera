@@ -684,8 +684,8 @@ void TacticalMapExtension::Draw_Super_Timers()
     for (int i = 0; i < Supers.Count(); ++i) {
 
         SuperClass *super = Supers[i];
-        SuperClassExtension *superext = Fetch_Extension<SuperClassExtension>(super);
-        SuperWeaponTypeClassExtension *supertypeext = Fetch_Extension<SuperWeaponTypeClassExtension>(super->Class);
+        SuperClassExtension *superext = Extension::Fetch<SuperClassExtension>(super);
+        SuperWeaponTypeClassExtension *supertypeext = Extension::Fetch<SuperWeaponTypeClassExtension>(super->Class);
 
         /**
          *  Should we show the recharge timer for this super?

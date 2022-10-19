@@ -66,7 +66,7 @@ DECLARE_PATCH(_WeaponTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<WeaponTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<WeaponTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create WeaponTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -130,7 +130,7 @@ DECLARE_PATCH(_WeaponTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<WeaponTypeClassExtension>(this_ptr);
+    Extension::Destroy<WeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -163,7 +163,7 @@ DECLARE_PATCH(_WeaponTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<WeaponTypeClassExtension>(this_ptr);
+    Extension::Destroy<WeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -192,7 +192,7 @@ DECLARE_PATCH(_WeaponTypeClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<WeaponTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<WeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -225,7 +225,7 @@ DECLARE_PATCH(_WeaponTypeClass_Read_INI_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<WeaponTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<WeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.

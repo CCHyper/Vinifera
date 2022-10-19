@@ -67,7 +67,7 @@ DECLARE_PATCH(_InfantryClass_Per_Cell_Process_Transport_Attach_Sound_Patch)
     /**
      *  If this transport we are entering has a passenger entering sound, play it now.
      */
-    radio_technotypeext = Fetch_Extension<TechnoTypeClassExtension>(techno->Techno_Type_Class());
+    radio_technotypeext = Extension::Fetch<TechnoTypeClassExtension>(techno->Techno_Type_Class());
     if (radio_technotypeext->EnterTransportSound != VOC_NONE) {
         Sound_Effect(radio_technotypeext->EnterTransportSound, techno->Coord);
     }
@@ -89,7 +89,7 @@ DECLARE_PATCH(_InfantryClass_Firing_AI_Mechanic_Patch)
     GET_REGISTER_STATIC(ObjectClass *, targ, esi);      // TarCom as ObjectClass.
     static InfantryTypeClassExtension *infantrytypeext;
 
-    infantrytypeext = Fetch_Extension<InfantryTypeClassExtension>(this_ptr->Class);
+    infantrytypeext = Extension::Fetch<InfantryTypeClassExtension>(this_ptr->Class);
 
     /**
      *  Is this infantry a "dual healer" (can it heal both infantry and units)?
@@ -148,7 +148,7 @@ DECLARE_PATCH(_InfantryClass_What_Action_Mechanic_Patch)
     GET_REGISTER_STATIC(/*const */ObjectClass *, object, esi);  // target
     static InfantryTypeClassExtension *infantrytypeext;
 
-    infantrytypeext = Fetch_Extension<InfantryTypeClassExtension>(this_ptr->Class);
+    infantrytypeext = Extension::Fetch<InfantryTypeClassExtension>(this_ptr->Class);
 
     /**
      *  Is this infantry a "dual healer" (can it heal both infantry and units)?

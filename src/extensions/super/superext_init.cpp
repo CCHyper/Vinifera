@@ -62,7 +62,7 @@ DECLARE_PATCH(_SuperClass_Default_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<SuperClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<SuperClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create SuperClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -97,7 +97,7 @@ DECLARE_PATCH(_SuperClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<SuperClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<SuperClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create SuperClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -132,7 +132,7 @@ DECLARE_PATCH(_SuperClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<SuperClassExtension>(this_ptr);
+    Extension::Destroy<SuperClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -157,7 +157,7 @@ DECLARE_PATCH(_SuperClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<SuperClassExtension>(this_ptr);
+    Extension::Destroy<SuperClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -185,7 +185,7 @@ DECLARE_PATCH(_SuperClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<SuperClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<SuperClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -213,7 +213,7 @@ DECLARE_PATCH(_SuperClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<SuperClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<SuperClassExtension>(this_ptr);
 
     ext_ptr->Compute_CRC(*crc);
 
@@ -236,6 +236,6 @@ void SuperClassExtension_Init()
     Patch_Jump(0x0060B4AB, &_SuperClass_Constructor_Patch);
     Patch_Jump(0x0060B51A, &_SuperClass_Destructor_Patch);
     Patch_Jump(0x0060CC2A, &_SuperClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x0060C81C, &_SuperClass_Detach_Patch);
+    //Patch_Jump(0x0060C81C, &_SuperClass_Detach_Patch);
     Patch_Jump(0x0060C870, &_SuperClass_Compute_CRC_Patch);
 }

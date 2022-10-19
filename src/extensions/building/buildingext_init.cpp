@@ -65,7 +65,7 @@ DECLARE_PATCH(_BuildingClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<BuildingClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<BuildingClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create BuildingClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -125,7 +125,7 @@ DECLARE_PATCH(_BuildingClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<BuildingClassExtension>(this_ptr);
+    Extension::Destroy<BuildingClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -153,7 +153,7 @@ DECLARE_PATCH(_BuildingClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<BuildingClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<BuildingClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -184,7 +184,7 @@ DECLARE_PATCH(_BuildingClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<BuildingClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<BuildingClassExtension>(this_ptr);
 
     ext_ptr->Compute_CRC(*crc);
 
@@ -206,6 +206,6 @@ void BuildingClassExtension_Init()
     Patch_Jump(0x00426615, &_BuildingClass_Constructor_Patch);
     Patch_Jump(0x00426184, &_BuildingClass_NoInit_Constructor_Patch);
     Patch_Jump(0x0042666E, &_BuildingClass_Destructor_Patch);
-    Patch_Jump(0x00433FA9, &_BuildingClass_Detach_Patch);
+    //Patch_Jump(0x00433FA9, &_BuildingClass_Detach_Patch);
     Patch_Jump(0x0043843D, &_BuildingClass_Compute_CRC_Patch);
 }

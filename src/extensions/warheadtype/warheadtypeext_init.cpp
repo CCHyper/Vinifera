@@ -64,7 +64,7 @@ DECLARE_PATCH(_WarheadTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<WarheadTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<WarheadTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create WarheadTypeClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -123,7 +123,7 @@ DECLARE_PATCH(_WarheadTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<WarheadTypeClassExtension>(this_ptr);
+    Extension::Destroy<WarheadTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -148,7 +148,7 @@ DECLARE_PATCH(_WarheadTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<WarheadTypeClassExtension>(this_ptr);
+    Extension::Destroy<WarheadTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -176,7 +176,7 @@ DECLARE_PATCH(_WarheadTypeClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<WarheadTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<WarheadTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -210,7 +210,7 @@ DECLARE_PATCH(_WarheadTypeClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<WarheadTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<WarheadTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -246,7 +246,7 @@ DECLARE_PATCH(_WarheadTypeClass_Read_INI_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<WarheadTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<WarheadTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -276,7 +276,7 @@ void WarheadTypeClassExtension_Init()
     Patch_Jump(0x0066EF4F, &_WarheadTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x0066EF78, &_WarheadTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x0066FA98, &_WarheadTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x0066F9B8, &_WarheadTypeClass_Detach_Patch);
+    //Patch_Jump(0x0066F9B8, &_WarheadTypeClass_Detach_Patch);
     Patch_Jump(0x0066F6A4, &_WarheadTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x0066F566, &_WarheadTypeClass_Read_INI_Patch);
 }

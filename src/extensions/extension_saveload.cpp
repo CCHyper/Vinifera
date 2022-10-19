@@ -342,7 +342,7 @@ bool Vinifera_Put_All(IStream *pStm)
 //    }
 
     DEBUG_INFO("Saving class extensions\n");
-    if (!Save_Extensions(pStm)) {
+    if (!Extension::Save(pStm)) {
         DEBUG_ERROR("\t***** FAILED!\n");
         return false;
     }
@@ -423,7 +423,7 @@ bool Vinifera_Load_All(IStream *pStm)
 //    }
 
     DEBUG_INFO("Loading class extensions\n");
-    if (!Load_Extensions(pStm)) {
+    if (!Extension::Load(pStm)) {
         DEBUG_ERROR("\t***** FAILED!\n");
         return false;
     }
@@ -446,7 +446,7 @@ bool Vinifera_Load_All(IStream *pStm)
 bool Vinifera_Remap_Extension_Pointers()
 {
     DEBUG_INFO("Remapping extension pointers\n");
-    if (!Request_Extension_Pointer_Remap()) {
+    if (!Extension::Request_Pointer_Remap()) {
         DEBUG_ERROR("\t***** FAILED!\n");
         return false;
     }

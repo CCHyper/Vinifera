@@ -652,17 +652,10 @@ bool Vinifera_Register_Com_Objects()
     //DEBUG_INFO("  TestLocomotionClass\n");
     REGISTER_CLASS(TestLocomotionClass);
     
-    /**
-     *  Command line option to disable class extensions.
-     */
-    const char *cmdline = GetCommandLineA();
-    bool no_class_extensions = (std::strstr(cmdline, "-NO_CLASS_EXT") != nullptr);
-    if (!no_class_extensions) {
-        //DEBUG_INFO("  Extension classes\n");
-        Register_Extension_Class_Factories();
-    }
+    //DEBUG_INFO("  Extension classes\n");
+    Extension::Register_Class_Factories();
 
-    //DEBUG_INFO("  ...OK!\n");
+    DEBUG_INFO("  ...OK!\n");
 
     return true;
 }

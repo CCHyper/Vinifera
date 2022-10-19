@@ -66,7 +66,7 @@ DECLARE_PATCH(_VoxelAnimTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<VoxelAnimTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<VoxelAnimTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create VoxelAnimTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -123,7 +123,7 @@ DECLARE_PATCH(_VoxelAnimTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<VoxelAnimTypeClassExtension>(this_ptr);
+    Extension::Destroy<VoxelAnimTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -148,7 +148,7 @@ DECLARE_PATCH(_VoxelAnimTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<VoxelAnimTypeClassExtension>(this_ptr);
+    Extension::Destroy<VoxelAnimTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -176,7 +176,7 @@ DECLARE_PATCH(_VoxelAnimTypeClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<VoxelAnimTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<VoxelAnimTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -207,7 +207,7 @@ DECLARE_PATCH(_VoxelAnimTypeClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<VoxelAnimTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<VoxelAnimTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -240,7 +240,7 @@ DECLARE_PATCH(_VoxelAnimTypeClass_Read_INI_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<VoxelAnimTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<VoxelAnimTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -270,7 +270,7 @@ void VoxelAnimTypeClassExtension_Init()
     //Patch_Jump(0x, &_VoxelAnimTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x0065F5F1, &_VoxelAnimTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x006600E1, &_VoxelAnimTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x0065FFA0, &_VoxelAnimTypeClass_Detach_Patch);
+    //Patch_Jump(0x0065FFA0, &_VoxelAnimTypeClass_Detach_Patch);
     Patch_Jump(0x0065FE22, &_VoxelAnimTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x0065FB54, 0x0065FC53); // Patch out multiple returns to just use 0x0065FC53
     Patch_Jump(0x0065FB76, 0x0065FC53);

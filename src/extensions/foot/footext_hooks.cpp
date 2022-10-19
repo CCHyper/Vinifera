@@ -52,7 +52,7 @@ DECLARE_PATCH(_FootClass_Mission_Move_Can_Passive_Acquire_Patch)
     GET_REGISTER_STATIC(FootClass *, this_ptr, esi);
     static TechnoClassExtension *technoclassext;
 
-    technoclassext = Fetch_Extension<TechnoClassExtension>(this_ptr);
+    technoclassext = Extension::Fetch<TechnoClassExtension>(this_ptr);
 
     /**
      *  Can this unit passively acquire new targets?
@@ -83,7 +83,7 @@ DECLARE_PATCH(_FootClass_Mission_Guard_Can_Passive_Acquire_Patch)
     GET_REGISTER_STATIC(FootClass *, this_ptr, esi);
     static TechnoClassExtension *technoclassext;
 
-    technoclassext = Fetch_Extension<TechnoClassExtension>(this_ptr);
+    technoclassext = Extension::Fetch<TechnoClassExtension>(this_ptr);
 
     /**
      *  Can this unit passively acquire new targets?
@@ -120,7 +120,7 @@ DECLARE_PATCH(_FootClass_Mission_Guard_Area_Can_Passive_Acquire_Patch)
     GET_REGISTER_STATIC(FootClass *, this_ptr, esi);
     static TechnoClassExtension *technoclassext;
 
-    technoclassext = Fetch_Extension<TechnoClassExtension>(this_ptr);
+    technoclassext = Extension::Fetch<TechnoClassExtension>(this_ptr);
 
     /**
      *  Can this unit passively acquire new targets?
@@ -153,7 +153,7 @@ DECLARE_PATCH(_FootClass_AI_IdleRate_Patch)
     GET_REGISTER_STATIC(ILocomotion *, loco, edi);
     static TechnoTypeClassExtension *technotypeext;
 
-    technotypeext = Fetch_Extension<TechnoTypeClassExtension>(this_ptr->Techno_Type_Class());
+    technotypeext = Extension::Fetch<TechnoTypeClassExtension>(this_ptr->Techno_Type_Class());
 
     /**
      *  Stolen bytes/code.

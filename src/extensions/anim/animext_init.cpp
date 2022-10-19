@@ -65,7 +65,7 @@ DECLARE_PATCH(_AnimClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<AnimClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<AnimClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create AnimClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -101,7 +101,7 @@ DECLARE_PATCH(_AnimClass_Constructor_Patch)
      *  @author: CCHyper
      */
     if (!this_ptr->ZAdjust) {
-        animtypeext = Fetch_Extension<AnimTypeClassExtension>(this_ptr->Class);
+        animtypeext = Extension::Fetch<AnimTypeClassExtension>(this_ptr->Class);
         this_ptr->ZAdjust = animtypeext->ZAdjust;
     }
 
@@ -151,7 +151,7 @@ DECLARE_PATCH(_AnimClass_Default_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<AnimClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<AnimClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create AnimClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -208,7 +208,7 @@ DECLARE_PATCH(_AnimClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<AnimClassExtension>(this_ptr);
+    Extension::Destroy<AnimClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -236,7 +236,7 @@ DECLARE_PATCH(_AnimClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<AnimClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<AnimClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -266,7 +266,7 @@ DECLARE_PATCH(_AnimClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<AnimClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<AnimClassExtension>(this_ptr);
 
     ext_ptr->Compute_CRC(*crc);
 
@@ -290,6 +290,6 @@ void AnimClassExtension_Init()
     Patch_Jump(0x004164D7, &_AnimClass_NoInit_Constructor_Patch);
     Patch_Jump(0x0041441F, 0x00414475); // This jump goes from duplicate code in the destructor to our patch, removing the need for two hooks.
     Patch_Jump(0x004142CB, &_AnimClass_Destructor_Patch);
-    Patch_Jump(0x004163D9, &_AnimClass_Detach_Patch);
+    //Patch_Jump(0x004163D9, &_AnimClass_Detach_Patch);
     Patch_Jump(0x00416626, &_AnimClass_Compute_CRC_Patch);
 }

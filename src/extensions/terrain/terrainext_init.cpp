@@ -64,7 +64,7 @@ DECLARE_PATCH(_TerrainClass_Default_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Make_Extension<TerrainClassExtension>(this_ptr);
+    ext_ptr = Extension::Make<TerrainClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create TerrainClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -103,7 +103,7 @@ DECLARE_PATCH(_TerrainClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Make_Extension<TerrainClassExtension>(this_ptr);
+    ext_ptr = Extension::Make<TerrainClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create TerrainClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -146,7 +146,7 @@ DECLARE_PATCH(_TerrainClass_Constructor_Before_Unlimbo_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Make_Extension<TerrainClassExtension>(this_ptr);
+    ext_ptr = Extension::Make<TerrainClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create TerrainClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -182,7 +182,7 @@ DECLARE_PATCH(_TerrainClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<TerrainClassExtension>(this_ptr);
+    Extension::Destroy<TerrainClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -207,7 +207,7 @@ DECLARE_PATCH(_TerrainClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<TerrainClassExtension>(this_ptr);
+    Extension::Destroy<TerrainClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -235,7 +235,7 @@ DECLARE_PATCH(_TerrainClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<TerrainClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<TerrainClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -265,7 +265,7 @@ DECLARE_PATCH(_TerrainClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<TerrainClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<TerrainClassExtension>(this_ptr);
 
     ext_ptr->Compute_CRC(*crc);
 
@@ -289,6 +289,6 @@ void TerrainClassExtension_Init()
     Patch_Jump(0x0063F556, _TerrainClass_Constructor_Before_Unlimbo_Patch);
     Patch_Jump(0x0063F18D, _TerrainClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00640C3D, _TerrainClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x0064089F, _TerrainClass_Detach_Patch);
+    //Patch_Jump(0x0064089F, _TerrainClass_Detach_Patch);
     Patch_Jump(0x0064086E, _TerrainClass_Compute_CRC_Patch);
 }

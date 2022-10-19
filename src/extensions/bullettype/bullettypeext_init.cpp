@@ -66,7 +66,7 @@ DECLARE_PATCH(_BulletTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<BulletTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<BulletTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create BulletTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);
@@ -123,7 +123,7 @@ DECLARE_PATCH(_BulletTypeClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<BulletTypeClassExtension>(this_ptr);
+    Extension::Destroy<BulletTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -148,7 +148,7 @@ DECLARE_PATCH(_BulletTypeClass_Scalar_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<BulletTypeClassExtension>(this_ptr);
+    Extension::Destroy<BulletTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -176,7 +176,7 @@ DECLARE_PATCH(_BulletTypeClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<BulletTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<BulletTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class detach.
@@ -207,7 +207,7 @@ DECLARE_PATCH(_BulletTypeClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<BulletTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<BulletTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class compute crc.
@@ -240,7 +240,7 @@ DECLARE_PATCH(_BulletTypeClass_Read_INI_Patch)
     /**
      *  Fetch the extension instance.
      */
-    exttype_ptr = Fetch_Extension<BulletTypeClassExtension>(this_ptr);
+    exttype_ptr = Extension::Fetch<BulletTypeClassExtension>(this_ptr);
 
     /**
      *  Read type class ini.
@@ -268,7 +268,7 @@ void BulletTypeClassExtension_Init()
     Patch_Jump(0x00447DAA, &_BulletTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x00447E11, &_BulletTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00448771, &_BulletTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x004486B8, &_BulletTypeClass_Detach_Patch);
+    //Patch_Jump(0x004486B8, &_BulletTypeClass_Detach_Patch);
     Patch_Jump(0x004484DD, &_BulletTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x00448275, &_BulletTypeClass_Read_INI_Patch);
 }

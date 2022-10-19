@@ -64,7 +64,7 @@ DECLARE_PATCH(_InfantryClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Make_Extension<InfantryClassExtension>(this_ptr);
+    exttype_ptr = Extension::Make<InfantryClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create InfantryClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -122,7 +122,7 @@ DECLARE_PATCH(_InfantryClass_Destructor_Patch)
     /**
      *  Remove the extended class from the global index.
      */
-    Destroy_Extension<InfantryTypeClassExtension>(this_ptr);
+    Extension::Destroy<InfantryTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -150,7 +150,7 @@ DECLARE_PATCH(_InfantryClass_Detach_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<InfantryClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<InfantryClassExtension>(this_ptr);
 
     ext_ptr->Detach(target, all);
 
@@ -180,7 +180,7 @@ DECLARE_PATCH(_InfantryClass_Compute_CRC_Patch)
     /**
      *  Fetch the extension instance.
      */
-    ext_ptr = Fetch_Extension<InfantryClassExtension>(this_ptr);
+    ext_ptr = Extension::Fetch<InfantryClassExtension>(this_ptr);
 
     ext_ptr->Compute_CRC(*crc);
 
@@ -202,6 +202,6 @@ void InfantryClassExtension_Init()
     Patch_Jump(0x004D21E1, &_InfantryClass_Constructor_Patch);
     Patch_Jump(0x004D940F, &_InfantryClass_NoInit_Constructor_Patch);
     Patch_Jump(0x004D22E1, &_InfantryClass_Destructor_Patch);
-    Patch_Jump(0x004D40E5, &_InfantryClass_Detach_Patch);
+    //Patch_Jump(0x004D40E5, &_InfantryClass_Detach_Patch);
     Patch_Jump(0x004D96DB, &_InfantryClass_Compute_CRC_Patch);
 }

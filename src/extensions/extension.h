@@ -39,71 +39,79 @@
 /**
  *  Do not call these directly! Use the template functions below.
  */
-AbstractClassExtension *Make_Extension_Internal(const AbstractClass *abstract);
-AbstractClassExtension *Fetch_Extension_Internal(const AbstractClass *abstract);
-bool Destroy_Extension_Internal(const AbstractClass *abstract);
+namespace ExtensionPrivate
+{
 
+    AbstractClassExtension *Make_Internal(const AbstractClass *abstract);
+    AbstractClassExtension *Fetch_Internal(const AbstractClass *abstract);
+    bool Destroy_Internal(const AbstractClass *abstract);
+
+}; // namespace "ExtensionPrivate".
+
+
+namespace Extension
+{
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+template<class T>
+T *Fetch(const AbstractClass *abstract)
+{
+    ASSERT(abstract != nullptr);
+
+    return (T *)ExtensionPrivate::Fetch_Internal(abstract);
+}
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+template<class T>
+T *Make(const AbstractClass *abstract)
+{
+    return (T *)ExtensionPrivate::Make_Internal(abstract);
+}
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+template<class T>
+void Destroy(const AbstractClass *abstract)
+{
+    ASSERT(abstract != nullptr);
+
+    ExtensionPrivate::Destroy_Internal(abstract);
+}
 
 /**
  *  Query if Vinifera supports this class with an extension.
  */
-bool Is_Extension_Support_Enabled(RTTIType rtti);
-bool Is_Extension_Support_Enabled(const AbstractClass *abstract);
-
-
-/**
- *  Save and load interface.
- */
-bool Save_Extensions(IStream *pStm);
-bool Load_Extensions(IStream *pStm);
+bool Is_Support_Enabled(RTTIType rtti);
+bool Is_Support_Enabled(const AbstractClass *abstract);
 
 /**
  *  Save and load interface.
  */
-bool Request_Extension_Pointer_Remap();
-
-bool Register_Extension_Class_Factories();
-
-void Clear_Extension_Lists();
-
-unsigned Get_Extension_Save_Version_Number();
-
+bool Save(IStream *pStm);
+bool Load(IStream *pStm);
 
 /**
- *  x
- * 
- *  @author: CCHyper
+ *  
  */
-template<class T>
-T *Fetch_Extension(const AbstractClass *abstract)
-{
-    ASSERT(abstract != nullptr);
+bool Request_Pointer_Remap();
 
-    return (T *)Fetch_Extension_Internal(abstract);
-}
+bool Register_Class_Factories();
 
+void Clear_Vectors();
 
-/**
- *  x
- * 
- *  @author: CCHyper
- */
-template<class T>
-T *Make_Extension(const AbstractClass *abstract)
-{
-    return (T *)Make_Extension_Internal(abstract);
-}
+void Detach_This_From_All(TARGET target, bool all = true);
 
+unsigned Get_Save_Version_Number();
 
-/**
- *  x
- * 
- *  @author: CCHyper
- */
-template<class T>
-void Destroy_Extension(const AbstractClass *abstract)
-{
-    ASSERT(abstract != nullptr);
-
-    Destroy_Extension_Internal(abstract);
-}
+}; // namespace "Extension".
