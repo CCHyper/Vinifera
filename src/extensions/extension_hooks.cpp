@@ -178,107 +178,119 @@ static void _Detach_This_From_All_Intercept(TARGET target, bool all)
     Detach_This_From_All(target, all);
 }
 
+#include "tibsun_functions.h"
+static void _Clear_Vectors_Intercept()
+{
+    Extension::Clear_Vectors();
+
+    Clear_Vectors();
+}
+
 
 
 void Extension_Hooks()
 {
-    Patch_Call(0x0040DBB3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0040F123, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0040FCD3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00410223, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004142C6, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00426662, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0043F94D, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0044407D, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004445F3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004474D3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00447DC3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00448723, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00448AE3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00448EF3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00456A26, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00456A58, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00456A7F, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00456AAB, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00456AD2, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004571F9, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004927D3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004931E3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00496DB3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00497AA3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004BB6DB, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004CDE93, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004CE603, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004D22DC, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004DA3B4, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004DB133, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004F2173, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004F23E3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x004F3344, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005015E3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00501DA3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00585F9E, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00586DB5, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0058B563, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0058CB13, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0058D196, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0058DC86, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005A32FA, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005A503A, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005A56D4, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005AE573, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005AEC63, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005AF153, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005AFC33, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005E78C3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005E7B83, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005E81E3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005E8293, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005F1AE3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005F1D93, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005FAAD3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005FAF03, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005FB313, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x005FC023, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00618D03, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0061DAD3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0061E4B6, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0061E73B, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0061E9AA, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0061F164, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00621503, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00621E43, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x006224E3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00627EF3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00629293, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0063F188, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00640C38, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00641653, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00641D83, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00642223, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00642F23, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00644A45, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x006491A3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00649943, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00649E03, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0064AFD3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0064B603, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0064D8A9, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0065BAD3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0065C793, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0065DF23, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0065F5A3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00660093, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00661227, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00661C00, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0066EF73, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x0066FA93, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x006702D4, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00672E73, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00673563, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00673AA3, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x00680C54, &_Detach_This_From_All_Intercept);
-    Patch_Call(0x006818F4, &_Detach_This_From_All_Intercept);
+    Patch_Call(0x0053DF7A, &_Clear_Vectors_Intercept); // MapSeedClass::Init_Random
+    Patch_Call(0x005DC590, &_Clear_Vectors_Intercept); // Clear_Scenario
+    Patch_Call(0x00601BA2, &_Clear_Vectors_Intercept); // Game_Shutdown
+
+    Patch_Call(0x0040DBB3, &_Detach_This_From_All_Intercept); // AircraftClass::~AircraftClass
+    Patch_Call(0x0040F123, &_Detach_This_From_All_Intercept); // AircraftClass_Fall_To_Death
+    Patch_Call(0x0040FCD3, &_Detach_This_From_All_Intercept); // AircraftTypeClass::~AircraftTypeClass
+    Patch_Call(0x00410223, &_Detach_This_From_All_Intercept); // AircraftTypeClass::~AircraftTypeClass
+    Patch_Call(0x004142C6, &_Detach_This_From_All_Intercept); // AnimClass::~AnimClass
+    Patch_Call(0x00426662, &_Detach_This_From_All_Intercept); // BuildingClass::~BuildingClass
+    Patch_Call(0x0043F94D, &_Detach_This_From_All_Intercept); // BuildingTypeClass::~BuildingTypeClass
+    Patch_Call(0x0044407D, &_Detach_This_From_All_Intercept); // BuildingTypeClass::~BuildingTypeClass
+    Patch_Call(0x004445F3, &_Detach_This_From_All_Intercept); // BulletClass::~BulletClass
+    Patch_Call(0x004474D3, &_Detach_This_From_All_Intercept); // BulletClass::~BulletClass
+    Patch_Call(0x00447DC3, &_Detach_This_From_All_Intercept); // BulletTypeClass::~BulletTypeClass
+    Patch_Call(0x00448723, &_Detach_This_From_All_Intercept); // BulletTypeClass::~BulletTypeClass
+    Patch_Call(0x00448AE3, &_Detach_This_From_All_Intercept); // CampaignClass::~CampaignClass
+    Patch_Call(0x00448EF3, &_Detach_This_From_All_Intercept); // CampaignClass::~CampaignClass
+    Patch_Call(0x00456A26, &_Detach_This_From_All_Intercept); // CellClass::Wall_Update
+    Patch_Call(0x00456A58, &_Detach_This_From_All_Intercept); // CellClass::Wall_Update
+    Patch_Call(0x00456A7F, &_Detach_This_From_All_Intercept); // CellClass::Wall_Update
+    Patch_Call(0x00456AAB, &_Detach_This_From_All_Intercept); // CellClass::Wall_Update
+    Patch_Call(0x00456AD2, &_Detach_This_From_All_Intercept); // CellClass::Wall_Update
+    Patch_Call(0x004571F9, &_Detach_This_From_All_Intercept); // CellClass::Reduce_Wall
+    Patch_Call(0x004927D3, &_Detach_This_From_All_Intercept); // EMPulseClass::~EMPulseClass
+    Patch_Call(0x004931E3, &_Detach_This_From_All_Intercept); // EMPulseClass::~EMPulseClass
+    Patch_Call(0x00496DB3, &_Detach_This_From_All_Intercept); // FactoryClass::~FactoryClass
+    Patch_Call(0x00497AA3, &_Detach_This_From_All_Intercept); // FactoryClass::~FactoryClass
+    Patch_Call(0x004BB6DB, &_Detach_This_From_All_Intercept); // HouseClass::~HouseClass
+    Patch_Call(0x004CDE93, &_Detach_This_From_All_Intercept); // HouseTypeClass::~HouseTypeClass
+    Patch_Call(0x004CE603, &_Detach_This_From_All_Intercept); // HouseTypeClass::~HouseTypeClass
+    Patch_Call(0x004D22DC, &_Detach_This_From_All_Intercept); // InfantryClass::~InfantryClass
+    Patch_Call(0x004DA3B4, &_Detach_This_From_All_Intercept); // InfantryTypeClass::~InfantryTypeClass
+    Patch_Call(0x004DB133, &_Detach_This_From_All_Intercept); // InfantryTypeClass::~InfantryTypeClass
+    Patch_Call(0x004F2173, &_Detach_This_From_All_Intercept); // IsometricTileClass::~IsometricTileClass
+    Patch_Call(0x004F23E3, &_Detach_This_From_All_Intercept); // IsometricTileClass::~IsometricTileClass
+    Patch_Call(0x004F3344, &_Detach_This_From_All_Intercept); // IsometricTileTypeClass::~IsometricTileTypeClass
+    Patch_Call(0x005015E3, &_Detach_This_From_All_Intercept); // LightSourceClass::~LightSourceClass
+    Patch_Call(0x00501DA3, &_Detach_This_From_All_Intercept); // LightSourceClass::~LightSourceClass
+    Patch_Call(0x00585F9E, &_Detach_This_From_All_Intercept); // ObjectClass::Detach_All
+    Patch_Call(0x00586DB5, &_Detach_This_From_All_Intercept); // ObjectClass::entry_E4
+    Patch_Call(0x0058B563, &_Detach_This_From_All_Intercept); // OverlayClass::~OverlayClass
+    Patch_Call(0x0058CB13, &_Detach_This_From_All_Intercept); // OverlayClass::~OverlayClass
+    Patch_Call(0x0058D196, &_Detach_This_From_All_Intercept); // OverlayTypeClass::~OverlayTypeClass
+    Patch_Call(0x0058DC86, &_Detach_This_From_All_Intercept); // OverlayTypeClass::~OverlayTypeClass
+    Patch_Call(0x005A32FA, &_Detach_This_From_All_Intercept); // ParticleClass::~ParticleClass
+    Patch_Call(0x005A503A, &_Detach_This_From_All_Intercept); // ParticleClass::~ParticleClass
+    Patch_Call(0x005A56D4, &_Detach_This_From_All_Intercept); // ParticleSystemClass::~ParticleSystemClass
+    Patch_Call(0x005AE573, &_Detach_This_From_All_Intercept); // ParticleSystemTypeClass::~ParticleSystemTypeClass
+    Patch_Call(0x005AEC63, &_Detach_This_From_All_Intercept); // ParticleSystemTypeClass::~ParticleSystemTypeClass
+    Patch_Call(0x005AF153, &_Detach_This_From_All_Intercept); // ParticleTypeClass::~ParticleTypeClass
+    Patch_Call(0x005AFC33, &_Detach_This_From_All_Intercept); // ParticleTypeClass::~ParticleTypeClass
+    Patch_Call(0x005E78C3, &_Detach_This_From_All_Intercept); // ScriptClass::~ScriptClass
+    Patch_Call(0x005E7B83, &_Detach_This_From_All_Intercept); // ScriptTypeClass::~ScriptTypeClass
+    Patch_Call(0x005E81E3, &_Detach_This_From_All_Intercept); // ScriptClass::~ScriptClass
+    Patch_Call(0x005E8293, &_Detach_This_From_All_Intercept); // ScriptTypeClass::~ScriptTypeClass
+    Patch_Call(0x005F1AE3, &_Detach_This_From_All_Intercept); // SideClass::~SideClass
+    Patch_Call(0x005F1D93, &_Detach_This_From_All_Intercept); // SideClass::~SideClass
+    Patch_Call(0x005FAAD3, &_Detach_This_From_All_Intercept); // SmudgeClass::~SmudgeClass
+    Patch_Call(0x005FAF03, &_Detach_This_From_All_Intercept); // SmudgeClass::~SmudgeClass
+    Patch_Call(0x005FB313, &_Detach_This_From_All_Intercept); // SmudgeTypeClass::~SmudgeTypeClass
+    Patch_Call(0x005FC023, &_Detach_This_From_All_Intercept); // SmudgeTypeClass::~SmudgeTypeClass
+    Patch_Call(0x00618D03, &_Detach_This_From_All_Intercept); // TActionClass::~TActionClass
+    Patch_Call(0x0061DAD3, &_Detach_This_From_All_Intercept); // TActionClass::~TActionClass
+    Patch_Call(0x0061E4B6, &_Detach_This_From_All_Intercept); // TagClass::~TagClass
+    Patch_Call(0x0061E73B, &_Detach_This_From_All_Intercept); // TagClass::~TagClass
+    Patch_Call(0x0061E9AA, &_Detach_This_From_All_Intercept); // TagClass::Spring
+    Patch_Call(0x0061F164, &_Detach_This_From_All_Intercept); // TagTypeClass::~TagTypeClass
+    Patch_Call(0x00621503, &_Detach_This_From_All_Intercept); // TaskForceClass::~TaskForceClass
+    Patch_Call(0x00621E43, &_Detach_This_From_All_Intercept); // TaskForceClass::~TaskForceClass
+    Patch_Call(0x006224E3, &_Detach_This_From_All_Intercept); // TeamClass::~TeamClass
+    Patch_Call(0x00627EF3, &_Detach_This_From_All_Intercept); // TeamTypeClass::~TeamTypeClass
+    Patch_Call(0x00629293, &_Detach_This_From_All_Intercept); // TeamTypeClass::~TeamTypeClass
+    Patch_Call(0x0063F188, &_Detach_This_From_All_Intercept); // TerrainClass::~TerrainClass
+    Patch_Call(0x00640C38, &_Detach_This_From_All_Intercept); // TerrainClass::~TerrainClass
+    Patch_Call(0x00641653, &_Detach_This_From_All_Intercept); // TerrainTypeClass::~TerrainTypeClass
+    Patch_Call(0x00641D83, &_Detach_This_From_All_Intercept); // TerrainTypeClass::~TerrainTypeClass
+    Patch_Call(0x00642223, &_Detach_This_From_All_Intercept); // TEventClass::~TEventClass
+    Patch_Call(0x00642F23, &_Detach_This_From_All_Intercept); // TEventClass::~TEventClass
+    Patch_Call(0x00644A45, &_Detach_This_From_All_Intercept); // TiberiumClass::~TiberiumClass
+    Patch_Call(0x006491A3, &_Detach_This_From_All_Intercept); // TriggerClass::~TriggerClass
+    Patch_Call(0x00649943, &_Detach_This_From_All_Intercept); // TriggerClass::~TriggerClass
+    Patch_Call(0x00649E03, &_Detach_This_From_All_Intercept); // TriggerTypeClass::~TriggerTypeClass
+    Patch_Call(0x0064AFD3, &_Detach_This_From_All_Intercept); // TubeClass::~TubeClass
+    Patch_Call(0x0064B603, &_Detach_This_From_All_Intercept); // TubeClass::~TubeClass
+    Patch_Call(0x0064D8A9, &_Detach_This_From_All_Intercept); // UnitClass::~UnitClass
+    Patch_Call(0x0065BAD3, &_Detach_This_From_All_Intercept); // UnitTypeClass::~UnitTypeClass
+    Patch_Call(0x0065C793, &_Detach_This_From_All_Intercept); // UnitTypeClass::~UnitTypeClass
+    Patch_Call(0x0065DF23, &_Detach_This_From_All_Intercept); // VoxelAnimClass::~VoxelAnimClass
+    Patch_Call(0x0065F5A3, &_Detach_This_From_All_Intercept); // VoxelAnimTypeClass::~VoxelAnimTypeClass
+    Patch_Call(0x00660093, &_Detach_This_From_All_Intercept); // VoxelAnimTypeClass::~VoxelAnimTypeClass
+    Patch_Call(0x00661227, &_Detach_This_From_All_Intercept); // VeinholeMonsterClass::~VeinholeMonsterClass
+    Patch_Call(0x00661C00, &_Detach_This_From_All_Intercept); // VeinholeMonsterClass::Take_Damage
+    Patch_Call(0x0066EF73, &_Detach_This_From_All_Intercept); // WarheadTypeClass::~WarheadTypeClass
+    Patch_Call(0x0066FA93, &_Detach_This_From_All_Intercept); // WarheadTypeClass::~WarheadTypeClass
+    Patch_Call(0x006702D4, &_Detach_This_From_All_Intercept); // WaveClass::~WaveClass
+    Patch_Call(0x00672E73, &_Detach_This_From_All_Intercept); // WaveClass::~WaveClass
+    Patch_Call(0x00673563, &_Detach_This_From_All_Intercept); // WaypointPathClass::~WaypointPathClass
+    Patch_Call(0x00673AA3, &_Detach_This_From_All_Intercept); // WaypointPathClass::~WaypointPathClass
+    Patch_Call(0x00680C54, &_Detach_This_From_All_Intercept); // WeaponTypeClass::~WeaponTypeClass
+    Patch_Call(0x006818F4, &_Detach_This_From_All_Intercept); // WeaponTypeClass::~WeaponTypeClass
 
 
 
