@@ -831,10 +831,11 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         case RTTI_AIRCRAFTTYPE:
         //case RTTI_ANIM:
         //case RTTI_ANIMTYPE:
-        //case RTTI_BUILDING:
+        case RTTI_BUILDING:
         case RTTI_BUILDINGTYPE:
         //case RTTI_BULLET:                     <- Not yet implemented
         //case RTTI_BULLETTYPE:
+        case RTTI_CAMPAIGN:                     // Supported, but Campaign's are not saved to file.
         //case RTTI_CELL:                       <- Not yet implemented
         //case RTTI_FACTORY:                    <- Not yet implemented
         case RTTI_HOUSE:
@@ -888,7 +889,6 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         //case RTTI_VEINHOLEMONSTER:            <- Not yet implemented
             return true;
 
-        case RTTI_CAMPAIGN:                     // Campaign's are not saved to file.
         case RTTI_SPECIAL:                      // Special case for sidebar cameos.
         case RTTI_ABSTRACT:                     // Special case for identifying classes with no What_Am_I() implemented.
             return false;
@@ -1115,7 +1115,7 @@ bool Extension::Request_Pointer_Remap()
     if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE) && !Extension_Request_Pointer_Remap<BuildingTypeClass, BuildingTypeClassExtension>(BuildingTypes)) { return false; }
     if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE) && !Extension_Request_Pointer_Remap<BulletTypeClass, BulletTypeClassExtension>(BulletTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN) && !Extension_Request_Pointer_Remap<CampaignClass, CampaignClassExtension>(Campaigns)) { return false; }
+    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { }                       // Does not need to be processed.
     if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_HOUSE) && !Extension_Request_Pointer_Remap<HouseClass, HouseClassExtension>(Houses)) { return false; }
@@ -1281,7 +1281,7 @@ void Extension::Clear_Vectors()
     if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE)) { BuildingTypeExtensions.Clear(); }
     if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE)) { BulletTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { CampaignExtensions.Clear(); }
+    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { }                       // Does not need to be processed.
     if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_HOUSE)) { HouseExtensions.Clear(); }
@@ -1366,7 +1366,7 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
     if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE)) { Extension_Print_CRCs(BuildingTypeExtensions, fp); }
     if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE)) { Extension_Print_CRCs(BulletTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { Extension_Print_CRCs(CampaignExtensions, fp); }
+    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { }                       // Does not need to be processed.
     if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_HOUSE)) { Extension_Print_CRCs(HouseExtensions, fp); }
@@ -1446,7 +1446,7 @@ void Extension::Detach_This_From_All(TARGET target, bool all)
     if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE)) { Extension_Detach_This_From_All(BuildingTypeExtensions, target, all); }
     if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE)) { Extension_Detach_This_From_All(BulletTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { Extension_Detach_This_From_All(CampaignExtensions, target, all); }
+    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { }                       // Does not need to be processed.
     if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
     if (Extension::Is_Support_Enabled(RTTI_HOUSE)) { Extension_Detach_This_From_All(HouseExtensions, target, all); }
@@ -1588,7 +1588,7 @@ unsigned Extension::Get_Save_Version_Number()
     version += sizeof(ScenarioClassExtension);
     version += sizeof(SessionClassExtension);
 
-    // TOOD EXT_RTTI_TACTICALMAP
+    // TODO EXT_RTTI_TACTICALMAP
     version += sizeof(TacticalMapExtension);
 
     return version;

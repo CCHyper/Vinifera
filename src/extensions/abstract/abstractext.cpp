@@ -29,6 +29,7 @@
 
 #include "abstractext.h"
 #include "tibsun_globals.h"
+#include "tibsun_functions.h"
 #include "swizzle.h"
 #include "vinifera_saveload.h"
 #include "extension.h"
@@ -177,10 +178,14 @@ HRESULT AbstractClassExtension::Internal_Load(IStream *pStm)
 
     //DEV_DEBUG_INFO("Read id = 0x%08X.\n", id);
 
+    Wstring class_name = Name_From_RTTI(RTTIType(What_Am_I()));
+    Wstring this_name = Wstring("this") + ":" + class_name;
+    Wstring thisptr_name = Wstring("ThisPtr") + ":" + class_name;
+
     /**
      *  x
      */
-    VINIFERA_SWIZZLE_REGISTER_POINTER(id, this, "this");
+    VINIFERA_SWIZZLE_REGISTER_POINTER(id, this, this_name.Peek_Buffer());
 
     //DEV_DEBUG_INFO("Registering pointer id = 0x%08X, this = 0x%08X.\n", id, (uintptr_t)(this));
 
@@ -194,7 +199,7 @@ HRESULT AbstractClassExtension::Internal_Load(IStream *pStm)
 
     //DEV_DEBUG_INFO("Read Size_Of = %d.\n", sizeof(*this));
     
-    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ThisPtr, "ThisPtr");
+    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ThisPtr, thisptr_name.Peek_Buffer());
 
     //DEV_DEBUG_INFO("Requested remap of ThisPtr.\n");
 
@@ -215,11 +220,14 @@ HRESULT AbstractClassExtension::Internal_Save(IStream *pStm, BOOL fClearDirty)
         return E_POINTER;
     }
 
+    Wstring class_name = Name_From_RTTI(RTTIType(What_Am_I()));
+    Wstring this_name = Wstring("this") + ":" + class_name;
+
     /**
      *  x
      */
     LONG id;
-    VINIFERA_SWIZZLE_FETCH_SWIZZLE_ID(this, id, "this");
+    VINIFERA_SWIZZLE_FETCH_SWIZZLE_ID(this, id, this_name.Peek_Buffer());
 
     //DEV_DEBUG_INFO("Writing id = 0x%08X.\n", id);
 
