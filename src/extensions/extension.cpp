@@ -181,9 +181,9 @@ bool Is_Extension_Support_Enabled(RTTIType rtti)
         case RTTI_BUILDINGTYPE:
         //case RTTI_BULLETTYPE:
         //case RTTI_CAMPAIGN:
-        //case RTTI_SIDE:
-        //case RTTI_HOUSE:
-        //case RTTI_HOUSETYPE:
+        case RTTI_SIDE:
+        case RTTI_HOUSE:
+        case RTTI_HOUSETYPE:
         case RTTI_INFANTRY:
         case RTTI_INFANTRYTYPE:
         //case RTTI_ISOTILETYPE:
