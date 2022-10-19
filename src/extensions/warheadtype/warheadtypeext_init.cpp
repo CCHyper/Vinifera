@@ -277,6 +277,6 @@ void WarheadTypeClassExtension_Init()
     //Patch_Jump(0x0066EF78, &_WarheadTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x0066FA98, &_WarheadTypeClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x0066F9B8, &_WarheadTypeClass_Detach_Patch);
-    Patch_Jump(0x0066F6A4, &_WarheadTypeClass_Compute_CRC_Patch);
+    //Patch_Jump(0x0066F6A4, &_WarheadTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x0066F566, &_WarheadTypeClass_Read_INI_Patch);
 }

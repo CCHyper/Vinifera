@@ -271,7 +271,7 @@ void VoxelAnimTypeClassExtension_Init()
     //Patch_Jump(0x0065F5F1, &_VoxelAnimTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x006600E1, &_VoxelAnimTypeClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x0065FFA0, &_VoxelAnimTypeClass_Detach_Patch);
-    Patch_Jump(0x0065FE22, &_VoxelAnimTypeClass_Compute_CRC_Patch);
+    //Patch_Jump(0x0065FE22, &_VoxelAnimTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x0065FB54, 0x0065FC53); // Patch out multiple returns to just use 0x0065FC53
     Patch_Jump(0x0065FB76, 0x0065FC53);
     Patch_Jump(0x0065FB9F, 0x0065FC53);

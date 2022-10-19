@@ -238,6 +238,6 @@ void HouseTypeClassExtension_Init()
     Patch_Jump(0x004CDE7A, &_HouseTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x004CDE98, &_HouseTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x004CE608, &_HouseTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x004CE2FE, &_HouseTypeClass_Compute_CRC_Patch);
+    //Patch_Jump(0x004CE2FE, &_HouseTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x004CE1F3, &_HouseTypeClass_Read_INI_Patch);
 }

@@ -238,6 +238,6 @@ void InfantryTypeClassExtension_Init()
     Patch_Jump(0x004DA394, &_InfantryTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x004DA3B9, &_InfantryTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x004DB138, &_InfantryTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x004DAE11, &_InfantryTypeClass_Compute_CRC_Patch);
+    //Patch_Jump(0x004DAE11, &_InfantryTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x004DAC2F, &_InfantryTypeClass_Read_INI_Patch);
 }

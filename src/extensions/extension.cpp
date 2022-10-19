@@ -335,7 +335,11 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
             return false;
         }
 
-        EXT_DEBUG_INFO("  -> %s\n", reinterpret_cast<EXT_CLASS *>(lpPS)->Name());
+        EXT_CLASS * ext_ptr = reinterpret_cast<EXT_CLASS *>(lpPS);
+
+        if (ext_ptr->What_Am_I() != EXT_RTTI_WAVE) {
+            EXT_DEBUG_INFO("  -> %s\n", ext_ptr->Name());
+        }
     }
 
     return true;
@@ -829,7 +833,7 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         case RTTI_UNIT:
         case RTTI_AIRCRAFT:
         case RTTI_AIRCRAFTTYPE:
-        //case RTTI_ANIM:
+        //case RTTI_ANIM:                  <--- !! CRASHES
         //case RTTI_ANIMTYPE:
         case RTTI_BUILDING:
         case RTTI_BUILDINGTYPE:
@@ -843,7 +847,7 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         case RTTI_INFANTRY:
         case RTTI_INFANTRYTYPE:
         //case RTTI_ISOTILE:                    <- Not yet implemented
-        //case RTTI_ISOTILETYPE:
+        //case RTTI_ISOTILETYPE:           <--- !! CRASHES
         //case RTTI_LIGHT:                      <- Not yet implemented
         //case RTTI_OVERLAY:                    <- Not yet implemented
         case RTTI_OVERLAYTYPE:
@@ -856,7 +860,7 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         case RTTI_SIDE:
         //case RTTI_SMUDGE:                     <- Not yet implemented
         case RTTI_SMUDGETYPE:
-        //case RTTI_SUPERWEAPONTYPE:
+        //case RTTI_SUPERWEAPONTYPE:       <--- !! CRASHES
         //case RTTI_TASKFORCE:                  <- Not yet implemented
         //case RTTI_TEAM:                       <- Not yet implemented
         //case RTTI_TEAMTYPE:                   <- Not yet implemented
@@ -867,7 +871,7 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         case RTTI_UNITTYPE:
         //case RTTI_VOXELANIM:                  <- Not yet implemented
         case RTTI_VOXELANIMTYPE:
-        //case RTTI_WAVE:
+        case RTTI_WAVE:
         //case RTTI_TAG:                        <- Not yet implemented
         //case RTTI_TAGTYPE:                    <- Not yet implemented
         //case RTTI_TIBERIUM:
@@ -880,7 +884,7 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         //case RTTI_LIGHTSOURCE:                <- Not yet implemented
         //case RTTI_EMPULSE:                    <- Not yet implemented
         //case RTTI_TACTICALMAP:                <- Not yet implemented, needs rewrite of extension class.
-        //case RTTI_SUPERWEAPON:
+        //case RTTI_SUPERWEAPON:           <--- !! CRASHES
         //case RTTI_AITRIGGER:                  <- Not yet implemented
         //case RTTI_AITRIGGERTYPE:              <- Not yet implemented
         //case RTTI_NEURON:                     <- Not yet implemented

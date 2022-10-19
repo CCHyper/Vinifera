@@ -256,6 +256,6 @@ void AircraftTypeClassExtension_Init()
     Patch_Jump(0x0040FCBA, &_AircraftTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x0040FCD8, &_AircraftTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00410228, &_AircraftTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x0040FF66, &_AircraftTypeClass_Compute_CRC_Patch);
+    //Patch_Jump(0x0040FF66, &_AircraftTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x0040FF0E, &_AircraftTypeClass_Read_INI_Patch);
 }

@@ -218,5 +218,5 @@ void HouseClassExtension_Init()
     Patch_Jump(0x004BA0A3, &_HouseClass_NoInit_Constructor_Patch);
     Patch_Jump(0x004BB9B7, &_HouseClass_Destructor_Patch);
     //Patch_Jump(0x004BF0FA, &_HouseClass_Detach_Patch);
-    Patch_Jump(0x004C49F1, &_HouseClass_Compute_CRC_Patch);
+    //Patch_Jump(0x004C49F1, &_HouseClass_Compute_CRC_Patch);
 }

@@ -244,6 +244,6 @@ void CampaignClassExtension_Init()
     //Patch_Jump(0x00448AE8, &_CampaignClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00448CD0, &_CampaignClass_Process_Patch); // Constructor is also inlined in CampaignClass::Process!
     Patch_Jump(0x00448EF8, &_CampaignClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x00448E4E, &_CampaignClass_Compute_CRC_Patch);
+    //Patch_Jump(0x00448E4E, &_CampaignClass_Compute_CRC_Patch);
     Patch_Jump(0x00448C17, &_CampaignClass_Read_INI_Patch);
 }

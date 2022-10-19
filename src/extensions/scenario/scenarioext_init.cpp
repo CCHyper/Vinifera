@@ -247,5 +247,5 @@ void ScenarioClassExtension_Init()
     Patch_Jump(0x005DAE87, &_ScenarioClass_NoInit_Constructor_Patch);
     Patch_Jump(0x006023CC, &_ScenarioClass_Destructor_Patch); // Inlined in game shutdown.
     Patch_Jump(0x005DB166, &_ScenarioClass_Init_Clear_Patch);
-    Patch_Jump(0x005E1440, &_ScenarioClass_Compute_CRC_Patch);
+    //Patch_Jump(0x005E1440, &_ScenarioClass_Compute_CRC_Patch);
 }

@@ -178,5 +178,5 @@ void SideClassExtension_Init()
     Patch_Jump(0x005F1AC6, &_SideClass_Constructor_Patch);
     //Patch_Jump(0x005F1AE8, &_SideClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x005F1D98, &_SideClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x005F1BC9, &_SideClass_Compute_CRC_Patch);
+    //Patch_Jump(0x005F1BC9, &_SideClass_Compute_CRC_Patch);
 }

@@ -237,5 +237,5 @@ void SuperClassExtension_Init()
     Patch_Jump(0x0060B51A, &_SuperClass_Destructor_Patch);
     Patch_Jump(0x0060CC2A, &_SuperClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x0060C81C, &_SuperClass_Detach_Patch);
-    Patch_Jump(0x0060C870, &_SuperClass_Compute_CRC_Patch);
+    //Patch_Jump(0x0060C870, &_SuperClass_Compute_CRC_Patch);
 }

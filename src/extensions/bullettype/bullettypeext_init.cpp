@@ -269,6 +269,6 @@ void BulletTypeClassExtension_Init()
     //Patch_Jump(0x00447E11, &_BulletTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00448771, &_BulletTypeClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x004486B8, &_BulletTypeClass_Detach_Patch);
-    Patch_Jump(0x004484DD, &_BulletTypeClass_Compute_CRC_Patch);
+    //Patch_Jump(0x004484DD, &_BulletTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x00448275, &_BulletTypeClass_Read_INI_Patch);
 }

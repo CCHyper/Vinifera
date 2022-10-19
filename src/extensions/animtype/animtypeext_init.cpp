@@ -270,6 +270,6 @@ void AnimTypeClassExtension_Init()
     //Patch_Jump(0x004187DB, &_AnimTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00419C22, &_AnimTypeClass_Scalar_Destructor_Patch);
     //Patch_Jump(0x00419A18, &_AnimTypeClass_Detach_Patch);
-    Patch_Jump(0x00419963, &_AnimTypeClass_Compute_CRC_Patch);
+    //Patch_Jump(0x00419963, &_AnimTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x00419624, &_AnimTypeClass_Read_INI_Patch);
 }

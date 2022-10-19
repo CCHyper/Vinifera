@@ -235,6 +235,6 @@ void TerrainTypeClassExtension_Init()
     Patch_Jump(0x0064163A, &_TerrainTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x00641658, &_TerrainTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00641D88, &_TerrainTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x00641B6E, &_TerrainTypeClass_Compute_CRC_Patch);
+    //Patch_Jump(0x00641B6E, &_TerrainTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x00641A63, &_TerrainTypeClass_Read_INI_Patch);
 }

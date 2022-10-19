@@ -323,7 +323,7 @@ void IsometricTileTypeClassExtension_Init()
     Patch_Jump(0x004F331F, &_IsometricTileTypeClass_NoInit_Constructor_Patch);
     Patch_Jump(0x004F3381, &_IsometricTileTypeClass_Destructor_Patch);
     //Patch_Jump(0x004F872E, &_IsometricTileTypeClass_Detach_Patch);
-    Patch_Jump(0x004F85AA, &_IsometricTileTypeClass_Compute_CRC_Patch);
+    //Patch_Jump(0x004F85AA, &_IsometricTileTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x004F55F2, &_IsometricTileTypeClass_Init_Patch);
     Patch_Jump(0x004F50AE, &_IsometricTileTypeClass_Read_INI_Patch_1);
     Patch_Jump(0x004F53E9, &_IsometricTileTypeClass_Read_INI_Patch_2);

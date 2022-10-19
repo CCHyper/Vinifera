@@ -207,5 +207,5 @@ void BuildingClassExtension_Init()
     Patch_Jump(0x00426184, &_BuildingClass_NoInit_Constructor_Patch);
     Patch_Jump(0x0042666E, &_BuildingClass_Destructor_Patch);
     //Patch_Jump(0x00433FA9, &_BuildingClass_Detach_Patch);
-    Patch_Jump(0x0043843D, &_BuildingClass_Compute_CRC_Patch);
+    //Patch_Jump(0x0043843D, &_BuildingClass_Compute_CRC_Patch);
 }
