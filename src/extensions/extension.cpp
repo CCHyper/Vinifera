@@ -100,6 +100,11 @@
 #include "waveext.h"
 #include "weapontypeext.h"
 
+#include "rulesext.h"
+#include "scenarioext.h"
+#include "sessionext.h"
+#include "tacticalext.h"
+
 #include <iostream>
 #include <typeinfo>
 
@@ -173,14 +178,14 @@ static void Clear_Extension_Pointer(const AbstractClass *abstract)
 bool Is_Extension_Support_Enabled(RTTIType rtti)
 {
     switch (rtti) {
-        //case RTTI_AIRCRAFT:
-        //case RTTI_AIRCRAFTTYPE:
+        case RTTI_AIRCRAFT:
+        case RTTI_AIRCRAFTTYPE:
         //case RTTI_ANIM:
         //case RTTI_ANIMTYPE:
         //case RTTI_BUILDING:
         case RTTI_BUILDINGTYPE:
         //case RTTI_BULLETTYPE:
-        //case RTTI_CAMPAIGN:
+        //case RTTI_CAMPAIGN:                   // <- crashes
         case RTTI_SIDE:
         case RTTI_HOUSE:
         case RTTI_HOUSETYPE:
@@ -1059,4 +1064,92 @@ void Clear_Extension_Lists()
     --ScenarioInit;
 
     DEBUG_INFO("Clear_Extension_Lists(exit)\n");
+}
+
+
+/**
+ *  Calculate the save game version.
+ * 
+ *  @author: CCHyper
+ */
+unsigned Get_Extension_Save_Version_Number()
+{
+    unsigned version = 10000;
+
+    /**
+     *  Game classes.
+     */
+    if (Is_Extension_Support_Enabled(RTTI_UNIT)) { version += sizeof(UnitClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFT)) { version += sizeof(AircraftClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFTTYPE)) { version += sizeof(AircraftTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_ANIM)) { version += sizeof(AnimClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_ANIMTYPE)) { version += sizeof(AnimTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDING)) { version += sizeof(BuildingClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDINGTYPE)) { version += sizeof(BuildingTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_BULLET)) { EXT_RTTI_BULLET; }
+    if (Is_Extension_Support_Enabled(RTTI_BULLETTYPE)) { version += sizeof(BulletTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_CAMPAIGN)) { version += sizeof(CampaignClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_CELL)) { EXT_RTTI_CELL; }
+    if (Is_Extension_Support_Enabled(RTTI_FACTORY)) { EXT_RTTI_FACTORY; }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSE)) { version += sizeof(HouseClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSETYPE)) { version += sizeof(HouseTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRY)) { version += sizeof(InfantryClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRYTYPE)) { version += sizeof(InfantryTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_ISOTILE)) { EXT_RTTI_ISOTILE; }
+    if (Is_Extension_Support_Enabled(RTTI_ISOTILETYPE)) { version += sizeof(IsometricTileTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_LIGHT)) { EXT_RTTI_LIGHT; }
+    if (Is_Extension_Support_Enabled(RTTI_OVERLAY)) { EXT_RTTI_OVERLAY; }
+    if (Is_Extension_Support_Enabled(RTTI_OVERLAYTYPE)) { version += sizeof(OverlayTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLE)) { EXT_RTTI_PARTICLE; }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLETYPE)) { version += sizeof(ParticleTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLESYSTEM)) { EXT_RTTI_PARTICLESYSTEM; }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLESYSTEMTYPE)) { version += sizeof(ParticleSystemTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_SCRIPT)) { EXT_RTTI_SCRIPT; }
+    if (Is_Extension_Support_Enabled(RTTI_SCRIPTTYPE)) { EXT_RTTI_SCRIPTTYPE; }
+    if (Is_Extension_Support_Enabled(RTTI_SIDE)) { version += sizeof(SideClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_SMUDGE)) { EXT_RTTI_SMUDGE; }
+    if (Is_Extension_Support_Enabled(RTTI_SMUDGETYPE)) { version += sizeof(SmudgeTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPONTYPE)) { version += sizeof(SuperWeaponTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_TASKFORCE)) { EXT_RTTI_TASKFORCE; }
+    if (Is_Extension_Support_Enabled(RTTI_TEAM)) { EXT_RTTI_TEAM; }
+    if (Is_Extension_Support_Enabled(RTTI_TEAMTYPE)) { EXT_RTTI_TEAMTYPE; }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAIN)) { version += sizeof(TerrainClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAINTYPE)) { version += sizeof(TerrainTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_TRIGGER)) { EXT_RTTI_TRIGGER; }
+    if (Is_Extension_Support_Enabled(RTTI_TRIGGERTYPE)) { EXT_RTTI_TRIGGERTYPE; }
+    if (Is_Extension_Support_Enabled(RTTI_UNITTYPE)) { version += sizeof(UnitTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_VOXELANIM)) { EXT_RTTI_VOXELANIM; }
+    if (Is_Extension_Support_Enabled(RTTI_VOXELANIMTYPE)) { version += sizeof(VoxelAnimTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_WAVE)) { version += sizeof(WaveClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_TAG)) { EXT_RTTI_TAG; }
+    if (Is_Extension_Support_Enabled(RTTI_TAGTYPE)) { EXT_RTTI_TAGTYPE; }
+    if (Is_Extension_Support_Enabled(RTTI_TIBERIUM)) { version += sizeof(TiberiumClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_ACTION)) { EXT_RTTI_ACTION; }
+    if (Is_Extension_Support_Enabled(RTTI_EVENT)) { EXT_RTTI_EVENT; }
+    if (Is_Extension_Support_Enabled(RTTI_WEAPONTYPE)) { version += sizeof(WeaponTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_WARHEADTYPE)) { version += sizeof(WarheadTypeClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_WAYPOINT)) { EXT_RTTI_WAYPOINT; }
+    if (Is_Extension_Support_Enabled(RTTI_TUBE)) { EXT_RTTI_TUBE; }
+    if (Is_Extension_Support_Enabled(RTTI_LIGHTSOURCE)) { EXT_RTTI_LIGHTSOURCE; }
+    if (Is_Extension_Support_Enabled(RTTI_EMPULSE)) { EXT_RTTI_EMPULSE; }
+    if (Is_Extension_Support_Enabled(RTTI_TACTICALMAP)) { EXT_RTTI_TACTICALMAP; }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPON)) { version += sizeof(SuperClassExtension); }
+    if (Is_Extension_Support_Enabled(RTTI_AITRIGGER)) { EXT_RTTI_AITRIGGER; }
+    if (Is_Extension_Support_Enabled(RTTI_AITRIGGERTYPE)) { EXT_RTTI_AITRIGGERTYPE; }
+    if (Is_Extension_Support_Enabled(RTTI_NEURON)) { EXT_RTTI_NEURON; }
+    if (Is_Extension_Support_Enabled(RTTI_FOGGEDOBJECT)) { EXT_RTTI_FOGGEDOBJECT; }
+    if (Is_Extension_Support_Enabled(RTTI_ALPHASHAPE)) { EXT_RTTI_ALPHASHAPE; }
+    if (Is_Extension_Support_Enabled(RTTI_VEINHOLEMONSTER)) { EXT_RTTI_VEINHOLEMONSTER; }
+
+    /**
+    *  Global classes.
+    */
+    version += sizeof(RulesClassExtension);
+    version += sizeof(ScenarioClassExtension);
+    version += sizeof(SessionClassExtension);
+
+    // TOOD EXT_RTTI_TACTICALMAP
+    version += sizeof(TacticalExtension);
+
+    return version;
 }

@@ -66,6 +66,8 @@ bool Register_Extension_Class_Factories();
 
 void Clear_Extension_Lists();
 
+unsigned Get_Extension_Save_Version_Number();
+
 
 /**
  *  x

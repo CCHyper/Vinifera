@@ -39,6 +39,7 @@
 #include "iomap.h"
 #include "theme.h"
 #include "extension_saveload.h"
+#include "extension.h"
 #include "loadoptions.h"
 #include "language.h"
 #include "vinifera_gitinfo.h"
@@ -46,6 +47,8 @@
 #include "hooker_macros.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+
+
 
 
 /**
@@ -597,28 +600,6 @@ failed:
 
 
 /**
- *  x
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_Remap_Extension_Pointers)
-{
-    /**
-     *  Call to the Vinifera extension pointer request function.
-     */
-    Vinifera_Remap_Extension_Pointers();
-    
-    /**
-     *  Stolen bytes/code.
-     */
-    _asm { mov eax, 0x005DC470 }
-    _asm { call eax } // Post_Load_Game
-
-    JMP(0x005D6B48)
-}
-
-
-/**
  *  #issue-269
  * 
  *  Adds a "Load Game" button to the dialog shown on mission lose.
@@ -802,7 +783,12 @@ void Vinifera_Hooks()
      */
     Patch_Jump(0x005D68F7, &_Put_All_Vinifera_Data);
     Patch_Jump(0x005D78ED, &_Load_All_Vinifera_Data);
-    //Patch_Jump(0x005D6B43, &_Remap_Extension_Pointers);
+
+    /**
+     *  Set the save game version.
+     */
+    ViniferaSaveGameVersion = Get_Extension_Save_Version_Number();
+    DEBUG_INFO("Save game version number: %d\n", ViniferaSaveGameVersion);
 
 #if 0
     Patch_Jump(0x004B6D96, &_SaveLoad_Disable_Buttons);

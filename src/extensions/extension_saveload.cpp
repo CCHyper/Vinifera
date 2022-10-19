@@ -85,50 +85,7 @@
  *  Constant of the current build version number. This number should be
  *  a sum of all the extended class sizes plus the build date.
  */
-unsigned ViniferaSaveGameVersion =
-
-            10000
-
-            /**
-            *  Global classes.
-            */
-            + sizeof(RulesClassExtension)
-            + sizeof(SessionClassExtension)
-            + sizeof(ScenarioClassExtension)
-            + sizeof(TacticalExtension)
-
-            /**
-             *  Extended type classes.
-             */
-            + sizeof(BuildingTypeClassExtension)
-            + sizeof(UnitTypeClassExtension)
-            + sizeof(InfantryTypeClassExtension)
-            + sizeof(AircraftTypeClassExtension)
-            + sizeof(WarheadTypeClassExtension)
-            + sizeof(WeaponTypeClassExtension)
-            + sizeof(BulletTypeClassExtension)
-            + sizeof(SuperWeaponTypeClassExtension)
-            + sizeof(VoxelAnimTypeClassExtension)
-            + sizeof(AnimTypeClassExtension)
-            + sizeof(ParticleTypeClassExtension)
-            + sizeof(ParticleSystemTypeClassExtension)
-            + sizeof(IsometricTileTypeClassExtension)
-            + sizeof(OverlayTypeClassExtension)
-            + sizeof(SmudgeTypeClassExtension)
-            + sizeof(TerrainTypeClassExtension)
-            + sizeof(HouseTypeClassExtension)
-            + sizeof(SideClassExtension)
-            + sizeof(CampaignClassExtension)
-            + sizeof(TiberiumClassExtension)
-            + sizeof(TechnoClassExtension)
-            + sizeof(AircraftClassExtension)
-            + sizeof(BuildingClassExtension)
-            + sizeof(InfantryClassExtension)
-            + sizeof(UnitClassExtension)
-            + sizeof(TerrainClassExtension)
-            + sizeof(WaveClassExtension)
-            + sizeof(SuperClassExtension)
-;
+unsigned ViniferaSaveGameVersion = 10000;
 
 
 /**
@@ -147,8 +104,8 @@ typedef struct ViniferaSaveFileHeaderStruct
 
 private:
     char _padding[1024
-                 - sizeof(Marker)
-                 - sizeof(CommitHash)];
+                  - sizeof(Marker)
+                  - sizeof(CommitHash)];
 };
 static_assert(sizeof(ViniferaSaveFileHeaderStruct), "ViniferaSaveFileHeaderStruct must be 1024 bytes in size!");
 
