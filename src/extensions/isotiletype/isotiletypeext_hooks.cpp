@@ -82,7 +82,7 @@ void IsometricTileTypeClassExtension_Hooks()
     /**
      *  Initialises the extended class.
      */
-    // BROKEN IsometricTileTypeClassExtension_Init();
+    IsometricTileTypeClassExtension_Init();
 
     Patch_Jump(0x004F3570, &IsometricTileTypeClassExt::_Get_Image_Data);
 }

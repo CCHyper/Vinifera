@@ -133,11 +133,11 @@ static std::string Extension_Get_TypeID_Name()
 
 
 /**
- *  Extension_Set_Pointer
+ *  x
  * 
  *  @author: CCHyper
  */
-static void Extension_Set_Pointer(const AbstractClass *abstract, const AbstractClassExtension *abstract_extension)
+static void Extension_Set_Abstract_Pointer(const AbstractClass *abstract, const AbstractClassExtension *abstract_extension)
 {
     ASSERT(abstract != nullptr);
     ASSERT(abstract_extension != nullptr);
@@ -147,11 +147,11 @@ static void Extension_Set_Pointer(const AbstractClass *abstract, const AbstractC
 
 
 /**
- *  Extension_Get_Pointer
+ *  x
  * 
  *  @author: CCHyper
  */
-static AbstractClassExtension *Extension_Get_Pointer(const AbstractClass *abstract)
+static AbstractClassExtension *Extension_Get_Abstract_Pointer(const AbstractClass *abstract)
 {
     uintptr_t abstract_extension_address = ABSTRACT_EXTENSION_POINTER_CAST_MACRO(abstract);
     AbstractClassExtension *abstract_extension = (AbstractClassExtension *)abstract_extension_address;
@@ -164,7 +164,7 @@ static AbstractClassExtension *Extension_Get_Pointer(const AbstractClass *abstra
  * 
  *  @author: CCHyper
  */
-static void Extension_Clear_Pointer(const AbstractClass *abstract)
+static void Extension_Clear_Abstract_Pointer(const AbstractClass *abstract)
 {
     ABSTRACT_EXTENSION_POINTER_CAST_MACRO(abstract) = (uintptr_t)0x00000000;
 }
@@ -235,7 +235,7 @@ static EXT_CLASS * Extension_Make(const BASE_CLASS *abstract_ptr)
     //EXT_DEBUG_INFO("Extension_Make... %s %s %s\n", Extension_Get_Abstract_Name(abstract_ptr), Extension_Get_TypeID_Name<BASE_CLASS>().c_str(), Extension_Get_TypeID_Name<EXT_CLASS>().c_str());
 
     const BASE_CLASS *abs_ptr = reinterpret_cast<const BASE_CLASS *>(abstract_ptr);
-    EXT_CLASS *ext_ptr = reinterpret_cast<EXT_CLASS *>(Extension_Get_Pointer(abs_ptr));
+    EXT_CLASS *ext_ptr = reinterpret_cast<EXT_CLASS *>(Extension_Get_Abstract_Pointer(abs_ptr));
     
     /**
      *  x
@@ -243,7 +243,7 @@ static EXT_CLASS * Extension_Make(const BASE_CLASS *abstract_ptr)
     ext_ptr = new EXT_CLASS(reinterpret_cast<const BASE_CLASS *>(abs_ptr));
     ASSERT(ext_ptr != nullptr);
     if (ext_ptr) {
-        EXT_DEBUG_INFO("\"%s\" extension created.\n", Extension_Get_TypeID_Name<BASE_CLASS>().c_str());
+        EXT_DEBUG_INFO("Created \"%s\" extension.\n", Extension_Get_TypeID_Name<BASE_CLASS>().c_str());
         return ext_ptr;
     }
 
@@ -264,7 +264,7 @@ static bool Extension_Destroy(const BASE_CLASS *abstract_ptr)
     //EXT_DEBUG_INFO("Extension_Destroy... %s %s %s\n", Extension_Get_Abstract_Name(abstract_ptr), Extension_Get_TypeID_Name<BASE_CLASS>().c_str(), Extension_Get_TypeID_Name<EXT_CLASS>().c_str());
     bool removed = false;
 
-    EXT_CLASS *ext_ptr = reinterpret_cast<EXT_CLASS *>(Extension_Get_Pointer(abstract_ptr));
+    EXT_CLASS *ext_ptr = reinterpret_cast<EXT_CLASS *>(Extension_Get_Abstract_Pointer(abstract_ptr));
     if (ext_ptr) {
     
         /**
@@ -275,9 +275,9 @@ static bool Extension_Destroy(const BASE_CLASS *abstract_ptr)
         EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Extension_Get_TypeID_Name<BASE_CLASS>().c_str());
 
         /**
-         *  NULL the extension pointer for the abstract instances.
+         *  Clear the extension pointer for the abstract class.
          */
-        Extension_Clear_Pointer(abstract_ptr);
+        Extension_Clear_Abstract_Pointer(abstract_ptr);
 
         return true;
     }
@@ -404,9 +404,9 @@ static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
         const BASE_CLASS *object = list[index];
         if (object) {
 
-            if (!Extension_Get_Pointer(object)) {
+            if (!Extension_Get_Abstract_Pointer(object)) {
                 DEV_DEBUG_ERROR("Extension_Request_Pointer_Remap: \"%s\" extension pointer for is null!\n", Extension_Get_TypeID_Name<BASE_CLASS>().c_str());
-                return false;
+                continue; //return false;
             }
 
             /**
@@ -633,7 +633,7 @@ AbstractClassExtension *ExtensionPrivate::Make_Internal(const AbstractClass *abs
      *  
      */
     if (extptr != nullptr) {
-        Extension_Set_Pointer(abstract, extptr);
+        Extension_Set_Abstract_Pointer(abstract, extptr);
     }
 
     return extptr;
@@ -649,7 +649,7 @@ AbstractClassExtension *ExtensionPrivate::Fetch_Internal(const AbstractClass *ab
 {
     ASSERT(abstract != nullptr);
 
-    AbstractClassExtension *ext_ptr = Extension_Get_Pointer(abstract);
+    AbstractClassExtension *ext_ptr = Extension_Get_Abstract_Pointer(abstract);
 
     if (!ext_ptr) {
         DEBUG_ERROR("Extension::Fetch: Extension for \"%s\" is null!\n", Extension_Get_Abstract_Name(abstract));
@@ -813,10 +813,7 @@ bool ExtensionPrivate::Destroy_Internal(const AbstractClass *abstract)
 
     };
 
-    /**
-     *  Clear the pointer in the abstract class.
-     */
-    Extension_Clear_Pointer(abstract);
+    ASSERT(removed);
 
     return true;
 }
@@ -833,8 +830,8 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         case RTTI_UNIT:
         case RTTI_AIRCRAFT:
         case RTTI_AIRCRAFTTYPE:
-        //case RTTI_ANIM:                  <--- !! CRASHES
-        //case RTTI_ANIMTYPE:
+        //case RTTI_ANIM:               // <--- !! CRASHES
+        case RTTI_ANIMTYPE:
         case RTTI_BUILDING:
         case RTTI_BUILDINGTYPE:
         //case RTTI_BULLET:                     <- Not yet implemented
@@ -847,7 +844,7 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         case RTTI_INFANTRY:
         case RTTI_INFANTRYTYPE:
         //case RTTI_ISOTILE:                    <- Not yet implemented
-        //case RTTI_ISOTILETYPE:           <--- !! CRASHES
+        //case RTTI_ISOTILETYPE:        // <--- !! CRASHES
         //case RTTI_LIGHT:                      <- Not yet implemented
         //case RTTI_OVERLAY:                    <- Not yet implemented
         case RTTI_OVERLAYTYPE:
@@ -860,7 +857,7 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         case RTTI_SIDE:
         //case RTTI_SMUDGE:                     <- Not yet implemented
         case RTTI_SMUDGETYPE:
-        //case RTTI_SUPERWEAPONTYPE:       <--- !! CRASHES
+        //case RTTI_SUPERWEAPONTYPE:    // <--- !! CRASHES
         //case RTTI_TASKFORCE:                  <- Not yet implemented
         //case RTTI_TEAM:                       <- Not yet implemented
         //case RTTI_TEAMTYPE:                   <- Not yet implemented
@@ -884,7 +881,7 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         //case RTTI_LIGHTSOURCE:                <- Not yet implemented
         //case RTTI_EMPULSE:                    <- Not yet implemented
         //case RTTI_TACTICALMAP:                <- Not yet implemented, needs rewrite of extension class.
-        //case RTTI_SUPERWEAPON:           <--- !! CRASHES
+        //case RTTI_SUPERWEAPON:        // <--- !! CRASHES
         //case RTTI_AITRIGGER:                  <- Not yet implemented
         //case RTTI_AITRIGGERTYPE:              <- Not yet implemented
         //case RTTI_NEURON:                     <- Not yet implemented
@@ -1092,7 +1089,7 @@ bool Extension::Load(IStream *pStm)
     /**
      *  x
      */
-    Extension::Request_Pointer_Remap();
+    if (!Extension::Request_Pointer_Remap()) { return false; }
 
     return true;
 }

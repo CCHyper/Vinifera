@@ -106,6 +106,14 @@ DECLARE_PATCH(_WaveClass_Default_Constructor_Before_Init_Patch)
     static WaveClassExtension *ext_ptr;
 
     /**
+     *  If we are performing a load operation, the Windows API will invoke the
+     *  constructors for us as part of the operation, so we can skip our hook here.
+     */
+    if (Vinifera_PerformingLoad) {
+        goto original_code;
+    }
+
+    /**
      *  Find existing or create an extended class instance.
      */
     ext_ptr = Extension::Make<WaveClassExtension>(this_ptr);
@@ -141,6 +149,14 @@ DECLARE_PATCH(_WaveClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(WaveClass *, this_ptr, esi); // Current "this" pointer.
     static WaveClassExtension *ext_ptr;
+
+    /**
+     *  If we are performing a load operation, the Windows API will invoke the
+     *  constructors for us as part of the operation, so we can skip our hook here.
+     */
+    if (Vinifera_PerformingLoad) {
+        goto original_code;
+    }
 
     /**
      *  Find existing or create an extended class instance.
@@ -184,6 +200,14 @@ DECLARE_PATCH(_WaveClass_Constructor_Before_Init_Patch)
 {
     GET_REGISTER_STATIC(WaveClass *, this_ptr, esi); // Current "this" pointer.
     static WaveClassExtension *ext_ptr;
+
+    /**
+     *  If we are performing a load operation, the Windows API will invoke the
+     *  constructors for us as part of the operation, so we can skip our hook here.
+     */
+    if (Vinifera_PerformingLoad) {
+        goto original_code;
+    }
 
     /**
      *  Find existing or create an extended class instance.

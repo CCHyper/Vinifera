@@ -382,7 +382,7 @@ void AnimClassExtension_Hooks()
     /**
      *  Initialises the extended class.
      */
-    // BROKEN AnimClassExtension_Init();
+    AnimClassExtension_Init();
 
     Patch_Jump(0x00415ADA, &_AnimClass_AI_RandomLoop_Randomiser_BugFix_Patch);
     //Patch_Jump(0x00413C79, &_AnimClass_Constructor_Init_Class_Values_Patch); // Moved to AnimClassExtension due to patching conflict.

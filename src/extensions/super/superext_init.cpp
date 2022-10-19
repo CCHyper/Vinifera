@@ -95,6 +95,14 @@ DECLARE_PATCH(_SuperClass_Constructor_Patch)
     static SuperClassExtension *exttype_ptr;
 
     /**
+     *  If we are performing a load operation, the Windows API will invoke the
+     *  constructors for us as part of the operation, so we can skip our hook here.
+     */
+    if (Vinifera_PerformingLoad) {
+        goto original_code;
+    }
+
+    /**
      *  Find existing or create an extended class instance.
      */
     exttype_ptr = Extension::Make<SuperClassExtension>(this_ptr);
