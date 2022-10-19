@@ -873,8 +873,8 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         //case RTTI_TIBERIUM:
         //case RTTI_ACTION:                     <- Not yet implemented
         //case RTTI_EVENT:                      <- Not yet implemented
-        //case RTTI_WEAPONTYPE:
-        //case RTTI_WARHEADTYPE:
+        case RTTI_WEAPONTYPE:
+        case RTTI_WARHEADTYPE:
         //case RTTI_WAYPOINT:                   <- Not yet implemented
         //case RTTI_TUBE:                       <- Not yet implemented
         //case RTTI_LIGHTSOURCE:                <- Not yet implemented
