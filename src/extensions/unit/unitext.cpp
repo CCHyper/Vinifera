@@ -28,6 +28,7 @@
 #include "unitext.h"
 #include "unit.h"
 #include "wwcrc.h"
+#include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -41,6 +42,8 @@ UnitClassExtension::UnitClassExtension(const UnitClass *this_ptr) :
     FootClassExtension(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("UnitClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    UnitExtensions.Add(this);
 }
 
 
@@ -64,6 +67,8 @@ UnitClassExtension::UnitClassExtension(const NoInitClass &noinit) :
 UnitClassExtension::~UnitClassExtension()
 {
     //EXT_DEBUG_TRACE("UnitClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    UnitExtensions.Delete(this);
 }
 
 

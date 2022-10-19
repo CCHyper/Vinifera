@@ -28,6 +28,7 @@
 #include "waveext.h"
 #include "wave.h"
 #include "wwcrc.h"
+#include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -41,6 +42,8 @@ WaveClassExtension::WaveClassExtension(const WaveClass *this_ptr) :
     ObjectClassExtension(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("WaveClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
+
+    WaveExtensions.Add(this);
 }
 
 
@@ -64,6 +67,8 @@ WaveClassExtension::WaveClassExtension(const NoInitClass &noinit) :
 WaveClassExtension::~WaveClassExtension()
 {
     //EXT_DEBUG_TRACE("WaveClassExtension destructor - 0x%08X\n", (uintptr_t)(This()));
+
+    WaveExtensions.Delete(this);
 }
 
 

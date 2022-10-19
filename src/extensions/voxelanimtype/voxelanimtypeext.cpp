@@ -42,6 +42,8 @@ VoxelAnimTypeClassExtension::VoxelAnimTypeClassExtension(const VoxelAnimTypeClas
     ObjectTypeClassExtension(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("VoxelAnimTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    VoxelAnimTypeExtensions.Add(this);
 }
 
 
@@ -65,6 +67,8 @@ VoxelAnimTypeClassExtension::VoxelAnimTypeClassExtension(const NoInitClass &noin
 VoxelAnimTypeClassExtension::~VoxelAnimTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("VoxelAnimTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    VoxelAnimTypeExtensions.Delete(this);
 }
 
 

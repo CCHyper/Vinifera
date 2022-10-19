@@ -42,6 +42,8 @@ HouseTypeClassExtension::HouseTypeClassExtension(const HouseTypeClass *this_ptr)
     AbstractTypeClassExtension(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("HouseTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    HouseTypeExtensions.Add(this);
 }
 
 
@@ -65,6 +67,8 @@ HouseTypeClassExtension::HouseTypeClassExtension(const NoInitClass &noinit) :
 HouseTypeClassExtension::~HouseTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("HouseTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    HouseTypeExtensions.Delete(this);
 }
 
 

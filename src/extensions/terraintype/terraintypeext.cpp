@@ -49,6 +49,8 @@ TerrainTypeClassExtension::TerrainTypeClassExtension(const TerrainTypeClass *thi
     LightBlueTint(1000000)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TerrainTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    TerrainTypeExtensions.Add(this);
 }
 
 
@@ -72,6 +74,8 @@ TerrainTypeClassExtension::TerrainTypeClassExtension(const NoInitClass &noinit) 
 TerrainTypeClassExtension::~TerrainTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("TerrainTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    TerrainTypeExtensions.Delete(this);
 }
 
 

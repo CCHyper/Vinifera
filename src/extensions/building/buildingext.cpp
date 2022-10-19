@@ -50,6 +50,8 @@ BuildingClassExtension::BuildingClassExtension(const BuildingClass *this_ptr) :
     IsBudgetDepleted(false)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("BuildingClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    BuildingExtensions.Add(this);
 }
 
 
@@ -73,6 +75,8 @@ BuildingClassExtension::BuildingClassExtension(const NoInitClass &noinit) :
 BuildingClassExtension::~BuildingClassExtension()
 {
     //EXT_DEBUG_TRACE("BuildingClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    BuildingExtensions.Delete(this);
 }
 
 

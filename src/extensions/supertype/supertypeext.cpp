@@ -47,6 +47,8 @@ SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(const SuperWeaponTy
     CameoImageSurface(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    SuperWeaponTypeExtensions.Add(this);
 }
 
 
@@ -73,6 +75,8 @@ SuperWeaponTypeClassExtension::~SuperWeaponTypeClassExtension()
 
     delete CameoImageSurface;
     CameoImageSurface = nullptr;
+
+    SuperWeaponTypeExtensions.Delete(this);
 }
 
 

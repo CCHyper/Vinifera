@@ -42,6 +42,8 @@ OverlayTypeClassExtension::OverlayTypeClassExtension(const OverlayTypeClass *thi
     ObjectTypeClassExtension(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("OverlayTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    OverlayTypeExtensions.Add(this);
 }
 
 
@@ -65,6 +67,8 @@ OverlayTypeClassExtension::OverlayTypeClassExtension(const NoInitClass &noinit) 
 OverlayTypeClassExtension::~OverlayTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("OverlayTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    OverlayTypeExtensions.Delete(this);
 }
 
 

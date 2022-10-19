@@ -66,7 +66,7 @@ DECLARE_PATCH(_CampaignClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Find_Or_Make_Extension<CampaignClassExtension>(this_ptr);
+    exttype_ptr = Make_Extension<CampaignClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create CampaignClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);

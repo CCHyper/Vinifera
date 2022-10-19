@@ -66,7 +66,7 @@ DECLARE_PATCH(_AnimTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Find_Or_Make_Extension<AnimTypeClassExtension>(this_ptr);
+    exttype_ptr = Make_Extension<AnimTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create AnimTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);

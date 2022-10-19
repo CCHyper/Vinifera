@@ -42,6 +42,8 @@ TiberiumClassExtension::TiberiumClassExtension(const TiberiumClass *this_ptr) :
     AbstractTypeClassExtension(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TiberiumClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    TiberiumExtensions.Add(this);
 }
 
 
@@ -65,6 +67,8 @@ TiberiumClassExtension::TiberiumClassExtension(const NoInitClass &noinit) :
 TiberiumClassExtension::~TiberiumClassExtension()
 {
     //EXT_DEBUG_TRACE("TiberiumClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    TiberiumExtensions.Delete(this);
 }
 
 

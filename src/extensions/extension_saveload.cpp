@@ -360,8 +360,6 @@ bool Vinifera_Put_All(IStream *pStm)
     /**
      *  Save class extensions here.
      */
-    DEBUG_INFO("Saving extended class data...\n");
-
 //    DEBUG_INFO("Saving RulesExtension\n");
 //    if (!Vinifera_Save_RulesExtension(pStm)) {
 //        DEBUG_ERROR("\t***** FAILED!\n");
@@ -443,8 +441,6 @@ bool Vinifera_Load_All(IStream *pStm)
     /**
      *  Load class extensions here.
      */
-    DEBUG_INFO("Loading extended class data...\n");
-
 //    DEBUG_INFO("Loading RulesExtension\n");
 //    if (!Vinifera_Load_RulesExtension(pStm)) {
 //        DEBUG_ERROR("\t***** FAILED!\n");

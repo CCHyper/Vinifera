@@ -49,6 +49,8 @@ AnimTypeClassExtension::AnimTypeClassExtension(const AnimTypeClass *this_ptr) :
     NumberOfParticles(0)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("AnimTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    AnimTypeExtensions.Add(this);
 }
 
 
@@ -72,6 +74,8 @@ AnimTypeClassExtension::AnimTypeClassExtension(const NoInitClass &noinit) :
 AnimTypeClassExtension::~AnimTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("AnimTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    AnimTypeExtensions.Delete(this);
 }
 
 

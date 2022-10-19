@@ -180,19 +180,19 @@ void Extension_Hooks()
      */
     AbstractClassExtension_Hooks();
 
-//    if (Is_Extension_Support_Enabled(EXT_RTTI_UNIT)
-//     || Is_Extension_Support_Enabled(EXT_RTTI_INFANTRY)
-//     || Is_Extension_Support_Enabled(EXT_RTTI_BUILDING)
-//     || Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFT)) {
+//    if (Is_Extension_Support_Enabled(RTTI_UNIT)
+//     || Is_Extension_Support_Enabled(RTTI_INFANTRY)
+//     || Is_Extension_Support_Enabled(RTTI_BUILDING)
+//     || Is_Extension_Support_Enabled(RTTI_AIRCRAFT)) {
 //
 //        TechnoClassExtension_Hooks();
 //        FootClassExtension_Hooks();
 //    }
 //
-//    if (Is_Extension_Support_Enabled(EXT_RTTI_UNITTYPE)
-//     || Is_Extension_Support_Enabled(EXT_RTTI_INFANTRYTYPE)
-//     || Is_Extension_Support_Enabled(EXT_RTTI_BUILDINGTYPE)
-//     || Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFTTYPE)) {
+//    if (Is_Extension_Support_Enabled(RTTI_UNITTYPE)
+//     || Is_Extension_Support_Enabled(RTTI_INFANTRYTYPE)
+//     || Is_Extension_Support_Enabled(RTTI_BUILDINGTYPE)
+//     || Is_Extension_Support_Enabled(RTTI_AIRCRAFTTYPE)) {
 //
 //        ObjectTypeClassExtension_Hooks();
 //        TechnoTypeClassExtension_Hooks();
@@ -201,67 +201,67 @@ void Extension_Hooks()
     /**
      *  All game class extensions here.
      */
-    if (Is_Extension_Support_Enabled(EXT_RTTI_UNIT)) { UnitClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFT)) { AircraftClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFTTYPE)) { AircraftTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIM)) { AnimClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIMTYPE)) { AnimTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDING)) { BuildingClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDINGTYPE)) { BuildingTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BULLET)) { BulletClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BULLETTYPE)) { BulletTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_CAMPAIGN)) { CampaignClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_CELL)) { CellClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_FACTORY)) { FactoryClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSE)) { HouseClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSETYPE)) { HouseTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRY)) { InfantryClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRYTYPE)) { InfantryTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ISOTILE)) { EXT_RTTI_ISOTILE; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ISOTILETYPE)) { IsometricTileTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_LIGHT)) { EXT_RTTI_LIGHT; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_OVERLAY)) { EXT_RTTI_OVERLAY; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_OVERLAYTYPE)) { OverlayTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLE)) { EXT_RTTI_PARTICLE; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLETYPE)) { ParticleTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLESYSTEM)) { ParticleSystemClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLESYSTEMTYPE)) { ParticleSystemTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SCRIPT)) { EXT_RTTI_SCRIPT; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SCRIPTTYPE)) { EXT_RTTI_SCRIPTTYPE; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SIDE)) { SideClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SMUDGE)) { EXT_RTTI_SMUDGE; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SMUDGETYPE)) { SmudgeTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPONTYPE)) { SuperWeaponTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TASKFORCE)) { EXT_RTTI_TASKFORCE; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TEAM)) { TeamClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TEAMTYPE)) { EXT_RTTI_TEAMTYPE; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAIN)) { TerrainClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAINTYPE)) { TerrainTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TRIGGER)) { EXT_RTTI_TRIGGER; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TRIGGERTYPE)) { EXT_RTTI_TRIGGERTYPE; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_UNITTYPE)) { UnitTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_VOXELANIM)) { EXT_RTTI_VOXELANIM; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_VOXELANIMTYPE)) { VoxelAnimTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WAVE)) { WaveClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TAG)) { EXT_RTTI_TAG; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TAGTYPE)) { EXT_RTTI_TAGTYPE; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TIBERIUM)) { TiberiumClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ACTION)) { TActionClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_EVENT)) { EXT_RTTI_EVENT; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WEAPONTYPE)) { WeaponTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WARHEADTYPE)) { WarheadTypeClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WAYPOINT)) { EXT_RTTI_WAYPOINT; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TUBE)) { EXT_RTTI_TUBE; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_LIGHTSOURCE)) { EXT_RTTI_LIGHTSOURCE; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_EMPULSE)) { EMPulseClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TACTICALMAP)) { EXT_RTTI_TACTICALMAP; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPON)) { SuperClassExtension_Hooks(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AITRIGGER)) { EXT_RTTI_AITRIGGER; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AITRIGGERTYPE)) { EXT_RTTI_AITRIGGERTYPE; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_NEURON)) { EXT_RTTI_NEURON; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_FOGGEDOBJECT)) { EXT_RTTI_FOGGEDOBJECT; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ALPHASHAPE)) { EXT_RTTI_ALPHASHAPE; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_VEINHOLEMONSTER)) { EXT_RTTI_VEINHOLEMONSTER; }
+    if (Is_Extension_Support_Enabled(RTTI_UNIT)) { UnitClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFT)) { AircraftClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFTTYPE)) { AircraftTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_ANIM)) { AnimClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_ANIMTYPE)) { AnimTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDING)) { BuildingClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDINGTYPE)) { BuildingTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_BULLET)) { BulletClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_BULLETTYPE)) { BulletTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_CAMPAIGN)) { CampaignClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_CELL)) { CellClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_FACTORY)) { FactoryClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSE)) { HouseClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSETYPE)) { HouseTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRY)) { InfantryClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRYTYPE)) { InfantryTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_ISOTILE)) { EXT_RTTI_ISOTILE; }
+    if (Is_Extension_Support_Enabled(RTTI_ISOTILETYPE)) { IsometricTileTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_LIGHT)) { EXT_RTTI_LIGHT; }
+    if (Is_Extension_Support_Enabled(RTTI_OVERLAY)) { EXT_RTTI_OVERLAY; }
+    if (Is_Extension_Support_Enabled(RTTI_OVERLAYTYPE)) { OverlayTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLE)) { EXT_RTTI_PARTICLE; }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLETYPE)) { ParticleTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLESYSTEM)) { ParticleSystemClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLESYSTEMTYPE)) { ParticleSystemTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_SCRIPT)) { EXT_RTTI_SCRIPT; }
+    if (Is_Extension_Support_Enabled(RTTI_SCRIPTTYPE)) { EXT_RTTI_SCRIPTTYPE; }
+    if (Is_Extension_Support_Enabled(RTTI_SIDE)) { SideClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_SMUDGE)) { EXT_RTTI_SMUDGE; }
+    if (Is_Extension_Support_Enabled(RTTI_SMUDGETYPE)) { SmudgeTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPONTYPE)) { SuperWeaponTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_TASKFORCE)) { EXT_RTTI_TASKFORCE; }
+    if (Is_Extension_Support_Enabled(RTTI_TEAM)) { TeamClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_TEAMTYPE)) { EXT_RTTI_TEAMTYPE; }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAIN)) { TerrainClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAINTYPE)) { TerrainTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_TRIGGER)) { EXT_RTTI_TRIGGER; }
+    if (Is_Extension_Support_Enabled(RTTI_TRIGGERTYPE)) { EXT_RTTI_TRIGGERTYPE; }
+    if (Is_Extension_Support_Enabled(RTTI_UNITTYPE)) { UnitTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_VOXELANIM)) { EXT_RTTI_VOXELANIM; }
+    if (Is_Extension_Support_Enabled(RTTI_VOXELANIMTYPE)) { VoxelAnimTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_WAVE)) { WaveClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_TAG)) { EXT_RTTI_TAG; }
+    if (Is_Extension_Support_Enabled(RTTI_TAGTYPE)) { EXT_RTTI_TAGTYPE; }
+    if (Is_Extension_Support_Enabled(RTTI_TIBERIUM)) { TiberiumClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_ACTION)) { TActionClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_EVENT)) { EXT_RTTI_EVENT; }
+    if (Is_Extension_Support_Enabled(RTTI_WEAPONTYPE)) { WeaponTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_WARHEADTYPE)) { WarheadTypeClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_WAYPOINT)) { EXT_RTTI_WAYPOINT; }
+    if (Is_Extension_Support_Enabled(RTTI_TUBE)) { EXT_RTTI_TUBE; }
+    if (Is_Extension_Support_Enabled(RTTI_LIGHTSOURCE)) { EXT_RTTI_LIGHTSOURCE; }
+    if (Is_Extension_Support_Enabled(RTTI_EMPULSE)) { EMPulseClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_TACTICALMAP)) { EXT_RTTI_TACTICALMAP; }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPON)) { SuperClassExtension_Hooks(); }
+    if (Is_Extension_Support_Enabled(RTTI_AITRIGGER)) { EXT_RTTI_AITRIGGER; }
+    if (Is_Extension_Support_Enabled(RTTI_AITRIGGERTYPE)) { EXT_RTTI_AITRIGGERTYPE; }
+    if (Is_Extension_Support_Enabled(RTTI_NEURON)) { EXT_RTTI_NEURON; }
+    if (Is_Extension_Support_Enabled(RTTI_FOGGEDOBJECT)) { EXT_RTTI_FOGGEDOBJECT; }
+    if (Is_Extension_Support_Enabled(RTTI_ALPHASHAPE)) { EXT_RTTI_ALPHASHAPE; }
+    if (Is_Extension_Support_Enabled(RTTI_VEINHOLEMONSTER)) { EXT_RTTI_VEINHOLEMONSTER; }
 
     /**
      *  All global class extensions here.

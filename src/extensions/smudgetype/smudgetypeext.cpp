@@ -42,6 +42,8 @@ SmudgeTypeClassExtension::SmudgeTypeClassExtension(const SmudgeTypeClass *this_p
     ObjectTypeClassExtension(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("SmudgeTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    SmudgeTypeExtensions.Add(this);
 }
 
 
@@ -65,6 +67,8 @@ SmudgeTypeClassExtension::SmudgeTypeClassExtension(const NoInitClass &noinit) :
 SmudgeTypeClassExtension::~SmudgeTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("SmudgeTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    SmudgeTypeExtensions.Delete(this);
 }
 
 

@@ -64,7 +64,7 @@ DECLARE_PATCH(_WaveClass_Default_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Find_Or_Make_Extension<WaveClassExtension>(this_ptr);
+    ext_ptr = Make_Extension<WaveClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -108,7 +108,7 @@ DECLARE_PATCH(_WaveClass_Default_Constructor_Before_Init_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Find_Or_Make_Extension<WaveClassExtension>(this_ptr);
+    ext_ptr = Make_Extension<WaveClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -145,7 +145,7 @@ DECLARE_PATCH(_WaveClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Find_Or_Make_Extension<WaveClassExtension>(this_ptr);
+    ext_ptr = Make_Extension<WaveClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -188,7 +188,7 @@ DECLARE_PATCH(_WaveClass_Constructor_Before_Init_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Find_Or_Make_Extension<WaveClassExtension>(this_ptr);
+    ext_ptr = Make_Extension<WaveClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);

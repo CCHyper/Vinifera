@@ -45,6 +45,8 @@ InfantryTypeClassExtension::InfantryTypeClassExtension(const InfantryTypeClass *
     IsOmniHealer(false)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("InfantryTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    InfantryTypeExtensions.Add(this);
 }
 
 
@@ -68,6 +70,8 @@ InfantryTypeClassExtension::InfantryTypeClassExtension(const NoInitClass &noinit
 InfantryTypeClassExtension::~InfantryTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("InfantryTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    InfantryTypeExtensions.Delete(this);
 }
 
 

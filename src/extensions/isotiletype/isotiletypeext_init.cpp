@@ -66,7 +66,7 @@ DECLARE_PATCH(_IsometricTileTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Find_Or_Make_Extension<IsometricTileTypeClassExtension>(this_ptr);
+    exttype_ptr = Make_Extension<IsometricTileTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create IsometricTileTypeClassExtension instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);

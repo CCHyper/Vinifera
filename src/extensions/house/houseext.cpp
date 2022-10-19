@@ -28,6 +28,7 @@
 #include "houseext.h"
 #include "house.h"
 #include "ccini.h"
+#include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -41,6 +42,8 @@ HouseClassExtension::HouseClassExtension(const HouseClass *this_ptr) :
     AbstractClassExtension(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("HouseClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
+
+    HouseExtensions.Add(this);
 }
 
 
@@ -64,6 +67,8 @@ HouseClassExtension::HouseClassExtension(const NoInitClass &noinit) :
 HouseClassExtension::~HouseClassExtension()
 {
     //EXT_DEBUG_TRACE("HouseClassExtension destructor - 0x%08X\n", (uintptr_t)(This()));
+
+    HouseExtensions.Delete(this);
 }
 
 

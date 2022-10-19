@@ -28,6 +28,7 @@
 #include "superext.h"
 #include "super.h"
 #include "wwcrc.h"
+#include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -43,6 +44,8 @@ SuperClassExtension::SuperClassExtension(const SuperClass *this_ptr) :
     TimerFlashState(false)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("SuperClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    SuperExtensions.Add(this);
 }
 
 
@@ -66,6 +69,8 @@ SuperClassExtension::SuperClassExtension(const NoInitClass &noinit) :
 SuperClassExtension::~SuperClassExtension()
 {
     //EXT_DEBUG_TRACE("SuperClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    SuperExtensions.Delete(this);
 }
 
 

@@ -27,8 +27,9 @@
  ******************************************************************************/
 #include "terrainext.h"
 #include "terrain.h"
-#include "wwcrc.h"
 #include "lightsource.h"
+#include "wwcrc.h"
+#include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -43,6 +44,8 @@ TerrainClassExtension::TerrainClassExtension(const TerrainClass *this_ptr) :
     LightSource(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TerrainClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    TerrainExtensions.Add(this);
 }
 
 
@@ -72,6 +75,8 @@ TerrainClassExtension::~TerrainClassExtension()
         delete LightSource;
         LightSource = nullptr;
     }
+
+    TerrainExtensions.Delete(this);
 }
 
 

@@ -28,6 +28,7 @@
 #include "particlesystypeext.h"
 #include "particlesystype.h"
 #include "ccini.h"
+#include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -41,6 +42,8 @@ ParticleSystemTypeClassExtension::ParticleSystemTypeClassExtension(const Particl
     ObjectTypeClassExtension(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    ParticleSystemTypeExtensions.Add(this);
 }
 
 
@@ -64,6 +67,8 @@ ParticleSystemTypeClassExtension::ParticleSystemTypeClassExtension(const NoInitC
 ParticleSystemTypeClassExtension::~ParticleSystemTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    ParticleSystemTypeExtensions.Delete(this);
 }
 
 

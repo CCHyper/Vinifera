@@ -62,7 +62,7 @@ DECLARE_PATCH(_SuperClass_Default_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Find_Or_Make_Extension<SuperClassExtension>(this_ptr);
+    exttype_ptr = Make_Extension<SuperClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create SuperClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -97,7 +97,7 @@ DECLARE_PATCH(_SuperClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Find_Or_Make_Extension<SuperClassExtension>(this_ptr);
+    exttype_ptr = Make_Extension<SuperClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create SuperClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);

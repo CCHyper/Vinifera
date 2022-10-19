@@ -50,6 +50,8 @@ WarheadTypeClassExtension::WarheadTypeClassExtension(const WarheadTypeClass *thi
     ShakePixelXLo(0)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("WarheadTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    WarheadTypeExtensions.Add(this);
 }
 
 
@@ -73,6 +75,8 @@ WarheadTypeClassExtension::WarheadTypeClassExtension(const NoInitClass &noinit) 
 WarheadTypeClassExtension::~WarheadTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("WarheadTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    WarheadTypeExtensions.Delete(this);
 }
 
 

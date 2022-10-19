@@ -54,6 +54,8 @@ WeaponTypeClassExtension::WeaponTypeClassExtension(const WeaponTypeClass *this_p
     ElectricBoltDeviation(EBOLT_DEFAULT_DEVIATION)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("WeaponTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    WeaponTypeExtensions.Add(this);
 }
 
 
@@ -77,6 +79,8 @@ WeaponTypeClassExtension::WeaponTypeClassExtension(const NoInitClass &noinit) :
 WeaponTypeClassExtension::~WeaponTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("WeaponTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    WeaponTypeExtensions.Delete(this);
 }
 
 /**

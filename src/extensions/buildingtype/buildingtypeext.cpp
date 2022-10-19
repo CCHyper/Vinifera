@@ -53,6 +53,8 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(const BuildingTypeClass *
     IsEligibleForAllyBuilding(false)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("BuildingTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    BuildingTypeExtensions.Add(this);
 }
 
 
@@ -76,6 +78,8 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(const NoInitClass &noinit
 BuildingTypeClassExtension::~BuildingTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("BuildingTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    BuildingTypeExtensions.Delete(this);
 }
 
 

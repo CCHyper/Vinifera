@@ -28,6 +28,7 @@
 #include "animext.h"
 #include "anim.h"
 #include "wwcrc.h"
+#include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -41,6 +42,8 @@ AnimClassExtension::AnimClassExtension(const AnimClass *this_ptr) :
     ObjectClassExtension(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("AnimClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    AnimExtensions.Add(this);
 }
 
 
@@ -64,6 +67,8 @@ AnimClassExtension::AnimClassExtension(const NoInitClass &noinit) :
 AnimClassExtension::~AnimClassExtension()
 {
     //EXT_DEBUG_TRACE("AnimClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    AnimExtensions.Delete(this);
 }
 
 

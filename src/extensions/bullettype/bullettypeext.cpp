@@ -44,6 +44,8 @@ BulletTypeClassExtension::BulletTypeClassExtension(const BulletTypeClass *this_p
     SpawnDelay(3)           // Default hardcoded value.
 {
     //if (this_ptr) EXT_DEBUG_TRACE("BulletTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    BulletTypeExtensions.Add(this);
 }
 
 
@@ -67,6 +69,8 @@ BulletTypeClassExtension::BulletTypeClassExtension(const NoInitClass &noinit) :
 BulletTypeClassExtension::~BulletTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("BulletTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    BulletTypeExtensions.Delete(this);
 }
 
 

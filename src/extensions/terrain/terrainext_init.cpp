@@ -64,7 +64,7 @@ DECLARE_PATCH(_TerrainClass_Default_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Find_Or_Make_Extension<TerrainClassExtension>(this_ptr);
+    ext_ptr = Make_Extension<TerrainClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create TerrainClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -103,7 +103,7 @@ DECLARE_PATCH(_TerrainClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Find_Or_Make_Extension<TerrainClassExtension>(this_ptr);
+    ext_ptr = Make_Extension<TerrainClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create TerrainClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
@@ -146,7 +146,7 @@ DECLARE_PATCH(_TerrainClass_Constructor_Before_Unlimbo_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    ext_ptr = Find_Or_Make_Extension<TerrainClassExtension>(this_ptr);
+    ext_ptr = Make_Extension<TerrainClassExtension>(this_ptr);
     if (!ext_ptr) {
         DEBUG_ERROR("Failed to create TerrainClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);

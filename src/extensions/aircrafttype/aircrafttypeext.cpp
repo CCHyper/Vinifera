@@ -42,6 +42,8 @@ AircraftTypeClassExtension::AircraftTypeClassExtension(const AircraftTypeClass *
     TechnoTypeClassExtension(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("AircraftTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    AircraftTypeExtensions.Add(this);
 }
 
 
@@ -65,6 +67,8 @@ AircraftTypeClassExtension::AircraftTypeClassExtension(const NoInitClass &noinit
 AircraftTypeClassExtension::~AircraftTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("AircraftTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    AircraftTypeExtensions.Delete(this);
 }
 
 

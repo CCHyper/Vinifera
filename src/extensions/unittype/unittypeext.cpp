@@ -48,6 +48,8 @@ UnitTypeClassExtension::UnitTypeClassExtension(const UnitTypeClass *this_ptr) :
     IdleFrames(0)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("UnitTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    UnitTypeExtensions.Add(this);
 }
 
 
@@ -71,6 +73,8 @@ UnitTypeClassExtension::UnitTypeClassExtension(const NoInitClass &noinit) :
 UnitTypeClassExtension::~UnitTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("UnitTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    UnitTypeExtensions.Delete(this);
 }
 
 

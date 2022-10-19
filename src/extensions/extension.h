@@ -29,69 +29,42 @@
 
 #include "always.h"
 #include "vinifera_defines.h"
+#include "extension_globals.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include <objidl.h> // for IStream.
 
 
-class AbstractClass;
-class AbstractClassExtension;
-
-
-/**
- *  For printing out extension debug info.
- */
-#ifndef NDEBUG
-#define EXT_DEBUG_SAY(x, ...) DEV_DEBUG_SAY(x, ##__VA_ARGS__)
-#define EXT_DEBUG_INFO(x, ...) DEV_DEBUG_INFO(x, ##__VA_ARGS__)
-#define EXT_DEBUG_WARNING(x, ...) DEV_DEBUG_WARNING(x, ##__VA_ARGS__)
-#define EXT_DEBUG_ERROR(x, ...) DEV_DEBUG_ERROR(x, ##__VA_ARGS__)
-#define EXT_DEBUG_FATAL(x, ...) DEV_DEBUG_FATAL(x, ##__VA_ARGS__)
-#define EXT_DEBUG_TRACE(x, ...) DEV_DEBUG_TRACE(x, ##__VA_ARGS__)
-#else
-#define EXT_DEBUG_SAY(x, ...) ((void)0)
-#define EXT_DEBUG_INFO(x, ...) ((void)0)
-#define EXT_DEBUG_WARNING(x, ...) ((void)0)
-#define EXT_DEBUG_ERROR(x, ...) ((void)0)
-#define EXT_DEBUG_FATAL(x, ...) ((void)0)
-#define EXT_DEBUG_TRACE(x, ...) ((void)0)
-#endif
-
-
 /**
  *  Do not call these directly! Use the template functions below.
  */
-AbstractClassExtension *Find_Or_Make_Extension_Internal(const AbstractClass *abstract, bool allow_make = true);
+AbstractClassExtension *Make_Extension_Internal(const AbstractClass *abstract);
 AbstractClassExtension *Fetch_Extension_Internal(const AbstractClass *abstract);
 bool Destroy_Extension_Internal(const AbstractClass *abstract);
 
 
 /**
+ *  Query if Vinifera supports this class with an extension.
+ */
+bool Is_Extension_Support_Enabled(RTTIType rtti);
+bool Is_Extension_Support_Enabled(const AbstractClass *abstract);
+
+
+/**
  *  Save and load interface.
  */
-bool Is_Extension_Support_Enabled(ExtensionRTTIType rtti);
-
 bool Save_Extensions(IStream *pStm);
 bool Load_Extensions(IStream *pStm);
 
+/**
+ *  Save and load interface.
+ */
 bool Request_Extension_Pointer_Remap();
 
 bool Register_Extension_Class_Factories();
 
 void Clear_Extension_Lists();
-
-
-/**
- *  x
- * 
- *  @author: CCHyper
- */
-template<class T>
-T *Find_Or_Make_Extension(const AbstractClass *abstract, bool allow_make = true)
-{
-    return (T *)Find_Or_Make_Extension_Internal(abstract, allow_make);
-}
 
 
 /**
@@ -114,9 +87,21 @@ T *Fetch_Extension(const AbstractClass *abstract)
  *  @author: CCHyper
  */
 template<class T>
-bool Destroy_Extension(const AbstractClass *abstract)
+T *Make_Extension(const AbstractClass *abstract)
+{
+    return (T *)Make_Extension_Internal(abstract);
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+template<class T>
+void Destroy_Extension(const AbstractClass *abstract)
 {
     ASSERT(abstract != nullptr);
 
-    return Destroy_Extension_Internal(abstract);
+    Destroy_Extension_Internal(abstract);
 }

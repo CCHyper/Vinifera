@@ -28,6 +28,7 @@
 #include "aircraftext.h"
 #include "aircraft.h"
 #include "wwcrc.h"
+#include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -41,6 +42,8 @@ AircraftClassExtension::AircraftClassExtension(const AircraftClass *this_ptr) :
     FootClassExtension(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("AircraftClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    AircraftExtensions.Add(this);
 }
 
 
@@ -64,6 +67,8 @@ AircraftClassExtension::AircraftClassExtension(const NoInitClass &noinit) :
 AircraftClassExtension::~AircraftClassExtension()
 {
     //EXT_DEBUG_TRACE("AircraftClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    AircraftExtensions.Delete(this);
 }
 
 

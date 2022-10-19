@@ -44,6 +44,8 @@ CampaignClassExtension::CampaignClassExtension(const CampaignClass *this_ptr) :
     IntroMovie()
 {
     //if (this_ptr) EXT_DEBUG_TRACE("CampaignClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    CampaignExtensions.Add(this);
 }
 
 
@@ -67,6 +69,8 @@ CampaignClassExtension::CampaignClassExtension(const NoInitClass &noinit) :
 CampaignClassExtension::~CampaignClassExtension()
 {
     //EXT_DEBUG_TRACE("CampaignClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    CampaignExtensions.Delete(this);
 }
 
 

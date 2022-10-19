@@ -119,40 +119,6 @@ static std::string Get_TypeID_Name(void *dummy = nullptr)
 /**
  *  x
  */
-static DynamicVectorClass<AircraftClassExtension *> AircraftExtensions;
-static DynamicVectorClass<AircraftTypeClassExtension *> AircraftTypeExtensions;
-static DynamicVectorClass<AnimClassExtension *> AnimExtensions;
-static DynamicVectorClass<AnimTypeClassExtension *> AnimTypeExtensions;
-static DynamicVectorClass<BuildingClassExtension *> BuildingExtensions;
-static DynamicVectorClass<BuildingTypeClassExtension *> BuildingTypeExtensions;
-static DynamicVectorClass<BulletTypeClassExtension *> BulletTypeExtensions;
-static DynamicVectorClass<CampaignClassExtension *> CampaignExtensions;
-static DynamicVectorClass<SideClassExtension *> SideExtensions;
-static DynamicVectorClass<HouseClassExtension *> HouseExtensions;
-static DynamicVectorClass<HouseTypeClassExtension *> HouseTypeExtensions;
-static DynamicVectorClass<InfantryClassExtension *> InfantryExtensions;
-static DynamicVectorClass<InfantryTypeClassExtension *> InfantryTypeExtensions;
-static DynamicVectorClass<IsometricTileTypeClassExtension *> IsometricTileTypeExtensions;
-static DynamicVectorClass<OverlayTypeClassExtension *> OverlayTypeExtensions;
-static DynamicVectorClass<ParticleSystemTypeClassExtension *> ParticleSystemTypeExtensions;
-static DynamicVectorClass<ParticleTypeClassExtension *> ParticleTypeExtensions;
-static DynamicVectorClass<SmudgeTypeClassExtension *> SmudgeTypeExtensions;
-static DynamicVectorClass<SuperClassExtension *> SuperExtensions;
-static DynamicVectorClass<SuperWeaponTypeClassExtension *> SuperWeaponTypeExtensions;
-static DynamicVectorClass<TerrainClassExtension *> TerrainExtensions;
-static DynamicVectorClass<TerrainTypeClassExtension *> TerrainTypeExtensions;
-static DynamicVectorClass<TiberiumClassExtension *> TiberiumExtensions;
-static DynamicVectorClass<UnitClassExtension *> UnitExtensions;
-static DynamicVectorClass<UnitTypeClassExtension *> UnitTypeExtensions;
-static DynamicVectorClass<VoxelAnimTypeClassExtension *> VoxelAnimTypeExtensions;
-static DynamicVectorClass<WarheadTypeClassExtension *> WarheadTypeExtensions;
-static DynamicVectorClass<WaveClassExtension *> WaveExtensions;
-static DynamicVectorClass<WeaponTypeClassExtension *> WeaponTypeExtensions;
-
-
-/**
- *  x
- */
 #define ABSTRACT_EXTENSION_POINTER_CAST_MACRO(ptr)    (*(uintptr_t *)(((unsigned char *)ptr) + 0x10))
 
 /**
@@ -204,47 +170,43 @@ static void Clear_Extension_Pointer(const AbstractClass *abstract)
  * 
  *  @author: CCHyper
  */
-bool Is_Extension_Support_Enabled(ExtensionRTTIType rtti)
+bool Is_Extension_Support_Enabled(RTTIType rtti)
 {
-#ifndef NDEBUG
     switch (rtti) {
-        //case EXT_RTTI_AIRCRAFT:
-        //case EXT_RTTI_AIRCRAFTTYPE:
-        //case EXT_RTTI_ANIM:
-        //case EXT_RTTI_ANIMTYPE:
-        case EXT_RTTI_BUILDING:
-        case EXT_RTTI_BUILDINGTYPE:
-        //case EXT_RTTI_BULLETTYPE:
-        //case EXT_RTTI_CAMPAIGN:
-        case EXT_RTTI_SIDE:
-        case EXT_RTTI_HOUSE:
-        case EXT_RTTI_HOUSETYPE:
-        //case EXT_RTTI_INFANTRY:
-        //case EXT_RTTI_INFANTRYTYPE:
-        //case EXT_RTTI_ISOTILETYPE:
-        //case EXT_RTTI_OVERLAYTYPE:
-        //case EXT_RTTI_PARTICLESYSTEMTYPE:
-        //case EXT_RTTI_PARTICLETYPE:
-        //case EXT_RTTI_SMUDGETYPE:
-        //case EXT_RTTI_SUPERWEAPON:
-        //case EXT_RTTI_SUPERWEAPONTYPE:
-        //case EXT_RTTI_TERRAIN:
-        //case EXT_RTTI_TERRAINTYPE:
-        //case EXT_RTTI_TIBERIUM:
-        //case EXT_RTTI_UNIT:
-        //case EXT_RTTI_UNITTYPE:
-        //case EXT_RTTI_VOXELANIMTYPE:
-        case EXT_RTTI_WARHEADTYPE:
-        //case EXT_RTTI_WAVE:
-        case EXT_RTTI_WEAPONTYPE:
+        //case RTTI_AIRCRAFT:
+        //case RTTI_AIRCRAFTTYPE:
+        //case RTTI_ANIM:
+        //case RTTI_ANIMTYPE:
+        //case RTTI_BUILDING:
+        case RTTI_BUILDINGTYPE:
+        //case RTTI_BULLETTYPE:
+        //case RTTI_CAMPAIGN:
+        //case RTTI_SIDE:
+        //case RTTI_HOUSE:
+        //case RTTI_HOUSETYPE:
+        //case RTTI_INFANTRY:
+        //case RTTI_INFANTRYTYPE:
+        //case RTTI_ISOTILETYPE:
+        //case RTTI_OVERLAYTYPE:
+        //case RTTI_PARTICLESYSTEMTYPE:
+        //case RTTI_PARTICLETYPE:
+        //case RTTI_SMUDGETYPE:
+        //case RTTI_SUPERWEAPON:
+        //case RTTI_SUPERWEAPONTYPE:
+        //case RTTI_TERRAIN:
+        //case RTTI_TERRAINTYPE:
+        //case RTTI_TIBERIUM:
+        //case RTTI_UNIT:
+        //case RTTI_UNITTYPE:
+        //case RTTI_VOXELANIMTYPE:
+        //case RTTI_WARHEADTYPE:
+        //case RTTI_WAVE:
+        //case RTTI_WEAPONTYPE:
             return true;
 
         default:
             return false;
     };
-#else
-    return true;
-#endif
 }
 
 
@@ -253,45 +215,11 @@ bool Is_Extension_Support_Enabled(ExtensionRTTIType rtti)
  * 
  *  @author: CCHyper
  */
-static bool Supports_Extension_For(const AbstractClass *abstract)
+bool Is_Extension_Support_Enabled(const AbstractClass *abstract)
 {
     ASSERT(abstract != nullptr);
 
-    switch (abstract->What_Am_I()) {
-        case RTTI_AIRCRAFT:
-        case RTTI_AIRCRAFTTYPE:
-        case RTTI_ANIM:
-        case RTTI_ANIMTYPE:
-        case RTTI_BUILDING:
-        case RTTI_BUILDINGTYPE:
-        case RTTI_BULLETTYPE:
-        case RTTI_CAMPAIGN:
-        case RTTI_SIDE:
-        case RTTI_HOUSE:
-        case RTTI_HOUSETYPE:
-        case RTTI_INFANTRY:
-        case RTTI_INFANTRYTYPE:
-        case RTTI_ISOTILETYPE:
-        case RTTI_OVERLAYTYPE:
-        case RTTI_PARTICLESYSTEMTYPE:
-        case RTTI_PARTICLETYPE:
-        case RTTI_SMUDGETYPE:
-        case RTTI_SUPERWEAPON:
-        case RTTI_SUPERWEAPONTYPE:
-        case RTTI_TERRAIN:
-        case RTTI_TERRAINTYPE:
-        case RTTI_TIBERIUM:
-        case RTTI_UNIT:
-        case RTTI_UNITTYPE:
-        case RTTI_VOXELANIMTYPE:
-        case RTTI_WARHEADTYPE:
-        case RTTI_WAVE:
-        case RTTI_WEAPONTYPE:
-            return true;
-
-        default:
-            return false;
-    };
+    return Is_Extension_Support_Enabled(RTTIType(abstract->What_Am_I()));
 }
 
 
@@ -355,30 +283,20 @@ static const char *Get_Abstract_Name(const AbstractClass *abstract)
  *  @author: CCHyper
  */
 template<class BASE_CLASS, class EXT_CLASS>
-static EXT_CLASS * Extension_Find_Or_Make(const BASE_CLASS *abstract_ptr, DynamicVectorClass<EXT_CLASS *> &list, bool &created, bool allow_make)
+static EXT_CLASS * Extension_Make(const BASE_CLASS *abstract_ptr)
 {
-    //EXT_DEBUG_INFO("Extension_Find_Or_Make... %s %s %s\n", Get_Abstract_Name(abstract_ptr), Get_TypeID_Name<BASE_CLASS>().c_str(), Get_TypeID_Name<EXT_CLASS>().c_str());
+    //EXT_DEBUG_INFO("Extension_Make... %s %s %s\n", Get_Abstract_Name(abstract_ptr), Get_TypeID_Name<BASE_CLASS>().c_str(), Get_TypeID_Name<EXT_CLASS>().c_str());
 
-    created = false;
     const BASE_CLASS *abs_ptr = reinterpret_cast<const BASE_CLASS *>(abstract_ptr);
     EXT_CLASS *ext_ptr = reinterpret_cast<EXT_CLASS *>(Get_Extension_Pointer(abs_ptr));
-
-    int found_index = list.ID(ext_ptr);
-    if (found_index != -1) {
-        ext_ptr = list[found_index];
-        EXT_DEBUG_INFO("\"%s\" extension found for \"%s\".\n", Get_TypeID_Name<BASE_CLASS>().c_str(), Get_Abstract_Name(abs_ptr));
-        return ext_ptr;
-    }
-
-    if (allow_make) {
-        ext_ptr = new EXT_CLASS(reinterpret_cast<const BASE_CLASS *>(abs_ptr));
-        bool added = list.Add(ext_ptr);
-        ASSERT(added);
-        if (added) {
-            EXT_DEBUG_INFO("\"%s\" extension created for \"%s\".\n", Get_TypeID_Name<BASE_CLASS>().c_str(), Get_Abstract_Name(abs_ptr));
-            created = true;
-            return ext_ptr;
-        }
+    
+    /**
+     *  x
+     */
+    ext_ptr = new EXT_CLASS(reinterpret_cast<const BASE_CLASS *>(abs_ptr));
+    ASSERT(ext_ptr != nullptr);
+    if (ext_ptr) {
+        EXT_DEBUG_INFO("\"%s\" extension created for \"%s\".\n", Get_TypeID_Name<BASE_CLASS>().c_str(), Get_Abstract_Name(abs_ptr));
         return ext_ptr;
     }
 
@@ -394,23 +312,18 @@ static EXT_CLASS * Extension_Find_Or_Make(const BASE_CLASS *abstract_ptr, Dynami
  *  @author: CCHyper
  */
 template<class BASE_CLASS, class EXT_CLASS>
-static bool Extension_Destroy(const BASE_CLASS *abstract_ptr, DynamicVectorClass<EXT_CLASS *> &list)
+static bool Extension_Destroy(const BASE_CLASS *abstract_ptr)
 {
     //EXT_DEBUG_INFO("Extension_Destroy... %s %s %s\n", Get_Abstract_Name(abstract_ptr), Get_TypeID_Name<BASE_CLASS>().c_str(), Get_TypeID_Name<EXT_CLASS>().c_str());
     bool removed = false;
 
     EXT_CLASS *ext_ptr = reinterpret_cast<EXT_CLASS *>(Get_Extension_Pointer(abstract_ptr));
     if (ext_ptr) {
-
-        removed = list.Delete(ext_ptr);
-
-#ifndef NDEBUG
-        ASSERT_FATAL_PRINT(removed, "Failed to destroy \"%s\" extension!\n", Get_TypeID_Name<BASE_CLASS>().c_str());
-#endif
-
-        if (!removed) {
-            return false;
-        }
+    
+        /**
+         *  x
+         */
+        delete ext_ptr;
 
         EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Get_TypeID_Name<BASE_CLASS>().c_str());
 
@@ -420,7 +333,7 @@ static bool Extension_Destroy(const BASE_CLASS *abstract_ptr, DynamicVectorClass
         Clear_Extension_Pointer(abstract_ptr);
     }
 
-    return removed;
+    return true;
 }
 
 
@@ -471,7 +384,7 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
             return false;
         }
 
-        EXT_DEBUG_INFO("  -> %s\n", reinterpret_cast<AbstractClassExtension *>(lpPS)->Name());
+        EXT_DEBUG_INFO("  -> %s\n", reinterpret_cast<EXT_CLASS *>(lpPS)->Name());
     }
 
     return true;
@@ -562,133 +475,132 @@ static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
  * 
  *  @author: CCHyper
  */
-AbstractClassExtension *Find_Or_Make_Extension_Internal(const AbstractClass *abstract, bool allow_make)
+AbstractClassExtension *Make_Extension_Internal(const AbstractClass *abstract)
 {
     ASSERT(abstract != nullptr);
 
-    bool created = false;
     AbstractClassExtension *extptr = nullptr;
 
     switch (const_cast<AbstractClass *>(abstract)->What_Am_I()) {
 
         case RTTI_AIRCRAFT:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const AircraftClass *>(abstract), AircraftExtensions, created, allow_make);
+            extptr = Extension_Make<AircraftClass, AircraftClassExtension>(reinterpret_cast<const AircraftClass *>(abstract));
             break;
 
         case RTTI_AIRCRAFTTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const AircraftTypeClass *>(abstract), AircraftTypeExtensions, created, allow_make);
+            extptr = Extension_Make<AircraftTypeClass, AircraftTypeClassExtension>(reinterpret_cast<const AircraftTypeClass *>(abstract));
             break;
 
         case RTTI_ANIM:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const AnimClass *>(abstract), AnimExtensions, created, allow_make);
+            extptr = Extension_Make<AnimClass, AnimClassExtension>(reinterpret_cast<const AnimClass *>(abstract));
             break;
 
         case RTTI_ANIMTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const AnimTypeClass *>(abstract), AnimTypeExtensions, created, allow_make);
+            extptr = Extension_Make<AnimTypeClass, AnimTypeClassExtension>(reinterpret_cast<const AnimTypeClass *>(abstract));
             break;
 
         case RTTI_BUILDING:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const BuildingClass *>(abstract), BuildingExtensions, created, allow_make);
+            extptr = Extension_Make<BuildingClass, BuildingClassExtension>(reinterpret_cast<const BuildingClass *>(abstract));
             break;
 
         case RTTI_BUILDINGTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const BuildingTypeClass *>(abstract), BuildingTypeExtensions, created, allow_make);
+            extptr = Extension_Make<BuildingTypeClass, BuildingTypeClassExtension>(reinterpret_cast<const BuildingTypeClass *>(abstract));
             break;
 
         case RTTI_BULLETTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const BulletTypeClass *>(abstract), BulletTypeExtensions, created, allow_make);
+            extptr = Extension_Make<BulletTypeClass, BulletTypeClassExtension>(reinterpret_cast<const BulletTypeClass *>(abstract));
             break;
 
         case RTTI_CAMPAIGN:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const CampaignClass *>(abstract), CampaignExtensions, created, allow_make);
+            extptr = Extension_Make<CampaignClass, CampaignClassExtension>(reinterpret_cast<const CampaignClass *>(abstract));
             break;
 
         case RTTI_SIDE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const SideClass *>(abstract), SideExtensions, created, allow_make);
+            extptr = Extension_Make<SideClass, SideClassExtension>(reinterpret_cast<const SideClass *>(abstract));
             break;
 
         case RTTI_HOUSE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const HouseClass *>(abstract), HouseExtensions, created, allow_make);
+            extptr = Extension_Make<HouseClass, HouseClassExtension>(reinterpret_cast<const HouseClass *>(abstract));
             break;
 
         case RTTI_HOUSETYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const HouseTypeClass *>(abstract), HouseTypeExtensions, created, allow_make);
+            extptr = Extension_Make<HouseTypeClass, HouseTypeClassExtension>(reinterpret_cast<const HouseTypeClass *>(abstract));
             break;
 
         case RTTI_INFANTRY:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const InfantryClass *>(abstract), InfantryExtensions, created, allow_make);
+            extptr = Extension_Make<InfantryClass, InfantryClassExtension>(reinterpret_cast<const InfantryClass *>(abstract));
             break;
 
         case RTTI_INFANTRYTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const InfantryTypeClass *>(abstract), InfantryTypeExtensions, created, allow_make);
+            extptr = Extension_Make<InfantryTypeClass, InfantryTypeClassExtension>(reinterpret_cast<const InfantryTypeClass *>(abstract));
             break;
 
         case RTTI_ISOTILETYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const IsometricTileTypeClass *>(abstract), IsometricTileTypeExtensions, created, allow_make);
+            extptr = Extension_Make<IsometricTileTypeClass, IsometricTileTypeClassExtension>(reinterpret_cast<const IsometricTileTypeClass *>(abstract));
             break;
 
         case RTTI_OVERLAYTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const OverlayTypeClass *>(abstract), OverlayTypeExtensions, created, allow_make);
+            extptr = Extension_Make<OverlayTypeClass, OverlayTypeClassExtension>(reinterpret_cast<const OverlayTypeClass *>(abstract));
             break;
 
         case RTTI_PARTICLESYSTEMTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const ParticleSystemTypeClass *>(abstract), ParticleSystemTypeExtensions, created, allow_make);
+            extptr = Extension_Make<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(reinterpret_cast<const ParticleSystemTypeClass *>(abstract));
             break;
 
         case RTTI_PARTICLETYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const ParticleTypeClass *>(abstract), ParticleTypeExtensions, created, allow_make);
+            extptr = Extension_Make<ParticleTypeClass, ParticleTypeClassExtension>(reinterpret_cast<const ParticleTypeClass *>(abstract));
             break;
 
         case RTTI_SMUDGETYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const SmudgeTypeClass *>(abstract), SmudgeTypeExtensions, created, allow_make);
+            extptr = Extension_Make<SmudgeTypeClass, SmudgeTypeClassExtension>(reinterpret_cast<const SmudgeTypeClass *>(abstract));
             break;
 
         case RTTI_SUPERWEAPON:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const SuperClass *>(abstract), SuperExtensions, created, allow_make);
+            extptr = Extension_Make<SuperClass, SuperClassExtension>(reinterpret_cast<const SuperClass *>(abstract));
             break;
 
         case RTTI_SUPERWEAPONTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const SuperWeaponTypeClass *>(abstract), SuperWeaponTypeExtensions, created, allow_make);
+            extptr = Extension_Make<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(reinterpret_cast<const SuperWeaponTypeClass *>(abstract));
             break;
 
         case RTTI_TERRAIN:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const TerrainClass *>(abstract), TerrainExtensions, created, allow_make);
+            extptr = Extension_Make<TerrainClass, TerrainClassExtension>(reinterpret_cast<const TerrainClass *>(abstract));
             break;
 
         case RTTI_TERRAINTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const TerrainTypeClass *>(abstract), TerrainTypeExtensions, created, allow_make);
+            extptr = Extension_Make<TerrainTypeClass, TerrainTypeClassExtension>(reinterpret_cast<const TerrainTypeClass *>(abstract));
             break;
 
         case RTTI_TIBERIUM:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const TiberiumClass *>(abstract), TiberiumExtensions, created, allow_make);
+            extptr = Extension_Make<TiberiumClass, TiberiumClassExtension>(reinterpret_cast<const TiberiumClass *>(abstract));
             break;
 
         case RTTI_UNIT:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const UnitClass *>(abstract), UnitExtensions, created, allow_make);
+            extptr = Extension_Make<UnitClass, UnitClassExtension>(reinterpret_cast<const UnitClass *>(abstract));
             break;
 
         case RTTI_UNITTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const UnitTypeClass *>(abstract), UnitTypeExtensions, created, allow_make);
+            extptr = Extension_Make<UnitTypeClass, UnitTypeClassExtension>(reinterpret_cast<const UnitTypeClass *>(abstract));
             break;
 
         case RTTI_VOXELANIMTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const VoxelAnimTypeClass *>(abstract), VoxelAnimTypeExtensions, created, allow_make);
+            extptr = Extension_Make<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(reinterpret_cast<const VoxelAnimTypeClass *>(abstract));
             break;
 
         case RTTI_WARHEADTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const WarheadTypeClass *>(abstract), WarheadTypeExtensions, created, allow_make);
+            extptr = Extension_Make<WarheadTypeClass, WarheadTypeClassExtension>(reinterpret_cast<const WarheadTypeClass *>(abstract));
             break;
 
         case RTTI_WAVE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const WaveClass *>(abstract), WaveExtensions, created, allow_make);
+            extptr = Extension_Make<WaveClass, WaveClassExtension>(reinterpret_cast<const WaveClass *>(abstract));
             break;
 
         case RTTI_WEAPONTYPE:
-            extptr = Extension_Find_Or_Make(reinterpret_cast<const WeaponTypeClass *>(abstract), WeaponTypeExtensions, created, allow_make);
+            extptr = Extension_Make<WeaponTypeClass, WeaponTypeClassExtension>(reinterpret_cast<const WeaponTypeClass *>(abstract));
             break;
 
         default:
-            DEBUG_ERROR("Find_Or_Make_Extension: No extension support for \"%s\" implemented!\n", Name_From_RTTI((RTTIType)abstract->What_Am_I()));
+            DEBUG_ERROR("Make_Extension: No extension support for \"%s\" implemented!\n", Name_From_RTTI((RTTIType)abstract->What_Am_I()));
             break;
 
     };
@@ -696,7 +608,7 @@ AbstractClassExtension *Find_Or_Make_Extension_Internal(const AbstractClass *abs
     /**
      *  
      */
-    if (created && extptr != nullptr) {
+    if (extptr != nullptr) {
         Set_Extension_Pointer(abstract, extptr);
     }
 
@@ -756,119 +668,119 @@ bool Destroy_Extension_Internal(const AbstractClass *abstract)
     switch (abstract->What_Am_I()) {
 
         case RTTI_AIRCRAFT:
-            removed = Extension_Destroy(reinterpret_cast<const AircraftClass *>(abstract), AircraftExtensions);
+            removed = Extension_Destroy<AircraftClass, AircraftClassExtension>(reinterpret_cast<const AircraftClass *>(abstract));
             break;
 
         case RTTI_AIRCRAFTTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const AircraftTypeClass *>(abstract), AircraftTypeExtensions);
+            removed = Extension_Destroy<AircraftTypeClass, AircraftTypeClassExtension>(reinterpret_cast<const AircraftTypeClass *>(abstract));
             break;
 
         case RTTI_ANIM:
-            removed = Extension_Destroy(reinterpret_cast<const AnimClass *>(abstract), AnimExtensions);
+            removed = Extension_Destroy<AnimClass, AnimClassExtension>(reinterpret_cast<const AnimClass *>(abstract));
             break;
 
         case RTTI_ANIMTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const AnimTypeClass *>(abstract), AnimTypeExtensions);
+            removed = Extension_Destroy<AnimTypeClass, AnimTypeClassExtension>(reinterpret_cast<const AnimTypeClass *>(abstract));
             break;
 
         case RTTI_BUILDING:
-            removed = Extension_Destroy(reinterpret_cast<const BuildingClass *>(abstract), BuildingExtensions);
+            removed = Extension_Destroy<BuildingClass, BuildingClassExtension>(reinterpret_cast<const BuildingClass *>(abstract));
             break;
 
         case RTTI_BUILDINGTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const BuildingTypeClass *>(abstract), BuildingTypeExtensions);
+            removed = Extension_Destroy<BuildingTypeClass, BuildingTypeClassExtension>(reinterpret_cast<const BuildingTypeClass *>(abstract));
             break;
 
         case RTTI_BULLETTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const BulletTypeClass *>(abstract), BulletTypeExtensions);
+            removed = Extension_Destroy<BulletTypeClass, BulletTypeClassExtension>(reinterpret_cast<const BulletTypeClass *>(abstract));
             break;
 
         case RTTI_CAMPAIGN:
-            removed = Extension_Destroy(reinterpret_cast<const CampaignClass *>(abstract), CampaignExtensions);
+            removed = Extension_Destroy<CampaignClass, CampaignClassExtension>(reinterpret_cast<const CampaignClass *>(abstract));
             break;
 
         case RTTI_SIDE:
-            removed = Extension_Destroy(reinterpret_cast<const SideClass *>(abstract), SideExtensions);
+            removed = Extension_Destroy<SideClass, SideClassExtension>(reinterpret_cast<const SideClass *>(abstract));
             break;
 
         case RTTI_HOUSE:
-            removed = Extension_Destroy(reinterpret_cast<const HouseClass *>(abstract), HouseExtensions);
+            removed = Extension_Destroy<HouseClass, HouseClassExtension>(reinterpret_cast<const HouseClass *>(abstract));
             break;
 
         case RTTI_HOUSETYPE:
-            removed = Extension_Destroy(reinterpret_cast<const HouseTypeClass *>(abstract), HouseTypeExtensions);
+            removed = Extension_Destroy<HouseTypeClass, HouseTypeClassExtension>(reinterpret_cast<const HouseTypeClass *>(abstract));
             break;
 
         case RTTI_INFANTRY:
-            removed = Extension_Destroy(reinterpret_cast<const InfantryClass *>(abstract), InfantryExtensions);
+            removed = Extension_Destroy<InfantryClass, InfantryClassExtension>(reinterpret_cast<const InfantryClass *>(abstract));
             break;
 
         case RTTI_INFANTRYTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const InfantryTypeClass *>(abstract), InfantryTypeExtensions);
+            removed = Extension_Destroy<InfantryTypeClass, InfantryTypeClassExtension>(reinterpret_cast<const InfantryTypeClass *>(abstract));
             break;
 
         case RTTI_ISOTILETYPE:
-            removed = Extension_Destroy(reinterpret_cast<const IsometricTileTypeClass *>(abstract), IsometricTileTypeExtensions);
+            removed = Extension_Destroy<IsometricTileTypeClass, IsometricTileTypeClassExtension>(reinterpret_cast<const IsometricTileTypeClass *>(abstract));
             break;
 
         case RTTI_OVERLAYTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const OverlayTypeClass *>(abstract), OverlayTypeExtensions);
+            removed = Extension_Destroy<OverlayTypeClass, OverlayTypeClassExtension>(reinterpret_cast<const OverlayTypeClass *>(abstract));
             break;
 
         case RTTI_PARTICLESYSTEMTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const ParticleSystemTypeClass *>(abstract), ParticleSystemTypeExtensions);
+            removed = Extension_Destroy<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(reinterpret_cast<const ParticleSystemTypeClass *>(abstract));
             break;
 
         case RTTI_PARTICLETYPE:
-            removed = Extension_Destroy(reinterpret_cast<const ParticleTypeClass *>(abstract), ParticleTypeExtensions);
+            removed = Extension_Destroy<ParticleTypeClass, ParticleTypeClassExtension>(reinterpret_cast<const ParticleTypeClass *>(abstract));
             break;
 
         case RTTI_SMUDGETYPE:
-            removed = Extension_Destroy(reinterpret_cast<const SmudgeTypeClass *>(abstract), SmudgeTypeExtensions);
+            removed = Extension_Destroy<SmudgeTypeClass, SmudgeTypeClassExtension>(reinterpret_cast<const SmudgeTypeClass *>(abstract));
             break;
 
         case RTTI_SUPERWEAPON:
-            removed = Extension_Destroy(reinterpret_cast<const SuperClass *>(abstract), SuperExtensions);
+            removed = Extension_Destroy<SuperClass, SuperClassExtension>(reinterpret_cast<const SuperClass *>(abstract));
             break;
 
         case RTTI_SUPERWEAPONTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const SuperWeaponTypeClass *>(abstract), SuperWeaponTypeExtensions);
+            removed = Extension_Destroy<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(reinterpret_cast<const SuperWeaponTypeClass *>(abstract));
             break;
 
         case RTTI_TERRAIN:
-            removed = Extension_Destroy(reinterpret_cast<const TerrainClass *>(abstract), TerrainExtensions);
+            removed = Extension_Destroy<TerrainClass, TerrainClassExtension>(reinterpret_cast<const TerrainClass *>(abstract));
             break;
 
         case RTTI_TERRAINTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const TerrainTypeClass *>(abstract), TerrainTypeExtensions);
+            removed = Extension_Destroy<TerrainTypeClass, TerrainTypeClassExtension>(reinterpret_cast<const TerrainTypeClass *>(abstract));
             break;
 
         case RTTI_TIBERIUM:
-            removed = Extension_Destroy(reinterpret_cast<const TiberiumClass *>(abstract), TiberiumExtensions);
+            removed = Extension_Destroy<TiberiumClass, TiberiumClassExtension>(reinterpret_cast<const TiberiumClass *>(abstract));
             break;
 
         case RTTI_UNIT:
-            removed = Extension_Destroy(reinterpret_cast<const UnitClass *>(abstract), UnitExtensions);
+            removed = Extension_Destroy<UnitClass, UnitClassExtension>(reinterpret_cast<const UnitClass *>(abstract));
             break;
 
         case RTTI_UNITTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const UnitTypeClass *>(abstract), UnitTypeExtensions);
+            removed = Extension_Destroy<UnitTypeClass, UnitTypeClassExtension>(reinterpret_cast<const UnitTypeClass *>(abstract));
             break;
 
         case RTTI_VOXELANIMTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const VoxelAnimTypeClass *>(abstract), VoxelAnimTypeExtensions);
+            removed = Extension_Destroy<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(reinterpret_cast<const VoxelAnimTypeClass *>(abstract));
             break;
 
         case RTTI_WARHEADTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const WarheadTypeClass *>(abstract), WarheadTypeExtensions);
+            removed = Extension_Destroy<WarheadTypeClass, WarheadTypeClassExtension>(reinterpret_cast<const WarheadTypeClass *>(abstract));
             break;
 
         case RTTI_WAVE:
-            removed = Extension_Destroy(reinterpret_cast<const WaveClass *>(abstract), WaveExtensions);
+            removed = Extension_Destroy<WaveClass, WaveClassExtension>(reinterpret_cast<const WaveClass *>(abstract));
             break;
 
         case RTTI_WEAPONTYPE:
-            removed = Extension_Destroy(reinterpret_cast<const WeaponTypeClass *>(abstract), WeaponTypeExtensions);
+            removed = Extension_Destroy<WeaponTypeClass, WeaponTypeClassExtension>(reinterpret_cast<const WeaponTypeClass *>(abstract));
             break;
 
         default:
@@ -906,35 +818,35 @@ bool Save_Extensions(IStream *pStm)
      */
     DEBUG_INFO("Save_Extensions(enter)\n");
     
-    if (Is_Extension_Support_Enabled(EXT_RTTI_UNIT) && !Extension_Save<UnitClass, UnitClassExtension>(pStm, UnitExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFT) && !Extension_Save<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFTTYPE) && !Extension_Save<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIM) && !Extension_Save<AnimClass, AnimClassExtension>(pStm, AnimExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIMTYPE) && !Extension_Save<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDING) && !Extension_Save<BuildingClass, BuildingClassExtension>(pStm, BuildingExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDINGTYPE) && !Extension_Save<BuildingTypeClass, BuildingTypeClassExtension>(pStm, BuildingTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BULLETTYPE) && !Extension_Save<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_CAMPAIGN) && !Extension_Save<CampaignClass, CampaignClassExtension>(pStm, CampaignExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSE) && !Extension_Save<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSETYPE) && !Extension_Save<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRY) && !Extension_Save<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRYTYPE) && !Extension_Save<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ISOTILETYPE) && !Extension_Save<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_OVERLAY) && !Extension_Save<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLESYSTEMTYPE) && !Extension_Save<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLETYPE) && !Extension_Save<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SIDE) && !Extension_Save<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SMUDGETYPE) && !Extension_Save<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPONTYPE) && !Extension_Save<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAIN) && !Extension_Save<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAINTYPE) && !Extension_Save<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_UNITTYPE) && !Extension_Save<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_VOXELANIMTYPE) && !Extension_Save<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WAVE) && !Extension_Save<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WEAPONTYPE) && !Extension_Save<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WARHEADTYPE) && !Extension_Save<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPON) && !Extension_Save<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TIBERIUM) && !Extension_Save<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_UNIT) && !Extension_Save<UnitClass, UnitClassExtension>(pStm, UnitExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFT) && !Extension_Save<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFTTYPE) && !Extension_Save<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_ANIM) && !Extension_Save<AnimClass, AnimClassExtension>(pStm, AnimExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_ANIMTYPE) && !Extension_Save<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDING) && !Extension_Save<BuildingClass, BuildingClassExtension>(pStm, BuildingExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDINGTYPE) && !Extension_Save<BuildingTypeClass, BuildingTypeClassExtension>(pStm, BuildingTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_BULLETTYPE) && !Extension_Save<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_CAMPAIGN) && !Extension_Save<CampaignClass, CampaignClassExtension>(pStm, CampaignExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSE) && !Extension_Save<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSETYPE) && !Extension_Save<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRY) && !Extension_Save<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRYTYPE) && !Extension_Save<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_ISOTILETYPE) && !Extension_Save<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_OVERLAY) && !Extension_Save<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLESYSTEMTYPE) && !Extension_Save<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLETYPE) && !Extension_Save<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_SIDE) && !Extension_Save<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_SMUDGETYPE) && !Extension_Save<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPONTYPE) && !Extension_Save<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAIN) && !Extension_Save<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAINTYPE) && !Extension_Save<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_UNITTYPE) && !Extension_Save<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_VOXELANIMTYPE) && !Extension_Save<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_WAVE) && !Extension_Save<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_WEAPONTYPE) && !Extension_Save<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_WARHEADTYPE) && !Extension_Save<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPON) && !Extension_Save<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_TIBERIUM) && !Extension_Save<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions)) { return false; }
 
     DEBUG_INFO("Save_Extensions(exit)\n");
 
@@ -962,35 +874,35 @@ bool Load_Extensions(IStream *pStm)
      */
     DEBUG_INFO("Load_Extensions(enter)\n");
 
-    if (Is_Extension_Support_Enabled(EXT_RTTI_UNIT) && !Extension_Load<UnitClass, UnitClassExtension>(pStm, UnitExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFT) && !Extension_Load<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFTTYPE) && !Extension_Load<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIM) && !Extension_Load<AnimClass, AnimClassExtension>(pStm, AnimExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIMTYPE) && !Extension_Load<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDING) && !Extension_Load<BuildingClass, BuildingClassExtension>(pStm, BuildingExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDINGTYPE) && !Extension_Load<BuildingTypeClass, BuildingTypeClassExtension>(pStm, BuildingTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BULLETTYPE) && !Extension_Load<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_CAMPAIGN) && !Extension_Load<CampaignClass, CampaignClassExtension>(pStm, CampaignExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSE) && !Extension_Load<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSETYPE) && !Extension_Load<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRY) && !Extension_Load<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRYTYPE) && !Extension_Load<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ISOTILETYPE) && !Extension_Load<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_OVERLAYTYPE) && !Extension_Load<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLESYSTEMTYPE) && !Extension_Load<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLETYPE) && !Extension_Load<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SIDE) && !Extension_Load<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SMUDGETYPE) && !Extension_Load<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPONTYPE) && !Extension_Load<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAIN) && !Extension_Load<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAINTYPE) && !Extension_Load<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_UNITTYPE) && !Extension_Load<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_VOXELANIMTYPE) && !Extension_Load<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WAVE) && !Extension_Load<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WEAPONTYPE) && !Extension_Load<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WARHEADTYPE) && !Extension_Load<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPON) && !Extension_Load<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TIBERIUM) && !Extension_Load<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_UNIT) && !Extension_Load<UnitClass, UnitClassExtension>(pStm, UnitExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFT) && !Extension_Load<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFTTYPE) && !Extension_Load<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_ANIM) && !Extension_Load<AnimClass, AnimClassExtension>(pStm, AnimExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_ANIMTYPE) && !Extension_Load<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDING) && !Extension_Load<BuildingClass, BuildingClassExtension>(pStm, BuildingExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDINGTYPE) && !Extension_Load<BuildingTypeClass, BuildingTypeClassExtension>(pStm, BuildingTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_BULLETTYPE) && !Extension_Load<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_CAMPAIGN) && !Extension_Load<CampaignClass, CampaignClassExtension>(pStm, CampaignExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSE) && !Extension_Load<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSETYPE) && !Extension_Load<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRY) && !Extension_Load<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRYTYPE) && !Extension_Load<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_ISOTILETYPE) && !Extension_Load<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_OVERLAYTYPE) && !Extension_Load<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLESYSTEMTYPE) && !Extension_Load<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLETYPE) && !Extension_Load<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_SIDE) && !Extension_Load<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_SMUDGETYPE) && !Extension_Load<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPONTYPE) && !Extension_Load<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAIN) && !Extension_Load<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAINTYPE) && !Extension_Load<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_UNITTYPE) && !Extension_Load<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_VOXELANIMTYPE) && !Extension_Load<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_WAVE) && !Extension_Load<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_WEAPONTYPE) && !Extension_Load<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_WARHEADTYPE) && !Extension_Load<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPON) && !Extension_Load<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_TIBERIUM) && !Extension_Load<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions)) { return false; }
 
     DEBUG_INFO("Load_Extensions(exit)\n");
 
@@ -1017,35 +929,35 @@ bool Request_Extension_Pointer_Remap()
      */
     DEBUG_INFO("Requesting remap for extension pointers...\n");
 
-    if (Is_Extension_Support_Enabled(EXT_RTTI_UNIT) && !Extension_Request_Pointer_Remap<UnitClass, UnitClassExtension>(Units)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFT) && !Extension_Request_Pointer_Remap<AircraftClass, AircraftClassExtension>(Aircrafts)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFTTYPE) && !Extension_Request_Pointer_Remap<AircraftTypeClass, AircraftTypeClassExtension>(AircraftTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIM) && !Extension_Request_Pointer_Remap<AnimClass, AnimClassExtension>(Anims)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIMTYPE) && !Extension_Request_Pointer_Remap<AnimTypeClass, AnimTypeClassExtension>(AnimTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDING) && !Extension_Request_Pointer_Remap<BuildingClass, BuildingClassExtension>(Buildings)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDINGTYPE) && !Extension_Request_Pointer_Remap<BuildingTypeClass, BuildingTypeClassExtension>(BuildingTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BULLETTYPE) && !Extension_Request_Pointer_Remap<BulletTypeClass, BulletTypeClassExtension>(BulletTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_CAMPAIGN) && !Extension_Request_Pointer_Remap<CampaignClass, CampaignClassExtension>(Campaigns)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSE) && !Extension_Request_Pointer_Remap<HouseClass, HouseClassExtension>(Houses)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSETYPE) && !Extension_Request_Pointer_Remap<HouseTypeClass, HouseTypeClassExtension>(HouseTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRY) && !Extension_Request_Pointer_Remap<InfantryClass, InfantryClassExtension>(Infantry)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRYTYPE) && !Extension_Request_Pointer_Remap<InfantryTypeClass, InfantryTypeClassExtension>(InfantryTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ISOTILETYPE) && !Extension_Request_Pointer_Remap<IsometricTileTypeClass, IsometricTileTypeClassExtension>(IsoTileTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_OVERLAYTYPE) && !Extension_Request_Pointer_Remap<OverlayTypeClass, OverlayTypeClassExtension>(OverlayTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLESYSTEMTYPE) && !Extension_Request_Pointer_Remap<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(ParticleSystemTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLETYPE) && !Extension_Request_Pointer_Remap<ParticleTypeClass, ParticleTypeClassExtension>(ParticleTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SIDE) && !Extension_Request_Pointer_Remap<SideClass, SideClassExtension>(Sides)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SMUDGETYPE) && !Extension_Request_Pointer_Remap<SmudgeTypeClass, SmudgeTypeClassExtension>(SmudgeTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPONTYPE) && !Extension_Request_Pointer_Remap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(SuperWeaponTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAIN) && !Extension_Request_Pointer_Remap<TerrainClass, TerrainClassExtension>(Terrains)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAINTYPE) && !Extension_Request_Pointer_Remap<TerrainTypeClass, TerrainTypeClassExtension>(TerrainTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_UNITTYPE) && !Extension_Request_Pointer_Remap<UnitTypeClass, UnitTypeClassExtension>(UnitTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_VOXELANIMTYPE) && !Extension_Request_Pointer_Remap<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(VoxelAnimTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WAVE) && !Extension_Request_Pointer_Remap<WaveClass, WaveClassExtension>(Waves)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WEAPONTYPE) && !Extension_Request_Pointer_Remap<WeaponTypeClass, WeaponTypeClassExtension>(WeaponTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WARHEADTYPE) && !Extension_Request_Pointer_Remap<WarheadTypeClass, WarheadTypeClassExtension>(WarheadTypes)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPON) && !Extension_Request_Pointer_Remap<SuperClass, SuperClassExtension>(Supers)) { return false; }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TIBERIUM) && !Extension_Request_Pointer_Remap<TiberiumClass, TiberiumClassExtension>(Tiberiums)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_UNIT) && !Extension_Request_Pointer_Remap<UnitClass, UnitClassExtension>(Units)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFT) && !Extension_Request_Pointer_Remap<AircraftClass, AircraftClassExtension>(Aircrafts)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFTTYPE) && !Extension_Request_Pointer_Remap<AircraftTypeClass, AircraftTypeClassExtension>(AircraftTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_ANIM) && !Extension_Request_Pointer_Remap<AnimClass, AnimClassExtension>(Anims)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_ANIMTYPE) && !Extension_Request_Pointer_Remap<AnimTypeClass, AnimTypeClassExtension>(AnimTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDING) && !Extension_Request_Pointer_Remap<BuildingClass, BuildingClassExtension>(Buildings)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDINGTYPE) && !Extension_Request_Pointer_Remap<BuildingTypeClass, BuildingTypeClassExtension>(BuildingTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_BULLETTYPE) && !Extension_Request_Pointer_Remap<BulletTypeClass, BulletTypeClassExtension>(BulletTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_CAMPAIGN) && !Extension_Request_Pointer_Remap<CampaignClass, CampaignClassExtension>(Campaigns)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSE) && !Extension_Request_Pointer_Remap<HouseClass, HouseClassExtension>(Houses)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSETYPE) && !Extension_Request_Pointer_Remap<HouseTypeClass, HouseTypeClassExtension>(HouseTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRY) && !Extension_Request_Pointer_Remap<InfantryClass, InfantryClassExtension>(Infantry)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRYTYPE) && !Extension_Request_Pointer_Remap<InfantryTypeClass, InfantryTypeClassExtension>(InfantryTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_ISOTILETYPE) && !Extension_Request_Pointer_Remap<IsometricTileTypeClass, IsometricTileTypeClassExtension>(IsoTileTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_OVERLAYTYPE) && !Extension_Request_Pointer_Remap<OverlayTypeClass, OverlayTypeClassExtension>(OverlayTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLESYSTEMTYPE) && !Extension_Request_Pointer_Remap<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(ParticleSystemTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLETYPE) && !Extension_Request_Pointer_Remap<ParticleTypeClass, ParticleTypeClassExtension>(ParticleTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_SIDE) && !Extension_Request_Pointer_Remap<SideClass, SideClassExtension>(Sides)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_SMUDGETYPE) && !Extension_Request_Pointer_Remap<SmudgeTypeClass, SmudgeTypeClassExtension>(SmudgeTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPONTYPE) && !Extension_Request_Pointer_Remap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(SuperWeaponTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAIN) && !Extension_Request_Pointer_Remap<TerrainClass, TerrainClassExtension>(Terrains)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAINTYPE) && !Extension_Request_Pointer_Remap<TerrainTypeClass, TerrainTypeClassExtension>(TerrainTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_UNITTYPE) && !Extension_Request_Pointer_Remap<UnitTypeClass, UnitTypeClassExtension>(UnitTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_VOXELANIMTYPE) && !Extension_Request_Pointer_Remap<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(VoxelAnimTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_WAVE) && !Extension_Request_Pointer_Remap<WaveClass, WaveClassExtension>(Waves)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_WEAPONTYPE) && !Extension_Request_Pointer_Remap<WeaponTypeClass, WeaponTypeClassExtension>(WeaponTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_WARHEADTYPE) && !Extension_Request_Pointer_Remap<WarheadTypeClass, WarheadTypeClassExtension>(WarheadTypes)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPON) && !Extension_Request_Pointer_Remap<SuperClass, SuperClassExtension>(Supers)) { return false; }
+    if (Is_Extension_Support_Enabled(RTTI_TIBERIUM) && !Extension_Request_Pointer_Remap<TiberiumClass, TiberiumClassExtension>(Tiberiums)) { return false; }
 
     DEBUG_INFO("Requests of extension pointers complete.\n");
 
@@ -1065,35 +977,35 @@ bool Register_Extension_Class_Factories()
      *
      *  #NOTE: The order of these calls must match the relevent RTTIType order!
      */
-    if (Is_Extension_Support_Enabled(EXT_RTTI_UNIT)) { REGISTER_CLASS(UnitClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFT)) { REGISTER_CLASS(AircraftClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFTTYPE)) { REGISTER_CLASS(AircraftTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIM)) { REGISTER_CLASS(AnimClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIMTYPE)) { REGISTER_CLASS(AnimTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDING)) { REGISTER_CLASS(BuildingClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDINGTYPE)) { REGISTER_CLASS(BuildingTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BULLETTYPE)) { REGISTER_CLASS(BulletTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_CAMPAIGN)) { REGISTER_CLASS(CampaignClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSE)) { REGISTER_CLASS(HouseClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSETYPE)) { REGISTER_CLASS(HouseTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRY)) { REGISTER_CLASS(InfantryClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRYTYPE)) { REGISTER_CLASS(InfantryTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ISOTILETYPE)) { REGISTER_CLASS(IsometricTileTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_OVERLAYTYPE)) { REGISTER_CLASS(OverlayTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLESYSTEMTYPE)) { REGISTER_CLASS(ParticleSystemTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLETYPE)) { REGISTER_CLASS(ParticleTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SIDE)) { REGISTER_CLASS(SideClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SMUDGETYPE)) { REGISTER_CLASS(SmudgeTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPONTYPE)) { REGISTER_CLASS(SuperWeaponTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAIN)) { REGISTER_CLASS(TerrainClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAINTYPE)) { REGISTER_CLASS(TerrainTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_UNITTYPE)) { REGISTER_CLASS(UnitTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_VOXELANIMTYPE)) { REGISTER_CLASS(VoxelAnimTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WAVE)) { REGISTER_CLASS(WaveClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WEAPONTYPE)) { REGISTER_CLASS(WeaponTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WARHEADTYPE)) { REGISTER_CLASS(WarheadTypeClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPON)) { REGISTER_CLASS(SuperClassExtension) }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TIBERIUM)) { REGISTER_CLASS(TiberiumClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_UNIT)) { REGISTER_CLASS(UnitClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFT)) { REGISTER_CLASS(AircraftClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFTTYPE)) { REGISTER_CLASS(AircraftTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_ANIM)) { REGISTER_CLASS(AnimClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_ANIMTYPE)) { REGISTER_CLASS(AnimTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDING)) { REGISTER_CLASS(BuildingClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDINGTYPE)) { REGISTER_CLASS(BuildingTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_BULLETTYPE)) { REGISTER_CLASS(BulletTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_CAMPAIGN)) { REGISTER_CLASS(CampaignClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSE)) { REGISTER_CLASS(HouseClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSETYPE)) { REGISTER_CLASS(HouseTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRY)) { REGISTER_CLASS(InfantryClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRYTYPE)) { REGISTER_CLASS(InfantryTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_ISOTILETYPE)) { REGISTER_CLASS(IsometricTileTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_OVERLAYTYPE)) { REGISTER_CLASS(OverlayTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLESYSTEMTYPE)) { REGISTER_CLASS(ParticleSystemTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLETYPE)) { REGISTER_CLASS(ParticleTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_SIDE)) { REGISTER_CLASS(SideClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_SMUDGETYPE)) { REGISTER_CLASS(SmudgeTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPONTYPE)) { REGISTER_CLASS(SuperWeaponTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAIN)) { REGISTER_CLASS(TerrainClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAINTYPE)) { REGISTER_CLASS(TerrainTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_UNITTYPE)) { REGISTER_CLASS(UnitTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_VOXELANIMTYPE)) { REGISTER_CLASS(VoxelAnimTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_WAVE)) { REGISTER_CLASS(WaveClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_WEAPONTYPE)) { REGISTER_CLASS(WeaponTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_WARHEADTYPE)) { REGISTER_CLASS(WarheadTypeClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPON)) { REGISTER_CLASS(SuperClassExtension) }
+    if (Is_Extension_Support_Enabled(RTTI_TIBERIUM)) { REGISTER_CLASS(TiberiumClassExtension) }
 
     return true;
 }
@@ -1110,35 +1022,35 @@ void Clear_Extension_Lists()
 
     ++ScenarioInit;
 
-    if (Is_Extension_Support_Enabled(EXT_RTTI_UNIT)) { UnitExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFT)) { AircraftExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_AIRCRAFTTYPE)) { AircraftTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIM)) { AnimExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ANIMTYPE)) { AnimTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDING)) { BuildingExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BUILDINGTYPE)) { BuildingTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_BULLETTYPE)) { BulletTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_CAMPAIGN)) { CampaignExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSE)) { HouseExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_HOUSETYPE)) { HouseTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRY)) { InfantryExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_INFANTRYTYPE)) { InfantryTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_ISOTILETYPE)) { IsometricTileTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_OVERLAYTYPE)) { OverlayTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLESYSTEMTYPE)) { ParticleSystemTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_PARTICLETYPE)) { ParticleTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SIDE)) { SideExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SMUDGETYPE)) { SmudgeTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPONTYPE)) { SuperWeaponTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAIN)) { TerrainExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TERRAINTYPE)) { TerrainTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_UNITTYPE)) { UnitTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_VOXELANIMTYPE)) { VoxelAnimTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WAVE)) { WaveExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WEAPONTYPE)) { WeaponTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_WARHEADTYPE)) { WarheadTypeExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_SUPERWEAPON)) { SuperExtensions.Clear(); }
-    if (Is_Extension_Support_Enabled(EXT_RTTI_TIBERIUM)) { TiberiumExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_UNIT)) { UnitExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFT)) { AircraftExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_AIRCRAFTTYPE)) { AircraftTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_ANIM)) { AnimExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_ANIMTYPE)) { AnimTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDING)) { BuildingExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_BUILDINGTYPE)) { BuildingTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_BULLETTYPE)) { BulletTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_CAMPAIGN)) { CampaignExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSE)) { HouseExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_HOUSETYPE)) { HouseTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRY)) { InfantryExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_INFANTRYTYPE)) { InfantryTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_ISOTILETYPE)) { IsometricTileTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_OVERLAYTYPE)) { OverlayTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLESYSTEMTYPE)) { ParticleSystemTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_PARTICLETYPE)) { ParticleTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_SIDE)) { SideExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_SMUDGETYPE)) { SmudgeTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPONTYPE)) { SuperWeaponTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAIN)) { TerrainExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_TERRAINTYPE)) { TerrainTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_UNITTYPE)) { UnitTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_VOXELANIMTYPE)) { VoxelAnimTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_WAVE)) { WaveExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_WEAPONTYPE)) { WeaponTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_WARHEADTYPE)) { WarheadTypeExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_SUPERWEAPON)) { SuperExtensions.Clear(); }
+    if (Is_Extension_Support_Enabled(RTTI_TIBERIUM)) { TiberiumExtensions.Clear(); }
 
     --ScenarioInit;
 

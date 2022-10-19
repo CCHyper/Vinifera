@@ -64,7 +64,7 @@ DECLARE_PATCH(_WarheadTypeClass_Constructor_Patch)
     /**
      *  Find existing or create an extended class instance.
      */
-    exttype_ptr = Find_Or_Make_Extension<WarheadTypeClassExtension>(this_ptr);
+    exttype_ptr = Make_Extension<WarheadTypeClassExtension>(this_ptr);
     if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create WarheadTypeClassExtensions instance for \"%s\"!\n", ini_name);
         ShowCursor(TRUE);

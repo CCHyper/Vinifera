@@ -31,6 +31,7 @@
 #include "scenario.h"
 #include "theatertype.h"
 #include "ccini.h"
+#include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -45,6 +46,8 @@ IsometricTileTypeClassExtension::IsometricTileTypeClassExtension(const Isometric
     TileSetName(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("IsometricTileTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    IsometricTileTypeExtensions.Add(this);
 }
 
 
@@ -68,6 +71,8 @@ IsometricTileTypeClassExtension::IsometricTileTypeClassExtension(const NoInitCla
 IsometricTileTypeClassExtension::~IsometricTileTypeClassExtension()
 {
     //EXT_DEBUG_TRACE("IsometricTileTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    IsometricTileTypeExtensions.Delete(this);
 }
 
 
