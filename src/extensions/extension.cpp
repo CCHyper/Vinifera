@@ -848,16 +848,16 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         //case RTTI_OVERLAY:                    <- Not yet implemented
         case RTTI_OVERLAYTYPE:
         //case RTTI_PARTICLE:                   <- Not yet implemented
-        //case RTTI_PARTICLETYPE:
+        case RTTI_PARTICLETYPE:
         //case RTTI_PARTICLESYSTEM:             <- Not yet implemented
-        //case RTTI_PARTICLESYSTEMTYPE:
+        case RTTI_PARTICLESYSTEMTYPE:
         //case RTTI_SCRIPT:                     <- Not yet implemented
         //case RTTI_SCRIPTTYPE:                 <- Not yet implemented
         case RTTI_SIDE:
         //case RTTI_SMUDGE:                     <- Not yet implemented
-        //case RTTI_SMUDGETYPE:
+        case RTTI_SMUDGETYPE:
         //case RTTI_SUPERWEAPONTYPE:
-        //case RTTI_TASKFORCE:
+        //case RTTI_TASKFORCE:                  <- Not yet implemented
         //case RTTI_TEAM:                       <- Not yet implemented
         //case RTTI_TEAMTYPE:                   <- Not yet implemented
         case RTTI_TERRAIN:
@@ -866,7 +866,7 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         //case RTTI_TRIGGERTYPE:                <- Not yet implemented
         case RTTI_UNITTYPE:
         //case RTTI_VOXELANIM:                  <- Not yet implemented
-        //case RTTI_VOXELANIMTYPE:
+        case RTTI_VOXELANIMTYPE:
         //case RTTI_WAVE:
         //case RTTI_TAG:                        <- Not yet implemented
         //case RTTI_TAGTYPE:                    <- Not yet implemented
@@ -879,7 +879,7 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         //case RTTI_TUBE:                       <- Not yet implemented
         //case RTTI_LIGHTSOURCE:                <- Not yet implemented
         //case RTTI_EMPULSE:                    <- Not yet implemented
-        //case RTTI_TACTICALMAP:
+        //case RTTI_TACTICALMAP:                <- Not yet implemented, needs rewrite of extension class.
         //case RTTI_SUPERWEAPON:
         //case RTTI_AITRIGGER:                  <- Not yet implemented
         //case RTTI_AITRIGGERTYPE:              <- Not yet implemented
