@@ -860,8 +860,8 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         //case RTTI_TASKFORCE:
         //case RTTI_TEAM:                       <- Not yet implemented
         //case RTTI_TEAMTYPE:                   <- Not yet implemented
-        //case RTTI_TERRAIN:
-        //case RTTI_TERRAINTYPE:
+        case RTTI_TERRAIN:
+        case RTTI_TERRAINTYPE:
         //case RTTI_TRIGGER:                    <- Not yet implemented
         //case RTTI_TRIGGERTYPE:                <- Not yet implemented
         case RTTI_UNITTYPE:
