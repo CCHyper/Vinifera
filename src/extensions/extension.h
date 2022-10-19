@@ -36,6 +36,9 @@
 #include <objidl.h> // for IStream.
 
 
+class EventClass;
+
+
 /**
  *  Do not call these directly! Use the template functions below.
  */
@@ -100,18 +103,19 @@ bool Is_Support_Enabled(const AbstractClass *abstract);
  */
 bool Save(IStream *pStm);
 bool Load(IStream *pStm);
+bool Request_Pointer_Remap();
+unsigned Get_Save_Version_Number();
 
 /**
  *  
  */
-bool Request_Pointer_Remap();
-
-bool Register_Class_Factories();
-
-void Clear_Vectors();
-
 void Detach_This_From_All(TARGET target, bool all = true);
+void Clear_Vectors();
+void Print_CRCs(FILE *fp, EventClass *ev);
 
-unsigned Get_Save_Version_Number();
+/**
+ *  
+ */
+bool Register_Class_Factories();
 
 }; // namespace "Extension".
