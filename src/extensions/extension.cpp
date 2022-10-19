@@ -834,7 +834,7 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         case RTTI_BUILDING:
         case RTTI_BUILDINGTYPE:
         //case RTTI_BULLET:                     <- Not yet implemented
-        //case RTTI_BULLETTYPE:
+        case RTTI_BULLETTYPE:
         case RTTI_CAMPAIGN:                     // Supported, but Campaign's are not saved to file.
         //case RTTI_CELL:                       <- Not yet implemented
         //case RTTI_FACTORY:                    <- Not yet implemented
