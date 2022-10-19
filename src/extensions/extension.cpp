@@ -196,8 +196,8 @@ bool Is_Extension_Support_Enabled(RTTIType rtti)
         //case RTTI_TERRAIN:
         //case RTTI_TERRAINTYPE:
         //case RTTI_TIBERIUM:
-        //case RTTI_UNIT:
-        //case RTTI_UNITTYPE:
+        case RTTI_UNIT:
+        case RTTI_UNITTYPE:
         //case RTTI_VOXELANIMTYPE:
         //case RTTI_WARHEADTYPE:
         //case RTTI_WAVE:
@@ -224,9 +224,9 @@ bool Is_Extension_Support_Enabled(const AbstractClass *abstract)
 
 
 /**
- *  Is_Valid_Extension_Pointer
+ *  Check if the extension pointer is a valid memory address.
  * 
- *  This is not guanteed to work, but it should capture the majority of possible bad pointers.
+ *  #WARNING: This is not guanteed to work, but it should capture the majority of possible bad pointers.
  * 
  *  0x00870000 -> End of GAME.EXE .data segment virtual address.
  *  0x20000000 -> Arbitrary address VINIFERA.DLL 'should' never get to.
@@ -278,7 +278,7 @@ static const char *Get_Abstract_Name(const AbstractClass *abstract)
 
 
 /**
- *  x
+ *  Creates and attach an instance of the extension class associated with the abstract class.
  * 
  *  @author: CCHyper
  */
@@ -296,18 +296,18 @@ static EXT_CLASS * Extension_Make(const BASE_CLASS *abstract_ptr)
     ext_ptr = new EXT_CLASS(reinterpret_cast<const BASE_CLASS *>(abs_ptr));
     ASSERT(ext_ptr != nullptr);
     if (ext_ptr) {
-        EXT_DEBUG_INFO("\"%s\" extension created for \"%s\".\n", Get_TypeID_Name<BASE_CLASS>().c_str(), Get_Abstract_Name(abs_ptr));
+        EXT_DEBUG_INFO("\"%s\" extension created.\n", Get_TypeID_Name<BASE_CLASS>().c_str());
         return ext_ptr;
     }
 
-    EXT_DEBUG_WARNING("Failed to find or make \"%s\" extension for \"%s\"!\n", Get_TypeID_Name<BASE_CLASS>().c_str(), Get_Abstract_Name(abs_ptr));
+    EXT_DEBUG_WARNING("Failed to make \"%s\" extension!\n", Get_TypeID_Name<BASE_CLASS>().c_str());
 
     return nullptr;
 }
 
 
 /**
- *  x
+ *  Destroys the attached extension instance for the abstract class.
  * 
  *  @author: CCHyper
  */
@@ -321,19 +321,23 @@ static bool Extension_Destroy(const BASE_CLASS *abstract_ptr)
     if (ext_ptr) {
     
         /**
-         *  x
+         *  Destroy the attached extension class instance.
          */
         delete ext_ptr;
 
         EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Get_TypeID_Name<BASE_CLASS>().c_str());
 
         /**
-         *  x
+         *  NULL the extension pointer for the abstract instances.
          */
         Clear_Extension_Pointer(abstract_ptr);
+
+        return true;
     }
 
-    return true;
+    EXT_DEBUG_WARNING("\"%s\" extension pointer is null!\n", Get_TypeID_Name<BASE_CLASS>().c_str());
+
+    return false;
 }
 
 
