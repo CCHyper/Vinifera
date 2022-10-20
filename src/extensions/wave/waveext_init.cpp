@@ -51,7 +51,6 @@
 DECLARE_PATCH(_WaveClass_Default_Constructor_Patch)
 {
     GET_REGISTER_STATIC(WaveClass *, this_ptr, esi); // Current "this" pointer.
-    static WaveClassExtension *ext_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -62,17 +61,9 @@ DECLARE_PATCH(_WaveClass_Default_Constructor_Patch)
     }
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    ext_ptr = Extension::Make<WaveClassExtension>(this_ptr);
-    if (!ext_ptr) {
-        DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create WaveClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create WaveClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<WaveClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -103,7 +94,6 @@ original_code:
 DECLARE_PATCH(_WaveClass_Default_Constructor_Before_Init_Patch)
 {
     GET_REGISTER_STATIC(WaveClass *, this_ptr, esi); // Current "this" pointer.
-    static WaveClassExtension *ext_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -114,17 +104,9 @@ DECLARE_PATCH(_WaveClass_Default_Constructor_Before_Init_Patch)
     }
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    ext_ptr = Extension::Make<WaveClassExtension>(this_ptr);
-    if (!ext_ptr) {
-        DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create WaveClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create WaveClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<WaveClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -148,7 +130,6 @@ original_code:
 DECLARE_PATCH(_WaveClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(WaveClass *, this_ptr, esi); // Current "this" pointer.
-    static WaveClassExtension *ext_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -159,17 +140,9 @@ DECLARE_PATCH(_WaveClass_Constructor_Patch)
     }
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    ext_ptr = Extension::Make<WaveClassExtension>(this_ptr);
-    if (!ext_ptr) {
-        DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create WaveClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create WaveClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<WaveClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -199,7 +172,6 @@ original_code:
 DECLARE_PATCH(_WaveClass_Constructor_Before_Init_Patch)
 {
     GET_REGISTER_STATIC(WaveClass *, this_ptr, esi); // Current "this" pointer.
-    static WaveClassExtension *ext_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -210,17 +182,9 @@ DECLARE_PATCH(_WaveClass_Constructor_Before_Init_Patch)
     }
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    ext_ptr = Extension::Make<WaveClassExtension>(this_ptr);
-    if (!ext_ptr) {
-        DEBUG_ERROR("Failed to create WaveClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create WaveClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create WaveClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<WaveClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

@@ -51,7 +51,6 @@ DECLARE_PATCH(_CampaignClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(CampaignClass *, this_ptr, ebp); // "this" pointer.
     GET_STACK_STATIC(const char *, ini_name, esp, 0x10); // ini name.
-    static CampaignClassExtension *exttype_ptr;
 
     // Campaign's are not saved to file, so this case is not required.
 #if 0
@@ -64,20 +63,10 @@ DECLARE_PATCH(_CampaignClass_Constructor_Patch)
     }
 #endif
 
-    //EXT_DEBUG_TRACE("Creating CampaignClassExtension instance for \"%s\".\n", ini_name);
-
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    exttype_ptr = Extension::Make<CampaignClassExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create CampaignClassExtensions instance for \"%s\"!\n", ini_name);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create CampaignClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create CampaignClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<CampaignClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

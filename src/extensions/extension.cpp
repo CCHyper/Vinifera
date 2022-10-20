@@ -229,21 +229,30 @@ static EXT_CLASS * Extension_Make(const BASE_CLASS *abstract_ptr)
      */
     ext_ptr = new EXT_CLASS(reinterpret_cast<const BASE_CLASS *>(abs_ptr));
     ASSERT(ext_ptr != nullptr);
-    if (ext_ptr) {
+    if (!ext_ptr) {
 
-        EXT_DEBUG_INFO("Created \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+        char buffer[256];
+        std::snprintf(buffer, sizeof(buffer), "Extension_Make: Failed to make \"%s\" extension!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
 
-        /**
-         *  Assign the extension class instance to the abstract class.
-         */
-        Extension_Set_Abstract_Pointer(abstract_ptr, ext_ptr);
+        EXT_DEBUG_WARNING(buffer);
 
-        return ext_ptr;
+        ShowCursor(TRUE);
+        MessageBoxA(MainWindow, buffer, "Vinifera", MB_OK|MB_ICONEXCLAMATION);
+
+        //Vinifera_Generate_Mini_Dump();
+        Fatal("Failed to create WeaponTypeClassExtension instance!\n");
+
+        return nullptr;
     }
 
-    EXT_DEBUG_WARNING("Extension_Make: Failed to make \"%s\" extension!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+    EXT_DEBUG_INFO("Created \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
 
-    return nullptr;
+    /**
+     *  Assign the extension class instance to the abstract class.
+     */
+    Extension_Set_Abstract_Pointer(abstract_ptr, ext_ptr);
+
+    return ext_ptr;
 }
 
 
@@ -259,26 +268,24 @@ static bool Extension_Destroy(const BASE_CLASS *abstract_ptr)
     bool removed = false;
 
     EXT_CLASS *ext_ptr = reinterpret_cast<EXT_CLASS *>(Extension_Get_Abstract_Pointer(abstract_ptr));
-    if (ext_ptr) {
-    
-        /**
-         *  Destroy the attached extension class instance.
-         */
-        delete ext_ptr;
-
-        EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
-
-        /**
-         *  Clear the extension pointer for the abstract class.
-         */
-        Extension_Clear_Abstract_Pointer(abstract_ptr);
-
-        return true;
+    if (!ext_ptr) {
+        EXT_DEBUG_WARNING("Extension_Destroy: \"%s\" extension pointer is null!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+        return false;
     }
+    
+    /**
+     *  Destroy the attached extension class instance.
+     */
+    delete ext_ptr;
 
-    EXT_DEBUG_WARNING("Extension_Destroy: \"%s\" extension pointer is null!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+    EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
 
-    return false;
+    /**
+     *  Clear the extension pointer for the abstract class.
+     */
+    Extension_Clear_Abstract_Pointer(abstract_ptr);
+
+    return true;
 }
 
 

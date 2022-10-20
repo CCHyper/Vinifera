@@ -49,7 +49,6 @@
 DECLARE_PATCH(_SuperClass_Default_Constructor_Patch)
 {
     GET_REGISTER_STATIC(SuperClass *, this_ptr, esi); // Current "this" pointer.
-    static SuperClassExtension *exttype_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -60,17 +59,9 @@ DECLARE_PATCH(_SuperClass_Default_Constructor_Patch)
     }
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    exttype_ptr = Extension::Make<SuperClassExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create SuperClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create SuperClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create SuperClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<SuperClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -92,7 +83,6 @@ original_code:
 DECLARE_PATCH(_SuperClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(SuperClass *, this_ptr, esi); // Current "this" pointer.
-    static SuperClassExtension *exttype_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -103,17 +93,9 @@ DECLARE_PATCH(_SuperClass_Constructor_Patch)
     }
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    exttype_ptr = Extension::Make<SuperClassExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create SuperClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create SuperClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create SuperClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<SuperClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

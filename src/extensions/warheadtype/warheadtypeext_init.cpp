@@ -51,7 +51,6 @@ DECLARE_PATCH(_WarheadTypeClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(WarheadTypeClass *, this_ptr, ebp); // "this" pointer.
     GET_STACK_STATIC(const char *, ini_name, esp, 0x14); // ini name.
-    static WarheadTypeClassExtension *exttype_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -62,17 +61,9 @@ DECLARE_PATCH(_WarheadTypeClass_Constructor_Patch)
     }
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    exttype_ptr = Extension::Make<WarheadTypeClassExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create WarheadTypeClassExtensions instance for \"%s\"!\n", ini_name);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create WarheadTypeClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create WarheadTypeClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<WarheadTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

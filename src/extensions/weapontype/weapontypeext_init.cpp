@@ -51,7 +51,6 @@ DECLARE_PATCH(_WeaponTypeClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(WeaponTypeClass *, this_ptr, esi); // "this" pointer.
     GET_STACK_STATIC(const char *, ini_name, esp, 0x10); // ini name.
-    static WeaponTypeClassExtension *exttype_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -61,20 +60,10 @@ DECLARE_PATCH(_WeaponTypeClass_Constructor_Patch)
         goto original_code;
     }
 
-    //EXT_DEBUG_TRACE("Creating WeaponTypeClassExtension instance for \"%s\".\n", ini_name);
-
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    exttype_ptr = Extension::Make<WeaponTypeClassExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create WeaponTypeClassExtension instance for \"%s\"!\n", ini_name);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create WeaponTypeClassExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create WeaponTypeClassExtension instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<WeaponTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

@@ -50,22 +50,11 @@
 DECLARE_PATCH(_RulesClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(RulesClass *, this_ptr, esi); // "this" pointer.
-    static RulesClassExtension *ext_ptr;
 
     /**
      *  Create the extended class instance.
      */
-    ext_ptr = Extension::Singleton::Make<RulesClass, RulesClassExtension>(this_ptr);
-    if (!ext_ptr) {
-        DEBUG_ERROR("Failed to create RuleExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create RuleExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create RuleExtension instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
-
-    RuleExtension = ext_ptr;
+    RuleExtension = Extension::Singleton::Make<RulesClass, RulesClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

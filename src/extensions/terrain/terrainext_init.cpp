@@ -51,7 +51,6 @@ DECLARE_PATCH(_TerrainClass_Default_Constructor_Patch)
     GET_REGISTER_STATIC(TerrainClass *, this_ptr, esi); // Current "this" pointer.
     GET_STACK_STATIC(const TerrainTypeClass *, classof, esp, 0x20);
     GET_STACK_STATIC(const Cell *, cell, esp, 0x24);
-    static TerrainClassExtension *ext_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -62,17 +61,9 @@ DECLARE_PATCH(_TerrainClass_Default_Constructor_Patch)
     }
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    ext_ptr = Extension::Make<TerrainClassExtension>(this_ptr);
-    if (!ext_ptr) {
-        DEBUG_ERROR("Failed to create TerrainClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create TerrainClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create TerrainClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<TerrainClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -98,20 +89,11 @@ original_code:
 DECLARE_PATCH(_TerrainClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(TerrainClass *, this_ptr, esi); // Current "this" pointer.
-    static TerrainClassExtension *ext_ptr;
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    ext_ptr = Extension::Make<TerrainClassExtension>(this_ptr);
-    if (!ext_ptr) {
-        DEBUG_ERROR("Failed to create TerrainClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create TerrainClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create TerrainClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<TerrainClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -141,20 +123,11 @@ DECLARE_PATCH(_TerrainClass_Constructor_Before_Unlimbo_Patch)
 {
     GET_REGISTER_STATIC(TerrainClass *, this_ptr, esi); // Current "this" pointer.
     GET_STACK_STATIC(Cell *, cell, esp, 0x24);
-    static TerrainClassExtension *ext_ptr;
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    ext_ptr = Extension::Make<TerrainClassExtension>(this_ptr);
-    if (!ext_ptr) {
-        DEBUG_ERROR("Failed to create TerrainClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create TerrainClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create TerrainClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<TerrainClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

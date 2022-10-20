@@ -51,8 +51,8 @@ DECLARE_PATCH(_IsometricTileTypeClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(IsometricTileTypeClass *, this_ptr, ebp); // "this" pointer.
     GET_STACK_STATIC(const char *, ini_name, esp, 0x50); // ini name.
-    static IsometricTileTypeClassExtension *exttype_ptr;
 
+    // IsoTileTypes's are not saved to file, so this case is not required.
 #if 0
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -63,20 +63,10 @@ DECLARE_PATCH(_IsometricTileTypeClass_Constructor_Patch)
     }
 #endif
 
-    //EXT_DEBUG_TRACE("Creating IsometricTileTypeClassExtension instance for \"%s\".\n", ini_name);
-
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    exttype_ptr = Extension::Make<IsometricTileTypeClassExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create IsometricTileTypeClassExtension instance for \"%s\"!\n", ini_name);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create IsometricTileTypeClassExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create IsometricTileTypeClassExtension instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<IsometricTileTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

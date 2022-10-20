@@ -51,7 +51,6 @@ DECLARE_PATCH(_AircraftTypeClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(AircraftTypeClass *, this_ptr, esi); // "this" pointer.
     GET_STACK_STATIC(const char *, ini_name, esp, 0x0C); // ini name.
-    static AircraftTypeClassExtension *exttype_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -61,20 +60,10 @@ DECLARE_PATCH(_AircraftTypeClass_Constructor_Patch)
         goto original_code;
     }
 
-    //EXT_DEBUG_TRACE("Creating AircraftTypeClassExtension instance for \"%s\".\n", ini_name);
-
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    exttype_ptr = Extension::Make<AircraftTypeClassExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create AircraftTypeClassExtension instance for \"%s\"!\n", ini_name);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create AircraftTypeClassExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create AircraftTypeClassExtension instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<AircraftTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

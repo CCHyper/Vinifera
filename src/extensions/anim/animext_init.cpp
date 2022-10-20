@@ -63,17 +63,9 @@ DECLARE_PATCH(_AnimClass_Constructor_Patch)
     }
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    exttype_ptr = Extension::Make<AnimClassExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create AnimClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create AnimClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create AnimClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<AnimClassExtension>(this_ptr);
 
     /**
      *  This following code was moved here due to a patching address conflict
@@ -146,7 +138,6 @@ destroy_anim:
 DECLARE_PATCH(_AnimClass_Default_Constructor_Patch)
 {
     GET_REGISTER_STATIC(AnimClass *, this_ptr, esi); // Current "this" pointer.
-    static AnimClassExtension *exttype_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -157,17 +148,9 @@ DECLARE_PATCH(_AnimClass_Default_Constructor_Patch)
     }
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    exttype_ptr = Extension::Make<AnimClassExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create AnimClassExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create AnimClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create AnimClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<AnimClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

@@ -50,7 +50,6 @@
 DECLARE_PATCH(_Tactical_Constructor_Patch)
 {
     GET_REGISTER_STATIC(Tactical *, this_ptr, esi); // "this" pointer.
-    static TacticalExtension *exttype_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -63,17 +62,7 @@ DECLARE_PATCH(_Tactical_Constructor_Patch)
     /**
      *  Create the extended class instance.
      */
-    exttype_ptr = Extension::Make<TacticalExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create TacticalExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create TacticalExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create TacticalExtension instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
-
-    TacticalMapExtension = exttype_ptr;
+    TacticalMapExtension = Extension::Make<TacticalExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

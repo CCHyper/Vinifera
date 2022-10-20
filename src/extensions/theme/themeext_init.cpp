@@ -50,22 +50,11 @@
 DECLARE_PATCH(_ThemeClass_ThemeControl_Constructor_Patch)
 {
     GET_REGISTER_STATIC(ThemeClass::ThemeControl *, this_ptr, eax); // "this" pointer.
-    static ThemeControlExtension *exttype_ptr;
-
-    //EXT_DEBUG_TRACE("Creating ThemeClass_ThemeControlExtension.\n");
 
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    exttype_ptr = Extension::Make<ThemeControlExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create ThemeControlExtension instance!\n");
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create ThemeControlExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create ThemeControlExtension instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<ThemeControlExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

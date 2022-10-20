@@ -50,22 +50,11 @@
 DECLARE_PATCH(_ScenarioClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(ScenarioClass *, this_ptr, ebp); // "this" pointer.
-    static ScenarioClassExtension *ext_ptr;
 
     /**
      *  Create the extended class instance.
      */
-    ext_ptr = Extension::Singleton::Make<ScenarioClass, ScenarioClassExtension>(this_ptr);
-    if (!ext_ptr) {
-        DEBUG_ERROR("Failed to create ScenarioExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create ScenarioExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create ScenarioExtension instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
-
-    ScenExtension = ext_ptr;
+    ScenExtension = Extension::Singleton::Make<ScenarioClass, ScenarioClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

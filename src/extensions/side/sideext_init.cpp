@@ -51,7 +51,6 @@ DECLARE_PATCH(_SideClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(SideClass *, this_ptr, esi); // "this" pointer.
     GET_STACK_STATIC(const char *, ini_name, esp, 0x10); // ini name.
-    static SideClassExtension *exttype_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -61,20 +60,10 @@ DECLARE_PATCH(_SideClass_Constructor_Patch)
         goto original_code;
     }
 
-    //EXT_DEBUG_TRACE("Creating SideClassExtension instance for \"%s\".\n", ini_name);
-
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    exttype_ptr = Extension::Make<SideClassExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create SideClassExtensions instance for \"%s\"!\n", ini_name);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create SideClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create SideClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<SideClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

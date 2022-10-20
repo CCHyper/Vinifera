@@ -49,22 +49,11 @@
 DECLARE_PATCH(_SessionClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(SessionClass *, this_ptr, ebp); // "this" pointer.
-    static SessionClassExtension *ext_ptr;
 
     /**
      *  Create the extended class instance.
      */
-    ext_ptr = Extension::Singleton::Make<SessionClass, SessionClassExtension>(this_ptr);
-    if (!ext_ptr) {
-        DEBUG_ERROR("Failed to create SessionExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create SessionExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create SessionExtension instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
-
-    SessionExtension = ext_ptr;
+    SessionExtension = Extension::Singleton::Make<SessionClass, SessionClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.

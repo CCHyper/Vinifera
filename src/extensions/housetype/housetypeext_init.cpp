@@ -51,7 +51,6 @@ DECLARE_PATCH(_HouseTypeClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(HouseTypeClass *, this_ptr, esi); // "this" pointer.
     GET_STACK_STATIC(const char *, ini_name, esp, 0xC); // ini name.
-    static HouseTypeClassExtension *exttype_ptr;
 
     /**
      *  If we are performing a load operation, the Windows API will invoke the
@@ -61,20 +60,10 @@ DECLARE_PATCH(_HouseTypeClass_Constructor_Patch)
         goto original_code;
     }
 
-    //EXT_DEBUG_TRACE("Creating HouseTypeClassExtension instance for \"%s\".\n", ini_name);
-
     /**
-     *  Find existing or create an extended class instance.
+     *  Create an extended class instance.
      */
-    exttype_ptr = Extension::Make<HouseTypeClassExtension>(this_ptr);
-    if (!exttype_ptr) {
-        DEBUG_ERROR("Failed to create HouseTypeClassExtensions instance for \"%s\"!\n", ini_name);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create HouseTypeClassExtensions instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create HouseTypeClassExtensions instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Make<HouseTypeClassExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
