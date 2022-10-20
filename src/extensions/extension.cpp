@@ -743,7 +743,7 @@ bool Extension::Is_Supported(RTTIType rtti)
         case RTTI_SIDE:
         //case RTTI_SMUDGE:                     // <- Not yet implemented
         case RTTI_SMUDGETYPE:
-        //case RTTI_SUPERWEAPONTYPE:    // <--- !! CRASHES
+        case RTTI_SUPERWEAPONTYPE:
         //case RTTI_TASKFORCE:                  // <- Not yet implemented
         //case RTTI_TEAM:                       // <- Not yet implemented
         //case RTTI_TEAMTYPE:                   // <- Not yet implemented
