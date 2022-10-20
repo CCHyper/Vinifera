@@ -53,7 +53,7 @@ WeaponTypeClassExtension::WeaponTypeClassExtension(const WeaponTypeClass *this_p
     ElectricBoltIterationCount(EBOLT_DEFAULT_INTERATIONS),
     ElectricBoltDeviation(EBOLT_DEFAULT_DEVIATION)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("WeaponTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("WeaponTypeClassExtension::WeaponTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     WeaponTypeExtensions.Add(this);
 }
@@ -67,7 +67,7 @@ WeaponTypeClassExtension::WeaponTypeClassExtension(const WeaponTypeClass *this_p
 WeaponTypeClassExtension::WeaponTypeClassExtension(const NoInitClass &noinit) :
     AbstractTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("WeaponTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("WeaponTypeClassExtension::WeaponTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -78,7 +78,7 @@ WeaponTypeClassExtension::WeaponTypeClassExtension(const NoInitClass &noinit) :
  */
 WeaponTypeClassExtension::~WeaponTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("WeaponTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("WeaponTypeClassExtension::~WeaponTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     WeaponTypeExtensions.Delete(this);
 }
@@ -109,7 +109,7 @@ HRESULT WeaponTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT WeaponTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("WeaponTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("WeaponTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -129,7 +129,7 @@ HRESULT WeaponTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT WeaponTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("WeaponTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("WeaponTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

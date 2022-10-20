@@ -41,7 +41,7 @@
 WaveClassExtension::WaveClassExtension(const WaveClass *this_ptr) :
     ObjectClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("WaveClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("WaveClassExtension::WaveClassExtension - 0x%08X\n", (uintptr_t)(This()));
 
     WaveExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ WaveClassExtension::WaveClassExtension(const WaveClass *this_ptr) :
 WaveClassExtension::WaveClassExtension(const NoInitClass &noinit) :
     ObjectClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("WaveClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("WaveClassExtension::WaveClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ WaveClassExtension::WaveClassExtension(const NoInitClass &noinit) :
  */
 WaveClassExtension::~WaveClassExtension()
 {
-    //EXT_DEBUG_TRACE("WaveClassExtension destructor - 0x%08X\n", (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("WaveClassExtension::~WaveClassExtension - 0x%08X\n", (uintptr_t)(This()));
 
     WaveExtensions.Delete(this);
 }

@@ -43,7 +43,7 @@ BulletTypeClassExtension::BulletTypeClassExtension(const BulletTypeClass *this_p
     ObjectTypeClassExtension(this_ptr),
     SpawnDelay(3)           // Default hardcoded value.
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("BulletTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("BulletTypeClassExtension::BulletTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     BulletTypeExtensions.Add(this);
 }
@@ -57,7 +57,7 @@ BulletTypeClassExtension::BulletTypeClassExtension(const BulletTypeClass *this_p
 BulletTypeClassExtension::BulletTypeClassExtension(const NoInitClass &noinit) :
     ObjectTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("BulletTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("BulletTypeClassExtension::BulletTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -68,7 +68,7 @@ BulletTypeClassExtension::BulletTypeClassExtension(const NoInitClass &noinit) :
  */
 BulletTypeClassExtension::~BulletTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("BulletTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("BulletTypeClassExtension::~BulletTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     BulletTypeExtensions.Delete(this);
 }
@@ -100,7 +100,7 @@ HRESULT BulletTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT BulletTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("BulletTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("BulletTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -120,7 +120,7 @@ HRESULT BulletTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT BulletTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("BulletTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("BulletTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

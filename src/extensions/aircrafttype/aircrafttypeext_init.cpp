@@ -146,41 +146,6 @@ original_code:
 
 
 /**
- *  Patch for reading the extended class members from the ini instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AircraftTypeClass_Read_INI_Patch)
-{
-    GET_REGISTER_STATIC(AircraftTypeClass *, this_ptr, esi);
-    GET_REGISTER_STATIC(CCINIClass *, ini, ebx);
-    static AircraftTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<AircraftTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class ini.
-     */
-    exttype_ptr->Read_INI(*ini);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov al, 1 }
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void AircraftTypeClassExtension_Init()
@@ -189,5 +154,4 @@ void AircraftTypeClassExtension_Init()
     Patch_Jump(0x0041009C, &_AircraftTypeClass_Find_Or_Make_Patch); // Constructor is also inlined in AircraftTypeClass::Find_Or_Make!
     //Patch_Jump(0x0040FCD8, &_AircraftTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00410228, &_AircraftTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x0040FF0E, &_AircraftTypeClass_Read_INI_Patch);
 }

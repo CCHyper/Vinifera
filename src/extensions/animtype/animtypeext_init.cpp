@@ -128,41 +128,6 @@ original_code:
 
 
 /**
- *  Patch for reading the extended class members from the ini instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AnimTypeClass_Read_INI_Patch)
-{
-    GET_REGISTER_STATIC(AnimTypeClass *, this_ptr, esi);
-    GET_REGISTER_STATIC(CCINIClass *, ini, ebx);
-    static AnimTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<AnimTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class ini.
-     */
-    exttype_ptr->Read_INI(*ini);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov al, 1 }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { add esp, 0x90 }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void AnimTypeClassExtension_Init()
@@ -170,5 +135,4 @@ void AnimTypeClassExtension_Init()
     Patch_Jump(0x00418798, &_AnimTypeClass_Constructor_Patch);
     //Patch_Jump(0x004187DB, &_AnimTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00419C22, &_AnimTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x00419624, &_AnimTypeClass_Read_INI_Patch);
 }

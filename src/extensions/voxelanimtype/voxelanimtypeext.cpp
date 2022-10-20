@@ -41,7 +41,7 @@
 VoxelAnimTypeClassExtension::VoxelAnimTypeClassExtension(const VoxelAnimTypeClass *this_ptr) :
     ObjectTypeClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("VoxelAnimTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("VoxelAnimTypeClassExtension::VoxelAnimTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     VoxelAnimTypeExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ VoxelAnimTypeClassExtension::VoxelAnimTypeClassExtension(const VoxelAnimTypeClas
 VoxelAnimTypeClassExtension::VoxelAnimTypeClassExtension(const NoInitClass &noinit) :
     ObjectTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("VoxelAnimTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("VoxelAnimTypeClassExtension::VoxelAnimTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ VoxelAnimTypeClassExtension::VoxelAnimTypeClassExtension(const NoInitClass &noin
  */
 VoxelAnimTypeClassExtension::~VoxelAnimTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("VoxelAnimTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("VoxelAnimTypeClassExtension::~VoxelAnimTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     VoxelAnimTypeExtensions.Delete(this);
 }
@@ -98,7 +98,7 @@ HRESULT VoxelAnimTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT VoxelAnimTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("VoxelAnimTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("VoxelAnimTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -118,7 +118,7 @@ HRESULT VoxelAnimTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT VoxelAnimTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("VoxelAnimTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("VoxelAnimTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

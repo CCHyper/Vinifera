@@ -41,7 +41,7 @@
 AircraftClassExtension::AircraftClassExtension(const AircraftClass *this_ptr) :
     FootClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("AircraftClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("AircraftClassExtension::AircraftClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     AircraftExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ AircraftClassExtension::AircraftClassExtension(const AircraftClass *this_ptr) :
 AircraftClassExtension::AircraftClassExtension(const NoInitClass &noinit) :
     FootClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("AircraftClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AircraftClassExtension::AircraftClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ AircraftClassExtension::AircraftClassExtension(const NoInitClass &noinit) :
  */
 AircraftClassExtension::~AircraftClassExtension()
 {
-    //EXT_DEBUG_TRACE("AircraftClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AircraftClassExtension::~AircraftClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     AircraftExtensions.Delete(this);
 }

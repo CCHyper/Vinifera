@@ -49,7 +49,7 @@ WarheadTypeClassExtension::WarheadTypeClassExtension(const WarheadTypeClass *thi
     ShakePixelXHi(0),
     ShakePixelXLo(0)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("WarheadTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("WarheadTypeClassExtension::WarheadTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     WarheadTypeExtensions.Add(this);
 }
@@ -63,7 +63,7 @@ WarheadTypeClassExtension::WarheadTypeClassExtension(const WarheadTypeClass *thi
 WarheadTypeClassExtension::WarheadTypeClassExtension(const NoInitClass &noinit) :
     AbstractTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("WarheadTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("WarheadTypeClassExtension::WarheadTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -74,7 +74,7 @@ WarheadTypeClassExtension::WarheadTypeClassExtension(const NoInitClass &noinit) 
  */
 WarheadTypeClassExtension::~WarheadTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("WarheadTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("WarheadTypeClassExtension::~WarheadTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     WarheadTypeExtensions.Delete(this);
 }
@@ -106,7 +106,7 @@ HRESULT WarheadTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT WarheadTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("WarheadTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("WarheadTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -126,7 +126,7 @@ HRESULT WarheadTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT WarheadTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("WarheadTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("WarheadTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

@@ -46,7 +46,7 @@ OptionsClassExtension *OptionsExtension = nullptr;
  */
 OptionsClassExtension::OptionsClassExtension(OptionsClass *this_ptr)
 {
-    //EXT_DEBUG_TRACE("OptionsClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("OptionsClassExtension::OptionsClassExtension - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -57,6 +57,7 @@ OptionsClassExtension::OptionsClassExtension(OptionsClass *this_ptr)
  */
 OptionsClassExtension::OptionsClassExtension(const NoInitClass &noinit)
 {
+    //EXT_DEBUG_TRACE("OptionsClassExtension::OptionsClassExtension(NoInitClass) - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -67,7 +68,7 @@ OptionsClassExtension::OptionsClassExtension(const NoInitClass &noinit)
  */
 OptionsClassExtension::~OptionsClassExtension()
 {
-    //EXT_DEBUG_TRACE("OptionsClassExtension destructor - 0x%08X\n", (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("OptionsClassExtension::~OptionsClassExtension - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -117,6 +118,6 @@ void OptionsClassExtension::Save_Settings()
  */
 void OptionsClassExtension::Set()
 {
-    //EXT_DEBUG_TRACE("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("OptionsClassExtension::Set - 0x%08X\n", (uintptr_t)(This()));
 
 }

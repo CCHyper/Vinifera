@@ -39,6 +39,26 @@
 #include "asserthandler.h"
 #include "debughandler.h"
 
+#include "housetypeext.h"
+#include "supertypeext.h"
+#include "animtypeext.h"
+#include "buildingtypeext.h"
+#include "aircrafttypeext.h"
+#include "unittypeext.h"
+#include "infantrytypeext.h"
+#include "weapontypeext.h"
+#include "bullettypeext.h"
+#include "warheadtypeext.h"
+#include "terraintypeext.h"
+#include "smudgetypeext.h"
+#include "overlaytypeext.h"
+#include "particletypeext.h"
+#include "particlesystypeext.h"
+#include "voxelanimtypeext.h"
+
+#include "extension.h"
+#include "extension_globals.h"
+
 
 RulesClassExtension::UIControlsStruct RulesClassExtension::UIControls;
 
@@ -226,6 +246,11 @@ void RulesClassExtension::Process(CCINIClass &ini)
     AudioVisual(ini);
 
     /**
+     *  Process the objects (extension classes).
+     */
+    Objects(ini);
+
+    /**
      *  Run some checks to ensure certain values are as expected.
      */
     Check();
@@ -240,6 +265,103 @@ void RulesClassExtension::Process(CCINIClass &ini)
 void RulesClassExtension::Initialize(CCINIClass &ini)
 {
     //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(This()));
+}
+
+
+/**
+ *  Fetch all the object characteristic values.
+ *  
+ *  @author: CCHyper
+ */
+bool RulesClassExtension::Objects(CCINIClass &ini)
+{
+    //EXT_DEBUG_TRACE("RulesClassExtension::Objects - 0x%08X\n", (uintptr_t)(This()));
+
+    /**
+     *  Fetch the game object (extension) values from the rules file.
+     */
+
+    DEBUG_INFO("Rules: Processing HouseTypeExtensions (Count: %d)...\n", HouseTypeExtensions.Count());
+    for (int index = 0; index < HouseTypeExtensions.Count(); ++index) {
+        HouseTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing SuperWeaponTypeExtensions (Count: %d)...\n", SuperWeaponTypeExtensions.Count());
+    for (int index = 0; index < SuperWeaponTypeExtensions.Count(); ++index) {
+        SuperWeaponTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing AnimTypeExtensions (Count: %d)...\n", AnimTypeExtensions.Count());
+    for (int index = 0; index < AnimTypeExtensions.Count(); ++index) {
+        AnimTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing BuildingTypeExtensions (Count: %d)...\n", BuildingTypeExtensions.Count());
+    for (int index = 0; index < BuildingTypeExtensions.Count(); ++index) {
+        BuildingTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing AircraftTypeExtensions (Count: %d)...\n", AircraftTypeExtensions.Count());
+    for (int index = 0; index < AircraftTypeExtensions.Count(); ++index) {
+        AircraftTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing UnitTypeExtensions (Count: %d)...\n", UnitTypeExtensions.Count());
+    for (int index = 0; index < UnitTypeExtensions.Count(); ++index) {
+        UnitTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing InfantryTypeExtensions (Count: %d)...\n", InfantryTypeExtensions.Count());
+    for (int index = 0; index < InfantryTypeExtensions.Count(); ++index) {
+        InfantryTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing WeaponTypeExtensions (Count: %d)...\n", WeaponTypeExtensions.Count());
+    for (int index = 0; index < WeaponTypeExtensions.Count(); ++index) {
+        WeaponTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing BulletTypeExtensions (Count: %d)...\n", BulletTypeExtensions.Count());
+    for (int index = 0; index < BulletTypeExtensions.Count(); ++index) {
+        BulletTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing WarheadTypeExtensions (Count: %d)...\n", WarheadTypeExtensions.Count());
+    for (int index = 0; index < WarheadTypeExtensions.Count(); ++index) {
+        WarheadTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing TerrainTypeExtensions (Count: %d)...\n", TerrainTypeExtensions.Count());
+    for (int index = 0; index < TerrainTypeExtensions.Count(); ++index) {
+        TerrainTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing SmudgeTypeExtensions (Count: %d)...\n", SmudgeTypeExtensions.Count());
+    for (int index = 0; index < SmudgeTypeExtensions.Count(); ++index) {
+        SmudgeTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing OverlayTypeExtensions (Count: %d)...\n", OverlayTypeExtensions.Count());
+    for (int index = 0; index < OverlayTypeExtensions.Count(); ++index) {
+        OverlayTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing ParticleTypeExtensions (Count: %d)...\n", ParticleTypeExtensions.Count());
+    for (int index = 0; index < ParticleTypeExtensions.Count(); ++index) {
+        ParticleTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing ParticleSystemTypeExtensions (Count: %d)...\n", ParticleSystemTypeExtensions.Count());
+    for (int index = 0; index < ParticleSystemTypeExtensions.Count(); ++index) {
+        ParticleSystemTypeExtensions[index]->Read_INI(ini);
+    }
+    
+    DEBUG_INFO("Rules: Processing VoxelAnimTypeExtensions (Count: %d)...\n", VoxelAnimTypeExtensions.Count());
+    for (int index = 0; index < VoxelAnimTypeExtensions.Count(); ++index) {
+        VoxelAnimTypeExtensions[index]->Read_INI(ini);
+    }
+
+    return true;
 }
 
 

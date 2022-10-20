@@ -43,7 +43,7 @@ CampaignClassExtension::CampaignClassExtension(const CampaignClass *this_ptr) :
     IsDebugOnly(false),
     IntroMovie()
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("CampaignClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("CampaignClassExtension::CampaignClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     CampaignExtensions.Add(this);
 }
@@ -57,7 +57,7 @@ CampaignClassExtension::CampaignClassExtension(const CampaignClass *this_ptr) :
 CampaignClassExtension::CampaignClassExtension(const NoInitClass &noinit) :
     AbstractTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("CampaignClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("CampaignClassExtension::CampaignClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -68,7 +68,7 @@ CampaignClassExtension::CampaignClassExtension(const NoInitClass &noinit) :
  */
 CampaignClassExtension::~CampaignClassExtension()
 {
-    //EXT_DEBUG_TRACE("CampaignClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("CampaignClassExtension::~CampaignClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     CampaignExtensions.Delete(this);
 }
@@ -100,7 +100,7 @@ HRESULT CampaignClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT CampaignClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("CampaignClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("CampaignClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -120,7 +120,7 @@ HRESULT CampaignClassExtension::Load(IStream *pStm)
  */
 HRESULT CampaignClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("CampaignClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("CampaignClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

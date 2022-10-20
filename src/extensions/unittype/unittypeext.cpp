@@ -47,7 +47,7 @@ UnitTypeClassExtension::UnitTypeClassExtension(const UnitTypeClass *this_ptr) :
     StartIdleFrame(0),
     IdleFrames(0)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("UnitTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("UnitTypeClassExtension::UnitTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     UnitTypeExtensions.Add(this);
 }
@@ -61,7 +61,7 @@ UnitTypeClassExtension::UnitTypeClassExtension(const UnitTypeClass *this_ptr) :
 UnitTypeClassExtension::UnitTypeClassExtension(const NoInitClass &noinit) :
     TechnoTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("UnitTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("UnitTypeClassExtension::UnitTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -72,7 +72,7 @@ UnitTypeClassExtension::UnitTypeClassExtension(const NoInitClass &noinit) :
  */
 UnitTypeClassExtension::~UnitTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("UnitTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("UnitTypeClassExtension::~UnitTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     UnitTypeExtensions.Delete(this);
 }
@@ -104,7 +104,7 @@ HRESULT UnitTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT UnitTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("UnitTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("UnitTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = TechnoTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -124,7 +124,7 @@ HRESULT UnitTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT UnitTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("UnitTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("UnitTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = TechnoTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

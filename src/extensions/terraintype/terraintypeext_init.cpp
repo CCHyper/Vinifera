@@ -127,42 +127,6 @@ original_code:
 
 
 /**
- *  Patch for reading the extended class members from the ini instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_TerrainTypeClass_Read_INI_Patch)
-{
-    GET_REGISTER_STATIC(TerrainTypeClass *, this_ptr, esi);
-    GET_REGISTER_STATIC(CCINIClass *, ini, ebp);
-    static TerrainTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<TerrainTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class ini.
-     */
-    exttype_ptr->Read_INI(*ini);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov al, 1 }
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebp }
-    _asm { add esp, 0x204 }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void TerrainTypeClassExtension_Init()
@@ -170,5 +134,4 @@ void TerrainTypeClassExtension_Init()
     Patch_Jump(0x00641619, &_TerrainTypeClass_Constructor_Patch);
     //Patch_Jump(0x00641658, &_TerrainTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00641D88, &_TerrainTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x00641A63, &_TerrainTypeClass_Read_INI_Patch);
 }

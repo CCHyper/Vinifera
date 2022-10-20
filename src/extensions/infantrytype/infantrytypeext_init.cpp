@@ -127,43 +127,6 @@ original_code:
 
 
 /**
- *  Patch for reading the extended class members from the ini instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_InfantryTypeClass_Read_INI_Patch)
-{
-    GET_REGISTER_STATIC(InfantryTypeClass *, this_ptr, esi);
-    GET_REGISTER_STATIC(CCINIClass *, ini, ebp);
-    static InfantryTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<InfantryTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class ini.
-     */
-    exttype_ptr->Read_INI(*ini);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov al, 1 }
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebp }
-    _asm { pop ebx }
-    _asm { add esp, 0x1C }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void InfantryTypeClassExtension_Init()
@@ -171,5 +134,4 @@ void InfantryTypeClassExtension_Init()
     Patch_Jump(0x004DA360, &_InfantryTypeClass_Constructor_Patch);
     //Patch_Jump(0x004DA3B9, &_InfantryTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x004DB138, &_InfantryTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x004DAC2F, &_InfantryTypeClass_Read_INI_Patch);
 }

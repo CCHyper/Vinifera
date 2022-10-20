@@ -144,43 +144,6 @@ original_code:
 
 
 /**
- *  Patch for reading the extended class members from the ini instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_WeaponTypeClass_Read_INI_Patch)
-{
-    GET_REGISTER_STATIC(WeaponTypeClass *, this_ptr, esi);
-    GET_STACK_STATIC(CCINIClass *, ini, esp, 0x0E4); // Can't use EBX as its reused by this point.
-    static WeaponTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<WeaponTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class ini.
-     */
-    exttype_ptr->Read_INI(*ini);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov al, 1 }
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebp }
-    _asm { pop ebx }
-    _asm { add esp, 0x0D0 }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void WeaponTypeClassExtension_Init()
@@ -188,5 +151,4 @@ void WeaponTypeClassExtension_Init()
     Patch_Jump(0x00680BEF, &_WeaponTypeClass_Constructor_Patch);
     //Patch_Jump(0x00680D0C, &_WeaponTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x006819AC, &_WeaponTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x0068129D, &_WeaponTypeClass_Read_INI_Patch);
 }

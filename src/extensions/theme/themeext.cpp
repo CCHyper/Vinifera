@@ -40,8 +40,7 @@
 ThemeControlExtension::ThemeControlExtension(const ThemeClass::ThemeControl *this_ptr) :
     RequiredAddon(ADDON_NONE)
 {
-    //ASSERT(ThisPtr != nullptr);
-    //EXT_DEBUG_TRACE("ThemeControlExtension constructor - Name: %s (0x%08X)\n", This()->Name, (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("ThemeControlExtension::ThemeControlExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -52,6 +51,7 @@ ThemeControlExtension::ThemeControlExtension(const ThemeClass::ThemeControl *thi
  */
 ThemeControlExtension::ThemeControlExtension(const NoInitClass &noinit)
 {
+    //EXT_DEBUG_TRACE("ThemeControlExtension::ThemeControlExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -62,7 +62,7 @@ ThemeControlExtension::ThemeControlExtension(const NoInitClass &noinit)
  */
 ThemeControlExtension::~ThemeControlExtension()
 {
-    //EXT_DEBUG_TRACE("ThemeControlExtension destructor - Name: %s (0x%08X)\n", This()->Name, (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ThemeControlExtension::~ThemeControlExtension - Name: %s (0x%08X)\n", This()->Name, (uintptr_t)(This()));
 }
 
 
@@ -75,13 +75,13 @@ bool ThemeControlExtension::Read_INI(CCINIClass &ini)
 {
     //EXT_DEBUG_TRACE("ThemeControlExtension::Read_INI - Name: %s (0x%08X)\n", This()->Name, (uintptr_t)(This()));
 
-    //const char *ini_name = This()->Name;
-    //
-    //if (!ini.Is_Present(ini_name)) {
-    //    return false;
-    //}
-    //
-    //RequiredAddon = (AddonType)ini.Get_Int(ini_name, "RequiredAddon", RequiredAddon);
+    const char *ini_name = This()->Name;
+
+    if (!ini.Is_Present(ini_name)) {
+        return false;
+    }
+
+    RequiredAddon = (AddonType)ini.Get_Int(ini_name, "RequiredAddon", RequiredAddon);
     
     return true;
 }

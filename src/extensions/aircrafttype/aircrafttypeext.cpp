@@ -41,7 +41,7 @@
 AircraftTypeClassExtension::AircraftTypeClassExtension(const AircraftTypeClass *this_ptr) :
     TechnoTypeClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("AircraftTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("AircraftTypeClassExtension::AircraftTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     AircraftTypeExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ AircraftTypeClassExtension::AircraftTypeClassExtension(const AircraftTypeClass *
 AircraftTypeClassExtension::AircraftTypeClassExtension(const NoInitClass &noinit) :
     TechnoTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("AircraftTypeClassExtension no init constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AircraftTypeClassExtension::AircraftTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ AircraftTypeClassExtension::AircraftTypeClassExtension(const NoInitClass &noinit
  */
 AircraftTypeClassExtension::~AircraftTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("AircraftTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AircraftTypeClassExtension::~AircraftTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     AircraftTypeExtensions.Delete(this);
 }
@@ -98,7 +98,7 @@ HRESULT AircraftTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT AircraftTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("AircraftTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AircraftTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = TechnoTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -118,7 +118,7 @@ HRESULT AircraftTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT AircraftTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("AircraftTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AircraftTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = TechnoTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

@@ -39,7 +39,7 @@
 ObjectClassExtension::ObjectClassExtension(const ObjectClass *this_ptr) :
     AbstractClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("ObjectClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("ObjectClassExtension::ObjectClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -51,7 +51,7 @@ ObjectClassExtension::ObjectClassExtension(const ObjectClass *this_ptr) :
 ObjectClassExtension::ObjectClassExtension(const NoInitClass &noinit) :
     AbstractClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("ObjectClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ObjectClassExtension::ObjectClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -62,7 +62,7 @@ ObjectClassExtension::ObjectClassExtension(const NoInitClass &noinit) :
  */
 ObjectClassExtension::~ObjectClassExtension()
 {
-    //EXT_DEBUG_TRACE("ObjectClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ObjectClassExtension::~ObjectClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -73,7 +73,7 @@ ObjectClassExtension::~ObjectClassExtension()
  */
 HRESULT ObjectClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("ObjectClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ObjectClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractClassExtension::Internal_Load(pStm);
     if (FAILED(hr)) {
@@ -92,7 +92,7 @@ HRESULT ObjectClassExtension::Load(IStream *pStm)
  */
 HRESULT ObjectClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("ObjectClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ObjectClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractClassExtension::Internal_Save(pStm, fClearDirty);
     if (FAILED(hr)) {

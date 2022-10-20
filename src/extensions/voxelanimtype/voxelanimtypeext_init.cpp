@@ -127,43 +127,6 @@ original_code:
 
 
 /**
- *  Patch for reading the extended class members from the ini instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_VoxelAnimTypeClass_Read_INI_Patch)
-{
-    GET_REGISTER_STATIC(VoxelAnimTypeClass *, this_ptr, esi);
-    GET_REGISTER_STATIC(CCINIClass *, ini, ebx);
-    static VoxelAnimTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<VoxelAnimTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class ini.
-     */
-    exttype_ptr->Read_INI(*ini);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov al, 1 }
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { mov esp, ebp }
-    _asm { pop ebp }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void VoxelAnimTypeClassExtension_Init()
@@ -171,9 +134,4 @@ void VoxelAnimTypeClassExtension_Init()
     Patch_Jump(0x0065F584, &_VoxelAnimTypeClass_Constructor_Patch);
     //Patch_Jump(0x0065F5F1, &_VoxelAnimTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x006600E1, &_VoxelAnimTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x0065FB54, 0x0065FC53); // Patch out multiple returns to just use 0x0065FC53
-    Patch_Jump(0x0065FB76, 0x0065FC53);
-    Patch_Jump(0x0065FB9F, 0x0065FC53);
-    Patch_Jump(0x0065FBB0, 0x0065FC53);
-    Patch_Jump(0x0065FC53, &_VoxelAnimTypeClass_Read_INI_Patch);
 }

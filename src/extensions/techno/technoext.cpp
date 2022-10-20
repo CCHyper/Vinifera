@@ -48,7 +48,7 @@ TechnoClassExtension::TechnoClassExtension(const TechnoClass *this_ptr) :
     ObjectClassExtension(this_ptr),
     ElectricBolt(nullptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("TechnoClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("TechnoClassExtension::TechnoClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -60,7 +60,7 @@ TechnoClassExtension::TechnoClassExtension(const TechnoClass *this_ptr) :
 TechnoClassExtension::TechnoClassExtension(const NoInitClass &noinit) :
     ObjectClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("TechnoClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TechnoClassExtension::TechnoClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -71,7 +71,7 @@ TechnoClassExtension::TechnoClassExtension(const NoInitClass &noinit) :
  */
 TechnoClassExtension::~TechnoClassExtension()
 {
-    //EXT_DEBUG_TRACE("TechnoClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TechnoClassExtension::~TechnoClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     ElectricBolt = nullptr;
 }
@@ -84,7 +84,7 @@ TechnoClassExtension::~TechnoClassExtension()
  */
 HRESULT TechnoClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("TechnoClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TechnoClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -104,7 +104,7 @@ HRESULT TechnoClassExtension::Load(IStream *pStm)
  */
 HRESULT TechnoClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("TechnoClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TechnoClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

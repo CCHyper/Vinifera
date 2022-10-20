@@ -41,7 +41,7 @@
 SideClassExtension::SideClassExtension(const SideClass *this_ptr) :
     AbstractTypeClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("SideClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("SideClassExtension::SideClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     SideExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ SideClassExtension::SideClassExtension(const SideClass *this_ptr) :
 SideClassExtension::SideClassExtension(const NoInitClass &noinit) :
     AbstractTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("SideClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SideClassExtension::SideClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ SideClassExtension::SideClassExtension(const NoInitClass &noinit) :
  */
 SideClassExtension::~SideClassExtension()
 {
-    //EXT_DEBUG_TRACE("SideClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SideClassExtension::~SideClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     SideExtensions.Delete(this);
 }
@@ -98,7 +98,7 @@ HRESULT SideClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT SideClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("SideClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SideClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -118,7 +118,7 @@ HRESULT SideClassExtension::Load(IStream *pStm)
  */
 HRESULT SideClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("SideClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SideClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

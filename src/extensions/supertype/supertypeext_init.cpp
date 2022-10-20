@@ -133,41 +133,6 @@ original_code:
 
 
 /**
- *  Patch for reading the extended class members from the ini instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_SuperWeaponTypeClass_Read_INI_Patch)
-{
-    GET_REGISTER_STATIC(SuperWeaponTypeClass *, this_ptr, ebp);
-    GET_REGISTER_STATIC(CCINIClass *, ini, ebx);
-    static SuperWeaponTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<SuperWeaponTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class ini.
-     */
-    exttype_ptr->Read_INI(*ini);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov al, 1 }
-    _asm { pop ebp }
-    _asm { pop ebx }
-    _asm { add esp, 0x3C8 }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void SuperWeaponTypeClassExtension_Init()
@@ -175,5 +140,4 @@ void SuperWeaponTypeClassExtension_Init()
     Patch_Jump(0x0060D04A, &_SuperWeaponTypeClass_Constructor_Patch);
     //Patch_Jump(0x0060D0EA, &_SuperWeaponTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x0060D87A, &_SuperWeaponTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x0060D57A, &_SuperWeaponTypeClass_Read_INI_Patch);
 }

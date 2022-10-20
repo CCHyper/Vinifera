@@ -41,7 +41,7 @@
 OverlayTypeClassExtension::OverlayTypeClassExtension(const OverlayTypeClass *this_ptr) :
     ObjectTypeClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("OverlayTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("OverlayTypeClassExtension::OverlayTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     OverlayTypeExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ OverlayTypeClassExtension::OverlayTypeClassExtension(const OverlayTypeClass *thi
 OverlayTypeClassExtension::OverlayTypeClassExtension(const NoInitClass &noinit) :
     ObjectTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("OverlayTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("OverlayTypeClassExtension::OverlayTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ OverlayTypeClassExtension::OverlayTypeClassExtension(const NoInitClass &noinit) 
  */
 OverlayTypeClassExtension::~OverlayTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("OverlayTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("OverlayTypeClassExtension::~OverlayTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     OverlayTypeExtensions.Delete(this);
 }
@@ -98,7 +98,7 @@ HRESULT OverlayTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT OverlayTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("OverlayTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("OverlayTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -118,7 +118,7 @@ HRESULT OverlayTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT OverlayTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("OverlayTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("OverlayTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

@@ -42,7 +42,7 @@ ObjectTypeClassExtension::ObjectTypeClassExtension(const ObjectTypeClass *this_p
     GraphicName(),
     AlphaGraphicName()
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("ObjectTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("ObjectTypeClassExtension::ObjectTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -54,7 +54,7 @@ ObjectTypeClassExtension::ObjectTypeClassExtension(const ObjectTypeClass *this_p
 ObjectTypeClassExtension::ObjectTypeClassExtension(const NoInitClass &noinit) :
     AbstractTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("ObjectTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ObjectTypeClassExtension::ObjectTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -65,7 +65,7 @@ ObjectTypeClassExtension::ObjectTypeClassExtension(const NoInitClass &noinit) :
  */
 ObjectTypeClassExtension::~ObjectTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("ObjectTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ObjectTypeClassExtension::~ObjectTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -76,7 +76,7 @@ ObjectTypeClassExtension::~ObjectTypeClassExtension()
  */
 HRESULT ObjectTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("ObjectTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ObjectTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -94,7 +94,7 @@ HRESULT ObjectTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT ObjectTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("ObjectTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ObjectTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     /**
      *  Store the graphic name strings as raw data, these are used by the load operation.

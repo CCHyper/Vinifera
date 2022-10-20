@@ -52,7 +52,7 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(const BuildingTypeClass *
     IsResetBudgetOnCapture(false),
     IsEligibleForAllyBuilding(false)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("BuildingTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("BuildingTypeClassExtension::BuildingTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     BuildingTypeExtensions.Add(this);
 }
@@ -66,7 +66,7 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(const BuildingTypeClass *
 BuildingTypeClassExtension::BuildingTypeClassExtension(const NoInitClass &noinit) :
     TechnoTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("BuildingTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("BuildingTypeClassExtension::BuildingTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -77,7 +77,7 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(const NoInitClass &noinit
  */
 BuildingTypeClassExtension::~BuildingTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("BuildingTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("BuildingTypeClassExtension::~BuildingTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     BuildingTypeExtensions.Delete(this);
 }
@@ -109,7 +109,7 @@ HRESULT BuildingTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT BuildingTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("BuildingTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("BuildingTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = TechnoTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -129,7 +129,7 @@ HRESULT BuildingTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT BuildingTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("BuildingTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("BuildingTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = TechnoTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

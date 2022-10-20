@@ -41,7 +41,7 @@
 TiberiumClassExtension::TiberiumClassExtension(const TiberiumClass *this_ptr) :
     AbstractTypeClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("TiberiumClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("TiberiumClassExtension::TiberiumClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     TiberiumExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ TiberiumClassExtension::TiberiumClassExtension(const TiberiumClass *this_ptr) :
 TiberiumClassExtension::TiberiumClassExtension(const NoInitClass &noinit) :
     AbstractTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("TiberiumClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TiberiumClassExtension::TiberiumClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ TiberiumClassExtension::TiberiumClassExtension(const NoInitClass &noinit) :
  */
 TiberiumClassExtension::~TiberiumClassExtension()
 {
-    //EXT_DEBUG_TRACE("TiberiumClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TiberiumClassExtension::~TiberiumClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     TiberiumExtensions.Delete(this);
 }
@@ -98,7 +98,7 @@ HRESULT TiberiumClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT TiberiumClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("TiberiumClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TiberiumClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -118,7 +118,7 @@ HRESULT TiberiumClassExtension::Load(IStream *pStm)
  */
 HRESULT TiberiumClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("TiberiumClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TiberiumClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

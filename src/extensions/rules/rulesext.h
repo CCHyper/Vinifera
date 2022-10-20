@@ -59,6 +59,8 @@ class RulesClassExtension final : public ExtensionSingleton<RulesClass>
         void Process(CCINIClass &ini);
         void Initialize(CCINIClass &ini);
 
+        bool Objects(CCINIClass &ini);
+
         bool General(CCINIClass &ini);
         bool MPlayer(CCINIClass &ini);
         bool AudioVisual(CCINIClass &ini);

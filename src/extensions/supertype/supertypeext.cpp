@@ -46,7 +46,7 @@ SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(const SuperWeaponTy
     IsShowTimer(false),
     CameoImageSurface(nullptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     SuperWeaponTypeExtensions.Add(this);
 }
@@ -60,7 +60,7 @@ SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(const SuperWeaponTy
 SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(const NoInitClass &noinit) :
     AbstractTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -71,7 +71,7 @@ SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(const NoInitClass &
  */
 SuperWeaponTypeClassExtension::~SuperWeaponTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::~SuperWeaponTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     delete CameoImageSurface;
     CameoImageSurface = nullptr;
@@ -106,7 +106,7 @@ HRESULT SuperWeaponTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT SuperWeaponTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -134,7 +134,7 @@ HRESULT SuperWeaponTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT SuperWeaponTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     /**
      *  Store the graphic name strings as raw data, these are used by the load operation.

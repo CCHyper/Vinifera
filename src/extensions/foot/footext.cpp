@@ -38,7 +38,7 @@
 FootClassExtension::FootClassExtension(const FootClass *this_ptr) :
     TechnoClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("FootClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("FootClassExtension::FootClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -50,7 +50,7 @@ FootClassExtension::FootClassExtension(const FootClass *this_ptr) :
 FootClassExtension::FootClassExtension(const NoInitClass &noinit) :
     TechnoClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("FootClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("FootClassExtension::FootClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -61,7 +61,7 @@ FootClassExtension::FootClassExtension(const NoInitClass &noinit) :
  */
 FootClassExtension::~FootClassExtension()
 {
-    //EXT_DEBUG_TRACE("FootClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("FootClassExtension::~FootClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -72,7 +72,7 @@ FootClassExtension::~FootClassExtension()
  */
 HRESULT FootClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("FootClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("FootClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = TechnoClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -90,7 +90,7 @@ HRESULT FootClassExtension::Load(IStream *pStm)
  */
 HRESULT FootClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("FootClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("FootClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = TechnoClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

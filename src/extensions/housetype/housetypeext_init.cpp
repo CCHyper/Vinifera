@@ -127,43 +127,6 @@ original_code:
 
 
 /**
- *  Patch for reading the extended class members from the ini instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_HouseTypeClass_Read_INI_Patch)
-{
-    GET_REGISTER_STATIC(HouseTypeClass *, this_ptr, ebx);
-    GET_STACK_STATIC(CCINIClass *, ini, ebp, 0x8); // Can't use ESI as its reused by this point.
-    static HouseTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<HouseTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class ini.
-     */
-    exttype_ptr->Read_INI(*ini);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov al, 1 }
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { mov esp, ebp }
-    _asm { pop ebp }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void HouseTypeClassExtension_Init()
@@ -171,5 +134,4 @@ void HouseTypeClassExtension_Init()
     Patch_Jump(0x004CDE57, &_HouseTypeClass_Constructor_Patch);
     //Patch_Jump(0x004CDE98, &_HouseTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x004CE608, &_HouseTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x004CE1F3, &_HouseTypeClass_Read_INI_Patch);
 }

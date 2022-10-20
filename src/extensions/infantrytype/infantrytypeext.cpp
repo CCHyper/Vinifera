@@ -44,7 +44,7 @@ InfantryTypeClassExtension::InfantryTypeClassExtension(const InfantryTypeClass *
     IsMechanic(false),
     IsOmniHealer(false)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("InfantryTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("InfantryTypeClassExtension::InfantryTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     InfantryTypeExtensions.Add(this);
 }
@@ -58,7 +58,7 @@ InfantryTypeClassExtension::InfantryTypeClassExtension(const InfantryTypeClass *
 InfantryTypeClassExtension::InfantryTypeClassExtension(const NoInitClass &noinit) :
     TechnoTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::InfantryTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -69,7 +69,7 @@ InfantryTypeClassExtension::InfantryTypeClassExtension(const NoInitClass &noinit
  */
 InfantryTypeClassExtension::~InfantryTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::~InfantryTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     InfantryTypeExtensions.Delete(this);
 }
@@ -101,7 +101,7 @@ HRESULT InfantryTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT InfantryTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = TechnoTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -121,7 +121,7 @@ HRESULT InfantryTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT InfantryTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = TechnoTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

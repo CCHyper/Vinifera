@@ -41,7 +41,7 @@
 HouseTypeClassExtension::HouseTypeClassExtension(const HouseTypeClass *this_ptr) :
     AbstractTypeClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("HouseTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("HouseTypeClassExtension::HouseTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HouseTypeExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ HouseTypeClassExtension::HouseTypeClassExtension(const HouseTypeClass *this_ptr)
 HouseTypeClassExtension::HouseTypeClassExtension(const NoInitClass &noinit) :
     AbstractTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("HouseTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("HouseTypeClassExtension::HouseTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ HouseTypeClassExtension::HouseTypeClassExtension(const NoInitClass &noinit) :
  */
 HouseTypeClassExtension::~HouseTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("HouseTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("HouseTypeClassExtension::~HouseTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HouseTypeExtensions.Delete(this);
 }
@@ -98,7 +98,7 @@ HRESULT HouseTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT HouseTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("HouseTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("HouseTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -118,7 +118,7 @@ HRESULT HouseTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT HouseTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("HouseTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("HouseTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

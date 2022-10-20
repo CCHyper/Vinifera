@@ -127,41 +127,6 @@ original_code:
 
 
 /**
- *  Patch for reading the extended class members from the ini instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_BulletTypeClass_Read_INI_Patch)
-{
-    GET_REGISTER_STATIC(BulletTypeClass *, this_ptr, esi);
-    GET_REGISTER_STATIC(CCINIClass *, ini, ebx);
-    static BulletTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<BulletTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class ini.
-     */
-    exttype_ptr->Read_INI(*ini);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov al, 1 }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { add esp, 0x84 }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void BulletTypeClassExtension_Init()
@@ -169,5 +134,4 @@ void BulletTypeClassExtension_Init()
     Patch_Jump(0x00447D86, &_BulletTypeClass_Constructor_Patch);
     //Patch_Jump(0x00447E11, &_BulletTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00448771, &_BulletTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x00448275, &_BulletTypeClass_Read_INI_Patch);
 }

@@ -41,7 +41,7 @@
 ParticleSystemTypeClassExtension::ParticleSystemTypeClassExtension(const ParticleSystemTypeClass *this_ptr) :
     ObjectTypeClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension::ParticleSystemTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     ParticleSystemTypeExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ ParticleSystemTypeClassExtension::ParticleSystemTypeClassExtension(const Particl
 ParticleSystemTypeClassExtension::ParticleSystemTypeClassExtension(const NoInitClass &noinit) :
     ObjectTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension::ParticleSystemTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ ParticleSystemTypeClassExtension::ParticleSystemTypeClassExtension(const NoInitC
  */
 ParticleSystemTypeClassExtension::~ParticleSystemTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension::~ParticleSystemTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     ParticleSystemTypeExtensions.Delete(this);
 }
@@ -98,7 +98,7 @@ HRESULT ParticleSystemTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT ParticleSystemTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -118,7 +118,7 @@ HRESULT ParticleSystemTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT ParticleSystemTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
@@ -171,7 +171,7 @@ void ParticleSystemTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
  */
 bool ParticleSystemTypeClassExtension::Read_INI(CCINIClass &ini)
 {
-    DEV_DEBUG_WARNING("ParticleSystemTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ParticleSystemTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     if (!ObjectTypeClassExtension::Read_INI(ini)) {
         return false;

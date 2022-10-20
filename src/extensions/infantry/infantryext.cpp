@@ -41,7 +41,7 @@
 InfantryClassExtension::InfantryClassExtension(const InfantryClass *this_ptr) :
     FootClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("InfantryClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("InfantryClassExtension::InfantryClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     InfantryExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ InfantryClassExtension::InfantryClassExtension(const InfantryClass *this_ptr) :
 InfantryClassExtension::InfantryClassExtension(const NoInitClass &noinit) :
     FootClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("InfantryClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("InfantryClassExtension::InfantryClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ InfantryClassExtension::InfantryClassExtension(const NoInitClass &noinit) :
  */
 InfantryClassExtension::~InfantryClassExtension()
 {
-    //EXT_DEBUG_TRACE("InfantryClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("InfantryClassExtension::~InfantryClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     InfantryExtensions.Delete(this);
 }

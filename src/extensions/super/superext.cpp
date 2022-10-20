@@ -43,7 +43,7 @@ SuperClassExtension::SuperClassExtension(const SuperClass *this_ptr) :
     FlashTimeEnd(0),
     TimerFlashState(false)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("SuperClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("SuperClassExtension::SuperClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     SuperExtensions.Add(this);
 }
@@ -57,7 +57,7 @@ SuperClassExtension::SuperClassExtension(const SuperClass *this_ptr) :
 SuperClassExtension::SuperClassExtension(const NoInitClass &noinit) :
     AbstractClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("SuperClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SuperClassExtension::SuperClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -68,7 +68,7 @@ SuperClassExtension::SuperClassExtension(const NoInitClass &noinit) :
  */
 SuperClassExtension::~SuperClassExtension()
 {
-    //EXT_DEBUG_TRACE("SuperClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SuperClassExtension::~SuperClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     SuperExtensions.Delete(this);
 }
@@ -100,7 +100,7 @@ HRESULT SuperClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT SuperClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("SuperClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SuperClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractClassExtension::Internal_Load(pStm);
     if (FAILED(hr)) {
@@ -120,7 +120,7 @@ HRESULT SuperClassExtension::Load(IStream *pStm)
  */
 HRESULT SuperClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("SuperClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SuperClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractClassExtension::Internal_Save(pStm, fClearDirty);
     if (FAILED(hr)) {

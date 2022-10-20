@@ -41,7 +41,7 @@
 SmudgeTypeClassExtension::SmudgeTypeClassExtension(const SmudgeTypeClass *this_ptr) :
     ObjectTypeClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("SmudgeTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("SmudgeTypeClassExtension::SmudgeTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     SmudgeTypeExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ SmudgeTypeClassExtension::SmudgeTypeClassExtension(const SmudgeTypeClass *this_p
 SmudgeTypeClassExtension::SmudgeTypeClassExtension(const NoInitClass &noinit) :
     ObjectTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("SmudgeTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SmudgeTypeClassExtension::SmudgeTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ SmudgeTypeClassExtension::SmudgeTypeClassExtension(const NoInitClass &noinit) :
  */
 SmudgeTypeClassExtension::~SmudgeTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("SmudgeTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SmudgeTypeClassExtension::~SmudgeTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     SmudgeTypeExtensions.Delete(this);
 }
@@ -98,7 +98,7 @@ HRESULT SmudgeTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT SmudgeTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("SmudgeTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SmudgeTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -118,7 +118,7 @@ HRESULT SmudgeTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT SmudgeTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("SmudgeTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SmudgeTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

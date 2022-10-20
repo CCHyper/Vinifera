@@ -41,7 +41,7 @@
 HouseClassExtension::HouseClassExtension(const HouseClass *this_ptr) :
     AbstractClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("HouseClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("HouseClassExtension::HouseClassExtension - 0x%08X\n", (uintptr_t)(This()));
 
     HouseExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ HouseClassExtension::HouseClassExtension(const HouseClass *this_ptr) :
 HouseClassExtension::HouseClassExtension(const NoInitClass &noinit) :
     AbstractClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("HouseClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("HouseClassExtension::HouseClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ HouseClassExtension::HouseClassExtension(const NoInitClass &noinit) :
  */
 HouseClassExtension::~HouseClassExtension()
 {
-    //EXT_DEBUG_TRACE("HouseClassExtension destructor - 0x%08X\n", (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("HouseClassExtension::~HouseClassExtension - 0x%08X\n", (uintptr_t)(This()));
 
     HouseExtensions.Delete(this);
 }

@@ -41,7 +41,7 @@
 UnitClassExtension::UnitClassExtension(const UnitClass *this_ptr) :
     FootClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("UnitClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("UnitClassExtension::UnitClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     UnitExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ UnitClassExtension::UnitClassExtension(const UnitClass *this_ptr) :
 UnitClassExtension::UnitClassExtension(const NoInitClass &noinit) :
     FootClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("UnitClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("UnitClassExtension::UnitClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ UnitClassExtension::UnitClassExtension(const NoInitClass &noinit) :
  */
 UnitClassExtension::~UnitClassExtension()
 {
-    //EXT_DEBUG_TRACE("UnitClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("UnitClassExtension::~UnitClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     UnitExtensions.Delete(this);
 }
@@ -98,7 +98,7 @@ HRESULT UnitClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT UnitClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("UnitClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("UnitClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = FootClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -118,7 +118,7 @@ HRESULT UnitClassExtension::Load(IStream *pStm)
  */
 HRESULT UnitClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("UnitClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("UnitClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = FootClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

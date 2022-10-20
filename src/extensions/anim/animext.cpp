@@ -41,7 +41,7 @@
 AnimClassExtension::AnimClassExtension(const AnimClass *this_ptr) :
     ObjectClassExtension(this_ptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("AnimClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("AnimClassExtension::AnimClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     AnimExtensions.Add(this);
 }
@@ -55,7 +55,7 @@ AnimClassExtension::AnimClassExtension(const AnimClass *this_ptr) :
 AnimClassExtension::AnimClassExtension(const NoInitClass &noinit) :
     ObjectClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("AnimClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AnimClassExtension::AnimClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ AnimClassExtension::AnimClassExtension(const NoInitClass &noinit) :
  */
 AnimClassExtension::~AnimClassExtension()
 {
-    //EXT_DEBUG_TRACE("AnimClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AnimClassExtension::~AnimClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     AnimExtensions.Delete(this);
 }
@@ -98,7 +98,7 @@ HRESULT AnimClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT AnimClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("AnimClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AnimClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -118,7 +118,7 @@ HRESULT AnimClassExtension::Load(IStream *pStm)
  */
 HRESULT AnimClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("AnimClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AnimClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

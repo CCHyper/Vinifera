@@ -45,7 +45,7 @@ IsometricTileTypeClassExtension::IsometricTileTypeClassExtension(const Isometric
     ObjectTypeClassExtension(this_ptr),
     TileSetName(nullptr)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("IsometricTileTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("IsometricTileTypeClassExtension::~IsometricTileTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     IsometricTileTypeExtensions.Add(this);
 }
@@ -59,7 +59,7 @@ IsometricTileTypeClassExtension::IsometricTileTypeClassExtension(const Isometric
 IsometricTileTypeClassExtension::IsometricTileTypeClassExtension(const NoInitClass &noinit) :
     ObjectTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("IsometricTileTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("IsometricTileTypeClassExtension::~IsometricTileTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -70,7 +70,7 @@ IsometricTileTypeClassExtension::IsometricTileTypeClassExtension(const NoInitCla
  */
 IsometricTileTypeClassExtension::~IsometricTileTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("IsometricTileTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("IsometricTileTypeClassExtension::~IsometricTileTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     IsometricTileTypeExtensions.Delete(this);
 }
@@ -102,7 +102,7 @@ HRESULT IsometricTileTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT IsometricTileTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("IsometricTileTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("IsometricTileTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -122,7 +122,7 @@ HRESULT IsometricTileTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT IsometricTileTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("IsometricTileTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("IsometricTileTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

@@ -48,7 +48,7 @@ TerrainTypeClassExtension::TerrainTypeClassExtension(const TerrainTypeClass *thi
     LightGreenTint(1000000),
     LightBlueTint(1000000)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("TerrainTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("TerrainTypeClassExtension::TerrainTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     TerrainTypeExtensions.Add(this);
 }
@@ -62,7 +62,7 @@ TerrainTypeClassExtension::TerrainTypeClassExtension(const TerrainTypeClass *thi
 TerrainTypeClassExtension::TerrainTypeClassExtension(const NoInitClass &noinit) :
     ObjectTypeClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("TerrainTypeClassExtension NoInit constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TerrainTypeClassExtension::TerrainTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -73,7 +73,7 @@ TerrainTypeClassExtension::TerrainTypeClassExtension(const NoInitClass &noinit) 
  */
 TerrainTypeClassExtension::~TerrainTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("TerrainTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TerrainTypeClassExtension::~TerrainTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     TerrainTypeExtensions.Delete(this);
 }
@@ -105,7 +105,7 @@ HRESULT TerrainTypeClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT TerrainTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("TerrainTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TerrainTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -125,7 +125,7 @@ HRESULT TerrainTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT TerrainTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("TerrainTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TerrainTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = ObjectTypeClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

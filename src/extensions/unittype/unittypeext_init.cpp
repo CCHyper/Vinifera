@@ -128,46 +128,6 @@ original_code:
 
 
 /**
- *  Patch for reading the extended class members from the ini instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_UnitTypeClass_Read_INI_Patch)
-{
-    GET_REGISTER_STATIC(void *, alt_image_ptr, eax); // Return from MixFileClass::Retrieve()
-    GET_REGISTER_STATIC(UnitTypeClass *, this_ptr, ebp);
-    GET_STACK_STATIC(CCINIClass *, ini, esp, 0x144); // Can't use ESI as its reused by this point.
-    static UnitTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<UnitTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class ini.
-     */
-    exttype_ptr->Read_INI(*ini);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    this_ptr->AltImage = (ShapeFileStruct *)alt_image_ptr;
-
-    _asm { mov al, 1 }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { pop edi }
-    _asm { pop ebp }
-    _asm { add esp, 0x130 }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void UnitTypeClassExtension_Init()
@@ -175,5 +135,4 @@ void UnitTypeClassExtension_Init()
     Patch_Jump(0x0065BA96, &_UnitTypeClass_Constructor_Patch);
     //Patch_Jump(0x0065BAD8, &_UnitTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x0065C798, &_UnitTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x0065C38D, &_UnitTypeClass_Read_INI_Patch);
 }

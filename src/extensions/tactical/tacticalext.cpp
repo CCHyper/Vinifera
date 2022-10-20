@@ -70,7 +70,7 @@ TacticalExtension::TacticalExtension(const Tactical *this_ptr) :
     InfoTextStyle(TPF_6PT_GRAD|TPF_DROPSHADOW),
     InfoTextTimer(0)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("TacticalExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("TacticalExtension::TacticalExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -84,7 +84,7 @@ TacticalExtension::TacticalExtension(const NoInitClass &noinit) :
     IsInfoTextSet(false),
     InfoTextTimer(noinit)
 {
-    //EXT_DEBUG_TRACE("TacticalExtension no init constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TacticalExtension::TacticalExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -95,7 +95,7 @@ TacticalExtension::TacticalExtension(const NoInitClass &noinit) :
  */
 TacticalExtension::~TacticalExtension()
 {
-    //EXT_DEBUG_TRACE("TacticalExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TacticalExtension::~TacticalExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -125,7 +125,7 @@ HRESULT TacticalExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT TacticalExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("TacticalExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TacticalExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractClassExtension::Internal_Load(pStm);
     if (FAILED(hr)) {
@@ -145,7 +145,7 @@ HRESULT TacticalExtension::Load(IStream *pStm)
  */
 HRESULT TacticalExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("TacticalExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("TacticalExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractClassExtension::Internal_Save(pStm, fClearDirty);
     if (FAILED(hr)) {

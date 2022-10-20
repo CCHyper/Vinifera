@@ -43,7 +43,7 @@ AbstractTypeClassExtension::AbstractTypeClassExtension(const AbstractTypeClass *
     IniName(),
     FullName()
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("AbstractTypeClassExtension constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("AbstractTypeClassExtension::AbstractTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -55,7 +55,7 @@ AbstractTypeClassExtension::AbstractTypeClassExtension(const AbstractTypeClass *
 AbstractTypeClassExtension::AbstractTypeClassExtension(const NoInitClass &noinit) :
     AbstractClassExtension(noinit)
 {
-    //EXT_DEBUG_TRACE("AbstractTypeClassExtension no init constructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AbstractTypeClassExtension::AbstractTypeClassExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -66,7 +66,7 @@ AbstractTypeClassExtension::AbstractTypeClassExtension(const NoInitClass &noinit
  */
 AbstractTypeClassExtension::~AbstractTypeClassExtension()
 {
-    //EXT_DEBUG_TRACE("AbstractTypeClassExtension destructor - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AbstractTypeClassExtension::~AbstractTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
 
 
@@ -77,7 +77,7 @@ AbstractTypeClassExtension::~AbstractTypeClassExtension()
  */
 HRESULT AbstractTypeClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("AbstractTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AbstractTypeClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = AbstractClassExtension::Internal_Load(pStm);
     if (FAILED(hr)) {
@@ -95,7 +95,7 @@ HRESULT AbstractTypeClassExtension::Load(IStream *pStm)
  */
 HRESULT AbstractTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("AbstractTypeClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("AbstractTypeClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
     
     /**
      *  Store the name strings as raw data, these are used by the load operation.

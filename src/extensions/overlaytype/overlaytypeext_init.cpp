@@ -127,46 +127,6 @@ original_code:
 
 
 /**
- *  Patch for reading the extended class members from the ini instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_OverlayTypeClass_Read_INI_Patch)
-{
-    GET_REGISTER_STATIC(bool, is_a_rock, al);  // Return from INIClass::Get_Bool() for "IsARock".
-    GET_REGISTER_STATIC(OverlayTypeClass *, this_ptr, esi);
-    GET_REGISTER_STATIC(CCINIClass *, ini, ebx);
-    static OverlayTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<OverlayTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class ini.
-     */
-    exttype_ptr->Read_INI(*ini);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    this_ptr->IsARock = is_a_rock;
-
-    _asm { mov al, 1 }
-    _asm { pop edi }
-    _asm { pop ebp }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { add esp, 0x280 }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void OverlayTypeClassExtension_Init()
@@ -175,5 +135,4 @@ void OverlayTypeClassExtension_Init()
     Patch_Jump(0x0058D12D, &_OverlayTypeClass_Constructor_Patch);
     //Patch_Jump(0x0058D19B, &_OverlayTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x0058DC8B, &_OverlayTypeClass_Scalar_Destructor_Patch);
-    Patch_Jump(0x0058D709, &_OverlayTypeClass_Read_INI_Patch);
 }
