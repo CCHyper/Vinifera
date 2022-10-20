@@ -88,28 +88,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members in the noinit creation process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AircraftClass_NoInit_Constructor_Patch)
-{
-    GET_REGISTER_STATIC(AircraftClass *, this_ptr, ebx);
-    GET_STACK_STATIC(const NoInitClass *, noinit, esp, 0x10);
-    static AircraftClassExtension *ext_ptr;
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov dword ptr [ebx], 0x006CADF8 } // this->vftable = const AircraftClass::`vftable';
-    JMP(0x0040EB87);
-}
-
-
-/**
  *  Patch for including the extended class members in the destruction process.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -135,74 +113,10 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members to the base class detach process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AircraftClass_Detach_Patch)
-{
-    GET_REGISTER_STATIC(AircraftClass *, this_ptr, esi);
-    GET_STACK_STATIC(TARGET, target, esp, 0x10);
-    GET_STACK_STATIC8(bool, all, esp, 0x8);
-    static AircraftClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<AircraftClassExtension>(this_ptr);
-
-    ext_ptr->Detach(target, all);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 8 }
-}
-
-
-/**
- *  Patch for including the extended class members to the base class crc calculation.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AircraftClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(AircraftClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static AircraftClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<AircraftClassExtension>(this_ptr);
-
-    ext_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void AircraftClassExtension_Init()
 {
     Patch_Jump(0x0040880C, &_AircraftClass_Constructor_Patch);
-    //Patch_Jump(0x0040EB81, &_AircraftClass_NoInit_Constructor_Patch);
     Patch_Jump(0x0040DBB8, &_AircraftClass_Destructor_Patch);
-    //Patch_Jump(0x0040EDC5, &_AircraftClass_Detach_Patch);
-    //Patch_Jump(0x0040ED91, &_AircraftClass_Compute_CRC_Patch);
 }

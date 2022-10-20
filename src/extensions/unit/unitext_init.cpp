@@ -89,28 +89,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members in the noinit creation process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_UnitClass_NoInit_Constructor_Patch)
-{
-    GET_REGISTER_STATIC(UnitClass *, this_ptr, esi);
-    GET_STACK_STATIC(const NoInitClass *, noinit, esp, 0x18);
-    static UnitClassExtension *ext_ptr;
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov dword ptr [esi], 0x006D8B6C } // this->vftable = const UnitClass::`vftable';
-    JMP(0x00659680);
-}
-
-
-/**
  *  Patch for including the extended class members in the destruction process.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -136,74 +114,10 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members to the base class detach process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_UnitClass_Detach_Patch)
-{
-    GET_REGISTER_STATIC(UnitClass *, this_ptr, esi);
-    GET_STACK_STATIC(TARGET, target, esp, 0x10);
-    GET_STACK_STATIC8(bool, all, esp, 0x8);
-    static UnitClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<UnitClassExtension>(this_ptr);
-
-    ext_ptr->Detach(target, all);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 8 }
-}
-
-
-/**
- *  Patch for including the extended class members to the base class crc calculation.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_UnitClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(UnitClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static UnitClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<UnitClassExtension>(this_ptr);
-
-    ext_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void UnitClassExtension_Init()
 {
     Patch_Jump(0x0064D7B4, &_UnitClass_Constructor_Patch);
-    //Patch_Jump(0x0065967A, &_UnitClass_NoInit_Constructor_Patch);
     Patch_Jump(0x0064D8AE, &_UnitClass_Destructor_Patch);
-    //Patch_Jump(0x00659863, &_UnitClass_Detach_Patch);
-    //Patch_Jump(0x00659825, &_UnitClass_Compute_CRC_Patch);
 }

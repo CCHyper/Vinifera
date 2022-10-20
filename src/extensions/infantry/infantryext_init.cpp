@@ -87,28 +87,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members in the noinit creation process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_InfantryClass_NoInit_Constructor_Patch)
-{
-    GET_REGISTER_STATIC(InfantryClass *, this_ptr, esi);
-    GET_STACK_STATIC(const NoInitClass *, noinit, esp, 0x20);
-    static InfantryClassExtension *ext_ptr;
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov dword ptr [esi], 0x006D211C } // this->vftable = const InfantryClass::`vftable';
-    JMP(0x004D9415);
-}
-
-
-/**
  *  Patch for including the extended class members in the destruction process.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -134,74 +112,10 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members to the base class detach process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_InfantryClass_Detach_Patch)
-{
-    GET_REGISTER_STATIC(InfantryClass *, this_ptr, esi);
-    GET_STACK_STATIC(TARGET, target, esp, 0x10);
-    GET_STACK_STATIC8(bool, all, esp, 0x8);
-    static InfantryClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<InfantryClassExtension>(this_ptr);
-
-    ext_ptr->Detach(target, all);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 8 }
-}
-
-
-/**
- *  Patch for including the extended class members to the base class crc calculation.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_InfantryClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(InfantryClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static InfantryClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<InfantryClassExtension>(this_ptr);
-
-    ext_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void InfantryClassExtension_Init()
 {
     Patch_Jump(0x004D21E1, &_InfantryClass_Constructor_Patch);
-    //Patch_Jump(0x004D940F, &_InfantryClass_NoInit_Constructor_Patch);
     Patch_Jump(0x004D22E1, &_InfantryClass_Destructor_Patch);
-    //Patch_Jump(0x004D40E5, &_InfantryClass_Detach_Patch);
-    //Patch_Jump(0x004D96DB, &_InfantryClass_Compute_CRC_Patch);
 }

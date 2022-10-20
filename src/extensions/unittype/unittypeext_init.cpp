@@ -89,28 +89,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members in the noinit creation process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_UnitTypeClass_NoInit_Constructor_Patch)
-{
-    GET_REGISTER_STATIC(UnitTypeClass *, this_ptr, esi);
-    GET_STACK_STATIC(const NoInitClass *, noinit_ptr, esp, 0x4);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for including the extended class members in the destruction process.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -161,39 +139,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members when computing a unique crc value for this instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_UnitTypeClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(UnitTypeClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static UnitTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<UnitTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class compute crc.
-     */
-    exttype_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for reading the extended class members from the ini instance.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -239,9 +184,7 @@ original_code:
 void UnitTypeClassExtension_Init()
 {
     Patch_Jump(0x0065BA96, &_UnitTypeClass_Constructor_Patch);
-    //Patch_Jump(0x0065BABA, &_UnitTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x0065BAD8, &_UnitTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x0065C798, &_UnitTypeClass_Scalar_Destructor_Patch);
-    //Patch_Jump(0x0065C50A, &_UnitTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x0065C38D, &_UnitTypeClass_Read_INI_Patch);
 }

@@ -138,39 +138,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members when computing a unique crc value for this instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_SideClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(SideClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static SideClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<SideClassExtension>(this_ptr);
-
-    /**
-     *  Read type class compute crc.
-     */
-    exttype_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void SideClassExtension_Init()
@@ -178,5 +145,4 @@ void SideClassExtension_Init()
     Patch_Jump(0x005F1AC6, &_SideClass_Constructor_Patch);
     //Patch_Jump(0x005F1AE8, &_SideClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x005F1D98, &_SideClass_Scalar_Destructor_Patch);
-    //Patch_Jump(0x005F1BC9, &_SideClass_Compute_CRC_Patch);
 }

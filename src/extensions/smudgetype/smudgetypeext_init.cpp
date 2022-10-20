@@ -88,28 +88,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members in the noinit creation process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_SmudgeTypeClass_NoInit_Constructor_Patch)
-{
-    GET_REGISTER_STATIC(SmudgeTypeClass *, this_ptr, esi);
-    GET_STACK_STATIC(const NoInitClass *, noinit_ptr, esp, 0x4);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for including the extended class members in the destruction process.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -160,39 +138,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members when computing a unique crc value for this instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_SmudgeTypeClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(SmudgeTypeClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static SmudgeTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<SmudgeTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class compute crc.
-     */
-    exttype_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for reading the extended class members from the ini instance.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -234,9 +179,7 @@ void SmudgeTypeClassExtension_Init()
 {
     Patch_Jump(0x005FB2CC, &_SmudgeTypeClass_Constructor_Patch);
     Patch_Jump(0x005FB2D9, &_SmudgeTypeClass_Constructor_Patch);
-    //Patch_Jump(0x005FB2FA, &_SmudgeTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x005FB318, &_SmudgeTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x005FC028, &_SmudgeTypeClass_Scalar_Destructor_Patch);
-    //Patch_Jump(0x005FB724, &_SmudgeTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x005FB6A7, &_SmudgeTypeClass_Read_INI_Patch);
 }

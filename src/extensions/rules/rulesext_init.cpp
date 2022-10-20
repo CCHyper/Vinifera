@@ -81,29 +81,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members in the noinit creation process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_RulesClass_NoInit_Constructor_Patch)
-{
-    GET_REGISTER_STATIC(RulesClass *, this_ptr, esi); // "this" pointer.
-    GET_STACK_STATIC(const NoInitClass *, noinit, esp, 0x4);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for including the extended class members in the destruction process.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -186,32 +163,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members to the base class detach process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_RulesClass_Detach_Patch)
-{
-    GET_REGISTER_STATIC(RulesClass *, this_ptr, esi);
-    GET_STACK_STATIC(TARGET, target, esp, 0x4);
-    GET_STACK_STATIC8(bool, all, esp, 0x8);
-
-    RuleExtension->Detach(target, all);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { ret 8 }
-}
-
-
-/**
  *  Patch for including the extended class members when processing the MPlayer section.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -242,10 +193,8 @@ original_code:
 void RulesClassExtension_Init()
 {
     Patch_Jump(0x005C59A1, &_RulesClass_Constructor_Patch);
-    //Patch_Jump(0x005C4347, &_RulesClass_NoInit_Constructor_Patch);
     Patch_Jump(0x005C6120, &_RulesClass_Destructor_Patch);
     Patch_Jump(0x005C66FF, &_RulesClass_Initialize_Patch);
     Patch_Jump(0x005C6A4D, &_RulesClass_Process_Patch);
-    //Patch_Jump(0x005D17F5, &_RulesClass_Detach_Patch);
     Patch_Jump(0x005CC3BF, &_RulesClass_MPlayer_Patch);
 }

@@ -87,30 +87,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members in the noinit creation process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_ScenarioClass_NoInit_Constructor_Patch)
-{
-    GET_REGISTER_STATIC(ScenarioClass *, this_ptr, esi); // "this" pointer.
-    GET_STACK_STATIC(const NoInitClass *, noinit, esp, 0x4);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for including the extended class members in the destruction process.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -147,7 +123,15 @@ DECLARE_PATCH(_ScenarioClass_Init_Clear_Patch)
 {
     GET_REGISTER_STATIC(ScenarioClass *, this_ptr, esi);
 
-    ScenExtension->Init_Clear();
+    /**
+     *  This is a odd case; ScenarioClass::Init_Clear is called within the class
+     *  constructor, so the first time this patch is called, ScenExtension is NULL.
+     *  The ScenarioClassExtension calls it's Init_Clear to mirror this behaviour
+     *  so we can just check if the extension has be created first to catch this.
+     */
+    if (ScenExtension) {
+        ScenExtension->Init_Clear();
+    }
 
     /**
      *  Stolen bytes here.
@@ -163,40 +147,11 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members when computing a unique crc value for this instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_ScenarioClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(OverlayTypeClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-
-    /**
-     *  Read type class compute crc.
-     */
-    ScenExtension->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void ScenarioClassExtension_Init()
 {
     Patch_Jump(0x005DADDE, &_ScenarioClass_Constructor_Patch);
-    Patch_Jump(0x005DAE87, &_ScenarioClass_NoInit_Constructor_Patch);
     Patch_Jump(0x006023CC, &_ScenarioClass_Destructor_Patch); // Inlined in game shutdown.
     Patch_Jump(0x005DB166, &_ScenarioClass_Init_Clear_Patch);
-    //Patch_Jump(0x005E1440, &_ScenarioClass_Compute_CRC_Patch);
 }

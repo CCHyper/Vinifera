@@ -284,37 +284,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members to the base class detach process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_WaveClass_Detach_Patch)
-{
-    GET_REGISTER_STATIC(WaveClass *, this_ptr, esi);
-    GET_STACK_STATIC(TARGET, target, esp, 0x10);
-    GET_STACK_STATIC8(bool, all, esp, 0x8);
-    static WaveClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<WaveClassExtension>(this_ptr);
-
-    ext_ptr->Detach(target, all);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 8 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void WaveClassExtension_Init()
@@ -325,5 +294,4 @@ void WaveClassExtension_Init()
     Patch_Jump(0x0066FECF, &_WaveClass_Constructor_Before_Init_Patch);
     Patch_Jump(0x006702D9, &_WaveClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00672E78, &_WaveClass_Scalar_Destructor_Patch);
-    //Patch_Jump(0x00670B3D, &_WaveClass_Detach_Patch);
 }

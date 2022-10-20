@@ -120,10 +120,8 @@ DECLARE_PATCH(_SessionClass_Read_MultiPlayer_Settings_Patch)
     /**
      *  Load ini.
      */
-    if (SessionExtension) {
-        //DEBUG_INFO("Reading extended session settings\n");
-        SessionExtension->Read_MultiPlayer_Settings();
-    }
+    //DEBUG_INFO("Reading extended session settings\n");
+    SessionExtension->Read_MultiPlayer_Settings();
 
     /**
      *  Stolen bytes here.
@@ -150,10 +148,8 @@ DECLARE_PATCH(_SessionClass_Write_MultiPlayer_Settings_Patch)
     /**
      *  Save ini.
      */
-    if (SessionExtension) {
-        //DEBUG_INFO("Writing extended session settings\n");
-        SessionExtension->Write_MultiPlayer_Settings();
-    }
+    //DEBUG_INFO("Writing extended session settings\n");
+    SessionExtension->Write_MultiPlayer_Settings();
 
     /**
      *  Stolen bytes here.

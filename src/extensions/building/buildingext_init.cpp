@@ -89,29 +89,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members in the noinit creation process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_BuildingClass_NoInit_Constructor_Patch)
-{
-    GET_REGISTER_STATIC(BuildingClass *, this_ptr, esi);
-    GET_STACK_STATIC(const NoInitClass *, noinit, esp, 0x4);
-    static BuildingClassExtension *ext_ptr;
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for including the extended class members in the destruction process.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -137,75 +114,10 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members to the base class detach process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_BuildingClass_Detach_Patch)
-{
-    GET_REGISTER_STATIC(BuildingClass *, this_ptr, esi);
-    GET_STACK_STATIC(TARGET, target, esp, 0x10);
-    GET_STACK_STATIC8(bool, all, esp, 0x8);
-    static BuildingClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<BuildingClassExtension>(this_ptr);
-
-    ext_ptr->Detach(target, all);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { pop ebx }
-    _asm { ret 8 }
-}
-
-
-/**
- *  Patch for including the extended class members to the base class crc calculation.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_BuildingClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(BuildingClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static BuildingClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<BuildingClassExtension>(this_ptr);
-
-    ext_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void BuildingClassExtension_Init()
 {
     Patch_Jump(0x00426615, &_BuildingClass_Constructor_Patch);
-    //Patch_Jump(0x00426184, &_BuildingClass_NoInit_Constructor_Patch);
     Patch_Jump(0x0042666E, &_BuildingClass_Destructor_Patch);
-    //Patch_Jump(0x00433FA9, &_BuildingClass_Detach_Patch);
-    //Patch_Jump(0x0043843D, &_BuildingClass_Compute_CRC_Patch);
 }

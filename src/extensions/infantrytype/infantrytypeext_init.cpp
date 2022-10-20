@@ -88,28 +88,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members in the noinit creation process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_InfantryTypeClass_NoInit_Constructor_Patch)
-{
-    GET_REGISTER_STATIC(InfantryTypeClass *, this_ptr, esi);
-    GET_STACK_STATIC(const NoInitClass *, noinit_ptr, esp, 0x4);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for including the extended class members in the destruction process.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -160,39 +138,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members when computing a unique crc value for this instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_InfantryTypeClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(InfantryTypeClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static InfantryTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<InfantryTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class compute crc.
-     */
-    exttype_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for reading the extended class members from the ini instance.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -235,9 +180,7 @@ original_code:
 void InfantryTypeClassExtension_Init()
 {
     Patch_Jump(0x004DA360, &_InfantryTypeClass_Constructor_Patch);
-    //Patch_Jump(0x004DA394, &_InfantryTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x004DA3B9, &_InfantryTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x004DB138, &_InfantryTypeClass_Scalar_Destructor_Patch);
-    //Patch_Jump(0x004DAE11, &_InfantryTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x004DAC2F, &_InfantryTypeClass_Read_INI_Patch);
 }

@@ -164,39 +164,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members when computing a unique crc value for this instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_CampaignClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(CampaignClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static CampaignClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<CampaignClassExtension>(this_ptr);
-
-    /**
-     *  Read type class compute crc.
-     */
-    exttype_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for reading the extended class members from the ini instance.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -244,6 +211,5 @@ void CampaignClassExtension_Init()
     //Patch_Jump(0x00448AE8, &_CampaignClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00448CD0, &_CampaignClass_Process_Patch); // Constructor is also inlined in CampaignClass::Process!
     Patch_Jump(0x00448EF8, &_CampaignClass_Scalar_Destructor_Patch);
-    //Patch_Jump(0x00448E4E, &_CampaignClass_Compute_CRC_Patch);
     Patch_Jump(0x00448C17, &_CampaignClass_Read_INI_Patch);
 }

@@ -107,28 +107,6 @@ DECLARE_PATCH(_AircraftTypeClass_Find_Or_Make_Patch)
 
 
 /**
- *  Patch for including the extended class members in the noinit creation process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AircraftTypeClass_NoInit_Constructor_Patch)
-{
-    GET_REGISTER_STATIC(AircraftTypeClass *, this_ptr, esi);
-    GET_STACK_STATIC(const NoInitClass *, noinit_ptr, esp, 0x4);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for including the extended class members in the destruction process.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -179,39 +157,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members when computing a unique crc value for this instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AircraftTypeClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(AircraftTypeClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static AircraftTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<AircraftTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class compute crc.
-     */
-    exttype_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for reading the extended class members from the ini instance.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -253,9 +198,7 @@ void AircraftTypeClassExtension_Init()
 {
     Patch_Jump(0x0040FC8F, &_AircraftTypeClass_Constructor_Patch);
     Patch_Jump(0x0041009C, &_AircraftTypeClass_Find_Or_Make_Patch); // Constructor is also inlined in AircraftTypeClass::Find_Or_Make!
-    //Patch_Jump(0x0040FCBA, &_AircraftTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x0040FCD8, &_AircraftTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00410228, &_AircraftTypeClass_Scalar_Destructor_Patch);
-    //Patch_Jump(0x0040FF66, &_AircraftTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x0040FF0E, &_AircraftTypeClass_Read_INI_Patch);
 }

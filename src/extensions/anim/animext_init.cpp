@@ -181,28 +181,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members in the noinit creation process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AnimClass_NoInit_Constructor_Patch)
-{
-    GET_REGISTER_STATIC(AnimClass *, this_ptr, esi);
-    GET_STACK_STATIC(const NoInitClass *, noinit, esp, 0x10);
-    static AnimClassExtension *ext_ptr;
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov dword ptr [esi], 0x006CB92C } // this->vftable = const AnimClass::`vftable'{for `IRTTITypeInfo'};
-    JMP(0x004164DD);
-}
-
-
-/**
  *  Patch for including the extended class members in the destruction process.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -228,76 +206,12 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members to the base class detach process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AnimClass_Detach_Patch)
-{
-    GET_REGISTER_STATIC(AnimClass *, this_ptr, esi);
-    GET_STACK_STATIC(TARGET, target, esp, 0x10);
-    GET_STACK_STATIC8(bool, all, esp, 0x8);
-    static AnimClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<AnimClassExtension>(this_ptr);
-
-    ext_ptr->Detach(target, all);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 8 }
-}
-
-
-/**
- *  Patch for including the extended class members to the base class crc calculation.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AnimClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(AnimClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static AnimClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<AnimClassExtension>(this_ptr);
-
-    ext_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void AnimClassExtension_Init()
 {
     Patch_Jump(0x00413C79, &_AnimClass_Constructor_Patch);
     Patch_Jump(0x004142A6, &_AnimClass_Default_Constructor_Patch);
-    //Patch_Jump(0x004164D7, &_AnimClass_NoInit_Constructor_Patch);
     Patch_Jump(0x0041441F, 0x00414475); // This jump goes from duplicate code in the destructor to our patch, removing the need for two hooks.
     Patch_Jump(0x004142CB, &_AnimClass_Destructor_Patch);
-    //Patch_Jump(0x004163D9, &_AnimClass_Detach_Patch);
-    //Patch_Jump(0x00416626, &_AnimClass_Compute_CRC_Patch);
 }

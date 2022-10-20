@@ -177,65 +177,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members to the base class detach process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_SuperClass_Detach_Patch)
-{
-    GET_REGISTER_STATIC(SuperClass *, this_ptr, ecx);
-    GET_STACK_STATIC(TARGET, target, esp, 0x10);
-    GET_STACK_STATIC8(bool, all, esp, 0x8);
-    static SuperClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<SuperClassExtension>(this_ptr);
-
-    ext_ptr->Detach(target, all);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { ret 8 }
-}
-
-
-/**
- *  Patch for including the extended class members to the base class crc calculation.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_SuperClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(SuperClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static SuperClassExtension *ext_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    ext_ptr = Extension::Fetch<SuperClassExtension>(this_ptr);
-
-    ext_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Main function for patching the hooks.
  */
 void SuperClassExtension_Init()
@@ -244,6 +185,4 @@ void SuperClassExtension_Init()
     Patch_Jump(0x0060B4AB, &_SuperClass_Constructor_Patch);
     Patch_Jump(0x0060B51A, &_SuperClass_Destructor_Patch);
     Patch_Jump(0x0060CC2A, &_SuperClass_Scalar_Destructor_Patch);
-    //Patch_Jump(0x0060C81C, &_SuperClass_Detach_Patch);
-    //Patch_Jump(0x0060C870, &_SuperClass_Compute_CRC_Patch);
 }

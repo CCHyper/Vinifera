@@ -89,28 +89,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members in the noinit creation process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AnimTypeClass_NoInit_Constructor_Patch)
-{
-    GET_REGISTER_STATIC(AnimTypeClass *, this_ptr, esi);
-    GET_STACK_STATIC(const NoInitClass *, noinit_ptr, esp, 0x4);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { mov eax, this_ptr }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for including the extended class members in the destruction process.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -161,71 +139,6 @@ original_code:
 
 
 /**
- *  Patch for including the extended class members to the base class detach process.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AnimTypeClass_Detach_Patch)
-{
-    GET_REGISTER_STATIC(AnimTypeClass *, this_ptr, ecx);
-    GET_STACK_STATIC(TARGET, target, esp, 0x4);
-    GET_STACK_STATIC8(bool, all, esp, 0x8);
-    static AnimTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<AnimTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class detach.
-     */
-    exttype_ptr->Detach(target, all);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { ret 8 }
-}
-
-
-/**
- *  Patch for including the extended class members when computing a unique crc value for this instance.
- * 
- *  @warning: Do not touch this unless you know what you are doing!
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_AnimTypeClass_Compute_CRC_Patch)
-{
-    GET_REGISTER_STATIC(AnimTypeClass *, this_ptr, esi);
-    GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
-    static AnimTypeClassExtension *exttype_ptr;
-
-    /**
-     *  Fetch the extension instance.
-     */
-    exttype_ptr = Extension::Fetch<AnimTypeClassExtension>(this_ptr);
-
-    /**
-     *  Read type class compute crc.
-     */
-    exttype_ptr->Compute_CRC(*crc);
-
-    /**
-     *  Stolen bytes here.
-     */
-original_code:
-    _asm { pop edi }
-    _asm { pop esi }
-    _asm { ret 4 }
-}
-
-
-/**
  *  Patch for reading the extended class members from the ini instance.
  * 
  *  @warning: Do not touch this unless you know what you are doing!
@@ -266,10 +179,7 @@ original_code:
 void AnimTypeClassExtension_Init()
 {
     Patch_Jump(0x00418798, &_AnimTypeClass_Constructor_Patch);
-    //Patch_Jump(0x004187BA, &_AnimTypeClass_NoInit_Constructor_Patch);
     //Patch_Jump(0x004187DB, &_AnimTypeClass_Destructor_Patch); // Destructor is actually inlined in scalar destructor!
     Patch_Jump(0x00419C22, &_AnimTypeClass_Scalar_Destructor_Patch);
-    //Patch_Jump(0x00419A18, &_AnimTypeClass_Detach_Patch);
-    //Patch_Jump(0x00419963, &_AnimTypeClass_Compute_CRC_Patch);
     Patch_Jump(0x00419624, &_AnimTypeClass_Read_INI_Patch);
 }
