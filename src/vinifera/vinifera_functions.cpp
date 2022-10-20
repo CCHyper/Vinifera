@@ -574,6 +574,17 @@ bool Vinifera_Shutdown()
     EBoltClass::Clear_All();
     TheaterTypes.Clear();
 
+    /**
+     *  Cleanup global extension instances.
+     */
+    delete OptionsExtension;
+    OptionsExtension = nullptr;
+
+    /**
+     *  Cleanup additional extension instances.
+     */
+    ThemeControlExtensions.Clear();
+
     DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 
     return true;

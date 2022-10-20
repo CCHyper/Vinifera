@@ -38,9 +38,10 @@
  *  @author: CCHyper
  */
 ThemeControlExtension::ThemeControlExtension(const ThemeClass::ThemeControl *this_ptr) :
+    ExtensionSingleton(this_ptr),
     RequiredAddon(ADDON_NONE)
 {
-    //if (this_ptr) EXT_DEBUG_TRACE("ThemeControlExtension::ThemeControlExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ThemeControlExtension::ThemeControlExtension - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -49,9 +50,10 @@ ThemeControlExtension::ThemeControlExtension(const ThemeClass::ThemeControl *thi
  *  
  *  @author: CCHyper
  */
-ThemeControlExtension::ThemeControlExtension(const NoInitClass &noinit)
+ThemeControlExtension::ThemeControlExtension(const NoInitClass &noinit) :
+    ExtensionSingleton(noinit)
 {
-    //EXT_DEBUG_TRACE("ThemeControlExtension::ThemeControlExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ThemeControlExtension::ThemeControlExtension(NoInitClass) - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -62,7 +64,80 @@ ThemeControlExtension::ThemeControlExtension(const NoInitClass &noinit)
  */
 ThemeControlExtension::~ThemeControlExtension()
 {
-    //EXT_DEBUG_TRACE("ThemeControlExtension::~ThemeControlExtension - Name: %s (0x%08X)\n", This()->Name, (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ThemeControlExtension::~ThemeControlExtension - 0x%08X\n", (uintptr_t)(This()));
+}
+
+
+/**
+ *  Initializes an object from the stream where it was saved previously.
+ *  
+ *  @author: CCHyper
+ */
+HRESULT ThemeControlExtension::Load(IStream *pStm)
+{
+    //EXT_DEBUG_TRACE("ThemeControlExtension::Load - 0x%08X\n", (uintptr_t)(This()));
+
+    HRESULT hr = ExtensionSingleton::Load(pStm);
+    if (FAILED(hr)) {
+        return E_FAIL;
+    }
+
+    new (this) ThemeControlExtension(NoInitClass());
+    
+    return hr;
+}
+
+
+/**
+ *  Saves an object to the specified stream.
+ *  
+ *  @author: CCHyper
+ */
+HRESULT ThemeControlExtension::Save(IStream *pStm, BOOL fClearDirty)
+{
+    //EXT_DEBUG_TRACE("ThemeControlExtension::Save - 0x%08X\n", (uintptr_t)(This()));
+
+    HRESULT hr = ExtensionSingleton::Save(pStm, fClearDirty);
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    return hr;
+}
+
+
+/**
+ *  Return the raw size of class data for save/load purposes.
+ *  
+ *  @author: CCHyper
+ */
+int ThemeControlExtension::Size_Of() const
+{
+    //EXT_DEBUG_TRACE("ThemeControlExtension::Size_Of - 0x%08X\n", (uintptr_t)(This()));
+
+    return sizeof(*this);
+}
+
+
+/**
+ *  Removes the specified target from any targeting and reference trackers.
+ *  
+ *  @author: CCHyper
+ */
+void ThemeControlExtension::Detach(TARGET target, bool all)
+{
+    //EXT_DEBUG_TRACE("ThemeControlExtension::Detach - 0x%08X\n", (uintptr_t)(This()));
+}
+
+
+/**
+ *  Compute a unique crc value for this instance.
+ *  
+ *  @author: CCHyper
+ */
+void ThemeControlExtension::Compute_CRC(WWCRCEngine &crc) const
+{
+    //EXT_DEBUG_TRACE("ThemeControlExtension::Compute_CRC - 0x%08X\n", (uintptr_t)(This()));
 }
 
 

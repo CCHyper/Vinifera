@@ -177,11 +177,11 @@ static void _Detach_This_From_All_Intercept(TARGET target, bool all)
 }
 
 #include "tibsun_functions.h"
-static void _Clear_Vectors_Intercept()
+static void _Free_Heaps_Intercept()
 {
-    Extension::Clear_Vectors();
+    Extension::Free_Heaps();
 
-    Clear_Vectors();
+    Free_Heaps();
 }
 
 DECLARE_PATCH(_Print_CRCs_Hook)
@@ -204,9 +204,9 @@ DECLARE_PATCH(_Print_CRCs_Hook)
 
 void Extension_Hooks()
 {
-    Patch_Call(0x0053DF7A, &_Clear_Vectors_Intercept); // MapSeedClass::Init_Random
-    Patch_Call(0x005DC590, &_Clear_Vectors_Intercept); // Clear_Scenario
-    Patch_Call(0x00601BA2, &_Clear_Vectors_Intercept); // Game_Shutdown
+    Patch_Call(0x0053DF7A, &_Free_Heaps_Intercept); // MapSeedClass::Init_Random
+    Patch_Call(0x005DC590, &_Free_Heaps_Intercept); // Clear_Scenario
+    Patch_Call(0x00601BA2, &_Free_Heaps_Intercept); // Game_Shutdown
 
     Patch_Call(0x0040DBB3, &_Detach_This_From_All_Intercept); // AircraftClass::~AircraftClass
     Patch_Call(0x0040F123, &_Detach_This_From_All_Intercept); // AircraftClass_Fall_To_Death
@@ -411,11 +411,12 @@ void Extension_Hooks()
     RulesClassExtension_Hooks();
     ScenarioClassExtension_Hooks();
     SessionClassExtension_Hooks();
+    OptionsClassExtension_Hooks();
 
-//    DisplayClassExtension_Hooks();
-//    SidebarClassExtension_Hooks();
-//    OptionsClassExtension_Hooks();
-//    ThemeClassExtension_Hooks();
+    ThemeClassExtension_Hooks();
+
+    DisplayClassExtension_Hooks();
+    SidebarClassExtension_Hooks();
 
     /**
      *  New classes and interfaces.

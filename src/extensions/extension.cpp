@@ -304,7 +304,7 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
     }
 
     if (list.Count() <= 0) {
-        DEBUG_INFO("Extension_Save: List for \"%s\" has a count of zero, skipping save.\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
+        DEBUG_INFO("List for \"%s\" has a count of zero, skipping save.\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
         return true;
     }
 
@@ -401,7 +401,7 @@ static bool Extension_Load(IStream *pStm, DynamicVectorClass<EXT_CLASS *> &list)
     }
 
     if (count <= 0) {
-        DEBUG_INFO("Extension_Save: Block for \"%s\" has a count of zero, skipping load.\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
+        DEBUG_INFO("List for \"%s\" has a count of zero, skipping load.\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
         return true;
     }
     DEBUG_INFO("Loading \"%s\" extensions (Count: %d)\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str(), count);
@@ -450,23 +450,23 @@ static bool Extension_Load(IStream *pStm, EXT_CLASS *ext)
 template<class BASE_CLASS, class EXT_CLASS>
 static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS *> &list)
 {
-    DEBUG_INFO("Requesting remap of \"%s\" extension pointers (Count %d)... ", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str(), list.Count());
-
     if (!list.Count()) {
-        DEBUG_INFO("(List empty)\n");
+        DEBUG_INFO("Requested remap of \"%s\" extension pointers, but the list is empty!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
         return true;
     }
 
+    DEBUG_INFO("Requesting remap of \"%s\" extension pointers (Count %d)...\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str(), list.Count());
+
     for (int index = 0; index < list.Count(); ++index) {
         if (index == 0) {
-            DEBUG_INFO("\n");
+            EXT_DEBUG_INFO("\n");
         }
 
         const BASE_CLASS *object = list[index];
         if (object) {
 
             if (!Extension_Get_Abstract_Pointer(object)) {
-                DEV_DEBUG_ERROR("Extension_Request_Pointer_Remap: \"%s\" extension pointer for is null!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+                DEV_DEBUG_ERROR("Extension_Request_Pointer_Remap: \"%s\" extension pointer (index %d) for is null!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str(), index);
                 continue; //return false;
             }
 
@@ -476,11 +476,9 @@ static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
             uintptr_t **ext_ptr_addr = ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(object);
             VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(*ext_ptr_addr, "AbstractClass::ExtPtr");
 
-            DEV_DEBUG_INFO("  Requested remap of index %d extension pointer complete.\n", index);
+            EXT_DEBUG_INFO("  Requested remap of index %d extension pointer complete.\n", index);
         }
     }
-
-    DEBUG_INFO("DONE!\n");
 
     return true;
 }
@@ -494,10 +492,10 @@ static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
 template<class BASE_CLASS, class EXT_CLASS>
 static bool Extension_Request_Pointer_Remap(BASE_CLASS *abstract)
 {
-    DEBUG_INFO("Requesting remap of \"%s\" extension pointer... ", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+    DEBUG_INFO("Requesting remap of \"%s\" extension pointer...\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
 
     if (!Extension_Get_Abstract_Pointer(abstract)) {
-        DEV_DEBUG_ERROR("Extension_Request_Pointer_Remap: \"%s\" extension pointer for is null!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+        EXT_DEBUG_ERROR("Extension_Request_Pointer_Remap: \"%s\" extension pointer for is null!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
         return false;
     }
 
@@ -507,9 +505,7 @@ static bool Extension_Request_Pointer_Remap(BASE_CLASS *abstract)
     uintptr_t **ext_ptr_addr = ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(abstract);
     VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(*ext_ptr_addr, "AbstractClass::ExtPtr");
 
-    DEV_DEBUG_INFO("  Requested remap of extension pointer complete.\n");
-
-    DEBUG_INFO("DONE!\n");
+    EXT_DEBUG_INFO("  Requested remap of extension pointer complete.\n");
 
     return true;
 }
@@ -1252,9 +1248,9 @@ bool Extension::Register_Class_Factories()
  * 
  *  @author: CCHyper
  */
-void Extension::Clear_Vectors()
+void Extension::Free_Heaps()
 {
-    DEBUG_INFO("Extension::Clear_Vectors(enter)\n");
+    DEBUG_INFO("Extension::Free_Heaps(enter)\n");
 
     ++ScenarioInit;
 
@@ -1327,7 +1323,7 @@ void Extension::Clear_Vectors()
 
     --ScenarioInit;
 
-    DEBUG_INFO("Extension::Clear_Vectors(exit)\n");
+    DEBUG_INFO("Extension::Free_Heaps(exit)\n");
 }
 
 

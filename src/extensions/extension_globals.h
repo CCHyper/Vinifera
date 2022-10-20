@@ -32,8 +32,6 @@
 #include "debughandler.h"
 #include "asserthandler.h"
 
-#include <objidl.h> // for IStream.
-
 
 class AbstractClass;
 class AbstractClassExtension;
@@ -73,6 +71,9 @@ class TacticalExtension;
 class RulesClassExtension;
 class ScenarioClassExtension;
 class SessionClassExtension;
+class OptionsClassExtension;
+
+class ThemeControlExtension;
 
 
 /**
@@ -96,8 +97,9 @@ class SessionClassExtension;
 
 
 /**
- *  x
+ *  Abstract derived classes.
  */
+extern DynamicVectorClass<UnitClassExtension *> UnitExtensions;
 extern DynamicVectorClass<AircraftClassExtension *> AircraftExtensions;
 extern DynamicVectorClass<AircraftTypeClassExtension *> AircraftTypeExtensions;
 extern DynamicVectorClass<AnimClassExtension *> AnimExtensions;
@@ -121,15 +123,26 @@ extern DynamicVectorClass<SuperWeaponTypeClassExtension *> SuperWeaponTypeExtens
 extern DynamicVectorClass<TerrainClassExtension *> TerrainExtensions;
 extern DynamicVectorClass<TerrainTypeClassExtension *> TerrainTypeExtensions;
 extern DynamicVectorClass<TiberiumClassExtension *> TiberiumExtensions;
-extern DynamicVectorClass<UnitClassExtension *> UnitExtensions;
 extern DynamicVectorClass<UnitTypeClassExtension *> UnitTypeExtensions;
 extern DynamicVectorClass<VoxelAnimTypeClassExtension *> VoxelAnimTypeExtensions;
 extern DynamicVectorClass<WarheadTypeClassExtension *> WarheadTypeExtensions;
 extern DynamicVectorClass<WaveClassExtension *> WaveExtensions;
 extern DynamicVectorClass<WeaponTypeClassExtension *> WeaponTypeExtensions;
 
+/**
+ *  Abstract derived classes, but only a single instance is required.
+ */
 extern TacticalExtension *TacticalMapExtension;
 
+/**
+ *  Global classes that are not abstract derived.
+ */
 extern RulesClassExtension *RuleExtension;
 extern ScenarioClassExtension *ScenExtension;
 extern SessionClassExtension *SessionExtension;
+extern OptionsClassExtension *OptionsExtension;
+
+/**
+ *  Classes that require a list, but are not abstract derived.
+ */
+extern DynamicVectorClass<ThemeControlExtension *> ThemeControlExtensions;

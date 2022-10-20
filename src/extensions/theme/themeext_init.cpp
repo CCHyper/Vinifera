@@ -31,6 +31,7 @@
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
 #include "vinifera_globals.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -38,7 +39,6 @@
 #include "hooker.h"
 #include "hooker_macros.h"
 
-#if 0
 
 /**
  *  Patch for including the extended class members in the creation process.
@@ -50,11 +50,12 @@
 DECLARE_PATCH(_ThemeClass_ThemeControl_Constructor_Patch)
 {
     GET_REGISTER_STATIC(ThemeClass::ThemeControl *, this_ptr, eax); // "this" pointer.
+    static ThemeControlExtension *ext_ptr;
 
     /**
      *  Create an extended class instance.
      */
-    Extension::Make<ThemeControlExtension>(this_ptr);
+    Extension::List::Make<ThemeClass::ThemeControl, ThemeControlExtension>(this_ptr, ThemeControlExtensions);
 
     /**
      *  Stolen bytes here.
@@ -100,10 +101,7 @@ DECLARE_PATCH(_ThemeClass_ThemeControl_Read_INI_Patch)
     /**
      *  Find the extension instance.
      */
-    exttype_ptr = ThemeControlExtensions.find(this_ptr);
-    if (!exttype_ptr) {
-        goto original_code;
-    }
+    exttype_ptr = Extension::List::Fetch<ThemeClass::ThemeControl, ThemeControlExtension>(this_ptr, ThemeControlExtensions);
 
     /**
      *  Read type class ini.
@@ -119,15 +117,15 @@ original_code:
     _asm { pop esi }
     _asm { ret 4 }
 }
-#endif
+
 
 /**
  *  Main function for patching the hooks.
  */
 void ThemeClassExtension_Init()
 {
-//    Patch_Jump(0x006439E5, &_ThemeClass_ThemeControl_Constructor_Patch);
-//    Patch_Jump(0x00643B45, &_ThemeClass_ThemeControl_Inlined_Constructor_Patch);
-//    //Patch_Jump(0x, &_ThemeClass_ThemeControl_Destructor_Patch); // No destructor to hook, extension should clean up on exit.
-//    Patch_Jump(0x00643AAB, &_ThemeClass_ThemeControl_Read_INI_Patch);
+    Patch_Jump(0x006439E5, &_ThemeClass_ThemeControl_Constructor_Patch);
+    Patch_Jump(0x00643B45, &_ThemeClass_ThemeControl_Inlined_Constructor_Patch);
+    //Patch_Jump(0x, &_ThemeClass_ThemeControl_Destructor_Patch); // No destructor to hook, extension should clean up on exit.
+    Patch_Jump(0x00643AAB, &_ThemeClass_ThemeControl_Read_INI_Patch);
 }

@@ -35,6 +35,7 @@
 #include "session.h"
 #include "scenario.h"
 #include "addon.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -87,7 +88,6 @@ bool ThemeClassExt::_Is_Allowed(ThemeType index) const
         return false;
     }
 
-#if 0
     /**
      *  #issue-764
      * 
@@ -95,13 +95,12 @@ bool ThemeClassExt::_Is_Allowed(ThemeType index) const
      * 
      *  @author: CCHyper
      */
-    ThemeControlExtension *themectrlext = ThemeControlExtensions.find(Themes[index]);
-    if (themectrlext && themectrlext->RequiredAddon != ADDON_NONE) {
+    ThemeControlExtension *themectrlext = Extension::List::Fetch<ThemeClass::ThemeControl, ThemeControlExtension>(Themes[index], ThemeControlExtensions);
+    if (themectrlext->RequiredAddon != ADDON_NONE) {
         if (!Addon_Enabled(themectrlext->RequiredAddon)) {
             return false;
         }
     }
-#endif
 
     /**
      *  If the theme is not allowed to be played by the player's house, then don't allow

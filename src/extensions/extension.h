@@ -105,17 +105,28 @@ void Destroy(const EXT_CLASS *ext)
 
 }; // namespace "Extension::Singleton".
 
+namespace List
+{
+
 /**
  *  x
  * 
  *  @author: CCHyper
  */
-template<class T>
-T *Fetch(const AbstractClass *abstract)
+template<class BASE_CLASS, class EXT_CLASS>
+EXT_CLASS *Fetch(const BASE_CLASS *base, DynamicVectorClass<EXT_CLASS *> &list)
 {
-    ASSERT(abstract != nullptr);
+    ASSERT(base != nullptr);
 
-    return (T *)Extension::Private::Fetch_Internal(abstract);
+    for (int index = 0; index < list.Count(); ++index) {
+        EXT_CLASS * ext = list[index];
+        if (list[index]->This() == base) {
+            EXT_DEBUG_INFO("Found \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+            return ext;
+        }
+    }
+
+    return nullptr;
 }
 
 /**
@@ -123,12 +134,19 @@ T *Fetch(const AbstractClass *abstract)
  * 
  *  @author: CCHyper
  */
-template<class T>
-T *Make(const AbstractClass *abstract)
+template<class BASE_CLASS, class EXT_CLASS>
+EXT_CLASS *Make(const BASE_CLASS *base, DynamicVectorClass<EXT_CLASS *> &list)
 {
-    ASSERT(abstract != nullptr);
+    ASSERT(base != nullptr);
 
-    return (T *)Extension::Private::Make_Internal(abstract);
+    EXT_CLASS *ext_ptr = new EXT_CLASS(base);
+    ASSERT(ext_ptr != nullptr);
+
+    EXT_DEBUG_INFO("Created \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+
+    list.Add(ext_ptr);
+
+    return ext_ptr;
 }
 
 /**
@@ -136,7 +154,57 @@ T *Make(const AbstractClass *abstract)
  * 
  *  @author: CCHyper
  */
-template<class T>
+template<class BASE_CLASS, class EXT_CLASS>
+void Destroy(const BASE_CLASS *base, DynamicVectorClass<EXT_CLASS *> &list)
+{
+    ASSERT(base != nullptr);
+
+    for (int index = 0; index < list.Count(); ++index) {
+        EXT_CLASS * ext = list[index].This();
+        if (ext->This() == base) {
+            EXT_DEBUG_INFO("Found \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+            delete ext;
+            return;
+        }
+    }
+
+    EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+}
+
+}; // namespace "Extension::List".
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+template<class EXT_CLASS>
+EXT_CLASS *Fetch(const AbstractClass *abstract)
+{
+    ASSERT(abstract != nullptr);
+
+    return (EXT_CLASS *)Extension::Private::Fetch_Internal(abstract);
+}
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+template<class EXT_CLASS>
+EXT_CLASS *Make(const AbstractClass *abstract)
+{
+    ASSERT(abstract != nullptr);
+
+    return (EXT_CLASS *)Extension::Private::Make_Internal(abstract);
+}
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+template<class EXT_CLASS>
 void Destroy(const AbstractClass *abstract)
 {
     ASSERT(abstract != nullptr);
@@ -162,7 +230,7 @@ unsigned Get_Save_Version_Number();
  *  
  */
 void Detach_This_From_All(TARGET target, bool all = true);
-void Clear_Vectors();
+void Free_Heaps();
 void Print_CRCs(FILE *fp, EventClass *ev);
 
 /**

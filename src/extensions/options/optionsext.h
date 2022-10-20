@@ -27,18 +27,35 @@
  ******************************************************************************/
 #pragma once
 
+#include "always.h"
+#include "extension_singleton.h"
+#include "options.h"
 
-class OptionsClass;
-class NoInitClass;
+
 class CCINIClass;
 
 
-class OptionsClassExtension
+class OptionsClassExtension final : public ExtensionSingleton<OptionsClass>
 {
     public:
-        OptionsClassExtension(OptionsClass *this_ptr);
+        IFACEMETHOD(Load)(IStream *pStm);
+        IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
+
+    public:
+        OptionsClassExtension(const OptionsClass *this_ptr);
         OptionsClassExtension(const NoInitClass &noinit);
-        ~OptionsClassExtension();
+        virtual ~OptionsClassExtension();
+
+        /**
+         *  OptionsClass extension does not require these to be used, but we
+         *  implement them for completeness.
+         */
+        virtual int Size_Of() const override;
+        virtual void Detach(TARGET target, bool all = true) override;
+        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+
+        virtual const char *Name() const override { return "Options"; }
+        virtual const char *Full_Name() const override { return "Options"; }
 
         void Load_Settings();
         void Load_Init_Settings();
@@ -48,6 +65,3 @@ class OptionsClassExtension
 
     public:
 };
-
-
-extern OptionsClassExtension *OptionsExtension;

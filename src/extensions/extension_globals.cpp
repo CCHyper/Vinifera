@@ -28,6 +28,7 @@
 #include "extension_globals.h"
 
 
+DynamicVectorClass<UnitClassExtension *> UnitExtensions;
 DynamicVectorClass<AircraftClassExtension *> AircraftExtensions;
 DynamicVectorClass<AircraftTypeClassExtension *> AircraftTypeExtensions;
 DynamicVectorClass<AnimClassExtension *> AnimExtensions;
@@ -51,7 +52,6 @@ DynamicVectorClass<SuperWeaponTypeClassExtension *> SuperWeaponTypeExtensions;
 DynamicVectorClass<TerrainClassExtension *> TerrainExtensions;
 DynamicVectorClass<TerrainTypeClassExtension *> TerrainTypeExtensions;
 DynamicVectorClass<TiberiumClassExtension *> TiberiumExtensions;
-DynamicVectorClass<UnitClassExtension *> UnitExtensions;
 DynamicVectorClass<UnitTypeClassExtension *> UnitTypeExtensions;
 DynamicVectorClass<VoxelAnimTypeClassExtension *> VoxelAnimTypeExtensions;
 DynamicVectorClass<WarheadTypeClassExtension *> WarheadTypeExtensions;
@@ -63,3 +63,6 @@ TacticalExtension *TacticalMapExtension = nullptr;
 RulesClassExtension *RuleExtension = nullptr;
 ScenarioClassExtension *ScenExtension = nullptr;
 SessionClassExtension *SessionExtension = nullptr;
+OptionsClassExtension *OptionsExtension = nullptr;
+
+DynamicVectorClass<ThemeControlExtension *> ThemeControlExtensions;
