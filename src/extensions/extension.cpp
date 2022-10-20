@@ -710,13 +710,13 @@ AbstractClassExtension *ExtensionPrivate::Fetch_Internal(const AbstractClass *ab
  * 
  *  @author: CCHyper
  */
-bool Extension::Is_Support_Enabled(RTTIType rtti)
+bool Extension::Is_Supported(RTTIType rtti)
 {
     switch (rtti) {
         case RTTI_UNIT:
         case RTTI_AIRCRAFT:
         case RTTI_AIRCRAFTTYPE:
-        //case RTTI_ANIM:               // <--- !! CRASHES
+        case RTTI_ANIM:
         case RTTI_ANIMTYPE:
         case RTTI_BUILDING:
         case RTTI_BUILDINGTYPE:
@@ -792,11 +792,11 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
  * 
  *  @author: CCHyper
  */
-bool Extension::Is_Support_Enabled(const AbstractClass *abstract)
+bool Extension::Is_Supported(const AbstractClass *abstract)
 {
     ASSERT(abstract != nullptr);
 
-    return Extension::Is_Support_Enabled(RTTIType(abstract->What_Am_I()));
+    return Extension::Is_Supported(RTTIType(abstract->What_Am_I()));
 }
 
 
@@ -818,69 +818,69 @@ bool Extension::Save(IStream *pStm)
     /**
      *  #NOTE: The order of these calls must match the relevent RTTIType order!
      */
-    if (Extension::Is_Support_Enabled(RTTI_UNIT) && !Extension_Save<UnitClass, UnitClassExtension>(pStm, UnitExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFT) && !Extension_Save<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFTTYPE) && !Extension_Save<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_ANIM) && !Extension_Save<AnimClass, AnimClassExtension>(pStm, AnimExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_ANIMTYPE) && !Extension_Save<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDING) && !Extension_Save<BuildingClass, BuildingClassExtension>(pStm, BuildingExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE) && !Extension_Save<BuildingTypeClass, BuildingTypeClassExtension>(pStm, BuildingTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE) && !Extension_Save<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { }                       // <- Do not save!
-    if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_HOUSE) && !Extension_Save<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_HOUSETYPE) && !Extension_Save<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRY) && !Extension_Save<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE) && !Extension_Save<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { }                    // <- Do not save!
-    if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE) && !Extension_Save<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLETYPE) && !Extension_Save<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEMTYPE) && !Extension_Save<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPT)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SIDE) && !Extension_Save<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGE)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGETYPE) && !Extension_Save<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_SPECIAL)) { }                        // <- Do not save!
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPONTYPE) && !Extension_Save<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAM)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TERRAIN) && !Extension_Save<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_TERRAINTYPE) && !Extension_Save<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGER)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_UNITTYPE) && !Extension_Save<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIMTYPE) && !Extension_Save<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_WAVE) && !Extension_Save<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_TAG)) { }                            // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TIBERIUM) && !Extension_Save<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_ACTION)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EVENT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_WEAPONTYPE) && !Extension_Save<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_WARHEADTYPE) && !Extension_Save<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ABSTRACT)) { }                       // <- Do not save!
-    if (Extension::Is_Support_Enabled(RTTI_TUBE)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPON) && !Extension_Save<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_NEURON)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNIT) && !Extension_Save<UnitClass, UnitClassExtension>(pStm, UnitExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_AIRCRAFT) && !Extension_Save<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_AIRCRAFTTYPE) && !Extension_Save<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_ANIM) && !Extension_Save<AnimClass, AnimClassExtension>(pStm, AnimExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_ANIMTYPE) && !Extension_Save<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_BUILDING) && !Extension_Save<BuildingClass, BuildingClassExtension>(pStm, BuildingExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_BUILDINGTYPE) && !Extension_Save<BuildingTypeClass, BuildingTypeClassExtension>(pStm, BuildingTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_BULLET)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_BULLETTYPE) && !Extension_Save<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_CAMPAIGN)) { }                       // <- Do not save!
+    if (Extension::Is_Supported(RTTI_CELL)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FACTORY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_HOUSE) && !Extension_Save<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_HOUSETYPE) && !Extension_Save<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_INFANTRY) && !Extension_Save<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_INFANTRYTYPE) && !Extension_Save<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_ISOTILE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ISOTILETYPE)) { }                    // <- Do not save!
+    if (Extension::Is_Supported(RTTI_LIGHT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAYTYPE) && !Extension_Save<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_PARTICLE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLETYPE) && !Extension_Save<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEMTYPE) && !Extension_Save<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_SCRIPT)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SIDE) && !Extension_Save<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_SMUDGE)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SMUDGETYPE) && !Extension_Save<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_SPECIAL)) { }                        // <- Do not save!
+    if (Extension::Is_Supported(RTTI_SUPERWEAPONTYPE) && !Extension_Save<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAM)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TERRAIN) && !Extension_Save<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_TERRAINTYPE) && !Extension_Save<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_TRIGGER)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNITTYPE) && !Extension_Save<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VOXELANIMTYPE) && !Extension_Save<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_WAVE) && !Extension_Save<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_TAG)) { }                            // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TIBERIUM) && !Extension_Save<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_ACTION)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EVENT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_WEAPONTYPE) && !Extension_Save<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_WARHEADTYPE) && !Extension_Save<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ABSTRACT)) { }                       // <- Do not save!
+    if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SUPERWEAPON) && !Extension_Save<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_NEURON)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
 
     DEBUG_INFO("Extension::Save(exit)\n");
 
@@ -906,69 +906,69 @@ bool Extension::Load(IStream *pStm)
     /**
      *  #NOTE: The order of these calls must match the relevent RTTIType order!
      */
-    if (Extension::Is_Support_Enabled(RTTI_UNIT) && !Extension_Load<UnitClass, UnitClassExtension>(pStm, UnitExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFT) && !Extension_Load<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFTTYPE) && !Extension_Load<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_ANIM) && !Extension_Load<AnimClass, AnimClassExtension>(pStm, AnimExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_ANIMTYPE) && !Extension_Load<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDING) && !Extension_Load<BuildingClass, BuildingClassExtension>(pStm, BuildingExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE) && !Extension_Load<BuildingTypeClass, BuildingTypeClassExtension>(pStm, BuildingTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE) && !Extension_Load<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { }                       // <- Do not save!
-    if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_HOUSE) && !Extension_Load<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_HOUSETYPE) && !Extension_Load<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRY) && !Extension_Load<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE) && !Extension_Load<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { }                    // <- Do not save!
-    if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE) && !Extension_Load<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLETYPE) && !Extension_Load<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEMTYPE) && !Extension_Load<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPT)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SIDE) && !Extension_Load<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGE)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGETYPE) && !Extension_Load<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_SPECIAL)) { }                        // <- Do not save!
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPONTYPE) && !Extension_Load<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAM)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TERRAIN) && !Extension_Load<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_TERRAINTYPE) && !Extension_Load<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGER)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_UNITTYPE) && !Extension_Load<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIMTYPE) && !Extension_Load<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_WAVE) && !Extension_Load<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_TAG)) { }                            // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TIBERIUM) && !Extension_Load<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_ACTION)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EVENT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_WEAPONTYPE) && !Extension_Load<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_WARHEADTYPE) && !Extension_Load<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ABSTRACT)) { }                       // <- Do not save!
-    if (Extension::Is_Support_Enabled(RTTI_TUBE)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPON) && !Extension_Load<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_NEURON)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNIT) && !Extension_Load<UnitClass, UnitClassExtension>(pStm, UnitExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_AIRCRAFT) && !Extension_Load<AircraftClass, AircraftClassExtension>(pStm, AircraftExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_AIRCRAFTTYPE) && !Extension_Load<AircraftTypeClass, AircraftTypeClassExtension>(pStm, AircraftTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_ANIM) && !Extension_Load<AnimClass, AnimClassExtension>(pStm, AnimExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_ANIMTYPE) && !Extension_Load<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_BUILDING) && !Extension_Load<BuildingClass, BuildingClassExtension>(pStm, BuildingExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_BUILDINGTYPE) && !Extension_Load<BuildingTypeClass, BuildingTypeClassExtension>(pStm, BuildingTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_BULLET)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_BULLETTYPE) && !Extension_Load<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_CAMPAIGN)) { }                       // <- Do not save!
+    if (Extension::Is_Supported(RTTI_CELL)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FACTORY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_HOUSE) && !Extension_Load<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_HOUSETYPE) && !Extension_Load<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_INFANTRY) && !Extension_Load<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_INFANTRYTYPE) && !Extension_Load<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_ISOTILE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ISOTILETYPE)) { }                    // <- Do not save!
+    if (Extension::Is_Supported(RTTI_LIGHT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAYTYPE) && !Extension_Load<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_PARTICLE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLETYPE) && !Extension_Load<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEMTYPE) && !Extension_Load<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_SCRIPT)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SIDE) && !Extension_Load<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_SMUDGE)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SMUDGETYPE) && !Extension_Load<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_SPECIAL)) { }                        // <- Do not save!
+    if (Extension::Is_Supported(RTTI_SUPERWEAPONTYPE) && !Extension_Load<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAM)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TERRAIN) && !Extension_Load<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_TERRAINTYPE) && !Extension_Load<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_TRIGGER)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNITTYPE) && !Extension_Load<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VOXELANIMTYPE) && !Extension_Load<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_WAVE) && !Extension_Load<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_TAG)) { }                            // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TIBERIUM) && !Extension_Load<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_ACTION)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EVENT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_WEAPONTYPE) && !Extension_Load<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_WARHEADTYPE) && !Extension_Load<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ABSTRACT)) { }                       // <- Do not save!
+    if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SUPERWEAPON) && !Extension_Load<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
+    if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_NEURON)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
 
     DEBUG_INFO("Extension::Load(exit)\n");
 
@@ -993,69 +993,69 @@ bool Extension::Request_Pointer_Remap()
     /**
      *  #NOTE: The order of these calls must match the relevent RTTIType order!
      */
-    if (Extension::Is_Support_Enabled(RTTI_UNIT) && !Extension_Request_Pointer_Remap<UnitClass, UnitClassExtension>(Units)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFT) && !Extension_Request_Pointer_Remap<AircraftClass, AircraftClassExtension>(Aircrafts)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFTTYPE) && !Extension_Request_Pointer_Remap<AircraftTypeClass, AircraftTypeClassExtension>(AircraftTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_ANIM) && !Extension_Request_Pointer_Remap<AnimClass, AnimClassExtension>(Anims)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_ANIMTYPE) && !Extension_Request_Pointer_Remap<AnimTypeClass, AnimTypeClassExtension>(AnimTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDING) && !Extension_Request_Pointer_Remap<BuildingClass, BuildingClassExtension>(Buildings)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE) && !Extension_Request_Pointer_Remap<BuildingTypeClass, BuildingTypeClassExtension>(BuildingTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE) && !Extension_Request_Pointer_Remap<BulletTypeClass, BulletTypeClassExtension>(BulletTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { }                       // Does not need to be processed.
-    if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_HOUSE) && !Extension_Request_Pointer_Remap<HouseClass, HouseClassExtension>(Houses)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_HOUSETYPE) && !Extension_Request_Pointer_Remap<HouseTypeClass, HouseTypeClassExtension>(HouseTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRY) && !Extension_Request_Pointer_Remap<InfantryClass, InfantryClassExtension>(Infantry)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE) && !Extension_Request_Pointer_Remap<InfantryTypeClass, InfantryTypeClassExtension>(InfantryTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { }                    // Does not need to be processed.
-    if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE) && !Extension_Request_Pointer_Remap<OverlayTypeClass, OverlayTypeClassExtension>(OverlayTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLETYPE) && !Extension_Request_Pointer_Remap<ParticleTypeClass, ParticleTypeClassExtension>(ParticleTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEMTYPE) && !Extension_Request_Pointer_Remap<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(ParticleSystemTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPT)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SIDE) && !Extension_Request_Pointer_Remap<SideClass, SideClassExtension>(Sides)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGE)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGETYPE) && !Extension_Request_Pointer_Remap<SmudgeTypeClass, SmudgeTypeClassExtension>(SmudgeTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_SPECIAL)) { }                        // <- Special case, does not actually "exist".
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPONTYPE) && !Extension_Request_Pointer_Remap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(SuperWeaponTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAM)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TERRAIN) && !Extension_Request_Pointer_Remap<TerrainClass, TerrainClassExtension>(Terrains)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_TERRAINTYPE) && !Extension_Request_Pointer_Remap<TerrainTypeClass, TerrainTypeClassExtension>(TerrainTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGER)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_UNITTYPE) && !Extension_Request_Pointer_Remap<UnitTypeClass, UnitTypeClassExtension>(UnitTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIMTYPE) && !Extension_Request_Pointer_Remap<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(VoxelAnimTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_WAVE) && !Extension_Request_Pointer_Remap<WaveClass, WaveClassExtension>(Waves)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_TAG)) { }                            // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TIBERIUM) && !Extension_Request_Pointer_Remap<TiberiumClass, TiberiumClassExtension>(Tiberiums)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_ACTION)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EVENT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_WEAPONTYPE) && !Extension_Request_Pointer_Remap<WeaponTypeClass, WeaponTypeClassExtension>(WeaponTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_WARHEADTYPE) && !Extension_Request_Pointer_Remap<WarheadTypeClass, WarheadTypeClassExtension>(WarheadTypes)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ABSTRACT)) { }                       // <- Special case, does not actually "exist".
-    if (Extension::Is_Support_Enabled(RTTI_TUBE)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPON) && !Extension_Request_Pointer_Remap<SuperClass, SuperClassExtension>(Supers)) { return false; }
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_NEURON)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNIT) && !Extension_Request_Pointer_Remap<UnitClass, UnitClassExtension>(Units)) { return false; }
+    if (Extension::Is_Supported(RTTI_AIRCRAFT) && !Extension_Request_Pointer_Remap<AircraftClass, AircraftClassExtension>(Aircrafts)) { return false; }
+    if (Extension::Is_Supported(RTTI_AIRCRAFTTYPE) && !Extension_Request_Pointer_Remap<AircraftTypeClass, AircraftTypeClassExtension>(AircraftTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_ANIM) && !Extension_Request_Pointer_Remap<AnimClass, AnimClassExtension>(Anims)) { return false; }
+    if (Extension::Is_Supported(RTTI_ANIMTYPE) && !Extension_Request_Pointer_Remap<AnimTypeClass, AnimTypeClassExtension>(AnimTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_BUILDING) && !Extension_Request_Pointer_Remap<BuildingClass, BuildingClassExtension>(Buildings)) { return false; }
+    if (Extension::Is_Supported(RTTI_BUILDINGTYPE) && !Extension_Request_Pointer_Remap<BuildingTypeClass, BuildingTypeClassExtension>(BuildingTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_BULLET)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_BULLETTYPE) && !Extension_Request_Pointer_Remap<BulletTypeClass, BulletTypeClassExtension>(BulletTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_CAMPAIGN)) { }                       // Does not need to be processed.
+    if (Extension::Is_Supported(RTTI_CELL)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FACTORY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_HOUSE) && !Extension_Request_Pointer_Remap<HouseClass, HouseClassExtension>(Houses)) { return false; }
+    if (Extension::Is_Supported(RTTI_HOUSETYPE) && !Extension_Request_Pointer_Remap<HouseTypeClass, HouseTypeClassExtension>(HouseTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_INFANTRY) && !Extension_Request_Pointer_Remap<InfantryClass, InfantryClassExtension>(Infantry)) { return false; }
+    if (Extension::Is_Supported(RTTI_INFANTRYTYPE) && !Extension_Request_Pointer_Remap<InfantryTypeClass, InfantryTypeClassExtension>(InfantryTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_ISOTILE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ISOTILETYPE)) { }                    // Does not need to be processed.
+    if (Extension::Is_Supported(RTTI_LIGHT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAYTYPE) && !Extension_Request_Pointer_Remap<OverlayTypeClass, OverlayTypeClassExtension>(OverlayTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_PARTICLE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLETYPE) && !Extension_Request_Pointer_Remap<ParticleTypeClass, ParticleTypeClassExtension>(ParticleTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEMTYPE) && !Extension_Request_Pointer_Remap<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(ParticleSystemTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_SCRIPT)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SIDE) && !Extension_Request_Pointer_Remap<SideClass, SideClassExtension>(Sides)) { return false; }
+    if (Extension::Is_Supported(RTTI_SMUDGE)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SMUDGETYPE) && !Extension_Request_Pointer_Remap<SmudgeTypeClass, SmudgeTypeClassExtension>(SmudgeTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_SPECIAL)) { }                        // <- Special case, does not actually "exist".
+    if (Extension::Is_Supported(RTTI_SUPERWEAPONTYPE) && !Extension_Request_Pointer_Remap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(SuperWeaponTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAM)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TERRAIN) && !Extension_Request_Pointer_Remap<TerrainClass, TerrainClassExtension>(Terrains)) { return false; }
+    if (Extension::Is_Supported(RTTI_TERRAINTYPE) && !Extension_Request_Pointer_Remap<TerrainTypeClass, TerrainTypeClassExtension>(TerrainTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_TRIGGER)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNITTYPE) && !Extension_Request_Pointer_Remap<UnitTypeClass, UnitTypeClassExtension>(UnitTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VOXELANIMTYPE) && !Extension_Request_Pointer_Remap<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(VoxelAnimTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_WAVE) && !Extension_Request_Pointer_Remap<WaveClass, WaveClassExtension>(Waves)) { return false; }
+    if (Extension::Is_Supported(RTTI_TAG)) { }                            // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TIBERIUM) && !Extension_Request_Pointer_Remap<TiberiumClass, TiberiumClassExtension>(Tiberiums)) { return false; }
+    if (Extension::Is_Supported(RTTI_ACTION)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EVENT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_WEAPONTYPE) && !Extension_Request_Pointer_Remap<WeaponTypeClass, WeaponTypeClassExtension>(WeaponTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_WARHEADTYPE) && !Extension_Request_Pointer_Remap<WarheadTypeClass, WarheadTypeClassExtension>(WarheadTypes)) { return false; }
+    if (Extension::Is_Supported(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ABSTRACT)) { }                       // <- Special case, does not actually "exist".
+    if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SUPERWEAPON) && !Extension_Request_Pointer_Remap<SuperClass, SuperClassExtension>(Supers)) { return false; }
+    if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_NEURON)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
 
     DEBUG_INFO("Extension::Request_Pointer_Remap(exit)\n");
 
@@ -1075,69 +1075,69 @@ bool Extension::Register_Class_Factories()
     /**
      *  #NOTE: The order of these calls must match the relevent RTTIType order!
      */
-    if (Extension::Is_Support_Enabled(RTTI_UNIT)) { REGISTER_CLASS(UnitClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFT)) { REGISTER_CLASS(AircraftClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFTTYPE)) { REGISTER_CLASS(AircraftTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_ANIM)) { REGISTER_CLASS(AnimClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_ANIMTYPE)) { REGISTER_CLASS(AnimTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDING)) { REGISTER_CLASS(BuildingClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE)) { REGISTER_CLASS(BuildingTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE)) { REGISTER_CLASS(BulletTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { REGISTER_CLASS(CampaignClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_HOUSE)) { REGISTER_CLASS(HouseClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_HOUSETYPE)) { REGISTER_CLASS(HouseTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRY)) { REGISTER_CLASS(InfantryClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE)) { REGISTER_CLASS(InfantryTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { REGISTER_CLASS(IsometricTileTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE)) { REGISTER_CLASS(OverlayTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLETYPE)) { REGISTER_CLASS(ParticleTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEMTYPE)) { REGISTER_CLASS(ParticleSystemTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPT)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SIDE)) { REGISTER_CLASS(SideClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGE)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGETYPE)) { REGISTER_CLASS(SmudgeTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_SPECIAL)) { }                        // <- Special case, does not actually "exist".
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPONTYPE)) { REGISTER_CLASS(SuperWeaponTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAM)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TERRAIN)) { REGISTER_CLASS(TerrainClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_TERRAINTYPE)) { REGISTER_CLASS(TerrainTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGER)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_UNITTYPE)) { REGISTER_CLASS(UnitTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIMTYPE)) { REGISTER_CLASS(VoxelAnimTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_WAVE)) { REGISTER_CLASS(WaveClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_TAG)) { }                            // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TIBERIUM)) { REGISTER_CLASS(TiberiumClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_ACTION)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EVENT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_WEAPONTYPE)) { REGISTER_CLASS(WeaponTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_WARHEADTYPE)) { REGISTER_CLASS(WarheadTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ABSTRACT)) { }                       // <- Special case, does not actually "exist".
-    if (Extension::Is_Support_Enabled(RTTI_TUBE)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPON)) { REGISTER_CLASS(SuperClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_NEURON)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNIT)) { REGISTER_CLASS(UnitClassExtension); }
+    if (Extension::Is_Supported(RTTI_AIRCRAFT)) { REGISTER_CLASS(AircraftClassExtension); }
+    if (Extension::Is_Supported(RTTI_AIRCRAFTTYPE)) { REGISTER_CLASS(AircraftTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_ANIM)) { REGISTER_CLASS(AnimClassExtension); }
+    if (Extension::Is_Supported(RTTI_ANIMTYPE)) { REGISTER_CLASS(AnimTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_BUILDING)) { REGISTER_CLASS(BuildingClassExtension); }
+    if (Extension::Is_Supported(RTTI_BUILDINGTYPE)) { REGISTER_CLASS(BuildingTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_BULLET)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_BULLETTYPE)) { REGISTER_CLASS(BulletTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_CAMPAIGN)) { REGISTER_CLASS(CampaignClassExtension); }
+    if (Extension::Is_Supported(RTTI_CELL)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FACTORY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_HOUSE)) { REGISTER_CLASS(HouseClassExtension); }
+    if (Extension::Is_Supported(RTTI_HOUSETYPE)) { REGISTER_CLASS(HouseTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_INFANTRY)) { REGISTER_CLASS(InfantryClassExtension); }
+    if (Extension::Is_Supported(RTTI_INFANTRYTYPE)) { REGISTER_CLASS(InfantryTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_ISOTILE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ISOTILETYPE)) { REGISTER_CLASS(IsometricTileTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_LIGHT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAYTYPE)) { REGISTER_CLASS(OverlayTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_PARTICLE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLETYPE)) { REGISTER_CLASS(ParticleTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEMTYPE)) { REGISTER_CLASS(ParticleSystemTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_SCRIPT)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SIDE)) { REGISTER_CLASS(SideClassExtension); }
+    if (Extension::Is_Supported(RTTI_SMUDGE)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SMUDGETYPE)) { REGISTER_CLASS(SmudgeTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_SPECIAL)) { }                        // <- Special case, does not actually "exist".
+    if (Extension::Is_Supported(RTTI_SUPERWEAPONTYPE)) { REGISTER_CLASS(SuperWeaponTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAM)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TERRAIN)) { REGISTER_CLASS(TerrainClassExtension); }
+    if (Extension::Is_Supported(RTTI_TERRAINTYPE)) { REGISTER_CLASS(TerrainTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_TRIGGER)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNITTYPE)) { REGISTER_CLASS(UnitTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VOXELANIMTYPE)) { REGISTER_CLASS(VoxelAnimTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_WAVE)) { REGISTER_CLASS(WaveClassExtension); }
+    if (Extension::Is_Supported(RTTI_TAG)) { }                            // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TIBERIUM)) { REGISTER_CLASS(TiberiumClassExtension); }
+    if (Extension::Is_Supported(RTTI_ACTION)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EVENT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_WEAPONTYPE)) { REGISTER_CLASS(WeaponTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_WARHEADTYPE)) { REGISTER_CLASS(WarheadTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ABSTRACT)) { }                       // <- Special case, does not actually "exist".
+    if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SUPERWEAPON)) { REGISTER_CLASS(SuperClassExtension); }
+    if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_NEURON)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
     
     DEBUG_INFO("Extension::Register_Class_Factories(exit)\n");
 
@@ -1159,69 +1159,69 @@ void Extension::Clear_Vectors()
     /**
      *  #NOTE: The order of these calls must match the relevent RTTIType order!
      */
-    if (Extension::Is_Support_Enabled(RTTI_UNIT)) { UnitExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFT)) { AircraftExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFTTYPE)) { AircraftTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_ANIM)) { AnimExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_ANIMTYPE)) { AnimTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDING)) { BuildingExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE)) { BuildingTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE)) { BulletTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { /* CampaignExtensions.Clear(); */ } // Does not need to be processed.
-    if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_HOUSE)) { HouseExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_HOUSETYPE)) { HouseTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRY)) { InfantryExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE)) { InfantryTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { /* IsometricTileTypeExtensions.Clear(); */ } // Does not need to be processed.
-    if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE)) { OverlayTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLETYPE)) { ParticleTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEMTYPE)) { ParticleSystemTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPT)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SIDE)) { SideExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGE)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGETYPE)) { SmudgeTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_SPECIAL)) { }                        // <- Special case, does not actually "exist".
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPONTYPE)) { SuperWeaponTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAM)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TERRAIN)) { TerrainExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_TERRAINTYPE)) { TerrainTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGER)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_UNITTYPE)) { UnitTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIMTYPE)) { VoxelAnimTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_WAVE)) { WaveExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_TAG)) { }                            // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TIBERIUM)) { TiberiumExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_ACTION)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EVENT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_WEAPONTYPE)) { WeaponTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_WARHEADTYPE)) { WarheadTypeExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ABSTRACT)) { }                       // <- Special case, does not actually "exist".
-    if (Extension::Is_Support_Enabled(RTTI_TUBE)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPON)) { SuperExtensions.Clear(); }
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_NEURON)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNIT)) { UnitExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_AIRCRAFT)) { AircraftExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_AIRCRAFTTYPE)) { AircraftTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_ANIM)) { AnimExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_ANIMTYPE)) { AnimTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_BUILDING)) { BuildingExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_BUILDINGTYPE)) { BuildingTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_BULLET)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_BULLETTYPE)) { BulletTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_CAMPAIGN)) { /* CampaignExtensions.Clear(); */ } // Does not need to be processed.
+    if (Extension::Is_Supported(RTTI_CELL)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FACTORY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_HOUSE)) { HouseExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_HOUSETYPE)) { HouseTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_INFANTRY)) { InfantryExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_INFANTRYTYPE)) { InfantryTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_ISOTILE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ISOTILETYPE)) { /* IsometricTileTypeExtensions.Clear(); */ } // Does not need to be processed.
+    if (Extension::Is_Supported(RTTI_LIGHT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAYTYPE)) { OverlayTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_PARTICLE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLETYPE)) { ParticleTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEMTYPE)) { ParticleSystemTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_SCRIPT)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SIDE)) { SideExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_SMUDGE)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SMUDGETYPE)) { SmudgeTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_SPECIAL)) { }                        // <- Special case, does not actually "exist".
+    if (Extension::Is_Supported(RTTI_SUPERWEAPONTYPE)) { SuperWeaponTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAM)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TERRAIN)) { TerrainExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_TERRAINTYPE)) { TerrainTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_TRIGGER)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNITTYPE)) { UnitTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VOXELANIMTYPE)) { VoxelAnimTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_WAVE)) { WaveExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_TAG)) { }                            // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TIBERIUM)) { TiberiumExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_ACTION)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EVENT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_WEAPONTYPE)) { WeaponTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_WARHEADTYPE)) { WarheadTypeExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ABSTRACT)) { }                       // <- Special case, does not actually "exist".
+    if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SUPERWEAPON)) { SuperExtensions.Clear(); }
+    if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_NEURON)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
 
     --ScenarioInit;
 
@@ -1239,74 +1239,74 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
 {
     DEBUG_INFO("Extension::Print_CRCs(enter)\n");
 
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRY)) { Extension_Print_Sync_Data(InfantryExtensions, fp, ev); }
-    if (Extension::Is_Support_Enabled(RTTI_UNIT)) { Extension_Print_Sync_Data(UnitExtensions, fp, ev); }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDING)) { Extension_Print_Sync_Data(BuildingExtensions, fp, ev); }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFT)) { Extension_Print_Sync_Data(AircraftExtensions, fp, ev); }
+    if (Extension::Is_Supported(RTTI_INFANTRY)) { Extension_Print_Sync_Data(InfantryExtensions, fp, ev); }
+    if (Extension::Is_Supported(RTTI_UNIT)) { Extension_Print_Sync_Data(UnitExtensions, fp, ev); }
+    if (Extension::Is_Supported(RTTI_BUILDING)) { Extension_Print_Sync_Data(BuildingExtensions, fp, ev); }
+    if (Extension::Is_Supported(RTTI_AIRCRAFT)) { Extension_Print_Sync_Data(AircraftExtensions, fp, ev); }
 
-    if (Extension::Is_Support_Enabled(RTTI_UNIT)) { Extension_Print_CRCs(UnitExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFT)) { Extension_Print_CRCs(AircraftExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFTTYPE)) { Extension_Print_CRCs(AircraftTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_ANIM)) { Extension_Print_CRCs(AnimExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_ANIMTYPE)) { Extension_Print_CRCs(AnimTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDING)) { Extension_Print_CRCs(BuildingExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE)) { Extension_Print_CRCs(BuildingTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE)) { Extension_Print_CRCs(BulletTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { }                       // Does not need to be processed.
-    if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_HOUSE)) { Extension_Print_CRCs(HouseExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_HOUSETYPE)) { Extension_Print_CRCs(HouseTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRY)) { Extension_Print_CRCs(InfantryExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE)) { Extension_Print_CRCs(InfantryTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { Extension_Print_CRCs(IsometricTileTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE)) { Extension_Print_CRCs(OverlayTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLETYPE)) { Extension_Print_CRCs(ParticleTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEMTYPE)) { Extension_Print_CRCs(ParticleSystemTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPT)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SIDE)) { Extension_Print_CRCs(SideExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGE)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGETYPE)) { Extension_Print_CRCs(SmudgeTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_SPECIAL)) { }                        // <- Special case, does not actually "exist".
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPONTYPE)) { Extension_Print_CRCs(SuperWeaponTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAM)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TERRAIN)) { Extension_Print_CRCs(TerrainExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_TERRAINTYPE)) { Extension_Print_CRCs(TerrainTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGER)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_UNITTYPE)) { Extension_Print_CRCs(UnitTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIMTYPE)) { Extension_Print_CRCs(VoxelAnimTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_WAVE)) { Extension_Print_CRCs(WaveExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_TAG)) { }                            // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TIBERIUM)) { Extension_Print_CRCs(TiberiumExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_ACTION)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EVENT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_WEAPONTYPE)) { Extension_Print_CRCs(WeaponTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_WARHEADTYPE)) { Extension_Print_CRCs(WarheadTypeExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ABSTRACT)) { }                       // <- Special case, does not actually "exist".
-    if (Extension::Is_Support_Enabled(RTTI_TUBE)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPON)) { Extension_Print_CRCs(SuperExtensions, fp); }
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_NEURON)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNIT)) { Extension_Print_CRCs(UnitExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_AIRCRAFT)) { Extension_Print_CRCs(AircraftExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_AIRCRAFTTYPE)) { Extension_Print_CRCs(AircraftTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_ANIM)) { Extension_Print_CRCs(AnimExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_ANIMTYPE)) { Extension_Print_CRCs(AnimTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_BUILDING)) { Extension_Print_CRCs(BuildingExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_BUILDINGTYPE)) { Extension_Print_CRCs(BuildingTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_BULLET)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_BULLETTYPE)) { Extension_Print_CRCs(BulletTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_CAMPAIGN)) { }                       // Does not need to be processed.
+    if (Extension::Is_Supported(RTTI_CELL)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FACTORY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_HOUSE)) { Extension_Print_CRCs(HouseExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_HOUSETYPE)) { Extension_Print_CRCs(HouseTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_INFANTRY)) { Extension_Print_CRCs(InfantryExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_INFANTRYTYPE)) { Extension_Print_CRCs(InfantryTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_ISOTILE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ISOTILETYPE)) { Extension_Print_CRCs(IsometricTileTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_LIGHT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAYTYPE)) { Extension_Print_CRCs(OverlayTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_PARTICLE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLETYPE)) { Extension_Print_CRCs(ParticleTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEMTYPE)) { Extension_Print_CRCs(ParticleSystemTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_SCRIPT)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SIDE)) { Extension_Print_CRCs(SideExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_SMUDGE)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SMUDGETYPE)) { Extension_Print_CRCs(SmudgeTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_SPECIAL)) { }                        // <- Special case, does not actually "exist".
+    if (Extension::Is_Supported(RTTI_SUPERWEAPONTYPE)) { Extension_Print_CRCs(SuperWeaponTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAM)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TERRAIN)) { Extension_Print_CRCs(TerrainExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_TERRAINTYPE)) { Extension_Print_CRCs(TerrainTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_TRIGGER)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNITTYPE)) { Extension_Print_CRCs(UnitTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VOXELANIMTYPE)) { Extension_Print_CRCs(VoxelAnimTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_WAVE)) { Extension_Print_CRCs(WaveExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_TAG)) { }                            // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TIBERIUM)) { Extension_Print_CRCs(TiberiumExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_ACTION)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EVENT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_WEAPONTYPE)) { Extension_Print_CRCs(WeaponTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_WARHEADTYPE)) { Extension_Print_CRCs(WarheadTypeExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ABSTRACT)) { }                       // <- Special case, does not actually "exist".
+    if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SUPERWEAPON)) { Extension_Print_CRCs(SuperExtensions, fp); }
+    if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_NEURON)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
 
     DEBUG_INFO("Extension::Print_CRCs(exit)\n");
 }
@@ -1324,69 +1324,69 @@ void Extension::Detach_This_From_All(TARGET target, bool all)
     /**
      *  #NOTE: The order of these calls must match the relevent RTTIType order!
      */
-    if (Extension::Is_Support_Enabled(RTTI_UNIT)) { Extension_Detach_This_From_All(UnitExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFT)) { Extension_Detach_This_From_All(AircraftExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFTTYPE)) { Extension_Detach_This_From_All(AircraftTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_ANIM)) { Extension_Detach_This_From_All(AnimExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_ANIMTYPE)) { Extension_Detach_This_From_All(AnimTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDING)) { Extension_Detach_This_From_All(BuildingExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE)) { Extension_Detach_This_From_All(BuildingTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE)) { Extension_Detach_This_From_All(BulletTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { }                       // Does not need to be processed.
-    if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_HOUSE)) { Extension_Detach_This_From_All(HouseExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_HOUSETYPE)) { Extension_Detach_This_From_All(HouseTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRY)) { Extension_Detach_This_From_All(InfantryExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE)) { Extension_Detach_This_From_All(InfantryTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { Extension_Detach_This_From_All(IsometricTileTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE)) { Extension_Detach_This_From_All(OverlayTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLETYPE)) { Extension_Detach_This_From_All(ParticleTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEMTYPE)) { Extension_Detach_This_From_All(ParticleSystemTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPT)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SIDE)) { Extension_Detach_This_From_All(SideExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGE)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGETYPE)) { Extension_Detach_This_From_All(SmudgeTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_SPECIAL)) { }                        // <- Special case, does not actually "exist".
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPONTYPE)) { Extension_Detach_This_From_All(SuperWeaponTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAM)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TERRAIN)) { Extension_Detach_This_From_All(TerrainExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_TERRAINTYPE)) { Extension_Detach_This_From_All(TerrainTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGER)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_UNITTYPE)) { Extension_Detach_This_From_All(UnitTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIMTYPE)) { Extension_Detach_This_From_All(VoxelAnimTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_WAVE)) { Extension_Detach_This_From_All(WaveExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_TAG)) { }                            // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TIBERIUM)) { Extension_Detach_This_From_All(TiberiumExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_ACTION)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EVENT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_WEAPONTYPE)) { Extension_Detach_This_From_All(WeaponTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_WARHEADTYPE)) { Extension_Detach_This_From_All(WarheadTypeExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ABSTRACT)) { }                       // <- Special case, does not actually "exist".
-    if (Extension::Is_Support_Enabled(RTTI_TUBE)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPON)) { Extension_Detach_This_From_All(SuperExtensions, target, all); }
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_NEURON)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNIT)) { Extension_Detach_This_From_All(UnitExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_AIRCRAFT)) { Extension_Detach_This_From_All(AircraftExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_AIRCRAFTTYPE)) { Extension_Detach_This_From_All(AircraftTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_ANIM)) { Extension_Detach_This_From_All(AnimExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_ANIMTYPE)) { Extension_Detach_This_From_All(AnimTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_BUILDING)) { Extension_Detach_This_From_All(BuildingExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_BUILDINGTYPE)) { Extension_Detach_This_From_All(BuildingTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_BULLET)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_BULLETTYPE)) { Extension_Detach_This_From_All(BulletTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_CAMPAIGN)) { }                       // Does not need to be processed.
+    if (Extension::Is_Supported(RTTI_CELL)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FACTORY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_HOUSE)) { Extension_Detach_This_From_All(HouseExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_HOUSETYPE)) { Extension_Detach_This_From_All(HouseTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_INFANTRY)) { Extension_Detach_This_From_All(InfantryExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_INFANTRYTYPE)) { Extension_Detach_This_From_All(InfantryTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_ISOTILE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ISOTILETYPE)) { Extension_Detach_This_From_All(IsometricTileTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_LIGHT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAYTYPE)) { Extension_Detach_This_From_All(OverlayTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_PARTICLE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLETYPE)) { Extension_Detach_This_From_All(ParticleTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEMTYPE)) { Extension_Detach_This_From_All(ParticleSystemTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_SCRIPT)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SIDE)) { Extension_Detach_This_From_All(SideExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_SMUDGE)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SMUDGETYPE)) { Extension_Detach_This_From_All(SmudgeTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_SPECIAL)) { }                        // <- Special case, does not actually "exist".
+    if (Extension::Is_Supported(RTTI_SUPERWEAPONTYPE)) { Extension_Detach_This_From_All(SuperWeaponTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAM)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TERRAIN)) { Extension_Detach_This_From_All(TerrainExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_TERRAINTYPE)) { Extension_Detach_This_From_All(TerrainTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_TRIGGER)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNITTYPE)) { Extension_Detach_This_From_All(UnitTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VOXELANIMTYPE)) { Extension_Detach_This_From_All(VoxelAnimTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_WAVE)) { Extension_Detach_This_From_All(WaveExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_TAG)) { }                            // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TIBERIUM)) { Extension_Detach_This_From_All(TiberiumExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_ACTION)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EVENT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_WEAPONTYPE)) { Extension_Detach_This_From_All(WeaponTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_WARHEADTYPE)) { Extension_Detach_This_From_All(WarheadTypeExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ABSTRACT)) { }                       // <- Special case, does not actually "exist".
+    if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SUPERWEAPON)) { Extension_Detach_This_From_All(SuperExtensions, target, all); }
+    if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_NEURON)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
 
     //DEBUG_INFO("Extension::Detach_This_From_All(exit)\n");
 }
@@ -1404,69 +1404,69 @@ unsigned Extension::Get_Save_Version_Number()
     /**
      *  Game classes.
      */
-    if (Extension::Is_Support_Enabled(RTTI_UNIT)) { version += sizeof(UnitClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFT)) { version += sizeof(AircraftClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_AIRCRAFTTYPE)) { version += sizeof(AircraftTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_ANIM)) { version += sizeof(AnimClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_ANIMTYPE)) { version += sizeof(AnimTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDING)) { version += sizeof(BuildingClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_BUILDINGTYPE)) { version += sizeof(BuildingTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_BULLET)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_BULLETTYPE)) { version += sizeof(BulletTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_CAMPAIGN)) { version += sizeof(CampaignClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_CELL)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FACTORY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_HOUSE)) { version += sizeof(HouseClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_HOUSETYPE)) { version += sizeof(HouseTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRY)) { version += sizeof(InfantryClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_INFANTRYTYPE)) { version += sizeof(InfantryTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ISOTILETYPE)) { version += sizeof(IsometricTileTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_LIGHT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAY)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_OVERLAYTYPE)) { version += sizeof(OverlayTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLETYPE)) { version += sizeof(ParticleTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_PARTICLESYSTEMTYPE)) { version += sizeof(ParticleSystemTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPT)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SIDE)) { version += sizeof(SideClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGE)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SMUDGETYPE)) { version += sizeof(SmudgeTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_SPECIAL)) { }                        // <- Special case, does not actually "exist".
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPONTYPE)) { version += sizeof(SuperWeaponTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAM)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TERRAIN)) { version += sizeof(TerrainClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_TERRAINTYPE)) { version += sizeof(TerrainTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGER)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_UNITTYPE)) { version += sizeof(UnitTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VOXELANIMTYPE)) { version += sizeof(VoxelAnimTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_WAVE)) { version += sizeof(WaveClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_TAG)) { }                            // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TIBERIUM)) { version += sizeof(TiberiumClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_ACTION)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EVENT)) { }                          // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_WEAPONTYPE)) { version += sizeof(WeaponTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_WARHEADTYPE)) { version += sizeof(WarheadTypeClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ABSTRACT)) { }                       // <- Special case, does not actually "exist".
-    if (Extension::Is_Support_Enabled(RTTI_TUBE)) { }                           // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_SUPERWEAPON)) { version += sizeof(SuperClassExtension); }
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_NEURON)) { }                         // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
-    if (Extension::Is_Support_Enabled(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNIT)) { version += sizeof(UnitClassExtension); }
+    if (Extension::Is_Supported(RTTI_AIRCRAFT)) { version += sizeof(AircraftClassExtension); }
+    if (Extension::Is_Supported(RTTI_AIRCRAFTTYPE)) { version += sizeof(AircraftTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_ANIM)) { version += sizeof(AnimClassExtension); }
+    if (Extension::Is_Supported(RTTI_ANIMTYPE)) { version += sizeof(AnimTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_BUILDING)) { version += sizeof(BuildingClassExtension); }
+    if (Extension::Is_Supported(RTTI_BUILDINGTYPE)) { version += sizeof(BuildingTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_BULLET)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_BULLETTYPE)) { version += sizeof(BulletTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_CAMPAIGN)) { version += sizeof(CampaignClassExtension); }
+    if (Extension::Is_Supported(RTTI_CELL)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FACTORY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_HOUSE)) { version += sizeof(HouseClassExtension); }
+    if (Extension::Is_Supported(RTTI_HOUSETYPE)) { version += sizeof(HouseTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_INFANTRY)) { version += sizeof(InfantryClassExtension); }
+    if (Extension::Is_Supported(RTTI_INFANTRYTYPE)) { version += sizeof(InfantryTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_ISOTILE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ISOTILETYPE)) { version += sizeof(IsometricTileTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_LIGHT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAY)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_OVERLAYTYPE)) { version += sizeof(OverlayTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_PARTICLE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLETYPE)) { version += sizeof(ParticleTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEM)) { }                 // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_PARTICLESYSTEMTYPE)) { version += sizeof(ParticleSystemTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_SCRIPT)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SCRIPTTYPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SIDE)) { version += sizeof(SideClassExtension); }
+    if (Extension::Is_Supported(RTTI_SMUDGE)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SMUDGETYPE)) { version += sizeof(SmudgeTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_SPECIAL)) { }                        // <- Special case, does not actually "exist".
+    if (Extension::Is_Supported(RTTI_SUPERWEAPONTYPE)) { version += sizeof(SuperWeaponTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAM)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TEAMTYPE)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TERRAIN)) { version += sizeof(TerrainClassExtension); }
+    if (Extension::Is_Supported(RTTI_TERRAINTYPE)) { version += sizeof(TerrainTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_TRIGGER)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TRIGGERTYPE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_UNITTYPE)) { version += sizeof(UnitTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_VOXELANIM)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VOXELANIMTYPE)) { version += sizeof(VoxelAnimTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_WAVE)) { version += sizeof(WaveClassExtension); }
+    if (Extension::Is_Supported(RTTI_TAG)) { }                            // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TAGTYPE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TIBERIUM)) { version += sizeof(TiberiumClassExtension); }
+    if (Extension::Is_Supported(RTTI_ACTION)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EVENT)) { }                          // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_WEAPONTYPE)) { version += sizeof(WeaponTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_WARHEADTYPE)) { version += sizeof(WarheadTypeClassExtension); }
+    if (Extension::Is_Supported(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ABSTRACT)) { }                       // <- Special case, does not actually "exist".
+    if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_SUPERWEAPON)) { version += sizeof(SuperClassExtension); }
+    if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_NEURON)) { }                         // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_FOGGEDOBJECT)) { }                   // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_ALPHASHAPE)) { }                     // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_VEINHOLEMONSTER)) { }                // <- Not yet implemented
 
     /**
     *  Global classes.

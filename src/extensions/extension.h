@@ -95,8 +95,8 @@ void Destroy(const AbstractClass *abstract)
 /**
  *  Query if Vinifera supports this class with an extension.
  */
-bool Is_Support_Enabled(RTTIType rtti);
-bool Is_Support_Enabled(const AbstractClass *abstract);
+bool Is_Supported(RTTIType rtti);
+bool Is_Supported(const AbstractClass *abstract);
 
 /**
  *  Save and load interface.
