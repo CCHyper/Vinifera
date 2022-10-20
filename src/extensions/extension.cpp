@@ -846,7 +846,7 @@ bool Extension::Is_Supported(RTTIType rtti)
         //case RTTI_LIGHTSOURCE:                // <- Not yet implemented
         //case RTTI_EMPULSE:                    // <- Not yet implemented
         case RTTI_TACTICALMAP:
-        //case RTTI_SUPERWEAPON:        // <--- !! FAILS POINTER REMAP
+        case RTTI_SUPERWEAPON:
         //case RTTI_AITRIGGER:                  // <- Not yet implemented
         //case RTTI_AITRIGGERTYPE:              // <- Not yet implemented
         //case RTTI_NEURON:                     // <- Not yet implemented

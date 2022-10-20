@@ -629,9 +629,6 @@ void TacticalExtension::Draw_Super_Timers()
     }
 #endif
 
-    // ! TEMP UNTIL SUPER IS FIXED !
-    return;
-
     /**
      *  Does the game rules state that the super weapon timers should be shown?
      */

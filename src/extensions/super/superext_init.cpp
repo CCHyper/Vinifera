@@ -159,6 +159,27 @@ original_code:
 
 
 /**
+ *  This patch fixes the incorrect constructor being used in SuperClass::Load, so
+ *  this is technically a bug fix, while also allowing the extended class to operate
+ *  correctly.
+ * 
+ *  @warning: Do not touch this unless you know what you are doing!
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_SuperClass_Load_Patch)
+{
+    _asm { lea ecx, [esp+0x0C] }
+    _asm { push ecx }
+    _asm { mov ecx, esi }
+    _asm { mov eax, 0x00405B70 } // AbstractClass::AbstractClass(const NoInitClass &)
+    _asm { call eax }
+
+    JMP(0x0060C7AF);
+}
+
+
+/**
  *  Main function for patching the hooks.
  */
 void SuperClassExtension_Init()
@@ -167,4 +188,5 @@ void SuperClassExtension_Init()
     Patch_Jump(0x0060B4AB, &_SuperClass_Constructor_Patch);
     Patch_Jump(0x0060B51A, &_SuperClass_Destructor_Patch);
     Patch_Jump(0x0060CC2A, &_SuperClass_Scalar_Destructor_Patch);
+    Patch_Jump(0x0060C7A8, &_SuperClass_Load_Patch);
 }
