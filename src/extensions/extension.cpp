@@ -243,7 +243,14 @@ static EXT_CLASS * Extension_Make(const BASE_CLASS *abstract_ptr)
     ext_ptr = new EXT_CLASS(reinterpret_cast<const BASE_CLASS *>(abs_ptr));
     ASSERT(ext_ptr != nullptr);
     if (ext_ptr) {
+
         EXT_DEBUG_INFO("Created \"%s\" extension.\n", Extension_Get_TypeID_Name<BASE_CLASS>().c_str());
+
+        /**
+         *  Assign the extension class instance to the abstract class.
+         */
+        Extension_Set_Abstract_Pointer(abstract_ptr, ext_ptr);
+
         return ext_ptr;
     }
 
@@ -506,137 +513,157 @@ AbstractClassExtension *ExtensionPrivate::Make_Internal(const AbstractClass *abs
     AbstractClassExtension *extptr = nullptr;
 
     switch (const_cast<AbstractClass *>(abstract)->What_Am_I()) {
-
-        case RTTI_AIRCRAFT:
-            extptr = Extension_Make<AircraftClass, AircraftClassExtension>(reinterpret_cast<const AircraftClass *>(abstract));
-            break;
-
-        case RTTI_AIRCRAFTTYPE:
-            extptr = Extension_Make<AircraftTypeClass, AircraftTypeClassExtension>(reinterpret_cast<const AircraftTypeClass *>(abstract));
-            break;
-
-        case RTTI_ANIM:
-            extptr = Extension_Make<AnimClass, AnimClassExtension>(reinterpret_cast<const AnimClass *>(abstract));
-            break;
-
-        case RTTI_ANIMTYPE:
-            extptr = Extension_Make<AnimTypeClass, AnimTypeClassExtension>(reinterpret_cast<const AnimTypeClass *>(abstract));
-            break;
-
-        case RTTI_BUILDING:
-            extptr = Extension_Make<BuildingClass, BuildingClassExtension>(reinterpret_cast<const BuildingClass *>(abstract));
-            break;
-
-        case RTTI_BUILDINGTYPE:
-            extptr = Extension_Make<BuildingTypeClass, BuildingTypeClassExtension>(reinterpret_cast<const BuildingTypeClass *>(abstract));
-            break;
-
-        case RTTI_BULLETTYPE:
-            extptr = Extension_Make<BulletTypeClass, BulletTypeClassExtension>(reinterpret_cast<const BulletTypeClass *>(abstract));
-            break;
-
-        case RTTI_CAMPAIGN:
-            extptr = Extension_Make<CampaignClass, CampaignClassExtension>(reinterpret_cast<const CampaignClass *>(abstract));
-            break;
-
-        case RTTI_SIDE:
-            extptr = Extension_Make<SideClass, SideClassExtension>(reinterpret_cast<const SideClass *>(abstract));
-            break;
-
-        case RTTI_HOUSE:
-            extptr = Extension_Make<HouseClass, HouseClassExtension>(reinterpret_cast<const HouseClass *>(abstract));
-            break;
-
-        case RTTI_HOUSETYPE:
-            extptr = Extension_Make<HouseTypeClass, HouseTypeClassExtension>(reinterpret_cast<const HouseTypeClass *>(abstract));
-            break;
-
-        case RTTI_INFANTRY:
-            extptr = Extension_Make<InfantryClass, InfantryClassExtension>(reinterpret_cast<const InfantryClass *>(abstract));
-            break;
-
-        case RTTI_INFANTRYTYPE:
-            extptr = Extension_Make<InfantryTypeClass, InfantryTypeClassExtension>(reinterpret_cast<const InfantryTypeClass *>(abstract));
-            break;
-
-        case RTTI_ISOTILETYPE:
-            extptr = Extension_Make<IsometricTileTypeClass, IsometricTileTypeClassExtension>(reinterpret_cast<const IsometricTileTypeClass *>(abstract));
-            break;
-
-        case RTTI_OVERLAYTYPE:
-            extptr = Extension_Make<OverlayTypeClass, OverlayTypeClassExtension>(reinterpret_cast<const OverlayTypeClass *>(abstract));
-            break;
-
-        case RTTI_PARTICLESYSTEMTYPE:
-            extptr = Extension_Make<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(reinterpret_cast<const ParticleSystemTypeClass *>(abstract));
-            break;
-
-        case RTTI_PARTICLETYPE:
-            extptr = Extension_Make<ParticleTypeClass, ParticleTypeClassExtension>(reinterpret_cast<const ParticleTypeClass *>(abstract));
-            break;
-
-        case RTTI_SMUDGETYPE:
-            extptr = Extension_Make<SmudgeTypeClass, SmudgeTypeClassExtension>(reinterpret_cast<const SmudgeTypeClass *>(abstract));
-            break;
-
-        case RTTI_SUPERWEAPON:
-            extptr = Extension_Make<SuperClass, SuperClassExtension>(reinterpret_cast<const SuperClass *>(abstract));
-            break;
-
-        case RTTI_SUPERWEAPONTYPE:
-            extptr = Extension_Make<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(reinterpret_cast<const SuperWeaponTypeClass *>(abstract));
-            break;
-
-        case RTTI_TERRAIN:
-            extptr = Extension_Make<TerrainClass, TerrainClassExtension>(reinterpret_cast<const TerrainClass *>(abstract));
-            break;
-
-        case RTTI_TERRAINTYPE:
-            extptr = Extension_Make<TerrainTypeClass, TerrainTypeClassExtension>(reinterpret_cast<const TerrainTypeClass *>(abstract));
-            break;
-
-        case RTTI_TIBERIUM:
-            extptr = Extension_Make<TiberiumClass, TiberiumClassExtension>(reinterpret_cast<const TiberiumClass *>(abstract));
-            break;
-
-        case RTTI_UNIT:
-            extptr = Extension_Make<UnitClass, UnitClassExtension>(reinterpret_cast<const UnitClass *>(abstract));
-            break;
-
-        case RTTI_UNITTYPE:
-            extptr = Extension_Make<UnitTypeClass, UnitTypeClassExtension>(reinterpret_cast<const UnitTypeClass *>(abstract));
-            break;
-
-        case RTTI_VOXELANIMTYPE:
-            extptr = Extension_Make<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(reinterpret_cast<const VoxelAnimTypeClass *>(abstract));
-            break;
-
-        case RTTI_WARHEADTYPE:
-            extptr = Extension_Make<WarheadTypeClass, WarheadTypeClassExtension>(reinterpret_cast<const WarheadTypeClass *>(abstract));
-            break;
-
-        case RTTI_WAVE:
-            extptr = Extension_Make<WaveClass, WaveClassExtension>(reinterpret_cast<const WaveClass *>(abstract));
-            break;
-
-        case RTTI_WEAPONTYPE:
-            extptr = Extension_Make<WeaponTypeClass, WeaponTypeClassExtension>(reinterpret_cast<const WeaponTypeClass *>(abstract));
-            break;
-
-        default:
-            DEBUG_ERROR("Extension::Make: No extension support for \"%s\" implemented!\n", Name_From_RTTI((RTTIType)abstract->What_Am_I()));
-            break;
-
+        case RTTI_UNIT: { extptr = Extension_Make<UnitClass, UnitClassExtension>(reinterpret_cast<const UnitClass *>(abstract)); break; }
+        case RTTI_AIRCRAFT: { extptr = Extension_Make<AircraftClass, AircraftClassExtension>(reinterpret_cast<const AircraftClass *>(abstract)); break; }
+        case RTTI_AIRCRAFTTYPE: { extptr = Extension_Make<AircraftTypeClass, AircraftTypeClassExtension>(reinterpret_cast<const AircraftTypeClass *>(abstract)); break; }
+        case RTTI_ANIM: { extptr = Extension_Make<AnimClass, AnimClassExtension>(reinterpret_cast<const AnimClass *>(abstract)); break; }
+        case RTTI_ANIMTYPE: { extptr = Extension_Make<AnimTypeClass, AnimTypeClassExtension>(reinterpret_cast<const AnimTypeClass *>(abstract)); break; }
+        case RTTI_BUILDING: { extptr = Extension_Make<BuildingClass, BuildingClassExtension>(reinterpret_cast<const BuildingClass *>(abstract)); break; }
+        case RTTI_BUILDINGTYPE: { extptr = Extension_Make<BuildingTypeClass, BuildingTypeClassExtension>(reinterpret_cast<const BuildingTypeClass *>(abstract));break; }
+        //case RTTI_BULLET: { }                   // <- Not yet implemented
+        case RTTI_BULLETTYPE: { extptr = Extension_Make<BulletTypeClass, BulletTypeClassExtension>(reinterpret_cast<const BulletTypeClass *>(abstract));break; }
+        case RTTI_CAMPAIGN: { extptr = Extension_Make<CampaignClass, CampaignClassExtension>(reinterpret_cast<const CampaignClass *>(abstract)); break; }
+        //case RTTI_CELL: { }                     // <- Not yet implemented
+        //case RTTI_FACTORY: { }                  // <- Not yet implemented
+        case RTTI_HOUSE: { extptr = Extension_Make<HouseClass, HouseClassExtension>(reinterpret_cast<const HouseClass *>(abstract)); break; }
+        case RTTI_HOUSETYPE: { extptr = Extension_Make<HouseTypeClass, HouseTypeClassExtension>(reinterpret_cast<const HouseTypeClass *>(abstract)); break; }
+        case RTTI_INFANTRY: {  extptr = Extension_Make<InfantryClass, InfantryClassExtension>(reinterpret_cast<const InfantryClass *>(abstract)); break; }
+        case RTTI_INFANTRYTYPE: {  extptr = Extension_Make<InfantryTypeClass, InfantryTypeClassExtension>(reinterpret_cast<const InfantryTypeClass *>(abstract)); break; }
+        //case RTTI_ISOTILE: { }                  // <- Not yet implemented
+        case RTTI_ISOTILETYPE: { extptr = Extension_Make<IsometricTileTypeClass, IsometricTileTypeClassExtension>(reinterpret_cast<const IsometricTileTypeClass *>(abstract)); break; }
+        //case RTTI_LIGHT: { }                    // <- Not yet implemented
+        //case RTTI_OVERLAY: { }                  // <- Not yet implemented
+        case RTTI_OVERLAYTYPE: { extptr = Extension_Make<OverlayTypeClass, OverlayTypeClassExtension>(reinterpret_cast<const OverlayTypeClass *>(abstract)); break; }
+        //case RTTI_PARTICLE: { }                 // <- Not yet implemented
+        case RTTI_PARTICLETYPE: { extptr = Extension_Make<ParticleTypeClass, ParticleTypeClassExtension>(reinterpret_cast<const ParticleTypeClass *>(abstract)); break; }
+        //case RTTI_PARTICLESYSTEM: { }           // <- Not yet implemented
+        case RTTI_PARTICLESYSTEMTYPE: { extptr = Extension_Make<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(reinterpret_cast<const ParticleSystemTypeClass *>(abstract)); break; }
+        //case RTTI_SCRIPT: { }                   // <- Not yet implemented
+        //case RTTI_SCRIPTTYPE: { }               // <- Not yet implemented
+        case RTTI_SIDE: { extptr = Extension_Make<SideClass, SideClassExtension>(reinterpret_cast<const SideClass *>(abstract)); break; }
+        //case RTTI_SMUDGE: { }                   // <- Not yet implemented
+        case RTTI_SMUDGETYPE: { extptr = Extension_Make<SmudgeTypeClass, SmudgeTypeClassExtension>(reinterpret_cast<const SmudgeTypeClass *>(abstract)); break; }
+        //case RTTI_SPECIAL: { }                  // <- Special case, does not actually "exist".
+        case RTTI_SUPERWEAPONTYPE: { extptr = Extension_Make<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(reinterpret_cast<const SuperWeaponTypeClass *>(abstract)); break; }
+        //case RTTI_TASKFORCE: { }                // <- Not yet implemented
+        //case RTTI_TEAM: { }                     // <- Not yet implemented
+        //case RTTI_TEAMTYPE: { }                 // <- Not yet implemented
+        case RTTI_TERRAIN: { extptr = Extension_Make<TerrainClass, TerrainClassExtension>(reinterpret_cast<const TerrainClass *>(abstract)); break; }
+        case RTTI_TERRAINTYPE: { extptr = Extension_Make<TerrainTypeClass, TerrainTypeClassExtension>(reinterpret_cast<const TerrainTypeClass *>(abstract)); break; }
+        //case RTTI_TRIGGER: { }                  // <- Not yet implemented
+        //case RTTI_TRIGGERTYPE: { }              // <- Not yet implemented
+        case RTTI_UNITTYPE: { extptr = Extension_Make<UnitTypeClass, UnitTypeClassExtension>(reinterpret_cast<const UnitTypeClass *>(abstract)); break; }
+        //case RTTI_VOXELANIM: { }                // <- Not yet implemented
+        case RTTI_VOXELANIMTYPE: { extptr = Extension_Make<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(reinterpret_cast<const VoxelAnimTypeClass *>(abstract)); break; }
+        case RTTI_WAVE: { extptr = Extension_Make<WaveClass, WaveClassExtension>(reinterpret_cast<const WaveClass *>(abstract)); break; }
+        //case RTTI_TAG: { }                      // <- Not yet implemented
+        //case RTTI_TAGTYPE: { }                  // <- Not yet implemented
+        case RTTI_TIBERIUM: { extptr = Extension_Make<TiberiumClass, TiberiumClassExtension>(reinterpret_cast<const TiberiumClass *>(abstract)); break; }
+        //case RTTI_ACTION: { }                   // <- Not yet implemented
+        //case RTTI_EVENT: { }                    // <- Not yet implemented
+        case RTTI_WEAPONTYPE: { extptr = Extension_Make<WeaponTypeClass, WeaponTypeClassExtension>(reinterpret_cast<const WeaponTypeClass *>(abstract)); break; }
+        case RTTI_WARHEADTYPE: { extptr = Extension_Make<WarheadTypeClass, WarheadTypeClassExtension>(reinterpret_cast<const WarheadTypeClass *>(abstract)); break; }
+        //case RTTI_WAYPOINT: { }                 // <- Not yet implemented
+        //case RTTI_ABSTRACT: { }                 // <- Special case, does not actually "exist".
+        //case RTTI_TUBE: { }                     // <- Not yet implemented
+        //case RTTI_LIGHTSOURCE: { }              // <- Not yet implemented
+        //case RTTI_EMPULSE: { }                  // <- Not yet implemented
+        //case RTTI_TACTICALMAP: { }              // <- Not yet implemented
+        case RTTI_SUPERWEAPON: { extptr = Extension_Make<SuperClass, SuperClassExtension>(reinterpret_cast<const SuperClass *>(abstract)); break; }
+        //case RTTI_AITRIGGER: { }                // <- Not yet implemented
+        //case RTTI_AITRIGGERTYPE: { }            // <- Not yet implemented
+        //case RTTI_NEURON: { }                   // <- Not yet implemented
+        //case RTTI_FOGGEDOBJECT: { }             // <- Not yet implemented
+        //case RTTI_ALPHASHAPE: { }               // <- Not yet implemented
+        //case RTTI_VEINHOLEMONSTER: { }          // <- Not yet implemented
+        default: { DEBUG_ERROR("Extension::Make: No extension support for \"%s\" implemented!\n", Name_From_RTTI((RTTIType)abstract->What_Am_I())); break; }
     };
 
-    /**
-     *  
-     */
-    if (extptr != nullptr) {
-        Extension_Set_Abstract_Pointer(abstract, extptr);
-    }
-
     return extptr;
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+bool ExtensionPrivate::Destroy_Internal(const AbstractClass *abstract)
+{
+    ASSERT(abstract != nullptr);
+    
+    bool removed = false;
+
+    switch (abstract->What_Am_I()) {
+        case RTTI_UNIT: { removed = Extension_Destroy<UnitClass, UnitClassExtension>(reinterpret_cast<const UnitClass *>(abstract)); break; }
+        case RTTI_AIRCRAFT: { removed = Extension_Destroy<AircraftClass, AircraftClassExtension>(reinterpret_cast<const AircraftClass *>(abstract)); break; }
+        case RTTI_AIRCRAFTTYPE: { removed = Extension_Destroy<AircraftTypeClass, AircraftTypeClassExtension>(reinterpret_cast<const AircraftTypeClass *>(abstract)); break; }
+        case RTTI_ANIM: { removed = Extension_Destroy<AnimClass, AnimClassExtension>(reinterpret_cast<const AnimClass *>(abstract)); break; }
+        case RTTI_ANIMTYPE: { removed = Extension_Destroy<AnimTypeClass, AnimTypeClassExtension>(reinterpret_cast<const AnimTypeClass *>(abstract)); break; }
+        case RTTI_BUILDING: { removed = Extension_Destroy<BuildingClass, BuildingClassExtension>(reinterpret_cast<const BuildingClass *>(abstract)); break; }
+        case RTTI_BUILDINGTYPE: { removed = Extension_Destroy<BuildingTypeClass, BuildingTypeClassExtension>(reinterpret_cast<const BuildingTypeClass *>(abstract));break; }
+        //case RTTI_BULLET: { }                   // <- Not yet implemented
+        case RTTI_BULLETTYPE: { removed = Extension_Destroy<BulletTypeClass, BulletTypeClassExtension>(reinterpret_cast<const BulletTypeClass *>(abstract));break; }
+        case RTTI_CAMPAIGN: { removed = Extension_Destroy<CampaignClass, CampaignClassExtension>(reinterpret_cast<const CampaignClass *>(abstract)); break; }
+        //case RTTI_CELL: { }                     // <- Not yet implemented
+        //case RTTI_FACTORY: { }                  // <- Not yet implemented
+        case RTTI_HOUSE: { removed = Extension_Destroy<HouseClass, HouseClassExtension>(reinterpret_cast<const HouseClass *>(abstract)); break; }
+        case RTTI_HOUSETYPE: { removed = Extension_Destroy<HouseTypeClass, HouseTypeClassExtension>(reinterpret_cast<const HouseTypeClass *>(abstract)); break; }
+        case RTTI_INFANTRY: {  removed = Extension_Destroy<InfantryClass, InfantryClassExtension>(reinterpret_cast<const InfantryClass *>(abstract)); break; }
+        case RTTI_INFANTRYTYPE: {  removed = Extension_Destroy<InfantryTypeClass, InfantryTypeClassExtension>(reinterpret_cast<const InfantryTypeClass *>(abstract)); break; }
+        //case RTTI_ISOTILE: { }                  // <- Not yet implemented
+        case RTTI_ISOTILETYPE: { removed = Extension_Destroy<IsometricTileTypeClass, IsometricTileTypeClassExtension>(reinterpret_cast<const IsometricTileTypeClass *>(abstract)); break; }
+        //case RTTI_LIGHT: { }                    // <- Not yet implemented
+        //case RTTI_OVERLAY: { }                  // <- Not yet implemented
+        case RTTI_OVERLAYTYPE: { removed = Extension_Destroy<OverlayTypeClass, OverlayTypeClassExtension>(reinterpret_cast<const OverlayTypeClass *>(abstract)); break; }
+        //case RTTI_PARTICLE: { }                 // <- Not yet implemented
+        case RTTI_PARTICLETYPE: { removed = Extension_Destroy<ParticleTypeClass, ParticleTypeClassExtension>(reinterpret_cast<const ParticleTypeClass *>(abstract)); break; }
+        //case RTTI_PARTICLESYSTEM: { }           // <- Not yet implemented
+        case RTTI_PARTICLESYSTEMTYPE: { removed = Extension_Destroy<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(reinterpret_cast<const ParticleSystemTypeClass *>(abstract)); break; }
+        //case RTTI_SCRIPT: { }                   // <- Not yet implemented
+        //case RTTI_SCRIPTTYPE: { }               // <- Not yet implemented
+        case RTTI_SIDE: { removed = Extension_Destroy<SideClass, SideClassExtension>(reinterpret_cast<const SideClass *>(abstract)); break; }
+        //case RTTI_SMUDGE: { }                   // <- Not yet implemented
+        case RTTI_SMUDGETYPE: { removed = Extension_Destroy<SmudgeTypeClass, SmudgeTypeClassExtension>(reinterpret_cast<const SmudgeTypeClass *>(abstract)); break; }
+        //case RTTI_SPECIAL: { }                  // <- Special case, does not actually "exist".
+        case RTTI_SUPERWEAPONTYPE: { removed = Extension_Destroy<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(reinterpret_cast<const SuperWeaponTypeClass *>(abstract)); break; }
+        //case RTTI_TASKFORCE: { }                // <- Not yet implemented
+        //case RTTI_TEAM: { }                     // <- Not yet implemented
+        //case RTTI_TEAMTYPE: { }                 // <- Not yet implemented
+        case RTTI_TERRAIN: { removed = Extension_Destroy<TerrainClass, TerrainClassExtension>(reinterpret_cast<const TerrainClass *>(abstract)); break; }
+        case RTTI_TERRAINTYPE: { removed = Extension_Destroy<TerrainTypeClass, TerrainTypeClassExtension>(reinterpret_cast<const TerrainTypeClass *>(abstract)); break; }
+        //case RTTI_TRIGGER: { }                  // <- Not yet implemented
+        //case RTTI_TRIGGERTYPE: { }              // <- Not yet implemented
+        case RTTI_UNITTYPE: { removed = Extension_Destroy<UnitTypeClass, UnitTypeClassExtension>(reinterpret_cast<const UnitTypeClass *>(abstract)); break; }
+        //case RTTI_VOXELANIM: { }                // <- Not yet implemented
+        case RTTI_VOXELANIMTYPE: { removed = Extension_Destroy<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(reinterpret_cast<const VoxelAnimTypeClass *>(abstract)); break; }
+        case RTTI_WAVE: { removed = Extension_Destroy<WaveClass, WaveClassExtension>(reinterpret_cast<const WaveClass *>(abstract)); break; }
+        //case RTTI_TAG: { }                      // <- Not yet implemented
+        //case RTTI_TAGTYPE: { }                  // <- Not yet implemented
+        case RTTI_TIBERIUM: { removed = Extension_Destroy<TiberiumClass, TiberiumClassExtension>(reinterpret_cast<const TiberiumClass *>(abstract)); break; }
+        //case RTTI_ACTION: { }                   // <- Not yet implemented
+        //case RTTI_EVENT: { }                    // <- Not yet implemented
+        case RTTI_WEAPONTYPE: { removed = Extension_Destroy<WeaponTypeClass, WeaponTypeClassExtension>(reinterpret_cast<const WeaponTypeClass *>(abstract)); break; }
+        case RTTI_WARHEADTYPE: { removed = Extension_Destroy<WarheadTypeClass, WarheadTypeClassExtension>(reinterpret_cast<const WarheadTypeClass *>(abstract)); break; }
+        //case RTTI_WAYPOINT: { }                 // <- Not yet implemented
+        //case RTTI_ABSTRACT: { }                 // <- Special case, does not actually "exist".
+        //case RTTI_TUBE: { }                     // <- Not yet implemented
+        //case RTTI_LIGHTSOURCE: { }              // <- Not yet implemented
+        //case RTTI_EMPULSE: { }                  // <- Not yet implemented
+        //case RTTI_TACTICALMAP: { }              // <- Not yet implemented
+        case RTTI_SUPERWEAPON: { removed = Extension_Destroy<SuperClass, SuperClassExtension>(reinterpret_cast<const SuperClass *>(abstract)); break; }
+        //case RTTI_AITRIGGER: { }                // <- Not yet implemented
+        //case RTTI_AITRIGGERTYPE: { }            // <- Not yet implemented
+        //case RTTI_NEURON: { }                   // <- Not yet implemented
+        //case RTTI_FOGGEDOBJECT: { }             // <- Not yet implemented
+        //case RTTI_ALPHASHAPE: { }               // <- Not yet implemented
+        //case RTTI_VEINHOLEMONSTER: { }          // <- Not yet implemented
+        default: { DEBUG_ERROR("Extension::Destroy: No extension support for \"%s\" implemented!\n", Name_From_RTTI((RTTIType)abstract->What_Am_I())); break; }
+    };
+
+    ASSERT(removed);
+
+    return true;
 }
 
 
@@ -679,147 +706,6 @@ AbstractClassExtension *ExtensionPrivate::Fetch_Internal(const AbstractClass *ab
 
 
 /**
- *  x
- * 
- *  @author: CCHyper
- */
-bool ExtensionPrivate::Destroy_Internal(const AbstractClass *abstract)
-{
-    ASSERT(abstract != nullptr);
-    
-    bool removed = false;
-
-    switch (abstract->What_Am_I()) {
-
-        case RTTI_AIRCRAFT:
-            removed = Extension_Destroy<AircraftClass, AircraftClassExtension>(reinterpret_cast<const AircraftClass *>(abstract));
-            break;
-
-        case RTTI_AIRCRAFTTYPE:
-            removed = Extension_Destroy<AircraftTypeClass, AircraftTypeClassExtension>(reinterpret_cast<const AircraftTypeClass *>(abstract));
-            break;
-
-        case RTTI_ANIM:
-            removed = Extension_Destroy<AnimClass, AnimClassExtension>(reinterpret_cast<const AnimClass *>(abstract));
-            break;
-
-        case RTTI_ANIMTYPE:
-            removed = Extension_Destroy<AnimTypeClass, AnimTypeClassExtension>(reinterpret_cast<const AnimTypeClass *>(abstract));
-            break;
-
-        case RTTI_BUILDING:
-            removed = Extension_Destroy<BuildingClass, BuildingClassExtension>(reinterpret_cast<const BuildingClass *>(abstract));
-            break;
-
-        case RTTI_BUILDINGTYPE:
-            removed = Extension_Destroy<BuildingTypeClass, BuildingTypeClassExtension>(reinterpret_cast<const BuildingTypeClass *>(abstract));
-            break;
-
-        case RTTI_BULLETTYPE:
-            removed = Extension_Destroy<BulletTypeClass, BulletTypeClassExtension>(reinterpret_cast<const BulletTypeClass *>(abstract));
-            break;
-
-        case RTTI_CAMPAIGN:
-            removed = Extension_Destroy<CampaignClass, CampaignClassExtension>(reinterpret_cast<const CampaignClass *>(abstract));
-            break;
-
-        case RTTI_SIDE:
-            removed = Extension_Destroy<SideClass, SideClassExtension>(reinterpret_cast<const SideClass *>(abstract));
-            break;
-
-        case RTTI_HOUSE:
-            removed = Extension_Destroy<HouseClass, HouseClassExtension>(reinterpret_cast<const HouseClass *>(abstract));
-            break;
-
-        case RTTI_HOUSETYPE:
-            removed = Extension_Destroy<HouseTypeClass, HouseTypeClassExtension>(reinterpret_cast<const HouseTypeClass *>(abstract));
-            break;
-
-        case RTTI_INFANTRY:
-            removed = Extension_Destroy<InfantryClass, InfantryClassExtension>(reinterpret_cast<const InfantryClass *>(abstract));
-            break;
-
-        case RTTI_INFANTRYTYPE:
-            removed = Extension_Destroy<InfantryTypeClass, InfantryTypeClassExtension>(reinterpret_cast<const InfantryTypeClass *>(abstract));
-            break;
-
-        case RTTI_ISOTILETYPE:
-            removed = Extension_Destroy<IsometricTileTypeClass, IsometricTileTypeClassExtension>(reinterpret_cast<const IsometricTileTypeClass *>(abstract));
-            break;
-
-        case RTTI_OVERLAYTYPE:
-            removed = Extension_Destroy<OverlayTypeClass, OverlayTypeClassExtension>(reinterpret_cast<const OverlayTypeClass *>(abstract));
-            break;
-
-        case RTTI_PARTICLESYSTEMTYPE:
-            removed = Extension_Destroy<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(reinterpret_cast<const ParticleSystemTypeClass *>(abstract));
-            break;
-
-        case RTTI_PARTICLETYPE:
-            removed = Extension_Destroy<ParticleTypeClass, ParticleTypeClassExtension>(reinterpret_cast<const ParticleTypeClass *>(abstract));
-            break;
-
-        case RTTI_SMUDGETYPE:
-            removed = Extension_Destroy<SmudgeTypeClass, SmudgeTypeClassExtension>(reinterpret_cast<const SmudgeTypeClass *>(abstract));
-            break;
-
-        case RTTI_SUPERWEAPON:
-            removed = Extension_Destroy<SuperClass, SuperClassExtension>(reinterpret_cast<const SuperClass *>(abstract));
-            break;
-
-        case RTTI_SUPERWEAPONTYPE:
-            removed = Extension_Destroy<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(reinterpret_cast<const SuperWeaponTypeClass *>(abstract));
-            break;
-
-        case RTTI_TERRAIN:
-            removed = Extension_Destroy<TerrainClass, TerrainClassExtension>(reinterpret_cast<const TerrainClass *>(abstract));
-            break;
-
-        case RTTI_TERRAINTYPE:
-            removed = Extension_Destroy<TerrainTypeClass, TerrainTypeClassExtension>(reinterpret_cast<const TerrainTypeClass *>(abstract));
-            break;
-
-        case RTTI_TIBERIUM:
-            removed = Extension_Destroy<TiberiumClass, TiberiumClassExtension>(reinterpret_cast<const TiberiumClass *>(abstract));
-            break;
-
-        case RTTI_UNIT:
-            removed = Extension_Destroy<UnitClass, UnitClassExtension>(reinterpret_cast<const UnitClass *>(abstract));
-            break;
-
-        case RTTI_UNITTYPE:
-            removed = Extension_Destroy<UnitTypeClass, UnitTypeClassExtension>(reinterpret_cast<const UnitTypeClass *>(abstract));
-            break;
-
-        case RTTI_VOXELANIMTYPE:
-            removed = Extension_Destroy<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(reinterpret_cast<const VoxelAnimTypeClass *>(abstract));
-            break;
-
-        case RTTI_WARHEADTYPE:
-            removed = Extension_Destroy<WarheadTypeClass, WarheadTypeClassExtension>(reinterpret_cast<const WarheadTypeClass *>(abstract));
-            break;
-
-        case RTTI_WAVE:
-            removed = Extension_Destroy<WaveClass, WaveClassExtension>(reinterpret_cast<const WaveClass *>(abstract));
-            break;
-
-        case RTTI_WEAPONTYPE:
-            removed = Extension_Destroy<WeaponTypeClass, WeaponTypeClassExtension>(reinterpret_cast<const WeaponTypeClass *>(abstract));
-            break;
-
-        default:
-            DEBUG_ERROR("Destroy_Extension: No extension support for \"%s\" implemented!\n", Name_From_RTTI((RTTIType)abstract->What_Am_I()));
-            break;
-
-    };
-
-    ASSERT(removed);
-
-    return true;
-}
-
-
-/**
  *  Do we support the class indentified by the RTTIType with an extension class?
  * 
  *  @author: CCHyper
@@ -834,60 +720,60 @@ bool Extension::Is_Support_Enabled(RTTIType rtti)
         case RTTI_ANIMTYPE:
         case RTTI_BUILDING:
         case RTTI_BUILDINGTYPE:
-        //case RTTI_BULLET:                     <- Not yet implemented
+        //case RTTI_BULLET:                     // <- Not yet implemented
         case RTTI_BULLETTYPE:
         case RTTI_CAMPAIGN:                     // Supported, but Campaign's are not saved to file.
-        //case RTTI_CELL:                       <- Not yet implemented
-        //case RTTI_FACTORY:                    <- Not yet implemented
+        //case RTTI_CELL:                       // <- Not yet implemented
+        //case RTTI_FACTORY:                    // <- Not yet implemented
         case RTTI_HOUSE:
         case RTTI_HOUSETYPE:
         case RTTI_INFANTRY:
         case RTTI_INFANTRYTYPE:
-        //case RTTI_ISOTILE:                    <- Not yet implemented
+        //case RTTI_ISOTILE:                    // <- Not yet implemented
         case RTTI_ISOTILETYPE:                  // Supported, but IsoTileTypes's are not saved to file.
-        //case RTTI_LIGHT:                      <- Not yet implemented
-        //case RTTI_OVERLAY:                    <- Not yet implemented
+        //case RTTI_LIGHT:                      // <- Not yet implemented
+        //case RTTI_OVERLAY:                    // <- Not yet implemented
         case RTTI_OVERLAYTYPE:
-        //case RTTI_PARTICLE:                   <- Not yet implemented
+        //case RTTI_PARTICLE:                   // <- Not yet implemented
         case RTTI_PARTICLETYPE:
-        //case RTTI_PARTICLESYSTEM:             <- Not yet implemented
+        //case RTTI_PARTICLESYSTEM:             // <- Not yet implemented
         case RTTI_PARTICLESYSTEMTYPE:
-        //case RTTI_SCRIPT:                     <- Not yet implemented
-        //case RTTI_SCRIPTTYPE:                 <- Not yet implemented
+        //case RTTI_SCRIPT:                     // <- Not yet implemented
+        //case RTTI_SCRIPTTYPE:                 // <- Not yet implemented
         case RTTI_SIDE:
-        //case RTTI_SMUDGE:                     <- Not yet implemented
+        //case RTTI_SMUDGE:                     // <- Not yet implemented
         case RTTI_SMUDGETYPE:
         //case RTTI_SUPERWEAPONTYPE:    // <--- !! CRASHES
-        //case RTTI_TASKFORCE:                  <- Not yet implemented
-        //case RTTI_TEAM:                       <- Not yet implemented
-        //case RTTI_TEAMTYPE:                   <- Not yet implemented
+        //case RTTI_TASKFORCE:                  // <- Not yet implemented
+        //case RTTI_TEAM:                       // <- Not yet implemented
+        //case RTTI_TEAMTYPE:                   // <- Not yet implemented
         case RTTI_TERRAIN:
         case RTTI_TERRAINTYPE:
-        //case RTTI_TRIGGER:                    <- Not yet implemented
-        //case RTTI_TRIGGERTYPE:                <- Not yet implemented
+        //case RTTI_TRIGGER:                    // <- Not yet implemented
+        //case RTTI_TRIGGERTYPE:                // <- Not yet implemented
         case RTTI_UNITTYPE:
-        //case RTTI_VOXELANIM:                  <- Not yet implemented
+        //case RTTI_VOXELANIM:                  // <- Not yet implemented
         case RTTI_VOXELANIMTYPE:
         case RTTI_WAVE:
-        //case RTTI_TAG:                        <- Not yet implemented
-        //case RTTI_TAGTYPE:                    <- Not yet implemented
+        //case RTTI_TAG:                        // <- Not yet implemented
+        //case RTTI_TAGTYPE:                    // <- Not yet implemented
         //case RTTI_TIBERIUM:
-        //case RTTI_ACTION:                     <- Not yet implemented
-        //case RTTI_EVENT:                      <- Not yet implemented
+        //case RTTI_ACTION:                     // <- Not yet implemented
+        //case RTTI_EVENT:                      // <- Not yet implemented
         case RTTI_WEAPONTYPE:
         case RTTI_WARHEADTYPE:
-        //case RTTI_WAYPOINT:                   <- Not yet implemented
-        //case RTTI_TUBE:                       <- Not yet implemented
-        //case RTTI_LIGHTSOURCE:                <- Not yet implemented
-        //case RTTI_EMPULSE:                    <- Not yet implemented
-        //case RTTI_TACTICALMAP:                <- Not yet implemented, needs rewrite of extension class.
+        //case RTTI_WAYPOINT:                   // <- Not yet implemented
+        //case RTTI_TUBE:                       // <- Not yet implemented
+        //case RTTI_LIGHTSOURCE:                // <- Not yet implemented
+        //case RTTI_EMPULSE:                    // <- Not yet implemented
+        //case RTTI_TACTICALMAP:                // <- Not yet implemented, needs rewrite of the extension class.
         //case RTTI_SUPERWEAPON:        // <--- !! CRASHES
-        //case RTTI_AITRIGGER:                  <- Not yet implemented
-        //case RTTI_AITRIGGERTYPE:              <- Not yet implemented
-        //case RTTI_NEURON:                     <- Not yet implemented
-        //case RTTI_FOGGEDOBJECT:               <- Not yet implemented
-        //case RTTI_ALPHASHAPE:                 <- Not yet implemented
-        //case RTTI_VEINHOLEMONSTER:            <- Not yet implemented
+        //case RTTI_AITRIGGER:                  // <- Not yet implemented
+        //case RTTI_AITRIGGERTYPE:              // <- Not yet implemented
+        //case RTTI_NEURON:                     // <- Not yet implemented
+        //case RTTI_FOGGEDOBJECT:               // <- Not yet implemented
+        //case RTTI_ALPHASHAPE:                 // <- Not yet implemented
+        //case RTTI_VEINHOLEMONSTER:            // <- Not yet implemented
             return true;
 
         case RTTI_SPECIAL:                      // Special case for sidebar cameos.

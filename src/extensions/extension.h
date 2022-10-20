@@ -46,8 +46,8 @@ namespace ExtensionPrivate
 {
 
     AbstractClassExtension *Make_Internal(const AbstractClass *abstract);
-    AbstractClassExtension *Fetch_Internal(const AbstractClass *abstract);
     bool Destroy_Internal(const AbstractClass *abstract);
+    AbstractClassExtension *Fetch_Internal(const AbstractClass *abstract);
 
 }; // namespace "ExtensionPrivate".
 
