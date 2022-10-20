@@ -27,6 +27,8 @@
  ******************************************************************************/
 #pragma once
 
+#include "abstractext.h"
+#include "tactical.h"
 #include "ttimer.h"
 #include "stimer.h"
 #include "wstring.h"
@@ -35,7 +37,6 @@
 #include <objidl.h>
 
 
-class Tactical;
 class HouseClass;
 class WWCRCEngine;
 
@@ -48,22 +49,36 @@ enum InfoTextPosType {
 };
 
 
-/**
- *  Extension to Tactical.
- */
-class TacticalMapExtension final
+class DECLSPEC_UUID(UUID_TACTICALMAP_EXTENSION)
+TacticalExtension final : public AbstractClassExtension
 {
     public:
-        TacticalMapExtension(const Tactical *this_ptr);
-        TacticalMapExtension(const NoInitClass &noinit);
-        ~TacticalMapExtension();
+        /**
+         *  IPersist
+         */
+        IFACEMETHOD(GetClassID)(CLSID *pClassID);
 
-        HRESULT Load(IStream *pStm);
-        HRESULT Save(IStream *pStm, BOOL fClearDirty);
-        int Size_Of() const;
+        /**
+         *  IPersistStream
+         */
+        IFACEMETHOD(Load)(IStream *pStm);
+        IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 
-        void Detach(TARGET target, bool all = true);
-        void Compute_CRC(WWCRCEngine &crc) const;
+    public:
+        TacticalExtension(const Tactical *this_ptr = nullptr);
+        TacticalExtension(const NoInitClass &noinit);
+        virtual ~TacticalExtension();
+
+        virtual int Size_Of() const override;
+        virtual void Detach(TARGET target, bool all = true) override;
+        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+
+        virtual const char *Name() const override { return "TacticalMap"; }
+        virtual const char *Full_Name() const override { return "TacticalMap"; }
+        
+        virtual Tactical *This() const override { return reinterpret_cast<Tactical *>(AbstractClassExtension::This()); }
+        virtual const Tactical *This_Const() const override { return reinterpret_cast<const Tactical *>(AbstractClassExtension::This_Const()); }
+        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_AIRCRAFTTYPE; }
 
         void Draw_Debug_Overlay();
         void Draw_FrameStep_Overlay();
@@ -116,9 +131,3 @@ class TacticalMapExtension final
          */
         CDTimerClass<MSTimerClass> InfoTextTimer;
 };
-
-
-/**
- *  Global instance of the extended class.
- */
-extern TacticalMapExtension *TacticalExtension;

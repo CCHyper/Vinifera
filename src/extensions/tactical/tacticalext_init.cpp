@@ -28,42 +28,16 @@
 #include "tacticalext_hooks.h"
 #include "tacticalext.h"
 #include "tactical.h"
-#include "fatal.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
 #include "vinifera_globals.h"
+#include "extension.h"
+#include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
-
-
-/**
- *  "new" operations must be done within a new function for patched code.
- * 
- *  @author: CCHyper
- */
-static void New_Tactical_Extension(Tactical *this_ptr)
-{
-    /**
-     *  Delete existing instance (should never be the case).
-     */
-    delete TacticalExtension;
-
-    TacticalExtension = new TacticalMapExtension(this_ptr);
-}
-
-
-/**
- *  "delete" operations must be done within a new function for patched code.
- * 
- *  @author: CCHyper
- */
-static void Delete_Tactical_Extension()
-{
-    delete TacticalExtension;
-}
 
 
 /**
@@ -76,12 +50,21 @@ static void Delete_Tactical_Extension()
 DECLARE_PATCH(_Tactical_Constructor_Patch)
 {
     GET_REGISTER_STATIC(Tactical *, this_ptr, esi); // "this" pointer.
+    static TacticalExtension *exttype_ptr;
+
+    /**
+     *  If we are performing a load operation, the Windows API will invoke the
+     *  constructors for us as part of the operation, so we can skip our hook here.
+     */
+    if (Vinifera_PerformingLoad) {
+        goto original_code;
+    }
 
     /**
      *  Create the extended class instance.
      */
-    New_Tactical_Extension(this_ptr);
-    if (!TacticalExtension) {
+    exttype_ptr = Extension::Make<TacticalExtension>(this_ptr);
+    if (!exttype_ptr) {
         DEBUG_ERROR("Failed to create TacticalExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
         MessageBoxA(MainWindow, "Failed to create TacticalExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
@@ -89,6 +72,8 @@ DECLARE_PATCH(_Tactical_Constructor_Patch)
         Fatal("Failed to create TacticalExtension instance!\n");
         goto original_code; // Keep this for clean code analysis.
     }
+
+    TacticalMapExtension = exttype_ptr;
 
     /**
      *  Stolen bytes here.
@@ -115,19 +100,6 @@ DECLARE_PATCH(_Tactical_NoInit_Constructor_Patch)
     GET_STACK_STATIC(const NoInitClass *, noinit, esp, 0x4);
 
     /**
-     *  Create the extended class instance.
-     */
-    New_Tactical_Extension(this_ptr);
-    if (!TacticalExtension) {
-        DEBUG_ERROR("Failed to create TacticalExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create TacticalExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create TacticalExtension instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
-
-    /**
      *  Stolen bytes here.
      */
 original_code:
@@ -151,7 +123,9 @@ DECLARE_PATCH(_Tactical_Destructor_Patch)
     /**
      *  Remove the extended class instance.
      */
-    Delete_Tactical_Extension();
+    Extension::Destroy<TacticalExtension>(this_ptr);
+
+    TacticalMapExtension = nullptr;
 
     /**
      *  Stolen bytes here.
@@ -162,6 +136,7 @@ original_code:
 }
 
 
+#if 0
 /**
  *  A fake class for implementing new member functions which allow
  *  access to the "this" pointer of the intended class.
@@ -211,6 +186,7 @@ void FakeTacticalClass::_Compute_CRC(WWCRCEngine &crc)
         TacticalExtension->Compute_CRC(crc);
     }
 }
+#endif
 
 
 /**
@@ -219,8 +195,8 @@ void FakeTacticalClass::_Compute_CRC(WWCRCEngine &crc)
 void TacticalExtension_Init()
 {
     Patch_Jump(0x0060F08A, &_Tactical_Constructor_Patch);
-    Patch_Jump(0x0060F0C5, &_Tactical_NoInit_Constructor_Patch);
+    //Patch_Jump(0x0060F0C5, &_Tactical_NoInit_Constructor_Patch);
     Patch_Jump(0x0060F0E7, &_Tactical_Destructor_Patch);
-    Change_Virtual_Address(0x006D7720, Get_Func_Address(&FakeTacticalClass::_Detach));
-    Change_Virtual_Address(0x006D7730, Get_Func_Address(&FakeTacticalClass::_Compute_CRC));
+    //Change_Virtual_Address(0x006D7720, Get_Func_Address(&FakeTacticalClass::_Detach));
+    //Change_Virtual_Address(0x006D7730, Get_Func_Address(&FakeTacticalClass::_Compute_CRC));
 }

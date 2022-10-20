@@ -68,6 +68,8 @@ class WarheadTypeClassExtension;
 class WaveClassExtension;
 class WeaponTypeClassExtension;
 
+class TacticalExtension;
+
 
 /**
  *  For printing out extension debug info.
@@ -121,3 +123,5 @@ extern DynamicVectorClass<VoxelAnimTypeClassExtension *> VoxelAnimTypeExtensions
 extern DynamicVectorClass<WarheadTypeClassExtension *> WarheadTypeExtensions;
 extern DynamicVectorClass<WaveClassExtension *> WaveExtensions;
 extern DynamicVectorClass<WeaponTypeClassExtension *> WeaponTypeExtensions;
+
+extern TacticalExtension *TacticalMapExtension;

@@ -57,3 +57,5 @@ DynamicVectorClass<VoxelAnimTypeClassExtension *> VoxelAnimTypeExtensions;
 DynamicVectorClass<WarheadTypeClassExtension *> WarheadTypeExtensions;
 DynamicVectorClass<WaveClassExtension *> WaveExtensions;
 DynamicVectorClass<WeaponTypeClassExtension *> WeaponTypeExtensions;
+
+TacticalExtension *TacticalMapExtension = nullptr;

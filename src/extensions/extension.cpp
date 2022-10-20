@@ -296,7 +296,7 @@ static bool Extension_Destroy(const BASE_CLASS *abstract_ptr)
 
 
 /**
- *  x
+ *  List version.
  * 
  *  @author: CCHyper
  */
@@ -354,7 +354,46 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
 
 
 /**
- *  x
+ *  Singleton version.
+ * 
+ *  @author: CCHyper
+ */
+template<class BASE_CLASS, class EXT_CLASS>
+static bool Extension_Save(IStream *pStm, EXT_CLASS *ext)
+{
+    DEBUG_INFO("Saving \"%s\" extension\n", Extension_Get_TypeID_Name<BASE_CLASS>().c_str());
+
+    /**
+     *  Tell the extension class to persist itself into the data stream.
+     */
+    IPersistStream *lpPS = nullptr;
+    HRESULT hr = ext->QueryInterface(__uuidof(IPersistStream), (LPVOID *)&lpPS);
+    if (FAILED(hr)) {
+        DEBUG_ERROR("Extension \"%s\" does not support IPersistStream!\n", Extension_Get_TypeID_Name<EXT_CLASS>().c_str());
+        return false;
+    }
+    
+    hr = OleSaveToStream(lpPS, pStm);
+    if (FAILED(hr)) {
+        DEBUG_ERROR("OleSaveToStream failed for extension \"%s\"!\n", Extension_Get_TypeID_Name<EXT_CLASS>().c_str());
+        return false;
+    }
+    
+    hr = lpPS->Release();
+    if (FAILED(hr)) {
+        DEBUG_ERROR("Failed to release extension \"%s\" stream!\n", Extension_Get_TypeID_Name<EXT_CLASS>().c_str());
+        return false;
+    }
+    
+    EXT_CLASS * ext_ptr = reinterpret_cast<EXT_CLASS *>(lpPS);
+    EXT_DEBUG_INFO("  -> %s\n", ext_ptr->Name());
+
+    return true;
+}
+
+
+/**
+ *  List version.
  * 
  *  @author: CCHyper
  */
@@ -389,7 +428,28 @@ static bool Extension_Load(IStream *pStm, DynamicVectorClass<EXT_CLASS *> &list)
 
 
 /**
- *  x
+ *  Singleton version.
+ * 
+ *  @author: CCHyper
+ */
+template<class BASE_CLASS, class EXT_CLASS>
+static bool Extension_Load(IStream *pStm, EXT_CLASS *ext)
+{
+    DEBUG_INFO("Loading \"%s\" extension.\n", Extension_Get_TypeID_Name<BASE_CLASS>().c_str());
+        
+    IUnknown *spUnk = nullptr;
+    HRESULT hr = OleLoadFromStream(pStm, __uuidof(IUnknown), (LPVOID *)&spUnk);
+    if (FAILED(hr)) {
+        DEBUG_ERROR("OleLoadFromStream failed for extension \"%s\"!\n", Extension_Get_TypeID_Name<EXT_CLASS>().c_str());
+        return false;
+    }
+
+    return true;
+}
+
+
+/**
+ *  List version.
  * 
  *  @author: CCHyper
  */
@@ -422,9 +482,38 @@ static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
             uintptr_t **ext_ptr_addr = ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(object);
             VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(*ext_ptr_addr, "AbstractClass::ExtPtr");
 
-            DEV_DEBUG_INFO("  Requested remap of index %d extension pointer.\n", index);
+            DEV_DEBUG_INFO("  Requested remap of index %d extension pointer complete.\n", index);
         }
     }
+
+    DEBUG_INFO("DONE!\n");
+
+    return true;
+}
+
+
+/**
+ *  Singleton version.
+ * 
+ *  @author: CCHyper
+ */
+template<class BASE_CLASS, class EXT_CLASS>
+static bool Extension_Request_Pointer_Remap(BASE_CLASS *abstract)
+{
+    DEBUG_INFO("Requesting remap of \"%s\" extension pointer... ", Extension_Get_TypeID_Name<BASE_CLASS>().c_str());
+
+    if (!Extension_Get_Abstract_Pointer(abstract)) {
+        DEV_DEBUG_ERROR("Extension_Request_Pointer_Remap: \"%s\" extension pointer for is null!\n", Extension_Get_TypeID_Name<BASE_CLASS>().c_str());
+        return false;
+    }
+
+    /**
+     *  
+     */
+    uintptr_t **ext_ptr_addr = ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(abstract);
+    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(*ext_ptr_addr, "AbstractClass::ExtPtr");
+
+    DEV_DEBUG_INFO("  Requested remap of extension pointer complete.\n");
 
     DEBUG_INFO("DONE!\n");
 
@@ -568,7 +657,7 @@ AbstractClassExtension *ExtensionPrivate::Make_Internal(const AbstractClass *abs
         //case RTTI_TUBE: { }                     // <- Not yet implemented
         //case RTTI_LIGHTSOURCE: { }              // <- Not yet implemented
         //case RTTI_EMPULSE: { }                  // <- Not yet implemented
-        //case RTTI_TACTICALMAP: { }              // <- Not yet implemented
+        case RTTI_TACTICALMAP: { extptr = Extension_Make<Tactical, TacticalExtension>(reinterpret_cast<const Tactical *>(abstract)); break; }
         case RTTI_SUPERWEAPON: { extptr = Extension_Make<SuperClass, SuperClassExtension>(reinterpret_cast<const SuperClass *>(abstract)); break; }
         //case RTTI_AITRIGGER: { }                // <- Not yet implemented
         //case RTTI_AITRIGGERTYPE: { }            // <- Not yet implemented
@@ -650,7 +739,7 @@ bool ExtensionPrivate::Destroy_Internal(const AbstractClass *abstract)
         //case RTTI_TUBE: { }                     // <- Not yet implemented
         //case RTTI_LIGHTSOURCE: { }              // <- Not yet implemented
         //case RTTI_EMPULSE: { }                  // <- Not yet implemented
-        //case RTTI_TACTICALMAP: { }              // <- Not yet implemented
+        case RTTI_TACTICALMAP: { removed = Extension_Destroy<Tactical, TacticalExtension>(reinterpret_cast<const Tactical *>(abstract)); break; }
         case RTTI_SUPERWEAPON: { removed = Extension_Destroy<SuperClass, SuperClassExtension>(reinterpret_cast<const SuperClass *>(abstract)); break; }
         //case RTTI_AITRIGGER: { }                // <- Not yet implemented
         //case RTTI_AITRIGGERTYPE: { }            // <- Not yet implemented
@@ -766,8 +855,8 @@ bool Extension::Is_Supported(RTTIType rtti)
         //case RTTI_TUBE:                       // <- Not yet implemented
         //case RTTI_LIGHTSOURCE:                // <- Not yet implemented
         //case RTTI_EMPULSE:                    // <- Not yet implemented
-        //case RTTI_TACTICALMAP:                // <- Not yet implemented, needs rewrite of the extension class.
-        //case RTTI_SUPERWEAPON:        // <--- !! CRASHES
+        case RTTI_TACTICALMAP:
+        //case RTTI_SUPERWEAPON:        // <--- !! FAILS POINTER REMAP
         //case RTTI_AITRIGGER:                  // <- Not yet implemented
         //case RTTI_AITRIGGERTYPE:              // <- Not yet implemented
         //case RTTI_NEURON:                     // <- Not yet implemented
@@ -873,7 +962,7 @@ bool Extension::Save(IStream *pStm)
     if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP) && !Extension_Save<Tactical, TacticalExtension>(pStm, TacticalMapExtension)) { return false; }
     if (Extension::Is_Supported(RTTI_SUPERWEAPON) && !Extension_Save<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
     if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
@@ -961,7 +1050,7 @@ bool Extension::Load(IStream *pStm)
     if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP) && !Extension_Load<Tactical, TacticalExtension>(pStm, TacticalMapExtension)) { return false; }
     if (Extension::Is_Supported(RTTI_SUPERWEAPON) && !Extension_Load<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
     if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
@@ -1048,7 +1137,7 @@ bool Extension::Request_Pointer_Remap()
     if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP) && !Extension_Request_Pointer_Remap<Tactical, TacticalExtension>(TacticalMap)) { return false; }
     if (Extension::Is_Supported(RTTI_SUPERWEAPON) && !Extension_Request_Pointer_Remap<SuperClass, SuperClassExtension>(Supers)) { return false; }
     if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
@@ -1130,7 +1219,7 @@ bool Extension::Register_Class_Factories()
     if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { REGISTER_CLASS(TacticalExtension); }
     if (Extension::Is_Supported(RTTI_SUPERWEAPON)) { REGISTER_CLASS(SuperClassExtension); }
     if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
@@ -1214,7 +1303,7 @@ void Extension::Clear_Vectors()
     if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // Does not need to be processed.
     if (Extension::Is_Supported(RTTI_SUPERWEAPON)) { SuperExtensions.Clear(); }
     if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
@@ -1299,7 +1388,7 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
     if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // Does not need to be processed.
     if (Extension::Is_Supported(RTTI_SUPERWEAPON)) { Extension_Print_CRCs(SuperExtensions, fp); }
     if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
@@ -1379,7 +1468,7 @@ void Extension::Detach_This_From_All(TARGET target, bool all)
     if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { TacticalMapExtension->Detach(target, all); }
     if (Extension::Is_Supported(RTTI_SUPERWEAPON)) { Extension_Detach_This_From_All(SuperExtensions, target, all); }
     if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
@@ -1459,7 +1548,7 @@ unsigned Extension::Get_Save_Version_Number()
     if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented
-    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { }                    // <- Not yet implemented
+    if (Extension::Is_Supported(RTTI_TACTICALMAP)) { version += sizeof(TacticalExtension); }
     if (Extension::Is_Supported(RTTI_SUPERWEAPON)) { version += sizeof(SuperClassExtension); }
     if (Extension::Is_Supported(RTTI_AITRIGGER)) { }                      // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_AITRIGGERTYPE)) { }                  // <- Not yet implemented
@@ -1474,9 +1563,6 @@ unsigned Extension::Get_Save_Version_Number()
     version += sizeof(RulesClassExtension);
     version += sizeof(ScenarioClassExtension);
     version += sizeof(SessionClassExtension);
-
-    // TODO EXT_RTTI_TACTICALMAP
-    version += sizeof(TacticalMapExtension);
 
     return version;
 }

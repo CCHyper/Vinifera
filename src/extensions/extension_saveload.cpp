@@ -265,38 +265,6 @@ static bool Vinifera_Load_ScenarioExtension(IStream *pStm)
 }
 
 
-static bool Vinifera_Save_TacticalExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-
-    if (!TacticalExtension) {
-        return false;
-    }
-
-    TacticalExtension->Save(pStm, true);
-
-    return true;
-}
-
-
-static bool Vinifera_Load_TacticalExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-    
-    if (!TacticalExtension) {
-        return false;
-    }
-
-    TacticalExtension->Load(pStm);
-
-    return true;
-}
-
-
 /**
  *  Save all Vinifera data to the file stream.
  * 
@@ -331,12 +299,6 @@ bool Vinifera_Put_All(IStream *pStm)
 //
 //    DEBUG_INFO("Saving ScenarioExtension\n");
 //    if (!Vinifera_Save_ScenarioExtension(pStm)) {
-//        DEBUG_ERROR("\t***** FAILED!\n");
-//        return false;
-//    }
-//
-//    DEBUG_INFO("Saving TacticalExtension\n");
-//    if (!Vinifera_Save_TacticalExtension(pStm)) {
 //        DEBUG_ERROR("\t***** FAILED!\n");
 //        return false;
 //    }
@@ -412,12 +374,6 @@ bool Vinifera_Load_All(IStream *pStm)
 //
 //    DEBUG_INFO("Loading ScenarioExtension\n");
 //    if (!Vinifera_Load_ScenarioExtension(pStm)) {
-//        DEBUG_ERROR("\t***** FAILED!\n");
-//        return false;
-//    }
-//
-//    DEBUG_INFO("Loading TacticalExtension\n");
-//    if (!Vinifera_Load_TacticalExtension(pStm)) {
 //        DEBUG_ERROR("\t***** FAILED!\n");
 //        return false;
 //    }
