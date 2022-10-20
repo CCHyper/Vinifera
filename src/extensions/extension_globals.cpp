@@ -59,3 +59,7 @@ DynamicVectorClass<WaveClassExtension *> WaveExtensions;
 DynamicVectorClass<WeaponTypeClassExtension *> WeaponTypeExtensions;
 
 TacticalExtension *TacticalMapExtension = nullptr;
+
+RulesClassExtension *RuleExtension = nullptr;
+ScenarioClassExtension *ScenExtension = nullptr;
+SessionClassExtension *SessionExtension = nullptr;

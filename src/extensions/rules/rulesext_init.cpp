@@ -30,39 +30,14 @@
 #include "rules.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
+#include "extension_globals.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
-
-
-/**
- *  "new" operations must be done within a new function for patched code.
- * 
- *  @author: CCHyper
- */
-static void New_Rules_Extension(RulesClass *this_ptr)
-{
-    /**
-     *  Delete existing instance (should never be the case).
-     */
-    delete RulesExtension;
-
-    RulesExtension = new RulesClassExtension(this_ptr);
-}
-
-
-/**
- *  "delete" operations must be done within a new function for patched code.
- * 
- *  @author: CCHyper
- */
-static void Delete_Rules_Extension()
-{
-    delete RulesExtension;
-}
 
 
 /**
@@ -75,19 +50,22 @@ static void Delete_Rules_Extension()
 DECLARE_PATCH(_RulesClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(RulesClass *, this_ptr, esi); // "this" pointer.
+    static RulesClassExtension *ext_ptr;
 
     /**
      *  Create the extended class instance.
      */
-    New_Rules_Extension(this_ptr);
-    if (!RulesExtension) {
-        DEBUG_ERROR("Failed to create RulesExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
+    ext_ptr = Extension::Singleton::Make<RulesClass, RulesClassExtension>(this_ptr);
+    if (!ext_ptr) {
+        DEBUG_ERROR("Failed to create RuleExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create RulesExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
+        MessageBoxA(MainWindow, "Failed to create RuleExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
         Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create RulesExtension instance!\n");
+        Fatal("Failed to create RuleExtension instance!\n");
         goto original_code; // Keep this for clean code analysis.
     }
+
+    RuleExtension = ext_ptr;
 
     /**
      *  Stolen bytes here.
@@ -115,19 +93,6 @@ DECLARE_PATCH(_RulesClass_NoInit_Constructor_Patch)
     GET_STACK_STATIC(const NoInitClass *, noinit, esp, 0x4);
 
     /**
-     *  Create the extended class instance.
-     */
-    New_Rules_Extension(this_ptr);
-    if (!RulesExtension) {
-        DEBUG_ERROR("Failed to create RulesExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create RulesExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create RulesExtension instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
-
-    /**
      *  Stolen bytes here.
      */
 original_code:
@@ -152,7 +117,7 @@ DECLARE_PATCH(_RulesClass_Destructor_Patch)
     /**
      *  Remove the extended class instance.
      */
-    Delete_Rules_Extension();
+    Extension::Singleton::Destroy<RulesClass, RulesClassExtension>(RuleExtension);
 
     /**
      *  Stolen bytes here.
@@ -178,14 +143,7 @@ DECLARE_PATCH(_RulesClass_Initialize_Patch)
     GET_STACK_STATIC(RulesClass *, this_ptr, esp, 0x10);
     GET_STACK_STATIC(CCINIClass *, ini, esp, 0x44);
 
-    /**
-     *  Find the extension instance.
-     */
-    if (!RulesExtension) {
-        goto original_code;
-    }
-
-    RulesExtension->Initialize(*ini);
+    RuleExtension->Initialize(*ini);
 
     /**
      *  Stolen bytes here.
@@ -212,14 +170,7 @@ DECLARE_PATCH(_RulesClass_Process_Patch)
     GET_REGISTER_STATIC(RulesClass *, this_ptr, ebp);
     GET_REGISTER_STATIC(CCINIClass *, ini, esi);
 
-    /**
-     *  Find the extension instance.
-     */
-    if (!RulesExtension) {
-        goto original_code;
-    }
-
-    RulesExtension->Process(*ini);
+    RuleExtension->Process(*ini);
 
     /**
      *  Stolen bytes here.
@@ -247,14 +198,7 @@ DECLARE_PATCH(_RulesClass_Detach_Patch)
     GET_STACK_STATIC(TARGET, target, esp, 0x4);
     GET_STACK_STATIC8(bool, all, esp, 0x8);
 
-    /**
-     *  Find the extension instance.
-     */
-    if (!RulesExtension) {
-        goto original_code;
-    }
-
-    RulesExtension->Detach(target, all);
+    RuleExtension->Detach(target, all);
 
     /**
      *  Stolen bytes here.
@@ -279,14 +223,7 @@ DECLARE_PATCH(_RulesClass_MPlayer_Patch)
     GET_REGISTER_STATIC(RulesClass *, this_ptr, esi);
     GET_REGISTER_STATIC(CCINIClass *, ini, edi);
 
-    /**
-     *  Find the extension instance.
-     */
-    if (!RulesExtension) {
-        goto original_code;
-    }
-
-    RulesExtension->MPlayer(*ini);
+    RuleExtension->MPlayer(*ini);
 
     /**
      *  Stolen bytes here.
@@ -305,7 +242,7 @@ original_code:
 void RulesClassExtension_Init()
 {
     Patch_Jump(0x005C59A1, &_RulesClass_Constructor_Patch);
-    Patch_Jump(0x005C4347, &_RulesClass_NoInit_Constructor_Patch);
+    //Patch_Jump(0x005C4347, &_RulesClass_NoInit_Constructor_Patch);
     Patch_Jump(0x005C6120, &_RulesClass_Destructor_Patch);
     Patch_Jump(0x005C66FF, &_RulesClass_Initialize_Patch);
     Patch_Jump(0x005C6A4D, &_RulesClass_Process_Patch);

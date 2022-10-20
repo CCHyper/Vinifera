@@ -70,6 +70,10 @@ class WeaponTypeClassExtension;
 
 class TacticalExtension;
 
+class RulesClassExtension;
+class ScenarioClassExtension;
+class SessionClassExtension;
+
 
 /**
  *  For printing out extension debug info.
@@ -125,3 +129,7 @@ extern DynamicVectorClass<WaveClassExtension *> WaveExtensions;
 extern DynamicVectorClass<WeaponTypeClassExtension *> WeaponTypeExtensions;
 
 extern TacticalExtension *TacticalMapExtension;
+
+extern RulesClassExtension *RuleExtension;
+extern ScenarioClassExtension *ScenExtension;
+extern SessionClassExtension *SessionExtension;

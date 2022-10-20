@@ -87,7 +87,7 @@
 //EXT_RTTI_TUBE
 //EXT_RTTI_LIGHTSOURCE
 #include "empulseext_hooks.h"
-//EXT_RTTI_TACTICALMAP
+#include "tacticalext_hooks.h"
 #include "superext_hooks.h"
 //EXT_RTTI_AITRIGGER
 //EXT_RTTI_AITRIGGERTYPE
@@ -96,7 +96,9 @@
 //EXT_RTTI_ALPHASHAPE
 //EXT_RTTI_VEINHOLEMONSTER
 
-
+#include "rulesext_hooks.h"
+#include "scenarioext_hooks.h"
+#include "sessionext_hooks.h"
 
 
 
@@ -106,16 +108,12 @@
 #include "mainloopext_hooks.h"
 #include "newmenuext_hooks.h"
 
-#include "rulesext_hooks.h"
-#include "tacticalext_hooks.h"
-#include "scenarioext_hooks.h"
 #include "displayext_hooks.h"
 #include "sidebarext_hooks.h"
 #include "tooltipext_hooks.h"
 #include "commandext_hooks.h"
 #include "optionsext_hooks.h"
 #include "msglistext_hooks.h"
-#include "sessionext_hooks.h"
 #include "cdext_hooks.h"
 
 #include "playmovie_hooks.h"
@@ -410,12 +408,13 @@ void Extension_Hooks()
     /**
      *  All global class extensions here.
      */
-//    RulesClassExtension_Hooks();
-//    ScenarioClassExtension_Hooks();
+    RulesClassExtension_Hooks();
+    ScenarioClassExtension_Hooks();
+    SessionClassExtension_Hooks();
+
 //    DisplayClassExtension_Hooks();
 //    SidebarClassExtension_Hooks();
 //    OptionsClassExtension_Hooks();
-//    SessionClassExtension_Hooks();
 //    ThemeClassExtension_Hooks();
 
     /**

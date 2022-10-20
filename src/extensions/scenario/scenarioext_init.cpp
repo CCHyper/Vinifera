@@ -30,39 +30,14 @@
 #include "scenario.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
+#include "extension_globals.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
-
-
-/**
- *  "new" operations must be done within a new function for patched code.
- * 
- *  @author: CCHyper
- */
-static void New_Scenario_Extension(ScenarioClass *this_ptr)
-{
-    /**
-     *  Delete existing instance (should never be the case).
-     */
-    delete ScenarioExtension;
-
-    ScenarioExtension = new ScenarioClassExtension(this_ptr);
-}
-
-
-/**
- *  "delete" operations must be done within a new function for patched code.
- * 
- *  @author: CCHyper
- */
-static void Delete_Scenario_Extension()
-{
-    delete ScenarioExtension;
-}
 
 
 /**
@@ -75,12 +50,13 @@ static void Delete_Scenario_Extension()
 DECLARE_PATCH(_ScenarioClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(ScenarioClass *, this_ptr, ebp); // "this" pointer.
+    static ScenarioClassExtension *ext_ptr;
 
     /**
      *  Create the extended class instance.
      */
-    New_Scenario_Extension(this_ptr);
-    if (!ScenarioExtension) {
+    ext_ptr = Extension::Singleton::Make<ScenarioClass, ScenarioClassExtension>(this_ptr);
+    if (!ext_ptr) {
         DEBUG_ERROR("Failed to create ScenarioExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
         MessageBoxA(MainWindow, "Failed to create ScenarioExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
@@ -88,6 +64,8 @@ DECLARE_PATCH(_ScenarioClass_Constructor_Patch)
         Fatal("Failed to create ScenarioExtension instance!\n");
         goto original_code; // Keep this for clean code analysis.
     }
+
+    ScenExtension = ext_ptr;
 
     /**
      *  Stolen bytes here.
@@ -121,19 +99,6 @@ DECLARE_PATCH(_ScenarioClass_NoInit_Constructor_Patch)
     GET_STACK_STATIC(const NoInitClass *, noinit, esp, 0x4);
 
     /**
-     *  Create the extended class instance.
-     */
-    New_Scenario_Extension(this_ptr);
-    if (!ScenarioExtension) {
-        DEBUG_ERROR("Failed to create ScenarioExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create ScenarioExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create ScenarioExtension instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
-
-    /**
      *  Stolen bytes here.
      */
 original_code:
@@ -159,7 +124,7 @@ DECLARE_PATCH(_ScenarioClass_Destructor_Patch)
     /**
      *  Remove the extended class instance.
      */
-    Delete_Scenario_Extension();
+    Extension::Singleton::Destroy<ScenarioClass, ScenarioClassExtension>(ScenExtension);
 
     /**
      *  Stolen bytes here.
@@ -182,14 +147,7 @@ DECLARE_PATCH(_ScenarioClass_Init_Clear_Patch)
 {
     GET_REGISTER_STATIC(ScenarioClass *, this_ptr, esi);
 
-    /**
-     *  Find the extension instance.
-     */
-    if (!ScenarioExtension) {
-        goto original_code;
-    }
-
-    ScenarioExtension->Init_Clear();
+    ScenExtension->Init_Clear();
 
     /**
      *  Stolen bytes here.
@@ -217,16 +175,9 @@ DECLARE_PATCH(_ScenarioClass_Compute_CRC_Patch)
     GET_STACK_STATIC(WWCRCEngine *, crc, esp, 0xC);
 
     /**
-     *  Find the extension instance.
-     */
-    if (!ScenarioExtension) {
-        goto original_code;
-    }
-
-    /**
      *  Read type class compute crc.
      */
-    ScenarioExtension->Compute_CRC(*crc);
+    ScenExtension->Compute_CRC(*crc);
 
     /**
      *  Stolen bytes here.

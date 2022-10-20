@@ -28,36 +28,30 @@
 #pragma once
 
 #include "always.h"
-#include "tibsun_defines.h"
-#include <objidl.h>
+#include "extension_singleton.h"
+#include "scenario.h"
 
 
-class ScenarioClass;
-class NoInitClass;
-class WWCRCEngine;
-
-
-class ScenarioClassExtension final
+class ScenarioClassExtension final : public ExtensionSingleton<ScenarioClass>
 {
     public:
-        ScenarioClassExtension(ScenarioClass *this_ptr);
-        ScenarioClassExtension(const NoInitClass &noinit);
-        ~ScenarioClassExtension();
+        IFACEMETHOD(Load)(IStream *pStm);
+        IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 
-        HRESULT Load(IStream *pStm);
-        HRESULT Save(IStream *pStm, BOOL fClearDirty);
-        int Size_Of() const;
-        void Detach(TARGET target, bool all);
-        void Compute_CRC(WWCRCEngine &crc) const;
+    public:
+        ScenarioClassExtension(const ScenarioClass *this_ptr);
+        ScenarioClassExtension(const NoInitClass &noinit);
+        virtual ~ScenarioClassExtension();
+
+        virtual int Size_Of() const override;
+        virtual void Detach(TARGET target, bool all = true) override;
+        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+
+        virtual const char *Name() const override { return "Scenario"; }
+        virtual const char *Full_Name() const override { return "Scenario"; }
 
         void Init_Clear();
 
     public:
 
 };
-
-
-/**
- *  Global instance of the extended class.
- */
-extern ScenarioClassExtension *ScenarioExtension;

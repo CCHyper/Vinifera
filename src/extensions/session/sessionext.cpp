@@ -39,18 +39,16 @@
 #include "debughandler.h"
 
 
-SessionClassExtension *SessionExtension = nullptr;
-
-
 /**
  *  Class constructor.
  *  
  *  @author: CCHyper
  */
-SessionClassExtension::SessionClassExtension(SessionClass *this_ptr) :
+SessionClassExtension::SessionClassExtension(const SessionClass *this_ptr) :
+    ExtensionSingleton(this_ptr),
     ExtOptions()
 {
-    //EXT_DEBUG_TRACE("SessionClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("SessionClassExtension::SessionClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 
    /**
      *  Initialises the default game options.
@@ -66,8 +64,10 @@ SessionClassExtension::SessionClassExtension(SessionClass *this_ptr) :
  *  
  *  @author: CCHyper
  */
-SessionClassExtension::SessionClassExtension(const NoInitClass &noinit)
+SessionClassExtension::SessionClassExtension(const NoInitClass &noinit) :
+    ExtensionSingleton(noinit)
 {
+    //EXT_DEBUG_TRACE("SessionClassExtension::SessionClassExtension(NoInitClass) - 0x%08X\n", (uintptr_t)(ThisPtr));
 }
 
 
@@ -78,67 +78,40 @@ SessionClassExtension::SessionClassExtension(const NoInitClass &noinit)
  */
 SessionClassExtension::~SessionClassExtension()
 {
-    //EXT_DEBUG_TRACE("SessionClassExtension destructor - 0x%08X\n", (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("SessionClassExtension::~SessionClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 }
 
 
+/**
+ *  Initializes an object from the stream where it was saved previously.
+ *  
+ *  @author: CCHyper
+ */
 HRESULT SessionClassExtension::Load(IStream *pStm)
 {
     //EXT_DEBUG_TRACE("SessionClassExtension::Load - 0x%08X\n", (uintptr_t)(This()));
 
-    if (!pStm) {
-        return E_POINTER;
-    }
-
-    /**
-     *  Load the unique id for this class.
-     */
-    ULONG id = 0;
-    HRESULT hr = pStm->Read(&id, sizeof(ULONG), nullptr);
+    HRESULT hr = ExtensionSingleton::Load(pStm);
     if (FAILED(hr)) {
-        return hr;
+        return E_FAIL;
     }
 
     new (this) SessionClassExtension(NoInitClass());
-
-    /**
-     *  x
-     */
-    VINIFERA_SWIZZLE_REGISTER_POINTER(id, this, "this");
-
-    /**
-     *  Read this classes instance binary blob data.
-     */
-    hr = pStm->Read(this, Size_Of(), nullptr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-
+    
     return hr;
 }
 
 
+/**
+ *  Saves an object to the specified stream.
+ *  
+ *  @author: CCHyper
+ */
 HRESULT SessionClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
     //EXT_DEBUG_TRACE("SessionClassExtension::Save - 0x%08X\n", (uintptr_t)(This()));
 
-    if (!pStm) {
-        return E_POINTER;
-    }
-
-    /**
-     *  x
-     */
-    ULONG id = (ULONG)this;
-    HRESULT hr = pStm->Write(&id, sizeof(id), nullptr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-    
-    /**
-     *  Write this class instance as a binary blob.
-     */
-    hr = pStm->Write(this, Size_Of(), nullptr);
+    HRESULT hr = ExtensionSingleton::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
     }
@@ -160,8 +133,25 @@ int SessionClassExtension::Size_Of() const
 }
 
 
+/**
+ *  Removes the specified target from any targeting and reference trackers.
+ *  
+ *  @author: CCHyper
+ */
+void SessionClassExtension::Detach(TARGET target, bool all)
+{
+    //EXT_DEBUG_TRACE("SessionClassExtension::Detach - 0x%08X\n", (uintptr_t)(This()));
+}
+
+
+/**
+ *  Compute a unique crc value for this instance.
+ *  
+ *  @author: CCHyper
+ */
 void SessionClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
+    //EXT_DEBUG_TRACE("SessionClassExtension::Compute_CRC - 0x%08X\n", (uintptr_t)(This()));
 }
 
 

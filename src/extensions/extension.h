@@ -34,26 +34,76 @@
 #include "asserthandler.h"
 
 #include <objidl.h> // for IStream.
+#include <string>
+#include <typeinfo>
 
 
 class EventClass;
 
 
+namespace Extension
+{
+
 /**
  *  Do not call these directly! Use the template functions below.
  */
-namespace ExtensionPrivate
+namespace Private
 {
 
-    AbstractClassExtension *Make_Internal(const AbstractClass *abstract);
-    bool Destroy_Internal(const AbstractClass *abstract);
-    AbstractClassExtension *Fetch_Internal(const AbstractClass *abstract);
+AbstractClassExtension *Make_Internal(const AbstractClass *abstract);
+bool Destroy_Internal(const AbstractClass *abstract);
+AbstractClassExtension *Fetch_Internal(const AbstractClass *abstract);
 
-}; // namespace "ExtensionPrivate".
-
-
-namespace Extension
+/**
+ *  Wrapper for "typeid(T).name()", removes the "class" prefix on the string.
+ */
+template<typename T>
+std::string Get_TypeID_Name()
 {
+    std::string str = typeid(T).name();
+    str.erase(0, 6);
+    return str;
+}
+
+}; // namespace "Extension::Private".
+
+namespace Singleton
+{
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+template<class BASE_CLASS, class EXT_CLASS>
+EXT_CLASS *Make(const BASE_CLASS *base)
+{
+    ASSERT(base != nullptr);
+
+    EXT_CLASS *ext_ptr = new EXT_CLASS(base);
+    ASSERT(ext_ptr != nullptr);
+
+    EXT_DEBUG_INFO("Created \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+
+    return ext_ptr;
+}
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+template<class BASE_CLASS, class EXT_CLASS>
+void Destroy(const EXT_CLASS *ext)
+{
+    ASSERT(ext != nullptr);
+
+    delete ext;
+
+    EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+}
+
+}; // namespace "Extension::Singleton".
 
 /**
  *  x
@@ -65,7 +115,7 @@ T *Fetch(const AbstractClass *abstract)
 {
     ASSERT(abstract != nullptr);
 
-    return (T *)ExtensionPrivate::Fetch_Internal(abstract);
+    return (T *)Extension::Private::Fetch_Internal(abstract);
 }
 
 /**
@@ -76,7 +126,9 @@ T *Fetch(const AbstractClass *abstract)
 template<class T>
 T *Make(const AbstractClass *abstract)
 {
-    return (T *)ExtensionPrivate::Make_Internal(abstract);
+    ASSERT(abstract != nullptr);
+
+    return (T *)Extension::Private::Make_Internal(abstract);
 }
 
 /**
@@ -89,7 +141,7 @@ void Destroy(const AbstractClass *abstract)
 {
     ASSERT(abstract != nullptr);
 
-    ExtensionPrivate::Destroy_Internal(abstract);
+    Extension::Private::Destroy_Internal(abstract);
 }
 
 /**

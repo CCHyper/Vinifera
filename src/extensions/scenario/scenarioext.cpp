@@ -35,17 +35,15 @@
 #include "debughandler.h"
 
 
-ScenarioClassExtension *ScenarioExtension = nullptr;
-
-
 /**
  *  Class constructor.
  *  
  *  @author: CCHyper
  */
-ScenarioClassExtension::ScenarioClassExtension(ScenarioClass *this_ptr)
+ScenarioClassExtension::ScenarioClassExtension(const ScenarioClass *this_ptr) :
+    ExtensionSingleton(this_ptr)
 {
-    //EXT_DEBUG_TRACE("ScenarioClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("ScenarioClassExtension::ScenarioClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 
     /**
      *  This copies the behavior of the games ScenarioClass.
@@ -59,8 +57,10 @@ ScenarioClassExtension::ScenarioClassExtension(ScenarioClass *this_ptr)
  *  
  *  @author: CCHyper
  */
-ScenarioClassExtension::ScenarioClassExtension(const NoInitClass &noinit)
+ScenarioClassExtension::ScenarioClassExtension(const NoInitClass &noinit) :
+    ExtensionSingleton(noinit)
 {
+    //EXT_DEBUG_TRACE("ScenarioClassExtension::ScenarioClassExtension(NoInitClass) - 0x%08X\n", (uintptr_t)(ThisPtr));
 }
 
 
@@ -71,15 +71,12 @@ ScenarioClassExtension::ScenarioClassExtension(const NoInitClass &noinit)
  */
 ScenarioClassExtension::~ScenarioClassExtension()
 {
-    //EXT_DEBUG_TRACE("ScenarioClassExtension destructor - 0x%08X\n", (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("ScenarioClassExtension::~ScenarioClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 }
 
 
 /**
  *  Initializes an object from the stream where it was saved previously.
- *
- *  As ScenarioClassExtension is static data, we do not need to request
- *  pointer remap of "ThisPtr" after loading has finished.
  *  
  *  @author: CCHyper
  */
@@ -87,34 +84,13 @@ HRESULT ScenarioClassExtension::Load(IStream *pStm)
 {
     //EXT_DEBUG_TRACE("ScenarioClassExtension::Load - 0x%08X\n", (uintptr_t)(This()));
 
-    if (!pStm) {
-        return E_POINTER;
-    }
-
-    /**
-     *  Load the unique id for this class.
-     */
-    ULONG id = 0;
-    HRESULT hr = pStm->Read(&id, sizeof(ULONG), nullptr);
+    HRESULT hr = ExtensionSingleton::Load(pStm);
     if (FAILED(hr)) {
-        return hr;
+        return E_FAIL;
     }
 
     new (this) ScenarioClassExtension(NoInitClass());
-
-    /**
-     *  x
-     */
-    VINIFERA_SWIZZLE_REGISTER_POINTER(id, this, "this");
-
-    /**
-     *  Read this classes instance binary blob data.
-     */
-    hr = pStm->Read(this, Size_Of(), nullptr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-
+    
     return hr;
 }
 
@@ -128,23 +104,7 @@ HRESULT ScenarioClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
     //EXT_DEBUG_TRACE("ScenarioClassExtension::Save - 0x%08X\n", (uintptr_t)(This()));
 
-    if (!pStm) {
-        return E_POINTER;
-    }
-
-    /**
-     *  x
-     */
-    ULONG id = (ULONG)this;
-    HRESULT hr = pStm->Write(&id, sizeof(id), nullptr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-    
-    /**
-     *  Write this class instance as a binary blob.
-     */
-    hr = pStm->Write(this, Size_Of(), nullptr);
+    HRESULT hr = ExtensionSingleton::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
     }

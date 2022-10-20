@@ -29,39 +29,14 @@
 #include "sessionext.h"
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
+#include "extension.h"
+#include "extension_globals.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
-
-
-/**
- *  "new" operations must be done within a new function for patched code.
- * 
- *  @author: CCHyper
- */
-static void New_Session_Extension(SessionClass *this_ptr)
-{
-    /**
-     *  Delete existing instance (should never be the case).
-     */
-    delete SessionExtension;
-
-    SessionExtension = new SessionClassExtension(this_ptr);
-}
-
-
-/**
- *  "delete" operations must be done within a new function for patched code.
- * 
- *  @author: CCHyper
- */
-static void Delete_Session_Extension()
-{
-    delete SessionExtension;
-}
 
 
 /**
@@ -74,12 +49,13 @@ static void Delete_Session_Extension()
 DECLARE_PATCH(_SessionClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(SessionClass *, this_ptr, ebp); // "this" pointer.
+    static SessionClassExtension *ext_ptr;
 
     /**
      *  Create the extended class instance.
      */
-    New_Session_Extension(this_ptr);
-    if (!SessionExtension) {
+    ext_ptr = Extension::Singleton::Make<SessionClass, SessionClassExtension>(this_ptr);
+    if (!ext_ptr) {
         DEBUG_ERROR("Failed to create SessionExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
         ShowCursor(TRUE);
         MessageBoxA(MainWindow, "Failed to create SessionExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
@@ -87,6 +63,8 @@ DECLARE_PATCH(_SessionClass_Constructor_Patch)
         Fatal("Failed to create SessionExtension instance!\n");
         goto original_code; // Keep this for clean code analysis.
     }
+
+    SessionExtension = ext_ptr;
 
     /**
      *  Stolen bytes here.
@@ -114,17 +92,9 @@ DECLARE_PATCH(_SessionClass_Destructor_Patch)
     GET_REGISTER_STATIC(SessionClass *, this_ptr, esi);
 
     /**
-     *  Create the extended class instance.
+     *  Remove the extended class instance.
      */
-    New_Session_Extension(this_ptr);
-    if (!SessionExtension) {
-        DEBUG_ERROR("Failed to create SessionExtension instance for 0x%08X!\n", (uintptr_t)this_ptr);
-        ShowCursor(TRUE);
-        MessageBoxA(MainWindow, "Failed to create SessionExtension instance!\n", "Vinifera", MB_OK|MB_ICONEXCLAMATION);
-        Vinifera_Generate_Mini_Dump();
-        Fatal("Failed to create SessionExtension instance!\n");
-        goto original_code; // Keep this for clean code analysis.
-    }
+    Extension::Singleton::Destroy<SessionClass, SessionClassExtension>(SessionExtension);
 
     /**
      *  Stolen bytes here.

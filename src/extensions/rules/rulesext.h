@@ -30,29 +30,31 @@
 
 #include "always.h"
 #include "tibsun_defines.h"
+#include "rules.h"
+#include "extension_singleton.h"
 #include "tpoint.h"
-#include <objidl.h>
 
 
-class RulesClass;
-class NoInitClass;
 class CCINIClass;
-class WWCRCEngine;
 
 
-class RulesClassExtension final
+class RulesClassExtension final : public ExtensionSingleton<RulesClass>
 {
+    public:
+        IFACEMETHOD(Load)(IStream *pStm);
+        IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
+
     public:
         RulesClassExtension(const RulesClass *this_ptr);
         RulesClassExtension(const NoInitClass &noinit);
-        ~RulesClassExtension();
+        virtual ~RulesClassExtension();
 
-        HRESULT Load(IStream *pStm);
-        HRESULT Save(IStream *pStm, BOOL fClearDirty);
-        int Size_Of() const;
+        virtual int Size_Of() const override;
+        virtual void Detach(TARGET target, bool all = true) override;
+        virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
-        void Detach(TARGET target, bool all = true);
-        void Compute_CRC(WWCRCEngine &crc) const;
+        virtual const char *Name() const override { return "Rule"; }
+        virtual const char *Full_Name() const override { return "Rule"; }
 
         void Process(CCINIClass &ini);
         void Initialize(CCINIClass &ini);
@@ -67,12 +69,6 @@ class RulesClassExtension final
 
     private:
         void Check();
-
-    private:
-        /**
-         *  x
-         */
-        RulesClass *This;
 
     public:
         typedef struct UIControlsStruct
@@ -119,9 +115,3 @@ class RulesClassExtension final
          */
         bool IsShowSuperWeaponTimers;
 };
-
-
-/**
- *  Global instance of the extended class.
- */
-extern RulesClassExtension *RulesExtension;

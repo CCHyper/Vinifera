@@ -106,7 +106,7 @@ HRESULT BuildingClassExtension::GetClassID(CLSID *lpClassID)
  */
 HRESULT BuildingClassExtension::Load(IStream *pStm)
 {
-    //EXT_DEBUG_TRACE("BuildingClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("BuildingClassExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = TechnoClassExtension::Load(pStm);
     if (FAILED(hr)) {
@@ -126,7 +126,7 @@ HRESULT BuildingClassExtension::Load(IStream *pStm)
  */
 HRESULT BuildingClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
-    //EXT_DEBUG_TRACE("BuildingClassExtension::Size_Of - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("BuildingClassExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     HRESULT hr = TechnoClassExtension::Save(pStm, fClearDirty);
     if (FAILED(hr)) {

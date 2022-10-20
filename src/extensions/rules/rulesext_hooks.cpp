@@ -37,6 +37,7 @@
 #include "addon.h"
 #include "wwmouse.h"
 #include "windialog.h"
+#include "extension_globals.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -75,11 +76,7 @@ void RulesClassExt::_Process(CCINIClass &ini)
      * 
      *  #NOTE: This must be last!
      */
-    if (RulesExtension) {
-        RulesExtension->Process(ini);
-    } else {
-        Process(ini);
-    }
+    RuleExtension->Process(ini);
 }
 
 
@@ -193,11 +190,9 @@ DECLARE_PATCH(_Init_Rules_Extended_Class_Patch)
     /**
      *  Store extended class values.
      */
-    if (SessionExtension && RulesExtension) {
-        SessionExtension->ExtOptions.IsAutoDeployMCV = RulesExtension->IsMPAutoDeployMCV;
-        SessionExtension->ExtOptions.IsPrePlacedConYards = RulesExtension->IsMPPrePlacedConYards;
-        SessionExtension->ExtOptions.IsBuildOffAlly = RulesExtension->IsBuildOffAlly;
-    }
+    SessionExtension->ExtOptions.IsAutoDeployMCV = RuleExtension->IsMPAutoDeployMCV;
+    SessionExtension->ExtOptions.IsPrePlacedConYards = RuleExtension->IsMPPrePlacedConYards;
+    SessionExtension->ExtOptions.IsBuildOffAlly = RuleExtension->IsBuildOffAlly;
 
     /**
      *  Stolen bytes/code.

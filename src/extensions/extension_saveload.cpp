@@ -169,102 +169,6 @@ static bool Vinifera_Load_Header(IStream *pStm)
 }
 
 
-static bool Vinifera_Save_RulesExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-
-    if (!RulesExtension) {
-        return false;
-    }
-
-    RulesExtension->Save(pStm, true);
-
-    return true;
-}
-
-
-static bool Vinifera_Load_RulesExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-    
-    if (!RulesExtension) {
-        return false;
-    }
-
-    RulesExtension->Load(pStm);
-
-    return true;
-}
-
-
-static bool Vinifera_Save_SessionExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-
-    if (!SessionExtension) {
-        return false;
-    }
-
-    SessionExtension->Save(pStm, true);
-
-    return true;
-}
-
-
-static bool Vinifera_Load_SessionExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-    
-    if (!SessionExtension) {
-        return false;
-    }
-
-    SessionExtension->Load(pStm);
-
-    return true;
-}
-
-
-static bool Vinifera_Save_ScenarioExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-
-    if (!ScenarioExtension) {
-        return false;
-    }
-
-    ScenarioExtension->Save(pStm, true);
-
-    return true;
-}
-
-
-static bool Vinifera_Load_ScenarioExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-    
-    if (!ScenarioExtension) {
-        return false;
-    }
-
-    ScenarioExtension->Load(pStm);
-
-    return true;
-}
-
-
 /**
  *  Save all Vinifera data to the file stream.
  * 
@@ -285,24 +189,6 @@ bool Vinifera_Put_All(IStream *pStm)
     /**
      *  Save class extensions here.
      */
-//    DEBUG_INFO("Saving RulesExtension\n");
-//    if (!Vinifera_Save_RulesExtension(pStm)) {
-//        DEBUG_ERROR("\t***** FAILED!\n");
-//        return false;
-//    }
-//
-//    DEBUG_INFO("Saving SessionExtension\n");
-//    if (!Vinifera_Save_SessionExtension(pStm)) {
-//        DEBUG_ERROR("\t***** FAILED!\n");
-//        return false;
-//    }
-//
-//    DEBUG_INFO("Saving ScenarioExtension\n");
-//    if (!Vinifera_Save_ScenarioExtension(pStm)) {
-//        DEBUG_ERROR("\t***** FAILED!\n");
-//        return false;
-//    }
-
     DEBUG_INFO("Saving class extensions\n");
     if (!Extension::Save(pStm)) {
         DEBUG_ERROR("\t***** FAILED!\n");
@@ -360,24 +246,6 @@ bool Vinifera_Load_All(IStream *pStm)
     /**
      *  Load class extensions here.
      */
-//    DEBUG_INFO("Loading RulesExtension\n");
-//    if (!Vinifera_Load_RulesExtension(pStm)) {
-//        DEBUG_ERROR("\t***** FAILED!\n");
-//        return false;
-//    }
-//
-//    DEBUG_INFO("Loading SessionExtension\n");
-//    if (!Vinifera_Load_SessionExtension(pStm)) {
-//        DEBUG_ERROR("\t***** FAILED!\n");
-//        return false;
-//    }
-//
-//    DEBUG_INFO("Loading ScenarioExtension\n");
-//    if (!Vinifera_Load_ScenarioExtension(pStm)) {
-//        DEBUG_ERROR("\t***** FAILED!\n");
-//        return false;
-//    }
-
     DEBUG_INFO("Loading class extensions\n");
     if (!Extension::Load(pStm)) {
         DEBUG_ERROR("\t***** FAILED!\n");

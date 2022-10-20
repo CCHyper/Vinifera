@@ -40,7 +40,6 @@
 #include "debughandler.h"
 
 
-RulesClassExtension *RulesExtension = nullptr;
 RulesClassExtension::UIControlsStruct RulesClassExtension::UIControls;
 
 
@@ -50,13 +49,13 @@ RulesClassExtension::UIControlsStruct RulesClassExtension::UIControls;
  *  @author: CCHyper
  */
 RulesClassExtension::RulesClassExtension(const RulesClass *this_ptr) :
-    This(const_cast<RulesClass *>(this_ptr)),
+    ExtensionSingleton(this_ptr),
     IsMPAutoDeployMCV(false),
     IsMPPrePlacedConYards(false),
     IsBuildOffAlly(true),
     IsShowSuperWeaponTimers(true)
 {
-    //EXT_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(This()));
+    //if (this_ptr) EXT_DEBUG_TRACE("RulesClassExtension::RulesClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 }
 
 
@@ -65,8 +64,10 @@ RulesClassExtension::RulesClassExtension(const RulesClass *this_ptr) :
  *  
  *  @author: CCHyper
  */
-RulesClassExtension::RulesClassExtension(const NoInitClass &noinit)
+RulesClassExtension::RulesClassExtension(const NoInitClass &noinit) :
+    ExtensionSingleton(noinit)
 {
+    //EXT_DEBUG_TRACE("RulesClassExtension::RulesClassExtension(NoInitClass) - 0x%08X\n", (uintptr_t)(ThisPtr));
 }
 
 
@@ -77,15 +78,12 @@ RulesClassExtension::RulesClassExtension(const NoInitClass &noinit)
  */
 RulesClassExtension::~RulesClassExtension()
 {
-    //EXT_DEBUG_TRACE("RulesClassExtension destructor - 0x%08X\n", (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("RulesClassExtension::~RulesClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 }
 
 
 /**
  *  Initializes an object from the stream where it was saved previously.
- * 
- *  As RulesClassExtension is static data, we do not need to request
- *  pointer remap of "ThisPtr" after loading has finished.
  *  
  *  @author: CCHyper
  */
@@ -93,34 +91,13 @@ HRESULT RulesClassExtension::Load(IStream *pStm)
 {
     //EXT_DEBUG_TRACE("RulesClassExtension::Load - 0x%08X\n", (uintptr_t)(This()));
 
-    if (!pStm) {
-        return E_POINTER;
-    }
-
-    /**
-     *  Load the unique id for this class.
-     */
-    ULONG id = 0;
-    HRESULT hr = pStm->Read(&id, sizeof(ULONG), nullptr);
+    HRESULT hr = ExtensionSingleton::Load(pStm);
     if (FAILED(hr)) {
-        return hr;
+        return E_FAIL;
     }
 
     new (this) RulesClassExtension(NoInitClass());
-
-    /**
-     *  x
-     */
-    VINIFERA_SWIZZLE_REGISTER_POINTER(id, this, "this");
-
-    /**
-     *  Read this classes instance binary blob data.
-     */
-    hr = pStm->Read(this, Size_Of(), nullptr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-
+    
     return hr;
 }
 
@@ -134,23 +111,7 @@ HRESULT RulesClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
     //EXT_DEBUG_TRACE("RulesClassExtension::Save - 0x%08X\n", (uintptr_t)(This()));
 
-    if (!pStm) {
-        return E_POINTER;
-    }
-
-    /**
-     *  x
-     */
-    ULONG id = (ULONG)this;
-    HRESULT hr = pStm->Write(&id, sizeof(id), nullptr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-    
-    /**
-     *  Write this class instance as a binary blob.
-     */
-    hr = pStm->Write(this, Size_Of(), nullptr);
+    HRESULT hr = ExtensionSingleton::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
     }
@@ -179,7 +140,7 @@ int RulesClassExtension::Size_Of() const
  */
 void RulesClassExtension::Detach(TARGET target, bool all)
 {
-    //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("RulesClassExtension::Detach - 0x%08X\n", (uintptr_t)(This()));
 }
 
 
@@ -190,7 +151,7 @@ void RulesClassExtension::Detach(TARGET target, bool all)
  */
 void RulesClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
-    //EXT_DEBUG_TRACE("RulesClassExtension::Size_Of - 0x%08X\n", (uintptr_t)(This()));
+    //EXT_DEBUG_TRACE("RulesClassExtension::Compute_CRC - 0x%08X\n", (uintptr_t)(This()));
 
     crc(IsMPAutoDeployMCV);
     crc(IsMPPrePlacedConYards);
@@ -213,10 +174,10 @@ void RulesClassExtension::Process(CCINIClass &ini)
      *  the its behaviour here first.
      */
 
-    This->Colors(ini);
-    This->Houses(ini);
-    This->Sides(ini);
-    This->Overlays(ini);
+    This()->Colors(ini);
+    This()->Houses(ini);
+    This()->Sides(ini);
+    This()->Overlays(ini);
 
     /**
      *  #issue-117
@@ -228,31 +189,31 @@ void RulesClassExtension::Process(CCINIClass &ini)
      */
     Weapons(ini);
 
-    This->SuperWeapons(ini);
-    This->Warheads(ini);
-    This->Smudges(ini);
-    This->Terrains(ini);
-    This->Buildings(ini);
-    This->Vehicles(ini);
-    This->Aircraft(ini);
-    This->Infantry(ini);
-    This->Animations(ini);
-    This->VoxelAnims(ini);
-    This->Particles(ini);
-    This->ParticleSystems(ini);
-    This->JumpjetControls(ini);
-    This->MPlayer(ini);
-    This->AI(ini);
-    This->Powerups(ini);
-    This->Land_Types(ini);
-    This->IQ(ini);
-    This->General(ini);
-    This->Objects(ini);
-    This->Difficulty(ini);
-    This->CrateRules(ini);
-    This->CombatDamage(ini);
-    This->AudioVisual(ini);
-    This->SpecialWeapons(ini);
+    This()->SuperWeapons(ini);
+    This()->Warheads(ini);
+    This()->Smudges(ini);
+    This()->Terrains(ini);
+    This()->Buildings(ini);
+    This()->Vehicles(ini);
+    This()->Aircraft(ini);
+    This()->Infantry(ini);
+    This()->Animations(ini);
+    This()->VoxelAnims(ini);
+    This()->Particles(ini);
+    This()->ParticleSystems(ini);
+    This()->JumpjetControls(ini);
+    This()->MPlayer(ini);
+    This()->AI(ini);
+    This()->Powerups(ini);
+    This()->Land_Types(ini);
+    This()->IQ(ini);
+    This()->General(ini);
+    This()->Objects(ini);
+    This()->Difficulty(ini);
+    This()->CrateRules(ini);
+    This()->CombatDamage(ini);
+    This()->AudioVisual(ini);
+    This()->SpecialWeapons(ini);
     TiberiumClass::Process(ini);
 
     /**
@@ -449,5 +410,5 @@ bool RulesClassExtension::Init_UI_Controls()
  */
 void RulesClassExtension::Check()
 {
-    ASSERT_PRINT(This->CreditTicks.Count() == 2, "CreditTicks must contain 2 valid entries!");
+    ASSERT_PRINT(This()->CreditTicks.Count() == 2, "CreditTicks must contain 2 valid entries!");
 }
