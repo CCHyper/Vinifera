@@ -311,7 +311,6 @@ template<class BASE_CLASS, class EXT_CLASS>
 static bool Extension_Destroy(const BASE_CLASS *abstract_ptr)
 {
     //EXT_DEBUG_INFO("Extension_Destroy... %s %s %s\n", Extension_Get_Abstract_Name(abstract_ptr), Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str(), Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
-    bool removed = false;
 
     EXT_CLASS *ext_ptr = reinterpret_cast<EXT_CLASS *>(Extension_Get_Abstract_Pointer(abstract_ptr));
     if (!ext_ptr) {
@@ -856,8 +855,8 @@ bool Extension::Is_Supported(RTTIType rtti)
         //case RTTI_BULLET:                     // <- Not yet implemented
         case RTTI_BULLETTYPE:
         case RTTI_CAMPAIGN:                     // Supported, but Campaign's are not saved to file.
-        //case RTTI_CELL:                       // <- Not yet implemented
-        //case RTTI_FACTORY:                    // <- Not yet implemented
+        case RTTI_CELL:                         // <- Partially implemented
+        case RTTI_FACTORY:                      // <- Partially implemented
         case RTTI_HOUSE:
         case RTTI_HOUSETYPE:
         case RTTI_INFANTRY:
@@ -878,7 +877,7 @@ bool Extension::Is_Supported(RTTIType rtti)
         case RTTI_SMUDGETYPE:
         case RTTI_SUPERWEAPONTYPE:
         //case RTTI_TASKFORCE:                  // <- Not yet implemented
-        //case RTTI_TEAM:                       // <- Not yet implemented
+        case RTTI_TEAM:                         // <- Partially implemented
         //case RTTI_TEAMTYPE:                   // <- Not yet implemented
         case RTTI_TERRAIN:
         case RTTI_TERRAINTYPE:
@@ -898,8 +897,8 @@ bool Extension::Is_Supported(RTTIType rtti)
         //case RTTI_WAYPOINT:                   // <- Not yet implemented
         //case RTTI_TUBE:                       // <- Not yet implemented
         //case RTTI_LIGHTSOURCE:                // <- Not yet implemented
-        //case RTTI_EMPULSE:                    // <- Not yet implemented
-        case RTTI_TACTICALMAP:
+        case RTTI_EMPULSE:                      // <- Partially implemented
+        //case RTTI_TACTICALMAP:
         case RTTI_SUPERWEAPON:
         //case RTTI_AITRIGGER:                  // <- Not yet implemented
         //case RTTI_AITRIGGERTYPE:              // <- Not yet implemented
