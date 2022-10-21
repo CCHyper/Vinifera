@@ -78,7 +78,7 @@ TacticalExtension final : public AbstractClassExtension
         
         virtual Tactical *This() const override { return reinterpret_cast<Tactical *>(AbstractClassExtension::This()); }
         virtual const Tactical *This_Const() const override { return reinterpret_cast<const Tactical *>(AbstractClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_AIRCRAFTTYPE; }
+        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_TACTICALMAP; }
 
         void Draw_Debug_Overlay();
         void Draw_FrameStep_Overlay();
