@@ -102,10 +102,39 @@ original_code:
 
 
 /**
+ *  Patch for including the extended class members in the virtual destruction process.
+ * 
+ *  @warning: Do not touch this unless you know what you are doing!
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Tactical_Scalar_Destructor_Patch)
+{
+    GET_REGISTER_STATIC(Tactical *, this_ptr, esi);
+
+    /**
+     *  Remove the extended class instance.
+     */
+    Extension::Destroy<TacticalExtension>(this_ptr);
+
+    /**
+     *  Stolen bytes here.
+     */
+original_code:
+    _asm { mov ecx, this_ptr }
+    _asm { mov eax, 0x00405B90 } // AbstractClass::~AbstractClass()
+    _asm { call eax }
+
+    JMP(0x0060D881);
+}
+
+
+/**
  *  Main function for patching the hooks.
  */
 void TacticalExtension_Init()
 {
     Patch_Jump(0x0060F08A, &_Tactical_Constructor_Patch);
     Patch_Jump(0x0060F0E7, &_Tactical_Destructor_Patch);
+    Patch_Jump(0x0061802A, &_Tactical_Scalar_Destructor_Patch);
 }
