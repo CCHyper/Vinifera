@@ -337,21 +337,6 @@ DECLARE_PATCH(_Save_Game_Put_Game_Version)
     static int version;
     version = ViniferaSaveGameVersion;
 
-    /**
-     *  If we are in developer mode, offset the build number as these save
-     *  files should not appear in normal game modes.
-     * 
-     *  For debug builds, we force an offset so they don't appear in any
-     *  other builds or releases.
-     */
-#ifndef NDEBUG
-    version *= 3;
-#else
-    if (Vinifera_DeveloperMode) {
-        version *= 2;
-    }
-#endif
-
     _asm { mov edx, version };
 
     JMP(0x005D5064);
@@ -394,22 +379,13 @@ failure:
  */
 DECLARE_PATCH(_LoadOptionsClass_Read_File_Check_Game_Version)
 {
-    GET_REGISTER_STATIC(int, version, eax);
-    static int ver;
+    GET_REGISTER_STATIC(int, file_version, eax);
 
     /**
      *  If the version in the save file does not match our build
      *  version exactly, then don't add this file to the listing.
      */
-    ver = ViniferaSaveGameVersion;
-#ifndef NDEBUG
-    ver *= 3;
-#else
-    if (Vinifera_DeveloperMode) {
-        ver *= 2;
-    }
-#endif
-    if (version != ver) {
+    if (file_version != ViniferaSaveGameVersion) {
         JMP(0x00505AAD);
     }
 
