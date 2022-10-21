@@ -41,7 +41,7 @@ class ObjectTypeClassExtension : public AbstractTypeClassExtension
         IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 
     public:
-        ObjectTypeClassExtension(const ObjectTypeClass *this_ptr);
+        ObjectTypeClassExtension(const ObjectTypeClass *this_ptr, const char *class_name);
         ObjectTypeClassExtension(const NoInitClass &noinit);
         virtual ~ObjectTypeClassExtension();
 

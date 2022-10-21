@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 SmudgeTypeClassExtension::SmudgeTypeClassExtension(const SmudgeTypeClass *this_ptr) :
-    ObjectTypeClassExtension(this_ptr)
+    ObjectTypeClassExtension(this_ptr, "SmudgeTypeClassExtension")
 {
     //if (this_ptr) EXT_DEBUG_TRACE("SmudgeTypeClassExtension::SmudgeTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 

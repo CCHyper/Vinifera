@@ -40,7 +40,7 @@
  *  @author: CCHyper
  */
 TerrainTypeClassExtension::TerrainTypeClassExtension(const TerrainTypeClass *this_ptr) :
-    ObjectTypeClassExtension(this_ptr),
+    ObjectTypeClassExtension(this_ptr, "TerrainTypeClassExtension"),
     IsLightEnabled(false),
     LightVisibility(5000),
     LightIntensity(0),

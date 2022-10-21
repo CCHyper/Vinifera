@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 AircraftTypeClassExtension::AircraftTypeClassExtension(const AircraftTypeClass *this_ptr) :
-    TechnoTypeClassExtension(this_ptr)
+    TechnoTypeClassExtension(this_ptr, "AircraftTypeClassExtension")
 {
     //if (this_ptr) EXT_DEBUG_TRACE("AircraftTypeClassExtension::AircraftTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 

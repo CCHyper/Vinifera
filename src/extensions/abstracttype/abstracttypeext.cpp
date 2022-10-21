@@ -38,8 +38,8 @@
  *  
  *  @author: CCHyper
  */
-AbstractTypeClassExtension::AbstractTypeClassExtension(const AbstractTypeClass *this_ptr) :
-    AbstractClassExtension(this_ptr),
+AbstractTypeClassExtension::AbstractTypeClassExtension(const AbstractTypeClass *this_ptr, const char *class_name) :
+    AbstractClassExtension(this_ptr, class_name),
     IniName(),
     FullName()
 {

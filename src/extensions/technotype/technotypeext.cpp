@@ -44,8 +44,8 @@
  *  
  *  @author: CCHyper
  */
-TechnoTypeClassExtension::TechnoTypeClassExtension(const TechnoTypeClass *this_ptr) :
-    ObjectTypeClassExtension(this_ptr),
+TechnoTypeClassExtension::TechnoTypeClassExtension(const TechnoTypeClass *this_ptr, const char *class_name) :
+    ObjectTypeClassExtension(this_ptr, class_name),
     CloakSound(VOC_NONE),
     UncloakSound(VOC_NONE),
     IsShakeScreen(false),

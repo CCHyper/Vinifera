@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 UnitClassExtension::UnitClassExtension(const UnitClass *this_ptr) :
-    FootClassExtension(this_ptr)
+    FootClassExtension(this_ptr, "UnitClassExtension")
 {
     //if (this_ptr) EXT_DEBUG_TRACE("UnitClassExtension::UnitClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 

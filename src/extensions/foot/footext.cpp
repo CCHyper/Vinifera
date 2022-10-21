@@ -35,8 +35,8 @@
  *  
  *  @author: CCHyper
  */
-FootClassExtension::FootClassExtension(const FootClass *this_ptr) :
-    TechnoClassExtension(this_ptr)
+FootClassExtension::FootClassExtension(const FootClass *this_ptr, const char *class_name) :
+    TechnoClassExtension(this_ptr, class_name)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("FootClassExtension::FootClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }

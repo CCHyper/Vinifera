@@ -61,7 +61,7 @@
  *  @author: CCHyper
  */
 TacticalExtension::TacticalExtension(const Tactical *this_ptr) :
-    AbstractClassExtension(this_ptr),
+    AbstractClassExtension(this_ptr, "TacticalExtension"),
     IsInfoTextSet(false),
     InfoTextBuffer(),
     InfoTextPosition(BOTTOM_LEFT),

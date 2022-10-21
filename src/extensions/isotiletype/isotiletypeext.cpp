@@ -42,7 +42,7 @@
  *  @author: CCHyper
  */
 IsometricTileTypeClassExtension::IsometricTileTypeClassExtension(const IsometricTileTypeClass *this_ptr) :
-    ObjectTypeClassExtension(this_ptr),
+    ObjectTypeClassExtension(this_ptr, "IsometricTileTypeClassExtension"),
     TileSetName(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("IsometricTileTypeClassExtension::~IsometricTileTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));

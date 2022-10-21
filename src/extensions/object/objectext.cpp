@@ -36,8 +36,8 @@
  *  
  *  @author: CCHyper
  */
-ObjectClassExtension::ObjectClassExtension(const ObjectClass *this_ptr) :
-    AbstractClassExtension(this_ptr)
+ObjectClassExtension::ObjectClassExtension(const ObjectClass *this_ptr, const char *class_name) :
+    AbstractClassExtension(this_ptr, class_name)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("ObjectClassExtension::ObjectClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }

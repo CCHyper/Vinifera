@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 TiberiumClassExtension::TiberiumClassExtension(const TiberiumClass *this_ptr) :
-    AbstractTypeClassExtension(this_ptr)
+    AbstractTypeClassExtension(this_ptr, "TiberiumClassExtension")
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TiberiumClassExtension::TiberiumClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 

@@ -40,7 +40,7 @@
  *  @author: CCHyper
  */
 TerrainClassExtension::TerrainClassExtension(const TerrainClass *this_ptr) :
-    ObjectClassExtension(this_ptr),
+    ObjectClassExtension(this_ptr, "TerrainClassExtension"),
     LightSource(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TerrainClassExtension::TerrainClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));

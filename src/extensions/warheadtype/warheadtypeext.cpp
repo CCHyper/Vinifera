@@ -40,7 +40,7 @@
  *  @author: CCHyper
  */
 WarheadTypeClassExtension::WarheadTypeClassExtension(const WarheadTypeClass *this_ptr) :
-    AbstractTypeClassExtension(this_ptr),
+    AbstractTypeClassExtension(this_ptr, "WarheadTypeClassExtension"),
     IsWallAbsoluteDestroyer(false),
     IsAffectsAllies(true),
     CombatLightSize(0.0f),

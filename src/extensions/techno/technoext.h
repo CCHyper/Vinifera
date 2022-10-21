@@ -43,7 +43,7 @@ class TechnoClassExtension : public ObjectClassExtension
         IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 
     public:
-        TechnoClassExtension(const TechnoClass *this_ptr = nullptr);
+        TechnoClassExtension(const TechnoClass *this_ptr, const char *class_name);
         TechnoClassExtension(const NoInitClass &noinit);
         virtual ~TechnoClassExtension();
 

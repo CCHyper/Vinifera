@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 InfantryClassExtension::InfantryClassExtension(const InfantryClass *this_ptr) :
-    FootClassExtension(this_ptr)
+    FootClassExtension(this_ptr, "InfantryClassExtension")
 {
     //if (this_ptr) EXT_DEBUG_TRACE("InfantryClassExtension::InfantryClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 

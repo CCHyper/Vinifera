@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 HouseTypeClassExtension::HouseTypeClassExtension(const HouseTypeClass *this_ptr) :
-    AbstractTypeClassExtension(this_ptr)
+    AbstractTypeClassExtension(this_ptr, "HouseTypeClassExtension")
 {
     //if (this_ptr) EXT_DEBUG_TRACE("HouseTypeClassExtension::HouseTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 

@@ -41,7 +41,7 @@ class FootClassExtension : public TechnoClassExtension
         IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 
     public:
-        FootClassExtension(const FootClass *this_ptr);
+        FootClassExtension(const FootClass *this_ptr, const char *class_name);
         FootClassExtension(const NoInitClass &noinit);
         virtual ~FootClassExtension();
 

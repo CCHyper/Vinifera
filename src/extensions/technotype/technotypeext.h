@@ -47,7 +47,7 @@ class TechnoTypeClassExtension : public ObjectTypeClassExtension
         IFACEMETHOD_(LONG, GetSizeMax)(ULARGE_INTEGER *pcbSize);
 
     public:
-        TechnoTypeClassExtension(const TechnoTypeClass *this_ptr = nullptr);
+        TechnoTypeClassExtension(const TechnoTypeClass *this_ptr, const char *class_name);
         TechnoTypeClassExtension(const NoInitClass &noinit);
         virtual ~TechnoTypeClassExtension();
 

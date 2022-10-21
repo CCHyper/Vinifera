@@ -40,7 +40,7 @@
  *  @author: CCHyper
  */
 UnitTypeClassExtension::UnitTypeClassExtension(const UnitTypeClass *this_ptr) :
-    TechnoTypeClassExtension(this_ptr),
+    TechnoTypeClassExtension(this_ptr, "UnitTypeClassExtension"),
     IsTotable(true),
     StartTurretFrame(-1),
     TurretFacings(32),		// Must default to 32 as all Tiberian Sun units have 32 facings for turrets.,

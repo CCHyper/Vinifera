@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 OverlayTypeClassExtension::OverlayTypeClassExtension(const OverlayTypeClass *this_ptr) :
-    ObjectTypeClassExtension(this_ptr)
+    ObjectTypeClassExtension(this_ptr, "OverlayTypeClassExtension")
 {
     //if (this_ptr) EXT_DEBUG_TRACE("OverlayTypeClassExtension::OverlayTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 

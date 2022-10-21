@@ -42,11 +42,17 @@
  * 
  *  @author: CCHyper
  */
-AbstractClassExtension::AbstractClassExtension(const AbstractClass *this_ptr) :
-    ThisPtr(this_ptr)
+AbstractClassExtension::AbstractClassExtension(const AbstractClass *this_ptr, const char *class_name) :
+    ThisPtr(this_ptr),
+    ClassName()
 {
     //if (this_ptr) EXT_DEBUG_TRACE("AbstractClassExtension::AbstractClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
     //ASSERT(ThisPtr != nullptr);      // NULL ThisPtr is valid when performing a Load state operation.
+
+    /**
+     *  x
+     */
+    std::strncpy(ClassName, class_name, std::strlen(class_name));
 }
 
 
@@ -178,9 +184,7 @@ HRESULT AbstractClassExtension::Internal_Load(IStream *pStm)
 
     //DEV_DEBUG_INFO("Read id = 0x%08X.\n", id);
 
-    Wstring class_name = Name_From_RTTI(RTTIType(What_Am_I()));
-    Wstring this_name = Wstring("this") + ":" + class_name;
-    Wstring thisptr_name = Wstring("ThisPtr") + ":" + class_name;
+    Wstring this_name = Wstring(ClassName) + ":" + Wstring("ThisPtr");
 
     /**
      *  x
@@ -199,7 +203,7 @@ HRESULT AbstractClassExtension::Internal_Load(IStream *pStm)
 
     //DEV_DEBUG_INFO("Read Size_Of = %d.\n", sizeof(*this));
     
-    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ThisPtr, thisptr_name.Peek_Buffer());
+    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ThisPtr, this_name.Peek_Buffer());
 
     //DEV_DEBUG_INFO("Requested remap of ThisPtr.\n");
 
@@ -220,8 +224,7 @@ HRESULT AbstractClassExtension::Internal_Save(IStream *pStm, BOOL fClearDirty)
         return E_POINTER;
     }
 
-    Wstring class_name = Name_From_RTTI(RTTIType(What_Am_I()));
-    Wstring this_name = Wstring("this") + ":" + class_name;
+    Wstring this_name = Wstring(ClassName) + ":" + Wstring("ThisPtr");
 
     /**
      *  x

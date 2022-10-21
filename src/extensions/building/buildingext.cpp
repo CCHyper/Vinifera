@@ -43,7 +43,7 @@
  *  @author: CCHyper
  */
 BuildingClassExtension::BuildingClassExtension(const BuildingClass *this_ptr) :
-    TechnoClassExtension(this_ptr),
+    TechnoClassExtension(this_ptr, "BuildingClassExtension"),
     ProduceCashTimer(),
     CurrentProduceCashBudget(-1),
     IsCaptureOneTimeCashGiven(false),
@@ -189,13 +189,13 @@ void BuildingClassExtension::Produce_Cash_AI()
 {
     //EXT_DEBUG_TRACE("BuildingClassExtension::Produce_Cash_AI - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
-    const BuildingClass *this_building = reinterpret_cast<const BuildingClass *>(ThisPtr);
-    const BuildingTypeClass *buildingtype = reinterpret_cast<const BuildingTypeClass *>(this_building->Class_Of());
+    const BuildingClass *this_building = reinterpret_cast<const BuildingClass *>(This());
+    const BuildingTypeClass *this_buildingtype = reinterpret_cast<const BuildingTypeClass *>(This()->Class_Of());
 
     /**
      *  Fetch the extension instance.
      */
-    BuildingTypeClassExtension *buildingtypeext = Extension::Fetch<BuildingTypeClassExtension>(buildingtype);
+    BuildingTypeClassExtension *buildingtypeext = Extension::Fetch<BuildingTypeClassExtension>(this_buildingtype);
 
 #if 0
     /**
@@ -216,7 +216,7 @@ void BuildingClassExtension::Produce_Cash_AI()
         /**
          *  Check if this building requires power to produce cash.
          */
-        if (buildingtype->IsPowered) {
+        if (this_buildingtype->IsPowered) {
 
             /**
              *  Stop the timer if the building is offline or has low power.

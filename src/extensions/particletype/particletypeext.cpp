@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 ParticleTypeClassExtension::ParticleTypeClassExtension(const ParticleTypeClass *this_ptr) :
-    ObjectTypeClassExtension(this_ptr)
+    ObjectTypeClassExtension(this_ptr, "ParticleTypeClassExtension")
 {
     //if (this_ptr) EXT_DEBUG_TRACE("ParticleTypeClassExtension::ParticleTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 

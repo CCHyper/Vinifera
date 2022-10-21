@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 SideClassExtension::SideClassExtension(const SideClass *this_ptr) :
-    AbstractTypeClassExtension(this_ptr)
+    AbstractTypeClassExtension(this_ptr, "SideClassExtension")
 {
     //if (this_ptr) EXT_DEBUG_TRACE("SideClassExtension::SideClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 

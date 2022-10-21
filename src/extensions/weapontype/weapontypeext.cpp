@@ -41,7 +41,7 @@
  *  @author: CCHyper
  */
 WeaponTypeClassExtension::WeaponTypeClassExtension(const WeaponTypeClass *this_ptr) :
-    AbstractTypeClassExtension(this_ptr),
+    AbstractTypeClassExtension(this_ptr, "WeaponTypeClassExtension"),
     IsSuicide(false),
     IsDeleteOnSuicide(false),
     IsElectricBolt(false),

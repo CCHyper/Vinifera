@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 AnimClassExtension::AnimClassExtension(const AnimClass *this_ptr) :
-    ObjectClassExtension(this_ptr)
+    ObjectClassExtension(this_ptr, "AnimClassExtension")
 {
     //if (this_ptr) EXT_DEBUG_TRACE("AnimClassExtension::AnimClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 

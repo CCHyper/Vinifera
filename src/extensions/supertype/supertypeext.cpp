@@ -41,7 +41,7 @@
  *  @author: CCHyper
  */
 SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(const SuperWeaponTypeClass *this_ptr) :
-    AbstractTypeClassExtension(this_ptr),
+    AbstractTypeClassExtension(this_ptr, "SuperWeaponTypeClassExtension"),
     SidebarImage(),
     IsShowTimer(false),
     CameoImageSurface(nullptr)

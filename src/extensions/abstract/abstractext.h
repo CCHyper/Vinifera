@@ -70,7 +70,7 @@ class AbstractClassExtension : public IPersistStream
         HRESULT STDMETHODCALLTYPE Internal_Save(IStream *pStm, BOOL fClearDirty);
 
     public:
-        AbstractClassExtension(const AbstractClass *this_ptr);
+        AbstractClassExtension(const AbstractClass *this_ptr, const char *class_name);
         AbstractClassExtension(const NoInitClass &noinit);
         virtual ~AbstractClassExtension();
 
@@ -117,13 +117,23 @@ class AbstractClassExtension : public IPersistStream
          *  x
          */
         virtual const char *Full_Name() const = 0;
+        
+        /**
+         *  x
+         */
+        /*virtual*/ const char *Class_Name() const { return ClassName; }
 
-    //private:
+    private:
         /**
          *  Pointer to the class we are extending. This provides us with a way of
          *  quickly referencing the base class without doing a look-up each time.
          */
         const AbstractClass *ThisPtr;
+
+        /**
+         *  x
+         */
+        char ClassName[128];
 
     private:
         AbstractClassExtension(const AbstractClassExtension &) = delete;

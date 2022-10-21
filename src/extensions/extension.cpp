@@ -108,6 +108,31 @@
 #include <iostream>
 
 
+namespace Extension
+{
+
+namespace Private
+{
+
+static std::string Get_Abstract_TypeID_Name(const AbstractClass *abstract)
+{
+    std::string str = typeid(*abstract).name();
+    str.erase(0, 6);
+    return str;
+}
+
+static std::string Get_Extension_TypeID_Name(const AbstractClassExtension *abstract_ext)
+{
+    std::string str = typeid(*abstract_ext).name();
+    str.erase(0, 6);
+    return str;
+}
+
+}; // namespace "Private"
+
+}; // namespace "Extension"
+
+
 /**
  *  x
  */
@@ -208,6 +233,27 @@ static const char *Extension_Get_Abstract_Name(const AbstractClass *abstract)
     }
 #endif
     return "<unknown>";
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+Wstring Extension_Get_ExtPtr_Name(const AbstractClass *abstract)
+{
+    Wstring str;
+
+    str += Extension::Private::Get_Abstract_TypeID_Name(abstract).c_str();
+
+    str += "::ExtPtr";
+    str += " -> ";
+
+    AbstractClassExtension *ext_ptr = Extension_Get_Abstract_Pointer(abstract);
+    str += Extension::Private::Get_Extension_TypeID_Name(ext_ptr).c_str();
+
+    return str;
 }
 
 
@@ -458,9 +504,6 @@ static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
     DEBUG_INFO("Requesting remap of \"%s\" extension pointers (Count %d)...\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str(), list.Count());
 
     for (int index = 0; index < list.Count(); ++index) {
-        if (index == 0) {
-            EXT_DEBUG_INFO("\n");
-        }
 
         const BASE_CLASS *object = list[index];
         if (object) {
@@ -470,11 +513,13 @@ static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
                 continue; //return false;
             }
 
+            Wstring extptr_name = Extension_Get_ExtPtr_Name(object);
+
             /**
              *  
              */
             uintptr_t **ext_ptr_addr = ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(object);
-            VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(*ext_ptr_addr, "AbstractClass::ExtPtr");
+            VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(*ext_ptr_addr, extptr_name.Peek_Buffer());
 
             EXT_DEBUG_INFO("  Requested remap of index %d extension pointer complete.\n", index);
         }
@@ -499,11 +544,13 @@ static bool Extension_Request_Pointer_Remap(BASE_CLASS *abstract)
         return false;
     }
 
+    Wstring extptr_name = Extension_Get_ExtPtr_Name(abstract);
+
     /**
      *  
      */
     uintptr_t **ext_ptr_addr = ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(abstract);
-    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(*ext_ptr_addr, "AbstractClass::ExtPtr");
+    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(*ext_ptr_addr, extptr_name.Peek_Buffer());
 
     EXT_DEBUG_INFO("  Requested remap of extension pointer complete.\n");
 

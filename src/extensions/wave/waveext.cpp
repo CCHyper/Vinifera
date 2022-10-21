@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 WaveClassExtension::WaveClassExtension(const WaveClass *this_ptr) :
-    ObjectClassExtension(this_ptr)
+    ObjectClassExtension(this_ptr, "WaveClassExtension")
 {
     //if (this_ptr) EXT_DEBUG_TRACE("WaveClassExtension::WaveClassExtension - 0x%08X\n", (uintptr_t)(This()));
 

@@ -44,7 +44,7 @@ class AbstractTypeClassExtension : public AbstractClassExtension
         IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 
     public:
-        AbstractTypeClassExtension(const AbstractTypeClass *this_ptr);
+        AbstractTypeClassExtension(const AbstractTypeClass *this_ptr, const char *class_name);
         AbstractTypeClassExtension(const NoInitClass &noinit);
         virtual ~AbstractTypeClassExtension();
 
