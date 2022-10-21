@@ -105,19 +105,23 @@ DECLARE_PATCH(_TechnoClass_Fire_At_Electric_Bolt_Patch)
     static WeaponTypeClassExtension *weapontypeext;
 
     /**
-     *  Stolen bytes/code.
-     */
-    this_ptr->Reduce_Ammunition();
-
-    /**
      *  Spawn the electric bolt.
      */
     weapontypeext = Extension::Fetch<WeaponTypeClassExtension>(weapon);
     if (weapontypeext->IsElectricBolt) {
         TechnoClassExtension_Electric_Bolt(this_ptr, target);
+
+    /**
+     *  Spawn the laser.
+     */
+    } else if (weapon->IsLaser) {
+        goto is_laser;
     }
 
-    JMP_REG(edx, 0x006312D7);
+    JMP(0x006312CD);
+
+is_laser:
+    JMP_REG(edi, 0x00631231);
 }
 
 
@@ -696,6 +700,6 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x00638095, &_TechnoClass_Refund_Amount_Soylent_Patch);
     Patch_Jump(0x00631661, &_TechnoClass_Player_Assign_Mission_Response_Patch);
     Patch_Jump(0x00630390, &_TechnoClass_Fire_At_Suicide_Patch);
-    Patch_Jump(0x006312CD, &_TechnoClass_Fire_At_Electric_Bolt_Patch);
+    Patch_Jump(0x00631223, &_TechnoClass_Fire_At_Electric_Bolt_Patch);
     Patch_Jump(0x00636F09, &_TechnoClass_Is_Allowed_To_Retaliate_Can_Retaliate_Patch);
 }
