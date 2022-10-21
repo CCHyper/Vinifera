@@ -248,10 +248,10 @@ Wstring Extension_Get_ExtPtr_Name(const AbstractClass *abstract)
     str += Extension::Private::Get_Abstract_TypeID_Name(abstract).c_str();
 
     str += "::ExtPtr";
-    str += " -> ";
+    //str += " -> ";
 
-    AbstractClassExtension *ext_ptr = Extension_Get_Abstract_Pointer(abstract);
-    str += Extension::Private::Get_Extension_TypeID_Name(ext_ptr).c_str();
+    //AbstractClassExtension *ext_ptr = Extension_Get_Abstract_Pointer(abstract);
+    //str += Extension::Private::Get_Extension_TypeID_Name(ext_ptr).c_str();
 
     return str;
 }
@@ -403,30 +403,37 @@ static bool Extension_Save(IStream *pStm, EXT_CLASS *ext)
 {
     DEBUG_INFO("Saving \"%s\" extension\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
 
+    HRESULT hr;
+
+#if 0
     /**
      *  Tell the extension class to persist itself into the data stream.
      */
     IPersistStream *lpPS = nullptr;
-    HRESULT hr = ext->QueryInterface(__uuidof(IPersistStream), (LPVOID *)&lpPS);
+    hr = ext->QueryInterface(__uuidof(IPersistStream), (LPVOID *)&lpPS);
     if (FAILED(hr)) {
         DEBUG_ERROR("Extension \"%s\" does not support IPersistStream!\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
         return false;
     }
+#endif
     
-    hr = OleSaveToStream(lpPS, pStm);
+    //hr = OleSaveToStream(lpPS, pStm);
+    hr = OleSaveToStream((LPPERSISTSTREAM)ext, pStm);
     if (FAILED(hr)) {
         DEBUG_ERROR("OleSaveToStream failed for extension \"%s\"!\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
         return false;
     }
     
+#if 0
     hr = lpPS->Release();
     if (FAILED(hr)) {
         DEBUG_ERROR("Failed to release extension \"%s\" stream!\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
         return false;
     }
+#endif
     
-    EXT_CLASS * ext_ptr = reinterpret_cast<EXT_CLASS *>(lpPS);
-    EXT_DEBUG_INFO("  -> %s\n", ext_ptr->Name());
+    //EXT_CLASS * ext_ptr = reinterpret_cast<EXT_CLASS *>(lpPS);
+    EXT_DEBUG_INFO("  -> %s\n", ext->Name());
 
     return true;
 }
@@ -476,7 +483,7 @@ template<class BASE_CLASS, class EXT_CLASS>
 static bool Extension_Load(IStream *pStm, EXT_CLASS *ext)
 {
     DEBUG_INFO("Loading \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
-        
+
     IUnknown *spUnk = nullptr;
     HRESULT hr = OleLoadFromStream(pStm, __uuidof(IUnknown), (LPVOID *)&spUnk);
     if (FAILED(hr)) {
