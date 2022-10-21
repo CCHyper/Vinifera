@@ -62,7 +62,7 @@ DECLARE_PATCH(_Tactical_Constructor_Patch)
     /**
      *  Create the extended class instance.
      */
-    TacticalMapExtension = Extension::Make<TacticalExtension>(this_ptr);
+    Extension::Make<TacticalExtension>(this_ptr);
 
     /**
      *  Stolen bytes here.
@@ -91,8 +91,6 @@ DECLARE_PATCH(_Tactical_Destructor_Patch)
      *  Remove the extended class instance.
      */
     Extension::Destroy<TacticalExtension>(this_ptr);
-
-    TacticalMapExtension = nullptr;
 
     /**
      *  Stolen bytes here.

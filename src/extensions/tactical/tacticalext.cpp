@@ -71,6 +71,8 @@ TacticalExtension::TacticalExtension(const Tactical *this_ptr) :
     InfoTextTimer(0)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TacticalExtension::TacticalExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    TacticalMapExtension = this;
 }
 
 
@@ -96,6 +98,8 @@ TacticalExtension::TacticalExtension(const NoInitClass &noinit) :
 TacticalExtension::~TacticalExtension()
 {
     //EXT_DEBUG_TRACE("TacticalExtension::~TacticalExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    TacticalMapExtension = nullptr;
 }
 
 

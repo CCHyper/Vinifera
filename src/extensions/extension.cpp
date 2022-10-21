@@ -898,7 +898,7 @@ bool Extension::Is_Supported(RTTIType rtti)
         //case RTTI_TUBE:                       // <- Not yet implemented
         //case RTTI_LIGHTSOURCE:                // <- Not yet implemented
         case RTTI_EMPULSE:                      // <- Partially implemented
-        //case RTTI_TACTICALMAP:
+        case RTTI_TACTICALMAP:
         case RTTI_SUPERWEAPON:
         //case RTTI_AITRIGGER:                  // <- Not yet implemented
         //case RTTI_AITRIGGERTYPE:              // <- Not yet implemented
