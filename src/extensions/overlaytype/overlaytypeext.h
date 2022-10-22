@@ -59,7 +59,7 @@ OverlayTypeClassExtension final : public ObjectTypeClassExtension
 
         virtual OverlayTypeClass *This() const override { return reinterpret_cast<OverlayTypeClass *>(ObjectTypeClassExtension::This()); }
         virtual const OverlayTypeClass *This_Const() const override { return reinterpret_cast<const OverlayTypeClass *>(ObjectTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_INFANTRYTYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_INFANTRYTYPE; }
 
     public:
 };

@@ -103,9 +103,7 @@ DECLARE_PATCH(_WeaponTypeClass_Destructor_Patch)
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov ecx, this_ptr }
-    _asm { mov eax, 0x00406330 } // AbstractTypeClass::~AbstractTypeClass()
-    _asm { call eax }
+    this_ptr->AbstractTypeClass::~AbstractTypeClass();
     JMP_REG(ecx, 0x00680D1F);
 }
 
@@ -136,9 +134,7 @@ DECLARE_PATCH(_WeaponTypeClass_Scalar_Destructor_Patch)
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov ecx, this_ptr }
-    _asm { mov eax, 0x00406330 } // AbstractTypeClass::~AbstractTypeClass()
-    _asm { call eax }
+    this_ptr->AbstractTypeClass::~AbstractTypeClass();
     JMP_REG(ecx, 0x006819BF);
 }
 

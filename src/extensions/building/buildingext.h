@@ -63,7 +63,7 @@ BuildingClassExtension final : public TechnoClassExtension
 
         virtual BuildingClass *This() const override { return reinterpret_cast<BuildingClass *>(TechnoClassExtension::This()); }
         virtual const BuildingClass *This_Const() const override { return reinterpret_cast<const BuildingClass *>(TechnoClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_BUILDING; }
+        virtual RTTIType What_Am_I() const override { return RTTI_BUILDING; }
 
         void Produce_Cash_AI();
 

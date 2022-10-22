@@ -57,7 +57,7 @@ TiberiumClassExtension final : public AbstractTypeClassExtension
 
         virtual TiberiumClass *This() const override { return reinterpret_cast<TiberiumClass *>(AbstractTypeClassExtension::This()); }
         virtual const TiberiumClass *This_Const() const override { return reinterpret_cast<const TiberiumClass *>(AbstractTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_TIBERIUM; }
+        virtual RTTIType What_Am_I() const override { return RTTI_TIBERIUM; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

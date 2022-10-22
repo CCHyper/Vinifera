@@ -79,7 +79,7 @@ class ThemeControlExtension;
 /**
  *  For printing out extension debug info.
  */
-#ifndef NDEBUG
+#ifdef VINIFERA_ENABLE_EXTENSION_DEBUG_PRINTING
 #define EXT_DEBUG_SAY(x, ...) DEV_DEBUG_SAY(x, ##__VA_ARGS__)
 #define EXT_DEBUG_INFO(x, ...) DEV_DEBUG_INFO(x, ##__VA_ARGS__)
 #define EXT_DEBUG_WARNING(x, ...) DEV_DEBUG_WARNING(x, ##__VA_ARGS__)

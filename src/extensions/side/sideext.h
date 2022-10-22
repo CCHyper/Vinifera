@@ -57,7 +57,7 @@ SideClassExtension final : public AbstractTypeClassExtension
 
         virtual SideClass *This() const override { return reinterpret_cast<SideClass *>(AbstractTypeClassExtension::This()); }
         virtual const SideClass *This_Const() const override { return reinterpret_cast<const SideClass *>(AbstractTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_SIDE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_SIDE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

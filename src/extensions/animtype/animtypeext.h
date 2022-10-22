@@ -57,7 +57,7 @@ AnimTypeClassExtension final : public ObjectTypeClassExtension
 
         virtual AnimTypeClass *This() const override { return reinterpret_cast<AnimTypeClass *>(ObjectTypeClassExtension::This()); }
         virtual const AnimTypeClass *This_Const() const override { return reinterpret_cast<const AnimTypeClass *>(ObjectTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_ANIMTYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_ANIMTYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

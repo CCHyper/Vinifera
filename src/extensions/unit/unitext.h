@@ -57,7 +57,7 @@ UnitClassExtension final : public FootClassExtension
 
         virtual UnitClass *This() const override { return reinterpret_cast<UnitClass *>(FootClassExtension::This()); }
         virtual const UnitClass *This_Const() const override { return reinterpret_cast<const UnitClass *>(FootClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_UNIT; }
+        virtual RTTIType What_Am_I() const override { return RTTI_UNIT; }
 
     public:
 };

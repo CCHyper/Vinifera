@@ -51,13 +51,15 @@ DECLARE_PATCH(_Tactical_Constructor_Patch)
 {
     GET_REGISTER_STATIC(Tactical *, this_ptr, esi); // "this" pointer.
 
-    /**
-     *  If we are performing a load operation, the Windows API will invoke the
-     *  constructors for us as part of the operation, so we can skip our hook here.
-     */
-    if (Vinifera_PerformingLoad) {
-        goto original_code;
-    }
+    DEBUG_INFO("Tactical CTOR\n");
+
+    ///**
+    // *  If we are performing a load operation, the Windows API will invoke the
+    // *  constructors for us as part of the operation, so we can skip our hook here.
+    // */
+    //if (Vinifera_PerformingLoad) {
+    //    goto original_code;
+    //}
 
     /**
      *  Create the extended class instance.
@@ -87,6 +89,8 @@ DECLARE_PATCH(_Tactical_Destructor_Patch)
 {
     GET_REGISTER_STATIC(Tactical *, this_ptr, esi);
 
+    DEBUG_INFO("Tactical DTOR\n");
+
     /**
      *  Remove the extended class instance.
      */
@@ -112,6 +116,8 @@ DECLARE_PATCH(_Tactical_Scalar_Destructor_Patch)
 {
     GET_REGISTER_STATIC(Tactical *, this_ptr, esi);
 
+    DEBUG_INFO("Tactical DTOR\n");
+
     /**
      *  Remove the extended class instance.
      */
@@ -121,11 +127,8 @@ DECLARE_PATCH(_Tactical_Scalar_Destructor_Patch)
      *  Stolen bytes here.
      */
 original_code:
-    _asm { mov ecx, this_ptr }
-    _asm { mov eax, 0x00405B90 } // AbstractClass::~AbstractClass()
-    _asm { call eax }
-
-    JMP(0x0060D881);
+    this_ptr->AbstractClass::~AbstractClass();
+    JMP(0x0061802F);
 }
 
 

@@ -57,7 +57,7 @@ UnitTypeClassExtension final : public TechnoTypeClassExtension
 
         virtual UnitTypeClass *This() const override { return reinterpret_cast<UnitTypeClass *>(TechnoTypeClassExtension::This()); }
         virtual const UnitTypeClass *This_Const() const override { return reinterpret_cast<const UnitTypeClass *>(TechnoTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_UNITTYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_UNITTYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

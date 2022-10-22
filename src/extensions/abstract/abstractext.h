@@ -106,7 +106,7 @@ class AbstractClassExtension : public IPersistStream
          *  
          *  @note: This must be overridden by the extended class!
          */
-        virtual ExtensionRTTIType What_Am_I() const = 0; // { return EXT_RTTI_ABSTRACT; }
+        virtual RTTIType What_Am_I() const = 0; // { return RTTI_ABSTRACT; }
 
         /**
          *  x

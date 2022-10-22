@@ -57,7 +57,7 @@ BulletTypeClassExtension final : public ObjectTypeClassExtension
         
         virtual BulletTypeClass *This() const override { return reinterpret_cast<BulletTypeClass *>(ObjectTypeClassExtension::This()); }
         virtual const BulletTypeClass *This_Const() const override { return reinterpret_cast<const BulletTypeClass *>(ObjectTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_BULLETTYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_BULLETTYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

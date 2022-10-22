@@ -64,7 +64,7 @@ SuperClassExtension final : public AbstractClassExtension
 
         virtual SuperClass *This() const override { return reinterpret_cast<SuperClass *>(AbstractClassExtension::This()); }
         virtual const SuperClass *This_Const() const override { return reinterpret_cast<const SuperClass *>(AbstractClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_SUPERWEAPON; }
+        virtual RTTIType What_Am_I() const override { return RTTI_SUPERWEAPON; }
 
     public:
         /**

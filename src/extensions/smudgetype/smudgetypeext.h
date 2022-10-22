@@ -57,7 +57,7 @@ SmudgeTypeClassExtension final : public ObjectTypeClassExtension
 
         virtual SmudgeTypeClass *This() const override { return reinterpret_cast<SmudgeTypeClass *>(ObjectTypeClassExtension::This()); }
         virtual const SmudgeTypeClass *This_Const() const override { return reinterpret_cast<const SmudgeTypeClass *>(ObjectTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_SMUDGETYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_SMUDGETYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

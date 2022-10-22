@@ -57,7 +57,7 @@ ParticleSystemTypeClassExtension final : public ObjectTypeClassExtension
 
         virtual ParticleSystemTypeClass *This() const override { return reinterpret_cast<ParticleSystemTypeClass *>(ObjectTypeClassExtension::This()); }
         virtual const ParticleSystemTypeClass *This_Const() const override { return reinterpret_cast<const ParticleSystemTypeClass *>(ObjectTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_PARTICLESYSTEMTYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_PARTICLESYSTEMTYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

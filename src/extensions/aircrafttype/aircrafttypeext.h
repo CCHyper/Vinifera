@@ -57,7 +57,7 @@ AircraftTypeClassExtension final : public TechnoTypeClassExtension
         
         virtual AircraftTypeClass *This() const override { return reinterpret_cast<AircraftTypeClass *>(TechnoTypeClassExtension::This()); }
         virtual const AircraftTypeClass *This_Const() const override { return reinterpret_cast<const AircraftTypeClass *>(TechnoTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_AIRCRAFTTYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_AIRCRAFTTYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

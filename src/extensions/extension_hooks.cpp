@@ -50,51 +50,51 @@
 #include "housetypeext_hooks.h"
 #include "infantryext_hooks.h"
 #include "infantrytypeext_hooks.h"
-//EXT_RTTI_ISOTILE
+//RTTI_ISOTILE
 #include "isotiletypeext_hooks.h"
-//EXT_RTTI_LIGHT
-//EXT_RTTI_OVERLAY
+//RTTI_LIGHT
+//RTTI_OVERLAY
 #include "overlaytypeext_hooks.h"
-//EXT_RTTI_PARTICLE
+//RTTI_PARTICLE
 #include "particletypeext_hooks.h"
 #include "particlesysext_hooks.h"
 #include "particlesystypeext_hooks.h"
-//EXT_RTTI_SCRIPT
-//EXT_RTTI_SCRIPTTYPE
+//RTTI_SCRIPT
+//RTTI_SCRIPTTYPE
 #include "sideext_hooks.h"
-//EXT_RTTI_SMUDGE
+//RTTI_SMUDGE
 #include "smudgetypeext_hooks.h"
 #include "supertypeext_hooks.h"
-//EXT_RTTI_TASKFORCE
+//RTTI_TASKFORCE
 #include "teamext_hooks.h"
-//EXT_RTTI_TEAMTYPE
+//RTTI_TEAMTYPE
 #include "terrainext_hooks.h"
 #include "terraintypeext_hooks.h"
-//EXT_RTTI_TRIGGER
-//EXT_RTTI_TRIGGERTYPE
+//RTTI_TRIGGER
+//RTTI_TRIGGERTYPE
 #include "unittypeext_hooks.h"
-//EXT_RTTI_VOXELANIM
+//RTTI_VOXELANIM
 #include "voxelanimtypeext_hooks.h"
 #include "waveext_hooks.h"
-//EXT_RTTI_TAG
-//EXT_RTTI_TAGTYPE
+//RTTI_TAG
+//RTTI_TAGTYPE
 #include "tiberiumext_hooks.h"
 #include "tactionext_hooks.h"
-//EXT_RTTI_EVENT
+//RTTI_EVENT
 #include "weapontypeext_hooks.h"
 #include "warheadtypeext_hooks.h"
-//EXT_RTTI_WAYPOINT
-//EXT_RTTI_TUBE
-//EXT_RTTI_LIGHTSOURCE
+//RTTI_WAYPOINT
+//RTTI_TUBE
+//RTTI_LIGHTSOURCE
 #include "empulseext_hooks.h"
 #include "tacticalext_hooks.h"
 #include "superext_hooks.h"
-//EXT_RTTI_AITRIGGER
-//EXT_RTTI_AITRIGGERTYPE
-//EXT_RTTI_NEURON
-//EXT_RTTI_FOGGEDOBJECT
-//EXT_RTTI_ALPHASHAPE
-//EXT_RTTI_VEINHOLEMONSTER
+//RTTI_AITRIGGER
+//RTTI_AITRIGGERTYPE
+//RTTI_NEURON
+//RTTI_FOGGEDOBJECT
+//RTTI_ALPHASHAPE
+//RTTI_VEINHOLEMONSTER
 
 #include "rulesext_hooks.h"
 #include "scenarioext_hooks.h"

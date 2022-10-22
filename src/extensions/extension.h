@@ -55,13 +55,32 @@ bool Destroy_Internal(const AbstractClass *abstract);
 AbstractClassExtension *Fetch_Internal(const AbstractClass *abstract);
 
 /**
- *  Wrapper for "typeid(T).name()", removes the "class" prefix on the string.
+ *  Erase First Occurrence of given substring from main string.
+ */
+inline void Erase_Sub_String(std::string &str, const std::string &erase)
+{
+    /**
+     *  Search for the substring in string.
+     */
+    size_t pos = str.find(erase);
+    if (pos != std::string::npos) {
+
+        /**
+         *  If found then erase it from string.
+         */
+        str.erase(pos, erase.length());
+    }
+}
+
+/**
+ *  Wrapper for "typeid(T).name()", removes the "class" or "struct" prefix on the string.
  */
 template<typename T>
 std::string Get_TypeID_Name()
 {
     std::string str = typeid(T).name();
-    str.erase(0, 6);
+    Erase_Sub_String(str, "class ");
+    Erase_Sub_String(str, "struct ");
     return str;
 }
 

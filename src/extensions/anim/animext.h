@@ -61,7 +61,7 @@ AnimClassExtension final : public ObjectClassExtension
 
         virtual AnimClass *This() const override { return reinterpret_cast<AnimClass *>(ObjectClassExtension::This()); }
         virtual const AnimClass *This_Const() const override { return reinterpret_cast<const AnimClass *>(ObjectClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_ANIM; }
+        virtual RTTIType What_Am_I() const override { return RTTI_ANIM; }
 
     public:
 };

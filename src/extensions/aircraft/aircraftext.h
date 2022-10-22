@@ -61,7 +61,7 @@ AircraftClassExtension final : public FootClassExtension
 
         virtual AircraftClass *This() const override { return reinterpret_cast<AircraftClass *>(FootClassExtension::This()); }
         virtual const AircraftClass *This_Const() const override { return reinterpret_cast<const AircraftClass *>(FootClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_AIRCRAFT; }
+        virtual RTTIType What_Am_I() const override { return RTTI_AIRCRAFT; }
 
     public:
 };

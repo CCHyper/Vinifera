@@ -73,6 +73,8 @@ TacticalExtension::TacticalExtension(const Tactical *this_ptr) :
     //if (this_ptr) EXT_DEBUG_TRACE("TacticalExtension::TacticalExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     TacticalMapExtension = this;
+
+    DEBUG_INFO("TacticalExt CTOR\n");
 }
 
 
@@ -100,6 +102,8 @@ TacticalExtension::~TacticalExtension()
     //EXT_DEBUG_TRACE("TacticalExtension::~TacticalExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     TacticalMapExtension = nullptr;
+
+    DEBUG_INFO("TacticalExt DTOR\n");
 }
 
 

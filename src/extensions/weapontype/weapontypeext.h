@@ -57,7 +57,7 @@ WeaponTypeClassExtension final : public AbstractTypeClassExtension
 
         virtual WeaponTypeClass *This() const override { return reinterpret_cast<WeaponTypeClass *>(AbstractTypeClassExtension::This()); }
         virtual const WeaponTypeClass *This_Const() const override { return reinterpret_cast<const WeaponTypeClass *>(AbstractTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_WEAPONTYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_WEAPONTYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

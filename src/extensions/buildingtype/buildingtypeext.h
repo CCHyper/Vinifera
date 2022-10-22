@@ -57,7 +57,7 @@ BuildingTypeClassExtension final : public TechnoTypeClassExtension
 
         virtual BuildingTypeClass *This() const override { return reinterpret_cast<BuildingTypeClass *>(TechnoTypeClassExtension::This()); }
         virtual const BuildingTypeClass *This_Const() const override { return reinterpret_cast<const BuildingTypeClass *>(TechnoTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_BUILDINGTYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_BUILDINGTYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

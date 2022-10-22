@@ -60,7 +60,7 @@ TerrainClassExtension final : public ObjectClassExtension
 
         virtual TerrainClass *This() const override { return reinterpret_cast<TerrainClass *>(ObjectClassExtension::This()); }
         virtual const TerrainClass *This_Const() const override { return reinterpret_cast<const TerrainClass *>(ObjectClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_TERRAIN; }
+        virtual RTTIType What_Am_I() const override { return RTTI_TERRAIN; }
 
     public:
         /**

@@ -383,7 +383,7 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
 
         EXT_CLASS * ext_ptr = reinterpret_cast<EXT_CLASS *>(lpPS);
 
-        if (ext_ptr->What_Am_I() != EXT_RTTI_WAVE) {
+        if (ext_ptr->What_Am_I() != RTTI_WAVE) {
             EXT_DEBUG_INFO("  -> %s\n", ext_ptr->Name());
         }
     }
@@ -826,7 +826,7 @@ AbstractClassExtension *Extension::Private::Fetch_Internal(const AbstractClass *
     /**
      *  Its still possible the pointer could be invalid, so perform a final check.
      */
-    if (ext_ptr->What_Am_I() <= EXT_RTTI_NONE || ext_ptr->What_Am_I() >= EXT_RTTI_COUNT) {
+    if (ext_ptr->What_Am_I() <= RTTI_NONE || ext_ptr->What_Am_I() >= RTTI_COUNT) {
         DEBUG_ERROR("Extension::Fetch: Invalid extension rtti type for \"%s\"!\n", Extension_Get_Abstract_Name(abstract));
         return nullptr;
     }
@@ -1077,7 +1077,7 @@ bool Extension::Load(IStream *pStm)
     if (Extension::Is_Supported(RTTI_SIDE) && !Extension_Load<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
     if (Extension::Is_Supported(RTTI_SMUDGE)) { }                         // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_SMUDGETYPE) && !Extension_Load<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
-    if (Extension::Is_Supported(RTTI_SPECIAL)) { }                        // <- Do not save!
+    if (Extension::Is_Supported(RTTI_SPECIAL)) { }                        // <- Special case, nothing to save!
     if (Extension::Is_Supported(RTTI_SUPERWEAPONTYPE) && !Extension_Load<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
     if (Extension::Is_Supported(RTTI_TASKFORCE)) { }                      // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_TEAM)) { }                           // <- Not yet implemented
@@ -1098,7 +1098,7 @@ bool Extension::Load(IStream *pStm)
     if (Extension::Is_Supported(RTTI_WEAPONTYPE) && !Extension_Load<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
     if (Extension::Is_Supported(RTTI_WARHEADTYPE) && !Extension_Load<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
     if (Extension::Is_Supported(RTTI_WAYPOINT)) { }                       // <- Not yet implemented
-    if (Extension::Is_Supported(RTTI_ABSTRACT)) { }                       // <- Do not save!
+    if (Extension::Is_Supported(RTTI_ABSTRACT)) { }                       // <- Special case, nothing to save!
     if (Extension::Is_Supported(RTTI_TUBE)) { }                           // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_LIGHTSOURCE)) { }                    // <- Not yet implemented
     if (Extension::Is_Supported(RTTI_EMPULSE)) { }                        // <- Not yet implemented

@@ -57,7 +57,7 @@ HouseTypeClassExtension final : public AbstractTypeClassExtension
         
         virtual HouseTypeClass *This() const override { return reinterpret_cast<HouseTypeClass *>(AbstractTypeClassExtension::This()); }
         virtual const HouseTypeClass *This_Const() const override { return reinterpret_cast<const HouseTypeClass *>(AbstractTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_HOUSETYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_HOUSETYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

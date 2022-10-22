@@ -57,7 +57,7 @@ WaveClassExtension final : public ObjectClassExtension
 
         virtual WaveClass *This() const override { return reinterpret_cast<WaveClass *>(ObjectClassExtension::This()); }
         virtual const WaveClass *This_Const() const override { return reinterpret_cast<const WaveClass *>(ObjectClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_WAVE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_WAVE; }
 
     public:
 };

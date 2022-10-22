@@ -57,7 +57,7 @@ InfantryTypeClassExtension final : public TechnoTypeClassExtension
         
         virtual InfantryTypeClass *This() const override { return reinterpret_cast<InfantryTypeClass *>(TechnoTypeClassExtension::This()); }
         virtual const InfantryTypeClass *This_Const() const override { return reinterpret_cast<const InfantryTypeClass *>(TechnoTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_INFANTRYTYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_INFANTRYTYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

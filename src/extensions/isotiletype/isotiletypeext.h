@@ -57,7 +57,7 @@ IsometricTileTypeClassExtension final : public ObjectTypeClassExtension
 
         virtual IsometricTileTypeClass *This() const override { return reinterpret_cast<IsometricTileTypeClass *>(ObjectTypeClassExtension::This()); }
         virtual const IsometricTileTypeClass *This_Const() const override { return reinterpret_cast<const IsometricTileTypeClass *>(ObjectTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_ISOTILETYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_ISOTILETYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

@@ -57,7 +57,7 @@ VoxelAnimTypeClassExtension final : public ObjectTypeClassExtension
 
         virtual VoxelAnimTypeClass *This() const override { return reinterpret_cast<VoxelAnimTypeClass *>(ObjectTypeClassExtension::This()); }
         virtual const VoxelAnimTypeClass *This_Const() const override { return reinterpret_cast<const VoxelAnimTypeClass *>(ObjectTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_VOXELANIMTYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_VOXELANIMTYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

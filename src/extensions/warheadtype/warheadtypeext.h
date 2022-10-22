@@ -57,7 +57,7 @@ WarheadTypeClassExtension final : public AbstractTypeClassExtension
 
         virtual WarheadTypeClass *This() const override { return reinterpret_cast<WarheadTypeClass *>(AbstractTypeClassExtension::This()); }
         virtual const WarheadTypeClass *This_Const() const override { return reinterpret_cast<const WarheadTypeClass *>(AbstractTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_WARHEADTYPE; }
+        virtual RTTIType What_Am_I() const override { return RTTI_WARHEADTYPE; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 

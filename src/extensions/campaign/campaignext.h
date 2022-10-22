@@ -57,7 +57,7 @@ CampaignClassExtension final : public AbstractTypeClassExtension
 
         virtual CampaignClass *This() const override { return reinterpret_cast<CampaignClass *>(AbstractTypeClassExtension::This()); }
         virtual const CampaignClass *This_Const() const override { return reinterpret_cast<const CampaignClass *>(AbstractTypeClassExtension::This_Const()); }
-        virtual ExtensionRTTIType What_Am_I() const override { return EXT_RTTI_CAMPAIGN; }
+        virtual RTTIType What_Am_I() const override { return RTTI_CAMPAIGN; }
 
         virtual bool Read_INI(CCINIClass &ini) override;
 
