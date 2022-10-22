@@ -80,17 +80,6 @@ ShapeFileStruct * NewSidebarClass::SidebarMiddleShape = nullptr;
 ShapeFileStruct * NewSidebarClass::SidebarBottomShape = nullptr;
 
 
-typedef enum ButtonNumberType {
-    BUTTON_RADAR = 100,
-    BUTTON_REPAIR,
-    BUTTON_POWER,
-    BUTTON_WAYPOINT,
-    BUTTON_DEMOLISH,
-    BUTTON_UPGRADE,
-    BUTTON_SELECT,
-    BUTTON_ZOOM
-} ButtonNumberType;
-
 /*
 ** Sidebar buttons
 */
@@ -106,10 +95,9 @@ NewSidebarClass::StripClass::SelectClass NewSidebarClass::StripClass::SelectButt
 /*
 ** Shape data pointers
 */
-ShapeFileStruct * NewSidebarClass::StripClass::LogoShapes = nullptr;
-ShapeFileStruct const * NewSidebarClass::StripClass::ClockShapes;
-ShapeFileStruct const * NewSidebarClass::StripClass::DarkenShape;
-ShapeFileStruct const * NewSidebarClass::StripClass::SpecialShapes[SPECIAL_COUNT];
+const ShapeFileStruct * NewSidebarClass::StripClass::ClockShapes;
+const ShapeFileStruct * NewSidebarClass::StripClass::DarkenShape;
+const ShapeFileStruct * NewSidebarClass::StripClass::RechargeClockShape;
 
 
 /***********************************************************************************************
@@ -152,10 +140,8 @@ NewSidebarClass::NewSidebarClass() : // TODO
     new (&Column[0]) StripClass(InitClass());
     new (&Column[1]) StripClass(InitClass());
 
-    Column[0].X = COLUMN_ONE_X;
-    Column[0].Y = COLUMN_ONE_Y;
-    Column[1].X = COLUMN_TWO_X;
-    Column[1].Y = COLUMN_TWO_Y;
+    Column[0].Set_Position(COLUMN_ONE_X, COLUMN_ONE_Y);
+    Column[1].Set_Position(COLUMN_TWO_X, COLUMN_TWO_Y);
 }
 
 
@@ -597,7 +583,52 @@ bool NewSidebarClass::Scroll(bool up, int column) // TODO
     }
 
     if (Column[column].Scroll(up)) {
-        // No need to redraw the whole sidebar juss because we scrolled a strip is there? ST - 10/15/96 7:29PM
+        // No need to redraw the whole sidebar just because we scrolled a strip is there? ST - 10/15/96 7:29PM
+        //IsToRedraw = true;
+        Flag_To_Redraw();
+        return true;
+    }
+    return false;
+}
+
+
+/***********************************************************************************************
+ * NewSidebarClass::Scroll -- Handles scrolling the sidebar object strip.                         *
+ *                                                                                             *
+ *    This routine is used to scroll the sidebar strip of objects. The strip appears whenever  *
+ *    a building is selected that can produce units. If the number of units to produce is      *
+ *    greater than what the sidebar can hold, this routine is used to scroll the other object  *
+ *    into view so they can be selected.                                                       *
+ *                                                                                             *
+ * INPUT:   up -- Should the scroll be upwards? Upward scrolling reveals object that are       *
+ *                later in the list of objects.                                                *
+ *                                                                                             *
+ * OUTPUT:  bool; Did scrolling occur?                                                         *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   10/28/94   JLB : Created.                                                                 *
+ *=============================================================================================*/
+bool NewSidebarClass::Scroll_Page(bool up, int column) // DONE ?
+{
+    if (column == -1) {
+        bool scr = false;
+        scr |= Column[0].Scroll_Page(up);
+        scr |= Column[1].Scroll_Page(up);
+        if (!scr) {
+            Sound_Effect(Rule->ScoldSound);
+        }
+        if (scr) {
+            IsToRedraw = true;
+            Flag_To_Redraw();
+            return true;
+        }
+        return false;
+    }
+
+    if (Column[column].Scroll_Page(up)) {
+        // No need to redraw the whole sidebar just because we scrolled a strip is there? ST - 10/15/96 7:29PM
         //IsToRedraw = true;
         Flag_To_Redraw();
         return true;
@@ -695,6 +726,8 @@ void NewSidebarClass::AI(KeyNumType & input, Point2D & xy) // TODO
 {
     bool redraw = false;
 
+    Point2D newxy(xy.X-SidebarRect.X, xy.Y);
+
 #if 0
     /*
     **  Toggle the sidebar in and out with the <TAB> key.
@@ -706,8 +739,8 @@ void NewSidebarClass::AI(KeyNumType & input, Point2D & xy) // TODO
 
     if (!Debug_Map) {
         Activate(1);    // Force the sidebar always on.
-        Column[0].AI(input, xy);
-        Column[1].AI(input, xy);
+        Column[0].AI(input, newxy);
+        Column[1].AI(input, newxy);
     }
 
     if (IsSidebarActive) {
@@ -1034,7 +1067,6 @@ void NewSidebarClass::StripClass::Init_IO(int id) // DONE
     UpButton[ID].field_3C = true;
     UpButton[ID].ShapeDrawer = SidebarDrawer;
     UpButton[ID].Flags = GadgetClass::RIGHTPRESS|GadgetClass::RIGHTRELEASE|GadgetClass::LEFTPRESS|GadgetClass::LEFTRELEASE;
-    UpButton[ID].IsSticky = true;
 
     DownButton[ID].IsSticky = true;
     DownButton[ID].ID = BUTTON_DOWN+id;
@@ -1179,7 +1211,35 @@ bool NewSidebarClass::StripClass::Scroll(bool up) // DONE
 }
 
 
-// Scroll_Page
+/***********************************************************************************************
+ * NewSidebarClass::StripClass::Scroll -- Causes the side strip to scroll.                        *
+ *                                                                                             *
+ *    Use this routine to flag the side strip to scroll. The direction scrolled is controlled  *
+ *    by the parameter. Scrolling is merely initiated by this routine. Subsequent calls to     *
+ *    the AI function and the Draw_It function are required to properly give the appearance    *
+ *    of scrolling.                                                                            *
+ *                                                                                             *
+ * INPUT:   bool; Should the side strip scroll UP? If it is to scroll down then pass false.    *
+ *                                                                                             *
+ * OUTPUT:  bool; Was the side strip started to scroll in the desired direction?               *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   12/31/1994 JLB : Created.                                                                 *
+ *   07/29/1995 JLB : Simplified scrolling logic.                                              *
+ *=============================================================================================*/
+bool NewSidebarClass::StripClass::Scroll_Page(bool up) // DONE
+{
+    if (up) {
+        if (!TopIndex) return false;
+        Scroller -= Max_Visible();
+    } else {
+        if (TopIndex+Max_Visible() >= BuildableCount) return false;
+        Scroller+=Max_Visible();
+    }
+    return true;
+}
 
 
 /***********************************************************************************************
@@ -1521,13 +1581,13 @@ void NewSidebarClass::StripClass::Draw_It(bool complete) // TODO
                     }
 
                 } else {
-                    shapefile = LogoShapes;
+                    //shapefile = LogoShapes;
                     if (!darken) {
                         shapenum = SB_BLANK;
                     }
                 }
             } else {
-                shapefile = LogoShapes;
+                //shapefile = LogoShapes;
                 shapenum = SB_BLANK;
                 production = false;
             }
@@ -1642,7 +1702,7 @@ bool NewSidebarClass::StripClass::Recalc() // TODO
             //ok = tech->Who_Can_Build_Me(true, ?, false, PlayerPtr->Class->House) != nullptr;
         } else {
             if (Buildables[index].BuildableID < SPECIAL_COUNT) {
-                ok = PlayerPtr->SuperWeapon[Buildables[index].BuildableID].Is_Present();
+                ok = PlayerPtr->SuperWeapon[Buildables[index].BuildableID]->Is_Present();
             } else {
                 ok = false;
             }
@@ -1805,7 +1865,7 @@ bool NewSidebarClass::StripClass::SelectClass::Action(unsigned flags, KeyNumType
         if (flags & LEFTPRESS) {
 
             if (spc < SPECIAL_COUNT) {
-                if (PlayerPtr->SuperWeapon[spc].Is_Ready()) {
+                if (PlayerPtr->SuperWeapon[spc]->Is_Ready()) {
                     //if (spc != SPECIAL_SONAR_PULSE) {
                     //    Map.TargettingType = spc;
                     //    Unselect_All();
@@ -1814,7 +1874,7 @@ bool NewSidebarClass::StripClass::SelectClass::Action(unsigned flags, KeyNumType
                     //    OutList.Add(EventClass(PlayerPtr->ID, SPECIAL_PLACE, SPECIAL_SONAR_PULSE, 0));
                     //}
                 } else {
-                    PlayerPtr->SuperWeapon[spc].Impatient_Click();
+                    PlayerPtr->SuperWeapon[spc]->Impatient_Click();
                 }
             }
         }
