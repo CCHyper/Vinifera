@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          THEATERTYPE_HOOKS.H
+ *  @file          NEWSIDEBAR_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for TheaterTypeClass.
+ *  @brief         Contains the hooks for NewSidebarClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -28,4 +28,4 @@
 #pragma once
 
 
-void TheaterTypeClassExtension_Hooks();
+void NewSidebarClassExtension_Hooks();

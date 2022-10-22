@@ -24,14 +24,13 @@
 #include "shapebtn.h"
 
 
-class InitClass {};
-
 class Straw;
 class Pipe;
 struct ShapeFileStruct;
+class FactoryClass;
 
 
-#define SIDEBAR_WID
+#define SIDEBAR_WID 999
 
 
 class NewSidebarClass : public PowerClass
@@ -92,25 +91,23 @@ class NewSidebarClass : public PowerClass
 
             public:
                 StripClass() {}
-                StripClass(InitClass const &);
-                StripClass(NoInitClass const & ) {};
+                StripClass(InitClass const & x);
+                StripClass(NoInitClass const & x) {}
 
                 bool Add(RTTIType type, int ID);
-                bool Abandon_Production(int factory);
+                bool Abandon_Production(FactoryClass * factory);
                 bool Scroll(bool up);
-                bool AI(KeyNumType & input, int x, int y);
+                bool AI(KeyNumType & input, Point2D & xy);
                 void Draw_It(bool complete);
                 void One_Time(int id);
                 void Init_Clear();
                 void Init_IO(int id);
-                void Init_Theater(TheaterType theater);
-                void Reload_LogoShapes();
                 bool Recalc();
                 void Activate();
                 void Deactivate();
                 void Flag_To_Redraw();
-                bool Factory_Link(int factory, RTTIType type, int id);
-                void const * Get_Special_Cameo(SpecialWeaponType type);
+                bool Factory_Link(FactoryClass * factory, RTTIType type, int id);
+                const ShapeFileStruct * Get_Special_Cameo(SpecialWeaponType type);
 
                 /*
                 **    File I/O.
@@ -125,30 +122,22 @@ class NewSidebarClass : public PowerClass
                     BUTTON_UP=200,
                     BUTTON_DOWN=210,
                     BUTTON_SELECT=220,
-                    MAX_BUILDABLES=75,            // Maximum number of object types in sidebar.
-                    OBJECT_HEIGHT=24,                // Pixel height of each buildable object.
-                    OBJECT_WIDTH=32,                // Pixel width of each buildable object.
+                    MAX_BUILDABLES=75,             // Maximum number of object types in sidebar.
+                    OBJECT_HEIGHT=24,              // Pixel height of each buildable object.
+                    OBJECT_WIDTH=32,               // Pixel width of each buildable object.
                     STRIP_WIDTH=35,                // Width of strip (not counting border lines).
-                    MAX_VISIBLE=4,                    // Number of object slots visible at any one time.
-#ifdef WIN32
+                    MAX_VISIBLE=4,                 // Number of object slots visible at any one time.
                     SCROLL_RATE=12,                // The pixel jump while scrolling (larger is faster).
-#else
-                    SCROLL_RATE=8,                    // The pixel jump while scrolling (larger is faster).
-#endif
-                    UP_X_OFFSET=2,                    // Scroll up arrow coordinates.
-#ifdef WIN32
-                    UP_Y_OFFSET=int(MAX_VISIBLE)*int(OBJECT_HEIGHT)+1,
-#else
-                    UP_Y_OFFSET=int(MAX_VISIBLE)*int(OBJECT_HEIGHT)+2,
-#endif
-                    DOWN_X_OFFSET=18,                // Scroll down arrow coordinates.
-                    DOWN_Y_OFFSET=UP_Y_OFFSET,//BGint(MAX_VISIBLE)*int(OBJECT_HEIGHT)+1,
-                    SBUTTON_WIDTH=16,                // Width of the mini-scroll button.
-                    SBUTTON_HEIGHT=12,                // Height of the mini-scroll button.
+                    UP_X_OFFSET=2,                 // Scroll up arrow coordinates.
+                    UP_Y_OFFSET=MAX_VISIBLE*OBJECT_HEIGHT+1,
+                    DOWN_X_OFFSET=18,              // Scroll down arrow coordinates.
+                    DOWN_Y_OFFSET=UP_Y_OFFSET,     //int(MAX_VISIBLE)*int(OBJECT_HEIGHT)+1,
+                    SBUTTON_WIDTH=16,              // Width of the mini-scroll button.
+                    SBUTTON_HEIGHT=12,             // Height of the mini-scroll button.
                     LEFT_EDGE_OFFSET=2,            // Offset from left edge for building shapes.
-                    TEXT_X_OFFSET=18,                // X offset to print "ready" text.
-                    TEXT_Y_OFFSET=15,                // Y offset to print "ready" text.
-                    TEXT_COLOR=255                    // Color to use for the "Ready" text.
+                    TEXT_X_OFFSET=18,              // X offset to print "ready" text.
+                    TEXT_Y_OFFSET=15,              // Y offset to print "ready" text.
+                    TEXT_COLOR=255                 // Color to use for the "Ready" text.
                 };
 
                 /*
@@ -249,7 +238,7 @@ class NewSidebarClass : public PowerClass
                 typedef struct BuildType {
                     int BuildableID;
                     RTTIType BuildableType;
-                    int Factory;                                // Production manager.
+                    FactoryClass * Factory;                                // Production manager.
                 } BuildType;
                 BuildType Buildables[MAX_BUILDABLES];
 
@@ -263,13 +252,15 @@ class NewSidebarClass : public PowerClass
                 **    This points to the animation sequence of frames used to mark the passage of time
                 **    as an object is undergoing construction.
                 */
-                static void ShapeFileStruct * ClockShapes;
+                static const ShapeFileStruct * ClockShapes;
+
+                static const ShapeFileStruct * DarkenShape;
 
                 /*
                 ** This points to the animation sequence which deals with special
                 ** shapes which handle non-production based icons.
                 */
-                static void ShapeFileStruct * SpecialShapes[SPC_COUNT];
+                static const ShapeFileStruct * SpecialShapes[SPECIAL_COUNT];
 
                 /*
                 **    This is the last theater that the special palette remap table was loaded
@@ -293,7 +284,7 @@ class NewSidebarClass : public PowerClass
     private:
         class SBGadgetClass: public GadgetClass {
             public:
-                SBGadgetClass() : GadgetClass((int)((int)SIDE_X+8), (int)SIDE_Y, (int)((int)SIDE_WIDTH-1)-1, (int)((int)SIDE_HEIGHT-1), LEFTUP) {}
+                SBGadgetClass() : GadgetClass(0, 0, 1, 1, LEFTUP) {}
 
             protected:
                 virtual bool Action(unsigned flags, KeyNumType & key);
@@ -301,7 +292,7 @@ class NewSidebarClass : public PowerClass
 
     public:
         NewSidebarClass();
-        NewSidebarClass(NoInitClass const & x);
+        NewSidebarClass(const NoInitClass & x);
 
         /*
         ** Initialization
@@ -309,19 +300,16 @@ class NewSidebarClass : public PowerClass
         virtual void One_Time();                            // One-time inits
         virtual void Init_Clear();                        // Clears all to known state
         virtual void Init_IO();                            // Inits button list
-        virtual void Init_Theater(TheaterType theater);    // Theater-specific inits
-        void Reload_Sidebar();                                // Loads house-specific sidebar art
 
-        virtual void AI(KeyNumType & input, int x, int y);
+        virtual void AI(KeyNumType & input, Point2D & xy);
         virtual void Draw_It(bool complete);
 
-        void Zoom_Mode_Control();
-        bool Abandon_Production(RTTIType type, int factory);
+        bool Abandon_Production(RTTIType type, FactoryClass * factory);
         bool Activate(int control);
         bool Add(RTTIType type, int ID);
-        bool Sidebar_Click(KeyNumType & input, int x, int y);
+        bool Sidebar_Click(KeyNumType & input, Point2D & xy);
         void Recalc();
-        bool Factory_Link(int factory, RTTIType type, int id);
+        bool Factory_Link(FactoryClass * factory, RTTIType type, int id);
         bool Scroll(bool up, int column);
 
         bool field_1CD4; // new in TS.
@@ -357,8 +345,9 @@ class NewSidebarClass : public PowerClass
         **    This is the button that is used to collapse and expand the sidebar.
         ** These buttons must be available to derived classes, for Save/Load.
         */
+        static ShapeButtonClass Waypoint;
+        static ShapeButtonClass Demolish;
+        static ShapeButtonClass Power;
         static ShapeButtonClass Repair;
-        static ShapeButtonClass Upgrade;
-        static ShapeButtonClass Zoom;
         static SBGadgetClass Background;
 };
