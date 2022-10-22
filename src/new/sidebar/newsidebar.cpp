@@ -78,6 +78,7 @@
 ShapeFileStruct * NewSidebarClass::SidebarShape = nullptr;
 ShapeFileStruct * NewSidebarClass::SidebarMiddleShape = nullptr;
 ShapeFileStruct * NewSidebarClass::SidebarBottomShape = nullptr;
+ShapeFileStruct * NewSidebarClass::SidebarAddonShape = nullptr;
 
 
 /*
@@ -95,9 +96,9 @@ NewSidebarClass::StripClass::SelectClass NewSidebarClass::StripClass::SelectButt
 /*
 ** Shape data pointers
 */
-const ShapeFileStruct * NewSidebarClass::StripClass::ClockShapes;
-const ShapeFileStruct * NewSidebarClass::StripClass::DarkenShape;
-const ShapeFileStruct * NewSidebarClass::StripClass::RechargeClockShape;
+const ShapeFileStruct * NewSidebarClass::ClockShape = nullptr;
+const ShapeFileStruct * NewSidebarClass::RechargeClockShape = nullptr;
+const ShapeFileStruct * NewSidebarClass::StripClass::DarkenShape = nullptr;
 
 
 /***********************************************************************************************
@@ -182,43 +183,18 @@ NewSidebarClass::NewSidebarClass(const NoInitClass &x) // DONE
  * HISTORY:                                                                                    *
  *   10/28/94   JLB : Created.                                                                 *
  *=============================================================================================*/
-void NewSidebarClass::One_Time() // TODO
+void NewSidebarClass::One_Time() // DONE
 {
     PowerClass::One_Time();
 
-    /*
-    **  This sets up the clipping window. This window is used by the shape drawing
-    **  code so that as the sidebar buildable buttons scroll, they get properly
-    **  clipped at the top and bottom edges.
-    */
-    //WindowList[WINDOW_SIDEBAR][WINDOWX] = ((SIDE_X+8));
-    //WindowList[WINDOW_SIDEBAR][WINDOWY] = (SIDE_Y + 1 + TOP_HEIGHT);
-    //WindowList[WINDOW_SIDEBAR][WINDOWWIDTH] = (SIDE_WIDTH);
-    //WindowList[WINDOW_SIDEBAR][WINDOWHEIGHT] = (StripClass::MAX_VISIBLE * StripClass::OBJECT_HEIGHT);
-//    WindowList[WINDOW_SIDEBAR][WINDOWHEIGHT] = (StripClass::MAX_VISIBLE * StripClass::OBJECT_HEIGHT-1);
-
-    /*
-    ** Top of the window seems to be wrong for the new sidebar. ST - 5/2/96 2:49AM
-    */
-    //WindowList[WINDOW_SIDEBAR][WINDOWY] -= 1;
-
-    /*
-    **  Set up the coordinates for the sidebar strips. These coordinates are for
-    **  the upper left corner.
-    */
-//    Column[0].X = COLUMN_ONE_X;
-//    Column[0].Y = COLUMN_ONE_Y;
-//    Column[1].X = COLUMN_TWO_X;
-//    Column[1].Y = COLUMN_TWO_Y;
     Column[0].One_Time(0);
     Column[1].One_Time(1);
 
     /*
-    **  Load the sidebar shape in at this time. (Hi-Res sidebar is theater dependant)
+    **  Load the sidebar shapes in at this time.
     */
-    if (SidebarShape == nullptr) {
-        SidebarShape = (ShapeFileStruct *)MFCC::Retrieve("SIDEBAR.SHP");
-    }
+    RechargeClockShape = (ShapeFileStruct *)MFCC::Retrieve("RCLOCK2.SHP");
+    ClockShape = (ShapeFileStruct *)MFCC::Retrieve("GCLOCK2.SHP");
 }
 
 
@@ -262,56 +238,80 @@ void NewSidebarClass::Init_Clear() // DONE
  * HISTORY:                                                                                    *
  *   12/24/1994 JLB : Created.                                                                 *
  *=============================================================================================*/
-void NewSidebarClass::Init_IO() // TODO
+void NewSidebarClass::Init_IO() // DONE
 {
     PowerClass::Init_IO();
+
+    SidebarRect.X = TacticalRect.Width + TacticalRect.X;
+    SidebarRect.Y = 148;
+    SidebarRect.Width = 641 - (TacticalRect.Width + TacticalRect.X);
+    SidebarRect.Height = TacticalRect.Height + TacticalRect.Y - SidebarRect.Y;
 
     /*
     ** Add the sidebar's buttons only if we're not in editor mode.
     */
     if (!Debug_Map) {
 
+        Repair.X = TacticalRect.Width + TacticalRect.X;
+        Demolish.X = TacticalRect.Width + TacticalRect.X + 27;
+        Power.X = TacticalRect.Width + TacticalRect.X + 54;
+        Waypoint.X = TacticalRect.Width + TacticalRect.X + 81;
+
         Repair.IsSticky = true;
         Repair.ID = BUTTON_REPAIR;
-        Repair.X = (498/2);
-        Repair.Y = (150/2);
+        Repair.Y = 148;
+        Repair.DrawX = -480;
+        Repair.DrawY = 3;
+        Repair.field_3C = true;
+        Repair.ShapeDrawer = SidebarDrawer;
         Repair.IsPressed = false;
         Repair.IsToggleType = true;
         Repair.ReflectButtonState = true;
-        Repair.Set_Shape((ShapeFileStruct *)MFCC::Retrieve("REPAIR.SHP"));
 
-        //Upgrade.IsSticky = true;
-        //Upgrade.ID = BUTTON_UPGRADE;
-        //Upgrade.X = 0x21f;
-        //Upgrade.Y = (0x96/2);
-        //Upgrade.IsPressed = false;
-        //Upgrade.IsToggleType = true;
-        //Upgrade.ReflectButtonState = true;
-        //Upgrade.Set_Shape((ShapeFileStruct *)MFCC::Retrieve("SELL.SHP"));
+        Demolish.IsSticky = true;
+        Demolish.ID = BUTTON_DEMOLISH;
+        Demolish.Y = 148;
+        Demolish.DrawX = -480;
+        Demolish.DrawY = 3;
+        Demolish.field_3C = true;
+        Demolish.ShapeDrawer = SidebarDrawer;
+        Demolish.IsPressed = false;
+        Demolish.IsToggleType = true;
+        Demolish.ReflectButtonState = true;
 
-        //Zoom.IsSticky = true;
-        //Zoom.ID = BUTTON_ZOOM;
-        //Zoom.X = (0x24c/2);
-        //Zoom.Y = (0x96/2);
-        //Zoom.IsPressed = false;
-        //Zoom.Set_Shape((ShapeFileStruct *)MFCC::Retrieve("MAP.SHP"));
+        Power.IsSticky = true;
+        Power.ID = BUTTON_POWER;
+        Power.Y = 148;
+        Power.DrawX = -480;
+        Power.DrawY = 3;
+        Power.field_3C = true;
+        Power.ShapeDrawer = SidebarDrawer;
+        Power.IsPressed = false;
+        Power.IsToggleType = true;
+        Power.ReflectButtonState = true;
 
-        //if ((IsRadarActive && Is_Zoomable()) || Session.Type != GAME_NORMAL) {
-        //    Zoom.Enable();
-        //} else {
-        //    Zoom.Disable();
-        //}
+        Waypoint.IsSticky = true;
+        Waypoint.ID = BUTTON_WAYPOINT;
+        Waypoint.Y = 148;
+        Waypoint.DrawX = -480;
+        Waypoint.DrawY = 3;
+        Waypoint.field_3C = true;
+        Waypoint.ShapeDrawer = SidebarDrawer;
+        Waypoint.IsPressed = false;
+        Waypoint.IsToggleType = true;
+        Waypoint.ReflectButtonState = true;
+
         Column[0].Init_IO(0);
         Column[1].Init_IO(1);
 
+        entry_84();
+
         /*
-        ** If a game was loaded & the sidebar was enabled, pop it up now
+        ** If a game was loaded & the sidebar was enabled, pop it up now.
         */
         if (IsSidebarActive) {
             IsSidebarActive = false;
             Activate(1);
-//            Background.Zap();
-//            Add_A_Button(Background);
         }
     }
 }
@@ -956,6 +956,7 @@ NewSidebarClass::StripClass::StripClass(InitClass const & x) : // DONE
     TopIndex(0),
     Scroller(0),
     Slid(0),
+    LastSlid(0),
     BuildableCount(0)
 {
     for (int index = 0; index < MAX_BUILDABLES; ++index) {
@@ -1483,9 +1484,9 @@ void NewSidebarClass::StripClass::Draw_It(bool complete) // TODO
         **  them. Their Y offset may be adjusted if the strip is in the process of scrolling.
         */
         for (int i = 0; i < MAX_VISIBLE + (IsScrolling ? 1 : 0); i++) {
-            bool production;
-            bool completed;
-            int  stage;
+            bool production = false;
+            bool completed = false;
+            int stage = 0;
             bool darken = false;
             void const * shapefile = 0;
             int shapenum = 0;
@@ -1500,7 +1501,6 @@ void NewSidebarClass::StripClass::Draw_It(bool complete) // TODO
             */
             if (IsScrolling) {
                 y -= (OBJECT_HEIGHT - Slid);
-//                y -= OBJECT_HEIGHT - Slid;
             }
 
             /*
@@ -1599,7 +1599,7 @@ void NewSidebarClass::StripClass::Draw_It(bool complete) // TODO
             **
             ** Don't draw blank shapes over the new 640x400 sidebar art - ST 5/1/96 6:01PM
             */
-            if (shapenum != SB_BLANK || shapefile != LogoShapes) {
+            if (shapenum != SB_BLANK /*|| shapefile != LogoShapes*/) {
                 //CC_Draw_Shape(shapefile, shapenum,
                 //    x-(WindowList[WINDOW_SIDEBAR][WINDOWX])+(LEFT_EDGE_OFFSET),
                 //    y-WindowList[WINDOW_SIDEBAR][WINDOWY],
@@ -1699,7 +1699,7 @@ bool NewSidebarClass::StripClass::Recalc() // TODO
     for (int index = 0; index < BuildableCount; ++index) {
         TechnoTypeClass const * tech = Fetch_Techno_Type(Buildables[index].BuildableType, Buildables[index].BuildableID);
         if (tech != nullptr) {
-            //ok = tech->Who_Can_Build_Me(true, ?, false, PlayerPtr->Class->House) != nullptr;
+            ok = tech->Who_Can_Build_Me(true, false, false, PlayerPtr) != nullptr;
         } else {
             if (Buildables[index].BuildableID < SPECIAL_COUNT) {
                 ok = PlayerPtr->SuperWeapon[Buildables[index].BuildableID]->Is_Present();
@@ -1714,7 +1714,7 @@ bool NewSidebarClass::StripClass::Recalc() // TODO
             **  Removes this entry from the list.
             */
             if (BuildableCount > 1 && index < BuildableCount-1) {
-                memcpy(&Buildables[index], &Buildables[index+1], sizeof(Buildables[0])*((BuildableCount-index)-1));
+                std::memcpy(&Buildables[index], &Buildables[index+1], sizeof(Buildables[0])*((BuildableCount-index)-1));
             }
             TopIndex = 0;
             IsToRedraw = true;
@@ -1732,6 +1732,7 @@ bool NewSidebarClass::StripClass::Recalc() // TODO
         Map.NewSidebarClass::Activate(0);
     }
 #endif
+
     return redraw;
 }
 
@@ -2162,7 +2163,22 @@ bool NewSidebarClass::StripClass::Abandon_Production(FactoryClass * factory) // 
 }
 
 
-// Radar_Mode_Control
+void NewSidebarClass::Radar_Mode_Control()
+{
+#if 0
+    if (Session.Type != GAME_NORMAL) {
+        if (RadarClass::Get_Tactical_Availablity()) {
+            RadarClass::Radar_Activate(1);
+
+        } else if (RadarClass::Player_Names()) {
+            RadarClass::Radar_Activate(0);
+
+        } else {
+            RadarClass::Radar_Activate(2);
+        }
+    }
+#endif
+}
 
 
 // entry_84
@@ -2171,11 +2187,11 @@ bool NewSidebarClass::StripClass::Abandon_Production(FactoryClass * factory) // 
 // Help_Text
 
 
-int NewSidebarClass::Max_Visible() // DONE
+int NewSidebarClass::StripClass::Max_Visible() // DONE
 {
-    return SidebarSurface && Sidebar1Shape
-        ? (SidebarRect.Height - Sidebar3Shape->FrameWidth - Sidebar1Shape->FrameWidth) / Sidebar2Shape->FrameWidth
-        : 4;
+    return SidebarSurface && SidebarShape
+        ? (SidebarRect.Height - SidebarBottomShape->Get_Width() - SidebarShape->Get_Width()) / SidebarMiddleShape->Get_Width()
+        : MAX_VISIBLE;
 }
 
 

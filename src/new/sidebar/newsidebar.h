@@ -18,7 +18,7 @@
 #pragma once
 
 #include "always.h"
-#include "power.h"
+#include "sidebar.h"
 #include "factory.h"
 #include "gcntrl.h"
 #include "shapebtn.h"
@@ -90,7 +90,7 @@ class NewSidebarClass : public PowerClass
                     BUTTON_SELECT = 220,
                     MAX_BUILDABLES = 75,             // Maximum number of object types in sidebar.
                     OBJECT_HEIGHT = 51,              // Pixel height of each buildable object.
-		            OBJECT_WIDTH = 64,               // Pixel width of each buildable object.
+                    OBJECT_WIDTH = 64,               // Pixel width of each buildable object.
                     STRIP_WIDTH = 35,                // Width of strip (not counting border lines).
                     MAX_VISIBLE = 4,                 // Number of object slots visible at any one time.
                     SCROLL_RATE = 12,                // The pixel jump while scrolling (larger is faster).
@@ -126,7 +126,7 @@ class NewSidebarClass : public PowerClass
             public:
                 StripClass() {}
                 StripClass(const InitClass & x);
-                StripClass(const NoInitClass & x) {}
+                StripClass(const NoInitClass & x) : StageClass() {}
                 ~StripClass() {}
 
                 bool Add(RTTIType type, int ID);
@@ -146,11 +146,8 @@ class NewSidebarClass : public PowerClass
                 const ShapeFileStruct * Get_Special_Cameo(SpecialWeaponType type);
                 inline void Set_Position(int x, int y) { X = x; Y = y; }
 
-                /**
-                 *  File I/O.
-                 */
-                bool Load(Straw & file);
-                bool Save(Pipe & file) const;
+            private:
+                static int Max_Visible();
 
             private:                
                 /**
@@ -302,21 +299,7 @@ class NewSidebarClass : public PowerClass
                 /**
                  *  
                  */
-                /*
-                **    This points to the animation sequence of frames used to mark the passage of time
-                **    as an object is undergoing construction.
-                */
-                static const ShapeFileStruct * ClockShapes;
-
-                /**
-                 *  
-                 */
                 static const ShapeFileStruct * DarkenShape;
-
-                /**
-                 *  
-                 */
-                static const ShapeFileStruct * RechargeClockShape;
 
                 static ShapeButtonClass UpButton[COLUMNS];
                 static ShapeButtonClass DownButton[COLUMNS];
@@ -348,7 +331,6 @@ class NewSidebarClass : public PowerClass
         bool Abandon_Production(RTTIType type, FactoryClass * factory);
         bool Activate(int control);
         bool Add(RTTIType type, int ID);
-        bool Sidebar_Click(KeyNumType & input, Point2D & xy);
         void Recalc();
         bool Factory_Link(FactoryClass * factory, RTTIType type, int id);
         bool Scroll(bool up, int column);
@@ -357,10 +339,8 @@ class NewSidebarClass : public PowerClass
         bool Activate_Upgrade(int control);
         bool Activate_Demolish(int control);
         int Which_Column(RTTIType type);
+        void Radar_Mode_Control();
 
-    private:
-        static int Max_Visible();
-        
     private:
         /**
          *  new in TS.
@@ -395,9 +375,17 @@ class NewSidebarClass : public PowerClass
         bool IsDemolishActive;
 
     private:
+        /**
+         *  This points to the animation sequence of frames used to mark the passage of time
+         *  as an object is undergoing construction.
+         */
+        static const ShapeFileStruct * ClockShape;
+        static const ShapeFileStruct * RechargeClockShape;
+
         static ShapeFileStruct * SidebarShape;
         static ShapeFileStruct * SidebarMiddleShape;
         static ShapeFileStruct * SidebarBottomShape;
+        static ShapeFileStruct * SidebarAddonShape;
 
         static ShapeButtonClass Waypoint;
         static ShapeButtonClass Demolish;
