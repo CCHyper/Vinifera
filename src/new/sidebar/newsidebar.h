@@ -119,25 +119,24 @@ class NewSidebarClass : public PowerClass
                 **    Working numbers used when rendering and processing the side strip.
                 */
                 enum SideBarGeneralEnums {
-                    BUTTON_UP=200,
-                    BUTTON_DOWN=210,
-                    BUTTON_SELECT=220,
-                    MAX_BUILDABLES=75,             // Maximum number of object types in sidebar.
-                    OBJECT_HEIGHT=24,              // Pixel height of each buildable object.
-                    OBJECT_WIDTH=32,               // Pixel width of each buildable object.
-                    STRIP_WIDTH=35,                // Width of strip (not counting border lines).
-                    MAX_VISIBLE=4,                 // Number of object slots visible at any one time.
-                    SCROLL_RATE=12,                // The pixel jump while scrolling (larger is faster).
-                    UP_X_OFFSET=2,                 // Scroll up arrow coordinates.
-                    UP_Y_OFFSET=MAX_VISIBLE*OBJECT_HEIGHT+1,
-                    DOWN_X_OFFSET=18,              // Scroll down arrow coordinates.
-                    DOWN_Y_OFFSET=UP_Y_OFFSET,     //int(MAX_VISIBLE)*int(OBJECT_HEIGHT)+1,
-                    SBUTTON_WIDTH=16,              // Width of the mini-scroll button.
-                    SBUTTON_HEIGHT=12,             // Height of the mini-scroll button.
-                    LEFT_EDGE_OFFSET=2,            // Offset from left edge for building shapes.
-                    TEXT_X_OFFSET=18,              // X offset to print "ready" text.
-                    TEXT_Y_OFFSET=15,              // Y offset to print "ready" text.
-                    TEXT_COLOR=255                 // Color to use for the "Ready" text.
+                    BUTTON_UP = 200,
+                    BUTTON_DOWN = 210,
+                    BUTTON_SELECT = 220,
+                    MAX_BUILDABLES = 75,             // Maximum number of object types in sidebar.
+                    OBJECT_HEIGHT = 51,             // Pixel height of each buildable object.
+		            OBJECT_WIDTH = 64,             // Pixel width of each buildable object.
+                    STRIP_WIDTH = 35,                // Width of strip (not counting border lines).
+                    MAX_VISIBLE = 4,                 // Number of object slots visible at any one time.
+                    SCROLL_RATE = 12,                // The pixel jump while scrolling (larger is faster).
+                    UP_X_OFFSET = 2,                 // Scroll up arrow coordinates.
+                    UP_Y_OFFSET = MAX_VISIBLE * OBJECT_HEIGHT + 1,
+                    DOWN_X_OFFSET = 18,              // Scroll down arrow coordinates.
+                    DOWN_Y_OFFSET = UP_Y_OFFSET,     //int(MAX_VISIBLE)*int(OBJECT_HEIGHT)+1,
+                    SBUTTON_WIDTH = 16,              // Width of the mini-scroll button.
+                    SBUTTON_HEIGHT = 12,             // Height of the mini-scroll button.
+                    LEFT_EDGE_OFFSET = 2,            // Offset from left edge for building shapes.
+                    TEXT_X_OFFSET = 18,              // X offset to print "ready" text.
+                    TEXT_Y_OFFSET = 15,              // Y offset to print "ready" text.
                 };
 
                 /*
@@ -311,6 +310,7 @@ class NewSidebarClass : public PowerClass
         void Recalc();
         bool Factory_Link(FactoryClass * factory, RTTIType type, int id);
         bool Scroll(bool up, int column);
+        static int Max_Visible();
 
         bool field_1CD4; // new in TS.
 

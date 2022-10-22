@@ -127,7 +127,7 @@ ShapeFileStruct const * NewSidebarClass::StripClass::SpecialShapes[SPECIAL_COUNT
  * HISTORY:                                                                                    *
  *   11/17/1994 JLB : Created.                                                                 *
  *=============================================================================================*/
-NewSidebarClass::NewSidebarClass() :
+NewSidebarClass::NewSidebarClass() : // TODO
     IsSidebarActive(false),
     IsToRedraw(true),
     IsRepairActive(false),
@@ -176,7 +176,7 @@ NewSidebarClass::NewSidebarClass() :
  * HISTORY:                                                                                    *
  *   08/06/1996 JLB : Created.                                                                 *
  *=============================================================================================*/
-NewSidebarClass::NewSidebarClass(const NoInitClass &x)
+NewSidebarClass::NewSidebarClass(const NoInitClass &x) // DONE
 {
 }
 
@@ -196,7 +196,7 @@ NewSidebarClass::NewSidebarClass(const NoInitClass &x)
  * HISTORY:                                                                                    *
  *   10/28/94   JLB : Created.                                                                 *
  *=============================================================================================*/
-void NewSidebarClass::One_Time()
+void NewSidebarClass::One_Time() // TODO
 {
     PowerClass::One_Time();
 
@@ -248,7 +248,7 @@ void NewSidebarClass::One_Time()
  * HISTORY:                                                                                    *
  *   12/24/1994 JLB : Created.                                                                 *
  *=============================================================================================*/
-void NewSidebarClass::Init_Clear()
+void NewSidebarClass::Init_Clear() // DONE
 {
     PowerClass::Init_Clear();
 
@@ -260,7 +260,7 @@ void NewSidebarClass::Init_Clear()
     Column[0].Init_Clear();
     Column[1].Init_Clear();
 
-    Activate(false);
+    Activate(0);
 }
 
 
@@ -276,7 +276,7 @@ void NewSidebarClass::Init_Clear()
  * HISTORY:                                                                                    *
  *   12/24/1994 JLB : Created.                                                                 *
  *=============================================================================================*/
-void NewSidebarClass::Init_IO()
+void NewSidebarClass::Init_IO() // TODO
 {
     PowerClass::Init_IO();
 
@@ -579,7 +579,7 @@ bool NewSidebarClass::Add(RTTIType type, int id) // DONE
  * HISTORY:                                                                                    *
  *   10/28/94   JLB : Created.                                                                 *
  *=============================================================================================*/
-bool NewSidebarClass::Scroll(bool up, int column)
+bool NewSidebarClass::Scroll(bool up, int column) // TODO
 {
     if (column == -1) {
         bool scr = false;
@@ -621,7 +621,7 @@ bool NewSidebarClass::Scroll(bool up, int column)
  *   10/28/94   JLB : Created.                                                                 *
  *   12/31/1994 JLB : Split rendering off into the sidebar strip class.                        *
  *=============================================================================================*/
-void NewSidebarClass::Draw_It(bool complete)
+void NewSidebarClass::Draw_It(bool complete) // TODO
 {
     PowerClass::Draw_It(complete);
 
@@ -691,7 +691,7 @@ void NewSidebarClass::Draw_It(bool complete)
  *   12/31/1994 JLB : Uses mouse coordinate parameters.                                        *
  *   06/27/1995 JLB : <TAB> key toggles sidebar.                                               *
  *=============================================================================================*/
-void NewSidebarClass::AI(KeyNumType & input, Point2D & xy)
+void NewSidebarClass::AI(KeyNumType & input, Point2D & xy) // TODO
 {
     bool redraw = false;
 
@@ -818,7 +818,7 @@ void NewSidebarClass::Recalc() // DONE
  * HISTORY:                                                                                    *
  *   12/09/1994 JLB : Created.                                                                 *
  *=============================================================================================*/
-bool NewSidebarClass::Activate(int control)
+bool NewSidebarClass::Activate(int control) // TODO
 {
     bool old = IsSidebarActive;
 
@@ -1041,13 +1041,12 @@ void NewSidebarClass::StripClass::Init_IO(int id) // DONE
     DownButton[ID].field_3C = true;
     DownButton[ID].ShapeDrawer = SidebarDrawer;
     DownButton[ID].Flags = GadgetClass::RIGHTPRESS|GadgetClass::RIGHTRELEASE|GadgetClass::LEFTPRESS|GadgetClass::LEFTRELEASE;
-    DownButton[ID].IsSticky = true;
 
-    for (int index = 0; index < MAX_VISIBLE; ++index) {
+    for (int index = 0; index < Max_Visible(); ++index) {
         SelectClass & g = SelectButton[ID][index];
         g.ID = BUTTON_SELECT;
         g.X = SidebarRect.X + X;
-        g.Y = SidebarRect.Y + Y + index;
+        g.Y = SidebarRect.Y + Y + (OBJECT_HEIGHT*index);
         g.Width = OBJECT_WIDTH;
         g.Height = OBJECT_HEIGHT;
         g.Set_Owner(*this, index);
@@ -1071,7 +1070,7 @@ void NewSidebarClass::StripClass::Init_IO(int id) // DONE
  * HISTORY:                                                                                    *
  *   01/19/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-void NewSidebarClass::StripClass::Activate()
+void NewSidebarClass::StripClass::Activate() // DONE
 {
     UpButton[ID].Zap();
     Map.Add_A_Button(UpButton[ID]);
@@ -1079,7 +1078,7 @@ void NewSidebarClass::StripClass::Activate()
     DownButton[ID].Zap();
     Map.Add_A_Button(DownButton[ID]);
 
-    for (int index = 0; index < MAX_VISIBLE; ++index) {
+    for (int index = 0; index < Max_Visible(); ++index) {
         SelectButton[ID][index].Zap();
         Map.Add_A_Button(SelectButton[ID][index]);
     }
@@ -1101,11 +1100,11 @@ void NewSidebarClass::StripClass::Activate()
  * HISTORY:                                                                                    *
  *   01/19/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-void NewSidebarClass::StripClass::Deactivate()
+void NewSidebarClass::StripClass::Deactivate() // DONE
 {
     Map.Remove_A_Button(UpButton[ID]);
     Map.Remove_A_Button(DownButton[ID]);
-    for (int index = 0; index < MAX_VISIBLE; ++index) {
+    for (int index = 0; index < Max_Visible(); ++index) {
         Map.Remove_A_Button(SelectButton[ID][index]);
     }
 }
@@ -1128,7 +1127,7 @@ void NewSidebarClass::StripClass::Deactivate()
  * HISTORY:                                                                                    *
  *   12/31/1994 JLB : Created.                                                                 *
  *=============================================================================================*/
-bool NewSidebarClass::StripClass::Add(RTTIType type, int id)
+bool NewSidebarClass::StripClass::Add(RTTIType type, int id) // DONE
 {
     if (BuildableCount <= MAX_BUILDABLES) {
         for (int index = 0; index < BuildableCount; ++index) {
@@ -1167,17 +1166,20 @@ bool NewSidebarClass::StripClass::Add(RTTIType type, int id)
  *   12/31/1994 JLB : Created.                                                                 *
  *   07/29/1995 JLB : Simplified scrolling logic.                                              *
  *=============================================================================================*/
-bool NewSidebarClass::StripClass::Scroll(bool up)
+bool NewSidebarClass::StripClass::Scroll(bool up) // DONE
 {
     if (up) {
         if (!TopIndex) return false;
         Scroller--;
     } else {
-        if (TopIndex+MAX_VISIBLE >= BuildableCount) return false;
+        if (TopIndex+Max_Visible() >= BuildableCount) return false;
         Scroller++;
     }
     return true;
 }
+
+
+// Scroll_Page
 
 
 /***********************************************************************************************
@@ -1195,10 +1197,9 @@ bool NewSidebarClass::StripClass::Scroll(bool up)
  * HISTORY:                                                                                    *
  *   05/18/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-void NewSidebarClass::StripClass::Flag_To_Redraw()
+void NewSidebarClass::StripClass::Flag_To_Redraw() // DONE
 {
     IsToRedraw = true;
-    //Map.NewSidebarClass::IsToRedraw = true;
     Map.Flag_To_Redraw();
 }
 
@@ -1224,7 +1225,7 @@ void NewSidebarClass::StripClass::Flag_To_Redraw()
  *   12/31/1994 JLB : Created.                                                                 *
  *   12/31/1994 JLB : Uses mouse coordinate parameters.                                        *
  *=============================================================================================*/
-bool NewSidebarClass::StripClass::AI(KeyNumType & input, Point2D & xy)
+bool NewSidebarClass::StripClass::AI(KeyNumType & input, Point2D & xy) // TODO
 {
     bool redraw = false;
 
@@ -1393,7 +1394,7 @@ bool NewSidebarClass::StripClass::AI(KeyNumType & input, Point2D & xy)
  *   12/31/1994 JLB : Created.                                                                 *
  *   08/06/1995 JLB : Handles multi factory tracking in same strip.                            *
  *=============================================================================================*/
-void NewSidebarClass::StripClass::Draw_It(bool complete)
+void NewSidebarClass::StripClass::Draw_It(bool complete) // TODO
 {
     if (IsToRedraw || complete) {
         IsToRedraw = false;
@@ -1621,7 +1622,7 @@ void NewSidebarClass::StripClass::Draw_It(bool complete)
  *   01/19/1995 JLB : Created.                                                                 *
  *   06/26/1995 JLB : Doesn't collapse sidebar when buildables removed.                        *
  *=============================================================================================*/
-bool NewSidebarClass::StripClass::Recalc()
+bool NewSidebarClass::StripClass::Recalc() // TODO
 {
     int ok;
 
@@ -1691,7 +1692,7 @@ bool NewSidebarClass::StripClass::Recalc()
  * HISTORY:                                                                                    *
  *   01/19/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-NewSidebarClass::StripClass::SelectClass::SelectClass() :
+NewSidebarClass::StripClass::SelectClass::SelectClass() : // DONE
     ControlClass(0, 0, 0, (OBJECT_WIDTH-1), OBJECT_HEIGHT, LEFTPRESS|RIGHTPRESS|LEFTUP),
     Strip(0),
     Index(0)
@@ -1743,7 +1744,7 @@ void NewSidebarClass::StripClass::SelectClass::Set_Owner(StripClass & strip, int
  *   01/19/1995 JLB : Created.                                                                 *
  *   10/09/1996 JLB : Sonar pulse converted to regular event type.                             *
  *=============================================================================================*/
-bool NewSidebarClass::StripClass::SelectClass::Action(unsigned flags, KeyNumType & key)
+bool NewSidebarClass::StripClass::SelectClass::Action(unsigned flags, KeyNumType & key) // TODO
 {
     int index = Strip->TopIndex + Index;
     RTTIType otype = Strip->Buildables[index].BuildableType;
@@ -1981,10 +1982,9 @@ bool NewSidebarClass::StripClass::SelectClass::Action(unsigned flags, KeyNumType
  * HISTORY:                                                                                    *
  *   03/28/1995 JLB : Created.                                                                 *
  *=============================================================================================*/
-bool NewSidebarClass::SBGadgetClass::Action(unsigned flags, KeyNumType & key)
+bool NewSidebarClass::SBGadgetClass::Action(unsigned flags, KeyNumType & key) // DONE
 {
-    //Map.Help_Text(TXT_NONE);
-    Map.Override_Mouse_Shape(MOUSE_NORMAL, false);
+    Map.Override_Mouse_Shape(MOUSE_NORMAL);
     return true;
 }
 
@@ -2069,7 +2069,7 @@ bool NewSidebarClass::Abandon_Production(RTTIType type, FactoryClass * factory) 
  *   05/18/1995 JLB : Created.                                                                 *
  *   08/06/1995 JLB : More intelligent abandon logic for multiple factories.                   *
  *=============================================================================================*/
-bool NewSidebarClass::StripClass::Abandon_Production(FactoryClass * factory)
+bool NewSidebarClass::StripClass::Abandon_Production(FactoryClass * factory) // DONE
 {
     bool noprod = true;
     bool abandon = false;
@@ -2100,3 +2100,29 @@ bool NewSidebarClass::StripClass::Abandon_Production(FactoryClass * factory)
     }
     return abandon;
 }
+
+
+// Radar_Mode_Control
+
+
+// entry_84
+
+
+// Help_Text
+
+
+int NewSidebarClass::Max_Visible() // DONE
+{
+    return SidebarSurface && Sidebar1Shape
+        ? (SidebarRect.Height - Sidebar3Shape->FrameWidth - Sidebar1Shape->FrameWidth) / Sidebar2Shape->FrameWidth
+        : 4;
+}
+
+
+// Print_Cameo_Text
+
+
+// Load
+
+
+// Save
