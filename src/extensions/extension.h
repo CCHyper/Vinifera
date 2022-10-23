@@ -33,7 +33,7 @@
 #include "debughandler.h"
 #include "asserthandler.h"
 
-#include <objidl.h> // for IStream.
+#include <unknwn.h> // for IStream
 #include <string>
 #include <typeinfo>
 
@@ -230,12 +230,6 @@ void Destroy(const AbstractClass *abstract)
 
     Extension::Private::Destroy_Internal(abstract);
 }
-
-/**
- *  Query if Vinifera supports this class with an extension.
- */
-bool Is_Supported(RTTIType rtti);
-bool Is_Supported(const AbstractClass *abstract);
 
 /**
  *  Save and load interface.

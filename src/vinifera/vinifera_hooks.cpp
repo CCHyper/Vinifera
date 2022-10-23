@@ -766,12 +766,6 @@ void Vinifera_Hooks()
     ViniferaSaveGameVersion = Extension::Get_Save_Version_Number();
     DEBUG_INFO("Save game version number: %d\n", ViniferaSaveGameVersion);
 
-#if 0
-    Patch_Jump(0x004B6D96, &_SaveLoad_Disable_Buttons);
-    Patch_Jump(0x0057FF8B, &_NewMenuClass_Process_Disable_Load_Button_Firestorm);
-    Patch_Jump(0x0058004D, &_NewMenuClass_Process_Disable_Load_Button_TiberianSun);
-#endif
-
     Patch_Jump(0x005DCDFD, &_Do_Lose_Create_Lose_WWMessageBox);
 
 #ifndef NDEBUG

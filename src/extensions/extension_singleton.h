@@ -36,7 +36,7 @@
 #include "noinit.h"
 #include "asserthandler.h"
 
-#include <objidl.h> // for IStream.
+#include <unknwn.h> // for IStream
 #include <typeinfo>
 
 

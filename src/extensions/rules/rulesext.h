@@ -27,7 +27,6 @@
  ******************************************************************************/
 #pragma once
 
-
 #include "always.h"
 #include "tibsun_defines.h"
 #include "rules.h"

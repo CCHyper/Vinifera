@@ -32,7 +32,7 @@
 #include "vinifera_defines.h"
 #include "noinit.h"
 
-#include <objidl.h> // for IStream.
+#include <unknwn.h> // for IStream
 
 
 class AbstractClass;

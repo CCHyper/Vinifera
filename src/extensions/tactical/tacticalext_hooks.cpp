@@ -330,6 +330,7 @@ DECLARE_PATCH(_Tactical_Render_Overlay_Patch)
         if (TacticalMapExtension->InfoTextTimer.Expired()) {
             TacticalMapExtension->InfoTextTimer.Stop();
             TacticalMapExtension->IsInfoTextSet = false;
+            std::memset(TacticalMapExtension->InfoTextBuffer, 0, sizeof(TacticalMapExtension->InfoTextBuffer));
             TacticalMapExtension->InfoTextNotifySound = VOC_NONE;
             TacticalMapExtension->InfoTextPosition = TOP_LEFT;
         }       

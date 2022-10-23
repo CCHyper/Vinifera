@@ -79,7 +79,7 @@ bool Prev_Theme_Command()
     char buffer[256];
     std::snprintf(buffer, sizeof(buffer), "Now Playing: %s", Theme.ThemeClass::Full_Name(theme));
 
-    TacticalMapExtension->InfoTextBuffer = buffer;
+    TacticalMapExtension->Set_Info_Text(buffer);
     TacticalMapExtension->IsInfoTextSet = true;
 
     TacticalMapExtension->InfoTextPosition = InfoTextPosType::BOTTOM_LEFT;
@@ -136,7 +136,7 @@ bool Next_Theme_Command()
     char buffer[256];
     std::snprintf(buffer, sizeof(buffer), "Now Playing: %s", Theme.ThemeClass::Full_Name(theme));
 
-    TacticalMapExtension->InfoTextBuffer = buffer;
+    TacticalMapExtension->Set_Info_Text(buffer);
     TacticalMapExtension->IsInfoTextSet = true;
     
     TacticalMapExtension->InfoTextPosition = InfoTextPosType::BOTTOM_LEFT;

@@ -61,7 +61,7 @@
  *  @author: CCHyper
  */
 TacticalExtension::TacticalExtension(const Tactical *this_ptr) :
-    AbstractClassExtension(this_ptr, "TacticalExtension"),
+    ExtensionSingleton(this_ptr),
     IsInfoTextSet(false),
     InfoTextBuffer(),
     InfoTextPosition(BOTTOM_LEFT),
@@ -71,10 +71,6 @@ TacticalExtension::TacticalExtension(const Tactical *this_ptr) :
     InfoTextTimer(0)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TacticalExtension::TacticalExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
-
-    TacticalMapExtension = this;
-
-    DEBUG_INFO("TacticalExt CTOR\n");
 }
 
 
@@ -84,8 +80,7 @@ TacticalExtension::TacticalExtension(const Tactical *this_ptr) :
  *  @author: CCHyper
  */
 TacticalExtension::TacticalExtension(const NoInitClass &noinit) :
-    AbstractClassExtension(noinit),
-    IsInfoTextSet(false),
+    ExtensionSingleton(noinit),
     InfoTextTimer(noinit)
 {
     //EXT_DEBUG_TRACE("TacticalExtension::TacticalExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
@@ -100,29 +95,6 @@ TacticalExtension::TacticalExtension(const NoInitClass &noinit) :
 TacticalExtension::~TacticalExtension()
 {
     //EXT_DEBUG_TRACE("TacticalExtension::~TacticalExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
-
-    TacticalMapExtension = nullptr;
-
-    DEBUG_INFO("TacticalExt DTOR\n");
-}
-
-
-/**
- *  Retrieves the class identifier (CLSID) of the object.
- *  
- *  @author: CCHyper
- */
-HRESULT TacticalExtension::GetClassID(CLSID *lpClassID)
-{
-    //EXT_DEBUG_TRACE("TacticalExtension::GetClassID - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
-
-    if (lpClassID == nullptr) {
-        return E_POINTER;
-    }
-
-    *lpClassID = __uuidof(this);
-
-    return S_OK;
 }
 
 
@@ -135,7 +107,7 @@ HRESULT TacticalExtension::Load(IStream *pStm)
 {
     //EXT_DEBUG_TRACE("TacticalExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
-    HRESULT hr = AbstractClassExtension::Internal_Load(pStm);
+    HRESULT hr = ExtensionSingleton::Load(pStm);
     if (FAILED(hr)) {
         return E_FAIL;
     }
@@ -155,7 +127,7 @@ HRESULT TacticalExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
     //EXT_DEBUG_TRACE("TacticalExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
-    HRESULT hr = AbstractClassExtension::Internal_Save(pStm, fClearDirty);
+    HRESULT hr = ExtensionSingleton::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
     }
@@ -196,6 +168,19 @@ void TacticalExtension::Detach(TARGET target, bool all)
 void TacticalExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("TacticalExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+}
+
+
+/**
+ *  Set the information text to be displayed.
+ * 
+ *  @authors: CCHyper
+ */
+void TacticalExtension::Set_Info_Text(const char *text)
+{
+    std::memset(TacticalMapExtension->InfoTextBuffer, 0, sizeof(TacticalMapExtension->InfoTextBuffer));
+    std::strncpy(TacticalMapExtension->InfoTextBuffer, text, sizeof(TacticalMapExtension->InfoTextBuffer));
+    TacticalMapExtension->InfoTextBuffer[std::strlen(text)-1] = '\0';
 }
 
 
@@ -385,16 +370,17 @@ void TacticalExtension::Draw_FrameStep_Overlay()
  */
 void TacticalExtension::Draw_Information_Text()
 {
+    if (!IsInfoTextSet) {
+        return;
+    }
+
     RGBClass rgb_black(0,0,0);
     unsigned color_black = DSurface::RGB_To_Pixel(0, 0, 0);
     ColorScheme *text_color = ColorScheme::As_Pointer("White");
 
     int padding = 2;
 
-    const char *text = InfoTextBuffer.Peek_Buffer();
-    if (!text) {
-        return;
-    }
+    const char *text = InfoTextBuffer;
 
     /**
      * Fetch the text occupy area.

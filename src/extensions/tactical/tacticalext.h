@@ -28,6 +28,7 @@
 #pragma once
 
 #include "abstractext.h"
+#include "extension_singleton.h"
 #include "tactical.h"
 #include "ttimer.h"
 #include "stimer.h"
@@ -49,18 +50,9 @@ enum InfoTextPosType {
 };
 
 
-class DECLSPEC_UUID(UUID_TACTICALMAP_EXTENSION)
-TacticalExtension final : public AbstractClassExtension
+class TacticalExtension final : public ExtensionSingleton<Tactical>
 {
     public:
-        /**
-         *  IPersist
-         */
-        IFACEMETHOD(GetClassID)(CLSID *pClassID);
-
-        /**
-         *  IPersistStream
-         */
         IFACEMETHOD(Load)(IStream *pStm);
         IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 
@@ -75,10 +67,8 @@ TacticalExtension final : public AbstractClassExtension
 
         virtual const char *Name() const override { return "TacticalMap"; }
         virtual const char *Full_Name() const override { return "TacticalMap"; }
-        
-        virtual Tactical *This() const override { return reinterpret_cast<Tactical *>(AbstractClassExtension::This()); }
-        virtual const Tactical *This_Const() const override { return reinterpret_cast<const Tactical *>(AbstractClassExtension::This_Const()); }
-        virtual RTTIType What_Am_I() const override { return RTTI_TACTICALMAP; }
+
+        void Set_Info_Text(const char *text);
 
         void Draw_Debug_Overlay();
         void Draw_FrameStep_Overlay();
@@ -104,7 +94,7 @@ TacticalExtension final : public AbstractClassExtension
         /**
          *  The information text to print on the screen.
          */
-        Wstring InfoTextBuffer;
+        char InfoTextBuffer[512];
 
         /**
          *  Where on the screen shall the text be printed?
