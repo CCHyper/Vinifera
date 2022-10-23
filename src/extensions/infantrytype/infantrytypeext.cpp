@@ -40,7 +40,7 @@
  *  @author: CCHyper
  */
 InfantryTypeClassExtension::InfantryTypeClassExtension(const InfantryTypeClass *this_ptr) :
-    TechnoTypeClassExtension(this_ptr, "InfantryTypeClassExtension"),
+    TechnoTypeClassExtension(this_ptr),
     IsMechanic(false),
     IsOmniHealer(false)
 {

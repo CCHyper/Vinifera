@@ -41,7 +41,7 @@
  *  @author: CCHyper
  */
 BuildingTypeClassExtension::BuildingTypeClassExtension(const BuildingTypeClass *this_ptr) :
-    TechnoTypeClassExtension(this_ptr, "BuildingTypeClassExtension"),
+    TechnoTypeClassExtension(this_ptr),
     GateUpSound(VOC_NONE),
     GateDownSound(VOC_NONE),
     ProduceCashStartup(0),

@@ -116,7 +116,7 @@ class ExtensionSingleton
 
 
 /**
- *  x
+ *  Class constructor
  * 
  *  @author: CCHyper
  */
@@ -130,7 +130,7 @@ ExtensionSingleton<T>::ExtensionSingleton(const T *this_ptr) :
 
 
 /**
- *  x
+ *  Class no-init constructor.
  * 
  *  @author: CCHyper
  */
@@ -142,7 +142,7 @@ ExtensionSingleton<T>::ExtensionSingleton(const NoInitClass &noinit)
 
 
 /**
- *  x
+ *  Class destructor
  * 
  *  @author: CCHyper
  */
@@ -175,30 +175,6 @@ HRESULT ExtensionSingleton<T>::Load(IStream *pStm)
 
     HRESULT hr;
 
-#if 0
-    /**
-     *  Load the unique id for this class.
-     */
-    LONG id = 0;
-    hr = pStm->Read(&id, sizeof(LONG), nullptr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-
-    //DEV_DEBUG_INFO("Read id = 0x%08X.\n", id);
-
-    Wstring class_name = Name();
-    Wstring this_name = Wstring("this") + ":" + class_name;
-    Wstring thisptr_name = Wstring("ThisPtr") + ":" + class_name;
-
-    /**
-     *  x
-     */
-    VINIFERA_SWIZZLE_REGISTER_POINTER(id, this, this_name.Peek_Buffer());
-
-    //DEV_DEBUG_INFO("Registering pointer id = 0x%08X, this = 0x%08X.\n", id, (uintptr_t)(this));
-#endif
-
     /**
      *  Read this classes binary blob data directly into this instance.
      */
@@ -206,14 +182,6 @@ HRESULT ExtensionSingleton<T>::Load(IStream *pStm)
     if (FAILED(hr)) {
         return hr;
     }
-
-    //DEV_DEBUG_INFO("Read Size_Of = %d.\n", sizeof(*this));
-    
-#if 0
-    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ThisPtr, thisptr_name.Peek_Buffer());
-
-    //DEV_DEBUG_INFO("Requested remap of ThisPtr.\n");
-#endif
 
     return hr;
 }
@@ -234,26 +202,6 @@ HRESULT ExtensionSingleton<T>::Save(IStream *pStm, BOOL fClearDirty)
     }
 
     HRESULT hr;
-
-#if 0
-    Wstring class_name = Name();
-    Wstring this_name = Wstring("this") + ":" + class_name;
-
-    /**
-     *  x
-     */
-    LONG id;
-    VINIFERA_SWIZZLE_FETCH_SWIZZLE_ID(this, id, this_name.Peek_Buffer());
-
-    //DEV_DEBUG_INFO("Writing id = 0x%08X.\n", id);
-
-    hr = pStm->Write(&id, sizeof(id), nullptr);
-    if (FAILED(hr)) {
-        return hr;
-    }
-#endif
-
-    //DEV_DEBUG_INFO("Writing Size_Of = %d.\n", Size_Of());
     
     /**
      *  Write this class instance as a binary blob.

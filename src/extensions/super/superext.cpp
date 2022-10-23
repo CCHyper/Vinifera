@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 SuperClassExtension::SuperClassExtension(const SuperClass *this_ptr) :
-    AbstractClassExtension(this_ptr, "SuperClassExtension"),
+    AbstractClassExtension(this_ptr),
     FlashTimeEnd(0),
     TimerFlashState(false)
 {

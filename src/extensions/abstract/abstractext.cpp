@@ -42,17 +42,11 @@
  * 
  *  @author: CCHyper
  */
-AbstractClassExtension::AbstractClassExtension(const AbstractClass *this_ptr, const char *class_name) :
-    ThisPtr(this_ptr),
-    ClassName()
+AbstractClassExtension::AbstractClassExtension(const AbstractClass *this_ptr) :
+    ThisPtr(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("AbstractClassExtension::AbstractClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
     //ASSERT(ThisPtr != nullptr);      // NULL ThisPtr is valid when performing a Load state operation.
-
-    /**
-     *  x
-     */
-    std::strncpy(ClassName, class_name, std::strlen(class_name));
 }
 
 
@@ -182,16 +176,12 @@ HRESULT AbstractClassExtension::Internal_Load(IStream *pStm)
         return hr;
     }
 
-    //DEV_DEBUG_INFO("Read id = 0x%08X.\n", id);
-
-    Wstring this_name = Wstring(ClassName) + ":" + Wstring("ThisPtr");
+    Wstring this_name = Wstring(Extension::Utility::Get_TypeID_Name(this).c_str()) + ":" + Wstring("ThisPtr");
 
     /**
      *  x
      */
     VINIFERA_SWIZZLE_REGISTER_POINTER(id, this, this_name.Peek_Buffer());
-
-    //DEV_DEBUG_INFO("Registering pointer id = 0x%08X, this = 0x%08X.\n", id, (uintptr_t)(this));
 
     /**
      *  Read this classes binary blob data directly into this instance.
@@ -200,12 +190,8 @@ HRESULT AbstractClassExtension::Internal_Load(IStream *pStm)
     if (FAILED(hr)) {
         return hr;
     }
-
-    //DEV_DEBUG_INFO("Read Size_Of = %d.\n", sizeof(*this));
     
     VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(ThisPtr, this_name.Peek_Buffer());
-
-    //DEV_DEBUG_INFO("Requested remap of ThisPtr.\n");
 
     return hr;
 }
@@ -224,7 +210,7 @@ HRESULT AbstractClassExtension::Internal_Save(IStream *pStm, BOOL fClearDirty)
         return E_POINTER;
     }
 
-    Wstring this_name = Wstring(ClassName) + ":" + Wstring("ThisPtr");
+    Wstring this_name = Wstring(Extension::Utility::Get_TypeID_Name(this).c_str()) + ":" + Wstring("ThisPtr");
 
     /**
      *  x
@@ -238,8 +224,6 @@ HRESULT AbstractClassExtension::Internal_Save(IStream *pStm, BOOL fClearDirty)
     if (FAILED(hr)) {
         return hr;
     }
-
-    //DEV_DEBUG_INFO("Writing Size_Of = %d.\n", Size_Of());
     
     /**
      *  Write this class instance as a binary blob.

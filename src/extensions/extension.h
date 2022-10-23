@@ -30,6 +30,8 @@
 #include "always.h"
 #include "vinifera_defines.h"
 #include "extension_globals.h"
+#include "abstract.h"
+#include "abstractext.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
@@ -53,6 +55,11 @@ namespace Private
 AbstractClassExtension *Make_Internal(const AbstractClass *abstract);
 bool Destroy_Internal(const AbstractClass *abstract);
 AbstractClassExtension *Fetch_Internal(const AbstractClass *abstract);
+
+}; // namespace "Extension::Private".
+
+namespace Utility
+{
 
 /**
  *  Erase First Occurrence of given substring from main string.
@@ -84,7 +91,21 @@ std::string Get_TypeID_Name()
     return str;
 }
 
-}; // namespace "Extension::Private".
+static std::string Get_TypeID_Name(const AbstractClass *abstract)
+{
+    std::string str = typeid(*abstract).name();
+    str.erase(0, 6);
+    return str;
+}
+
+static std::string Get_TypeID_Name(const AbstractClassExtension *abstract_ext)
+{
+    std::string str = typeid(*abstract_ext).name();
+    str.erase(0, 6);
+    return str;
+}
+
+}; // namespace "Extension::Utility"
 
 namespace Singleton
 {
@@ -102,7 +123,7 @@ EXT_CLASS *Make(const BASE_CLASS *base)
     EXT_CLASS *ext_ptr = new EXT_CLASS(base);
     ASSERT(ext_ptr != nullptr);
 
-    EXT_DEBUG_INFO("Created \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+    EXT_DEBUG_INFO("Created \"%s\" extension.\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
 
     return ext_ptr;
 }
@@ -119,7 +140,7 @@ void Destroy(const EXT_CLASS *ext)
 
     delete ext;
 
-    EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+    EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
 }
 
 }; // namespace "Extension::Singleton".
@@ -140,7 +161,7 @@ EXT_CLASS *Fetch(const BASE_CLASS *base, DynamicVectorClass<EXT_CLASS *> &list)
     for (int index = 0; index < list.Count(); ++index) {
         EXT_CLASS * ext = list[index];
         if (list[index]->This() == base) {
-            EXT_DEBUG_INFO("Found \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+            EXT_DEBUG_INFO("Found \"%s\" extension.\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
             return ext;
         }
     }
@@ -161,7 +182,7 @@ EXT_CLASS *Make(const BASE_CLASS *base, DynamicVectorClass<EXT_CLASS *> &list)
     EXT_CLASS *ext_ptr = new EXT_CLASS(base);
     ASSERT(ext_ptr != nullptr);
 
-    EXT_DEBUG_INFO("Created \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+    EXT_DEBUG_INFO("Created \"%s\" extension.\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
 
     list.Add(ext_ptr);
 
@@ -181,13 +202,13 @@ void Destroy(const BASE_CLASS *base, DynamicVectorClass<EXT_CLASS *> &list)
     for (int index = 0; index < list.Count(); ++index) {
         EXT_CLASS * ext = list[index].This();
         if (ext->This() == base) {
-            EXT_DEBUG_INFO("Found \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+            EXT_DEBUG_INFO("Found \"%s\" extension.\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
             delete ext;
             return;
         }
     }
 
-    EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+    EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
 }
 
 }; // namespace "Extension::List".

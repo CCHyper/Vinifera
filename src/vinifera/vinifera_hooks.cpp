@@ -49,8 +49,6 @@
 #include "asserthandler.h"
 
 
-
-
 /**
  *  Draws the version text on the main menu.
  * 

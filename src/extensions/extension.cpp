@@ -108,31 +108,6 @@
 #include <iostream>
 
 
-namespace Extension
-{
-
-namespace Private
-{
-
-static std::string Get_Abstract_TypeID_Name(const AbstractClass *abstract)
-{
-    std::string str = typeid(*abstract).name();
-    str.erase(0, 6);
-    return str;
-}
-
-static std::string Get_Extension_TypeID_Name(const AbstractClassExtension *abstract_ext)
-{
-    std::string str = typeid(*abstract_ext).name();
-    str.erase(0, 6);
-    return str;
-}
-
-}; // namespace "Private"
-
-}; // namespace "Extension"
-
-
 /**
  *  x
  */
@@ -241,11 +216,11 @@ static const char *Extension_Get_Abstract_Name(const AbstractClass *abstract)
  * 
  *  @author: CCHyper
  */
-Wstring Extension_Get_ExtPtr_Name(const AbstractClass *abstract)
+static Wstring Extension_Get_ExtPtr_Name(const AbstractClass *abstract)
 {
     Wstring str;
 
-    str += Extension::Private::Get_Abstract_TypeID_Name(abstract).c_str();
+    str += Extension::Utility::Get_TypeID_Name(abstract).c_str();
 
     str += "::ExtPtr";
     //str += " -> ";
@@ -265,7 +240,7 @@ Wstring Extension_Get_ExtPtr_Name(const AbstractClass *abstract)
 template<class BASE_CLASS, class EXT_CLASS>
 static EXT_CLASS * Extension_Make(const BASE_CLASS *abstract_ptr)
 {
-    //EXT_DEBUG_INFO("Extension_Make... %s %s %s\n", Extension_Get_Abstract_Name(abstract_ptr), Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str(), Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
+    //EXT_DEBUG_INFO("Extension_Make... %s %s %s\n", Extension_Get_Abstract_Name(abstract_ptr), Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str(), Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
 
     const BASE_CLASS *abs_ptr = reinterpret_cast<const BASE_CLASS *>(abstract_ptr);
     EXT_CLASS *ext_ptr = reinterpret_cast<EXT_CLASS *>(Extension_Get_Abstract_Pointer(abs_ptr));
@@ -278,7 +253,7 @@ static EXT_CLASS * Extension_Make(const BASE_CLASS *abstract_ptr)
     if (!ext_ptr) {
 
         char buffer[256];
-        std::snprintf(buffer, sizeof(buffer), "Extension_Make: Failed to make \"%s\" extension!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+        std::snprintf(buffer, sizeof(buffer), "Extension_Make: Failed to make \"%s\" extension!\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
 
         EXT_DEBUG_WARNING(buffer);
 
@@ -291,7 +266,7 @@ static EXT_CLASS * Extension_Make(const BASE_CLASS *abstract_ptr)
         return nullptr;
     }
 
-    EXT_DEBUG_INFO("Created \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+    EXT_DEBUG_INFO("Created \"%s\" extension.\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
 
     /**
      *  Assign the extension class instance to the abstract class.
@@ -310,11 +285,11 @@ static EXT_CLASS * Extension_Make(const BASE_CLASS *abstract_ptr)
 template<class BASE_CLASS, class EXT_CLASS>
 static bool Extension_Destroy(const BASE_CLASS *abstract_ptr)
 {
-    //EXT_DEBUG_INFO("Extension_Destroy... %s %s %s\n", Extension_Get_Abstract_Name(abstract_ptr), Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str(), Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
+    //EXT_DEBUG_INFO("Extension_Destroy... %s %s %s\n", Extension_Get_Abstract_Name(abstract_ptr), Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str(), Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
 
     EXT_CLASS *ext_ptr = reinterpret_cast<EXT_CLASS *>(Extension_Get_Abstract_Pointer(abstract_ptr));
     if (!ext_ptr) {
-        EXT_DEBUG_WARNING("Extension_Destroy: \"%s\" extension pointer is null!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+        EXT_DEBUG_WARNING("Extension_Destroy: \"%s\" extension pointer is null!\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
         return false;
     }
     
@@ -323,7 +298,7 @@ static bool Extension_Destroy(const BASE_CLASS *abstract_ptr)
      */
     delete ext_ptr;
 
-    EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+    EXT_DEBUG_INFO("Destroyed \"%s\" extension.\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
 
     /**
      *  Clear the extension pointer for the abstract class.
@@ -349,11 +324,11 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
     }
 
     if (list.Count() <= 0) {
-        DEBUG_INFO("List for \"%s\" has a count of zero, skipping save.\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
+        DEBUG_INFO("List for \"%s\" has a count of zero, skipping save.\n", Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
         return true;
     }
 
-    DEBUG_INFO("Saving \"%s\" extensions (Count: %d)\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str(), list.Count());
+    DEBUG_INFO("Saving \"%s\" extensions (Count: %d)\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str(), list.Count());
 
     for (int index = 0; index < count; ++index) {
 
@@ -365,19 +340,19 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
         IPersistStream *lpPS = nullptr;
         hr = ptr->QueryInterface(__uuidof(IPersistStream), (LPVOID *)&lpPS);
         if (FAILED(hr)) {
-            DEBUG_ERROR("Extension \"%s\" does not support IPersistStream!\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
+            DEBUG_ERROR("Extension \"%s\" does not support IPersistStream!\n", Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
             return false;
         }
 
         hr = OleSaveToStream(lpPS, pStm);
         if (FAILED(hr)) {
-            DEBUG_ERROR("OleSaveToStream failed for extension \"%s\" (Index: %d)!\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str(), index);
+            DEBUG_ERROR("OleSaveToStream failed for extension \"%s\" (Index: %d)!\n", Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str(), index);
             return false;
         }
 
         hr = lpPS->Release();
         if (FAILED(hr)) {
-            DEBUG_ERROR("Failed to release extension \"%s\" stream!\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
+            DEBUG_ERROR("Failed to release extension \"%s\" stream!\n", Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
             return false;
         }
 
@@ -407,17 +382,17 @@ static bool Extension_Load(IStream *pStm, DynamicVectorClass<EXT_CLASS *> &list)
     }
 
     if (count <= 0) {
-        DEBUG_INFO("List for \"%s\" has a count of zero, skipping load.\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
+        DEBUG_INFO("List for \"%s\" has a count of zero, skipping load.\n", Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
         return true;
     }
-    DEBUG_INFO("Loading \"%s\" extensions (Count: %d)\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str(), count);
+    DEBUG_INFO("Loading \"%s\" extensions (Count: %d)\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str(), count);
     
     for (int index = 0; index < count; ++index) {
         
         IUnknown *spUnk = nullptr;
         hr = OleLoadFromStream(pStm, __uuidof(IUnknown), (LPVOID *)&spUnk);
         if (FAILED(hr)) {
-            DEBUG_ERROR("OleLoadFromStream failed for extension \"%s\" (Index: %d)!\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str(), index);
+            DEBUG_ERROR("OleLoadFromStream failed for extension \"%s\" (Index: %d)!\n", Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str(), index);
             return false;
         }
 
@@ -436,11 +411,11 @@ template<class BASE_CLASS, class EXT_CLASS>
 static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS *> &list)
 {
     if (!list.Count()) {
-        DEBUG_INFO("Requested remap of \"%s\" extension pointers, but the list is empty!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str());
+        DEBUG_INFO("Requested remap of \"%s\" extension pointers, but the list is empty!\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
         return true;
     }
 
-    DEBUG_INFO("Requesting remap of \"%s\" extension pointers (Count %d)...\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str(), list.Count());
+    DEBUG_INFO("Requesting remap of \"%s\" extension pointers (Count %d)...\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str(), list.Count());
 
     for (int index = 0; index < list.Count(); ++index) {
 
@@ -448,7 +423,7 @@ static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
         if (object) {
 
             if (!Extension_Get_Abstract_Pointer(object)) {
-                DEV_DEBUG_ERROR("Extension_Request_Pointer_Remap: \"%s\" extension pointer (index %d) for is null!\n", Extension::Private::Get_TypeID_Name<BASE_CLASS>().c_str(), index);
+                DEV_DEBUG_ERROR("Extension_Request_Pointer_Remap: \"%s\" extension pointer (index %d) for is null!\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str(), index);
                 continue; //return false;
             }
 
@@ -495,7 +470,7 @@ static void Extension_Print_Sync_Data(DynamicVectorClass<EXT_CLASS *> &list, FIL
         HouseClass *housep = Houses[house];
         if (housep) {
             GameCRC = 0;
-            std::fprintf(fp, "------------- %s %s ------------\n", housep->Class->Name(), Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
+            std::fprintf(fp, "------------- %s %s ------------\n", housep->Class->Name(), Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
             for (int index = 0; index < list.Count(); ++index) {
                 EXT_CLASS *ptr = list[index];
                 if (ptr->Owner() == house) {
@@ -505,7 +480,7 @@ static void Extension_Print_Sync_Data(DynamicVectorClass<EXT_CLASS *> &list, FIL
                                 ptr->This()->Class->Type, ptr->This()->As_Target());
                 }
             }
-            EXT_DEBUG_INFO("%s %s:%x\n", housep->Class->Name(), Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str(), GameCRC);
+            EXT_DEBUG_INFO("%s %s:%x\n", housep->Class->Name(), Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str(), GameCRC);
         }
     }
 #endif
@@ -522,7 +497,7 @@ static void Extension_Print_CRCs(DynamicVectorClass<EXT_CLASS *> &list, FILE *fp
 {
     WWCRCEngine *crc = new WWCRCEngine;
 
-    std::fprintf(fp, "\n\n********* %s CRCs ********\n\n", Extension::Private::Get_TypeID_Name<EXT_CLASS>().c_str());
+    std::fprintf(fp, "\n\n********* %s CRCs ********\n\n", Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
     std::fprintf(fp, "Index     CRC\n");
     std::fprintf(fp, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 

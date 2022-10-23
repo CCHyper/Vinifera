@@ -39,7 +39,7 @@
  *  @author: CCHyper
  */
 CampaignClassExtension::CampaignClassExtension(const CampaignClass *this_ptr) :
-    AbstractTypeClassExtension(this_ptr, "CampaignClassExtension"),
+    AbstractTypeClassExtension(this_ptr),
     IsDebugOnly(false),
     IntroMovie()
 {

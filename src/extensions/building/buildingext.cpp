@@ -43,7 +43,7 @@
  *  @author: CCHyper
  */
 BuildingClassExtension::BuildingClassExtension(const BuildingClass *this_ptr) :
-    TechnoClassExtension(this_ptr, "BuildingClassExtension"),
+    TechnoClassExtension(this_ptr),
     ProduceCashTimer(),
     CurrentProduceCashBudget(-1),
     IsCaptureOneTimeCashGiven(false),

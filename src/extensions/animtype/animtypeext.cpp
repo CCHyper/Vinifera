@@ -40,7 +40,7 @@
  *  @author: CCHyper
  */
 AnimTypeClassExtension::AnimTypeClassExtension(const AnimTypeClass *this_ptr) :
-    ObjectTypeClassExtension(this_ptr, "AnimTypeClassExtension"),
+    ObjectTypeClassExtension(this_ptr),
     IsHideIfNotTiberium(false),
     IsForceBigCraters(false),
     ZAdjust(0),

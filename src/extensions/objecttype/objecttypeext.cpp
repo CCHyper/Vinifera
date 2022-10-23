@@ -37,8 +37,8 @@
  *  
  *  @author: CCHyper
  */
-ObjectTypeClassExtension::ObjectTypeClassExtension(const ObjectTypeClass *this_ptr, const char *class_name) :
-    AbstractTypeClassExtension(this_ptr, class_name),
+ObjectTypeClassExtension::ObjectTypeClassExtension(const ObjectTypeClass *this_ptr) :
+    AbstractTypeClassExtension(this_ptr),
     GraphicName(),
     AlphaGraphicName()
 {
