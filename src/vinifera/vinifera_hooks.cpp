@@ -375,19 +375,21 @@ failure:
  */
 DECLARE_PATCH(_LoadOptionsClass_Read_File_Check_Game_Version)
 {
-    //GET_REGISTER_OFFSET_STATIC(WWSaveLoadClass *, saveload, esp, 0x0C);
-    GET_REGISTER_OFFSET_STATIC(const char *, filename, esp, 0x348);
     GET_REGISTER_STATIC(FileEntryClass *, file, ebp);
     GET_REGISTER_STATIC(int, file_version, eax);
+    GET_REGISTER_OFFSET_STATIC(WIN32_FIND_DATA *, wfd, esp, 0x348);
+    //GET_REGISTER_OFFSET_STATIC(WWSaveLoadClass *, saveload, esp, 0x0C);
 
     /**
      *  If the version in the save file does not match our build
      *  version exactly, then don't add this file to the listing.
      */
     if (file_version != ViniferaSaveGameVersion) {
-        DEBUG_WARNING("Save file \"%s\" (%s) has version %d, expected version %d!\n", filename, file_version, ViniferaSaveGameVersion);
+        DEBUG_WARNING("Save file \"%s\" is incompatible! File version %d, Expected version %d.\n", wfd->cFileName, file_version, ViniferaSaveGameVersion);
         JMP(0x00505AAD);
     }
+    
+    DEV_DEBUG_INFO("Save file \"%s\" is compatible.\n", wfd->cFileName);
 
     JMP(0x00505ABB);
 }
