@@ -85,50 +85,7 @@
  *  Constant of the current build version number. This number should be
  *  a sum of all the extended class sizes plus the build date.
  */
-unsigned ViniferaSaveGameVersion =
-
-            10000
-
-            /**
-            *  Global classes.
-            */
-            + sizeof(RulesClassExtension)
-            + sizeof(SessionClassExtension)
-            + sizeof(ScenarioClassExtension)
-            + sizeof(TacticalExtension)
-
-            /**
-             *  Extended type classes.
-             */
-            + sizeof(BuildingTypeClassExtension)
-            + sizeof(UnitTypeClassExtension)
-            + sizeof(InfantryTypeClassExtension)
-            + sizeof(AircraftTypeClassExtension)
-            + sizeof(WarheadTypeClassExtension)
-            + sizeof(WeaponTypeClassExtension)
-            + sizeof(BulletTypeClassExtension)
-            + sizeof(SuperWeaponTypeClassExtension)
-            + sizeof(VoxelAnimTypeClassExtension)
-            + sizeof(AnimTypeClassExtension)
-            + sizeof(ParticleTypeClassExtension)
-            + sizeof(ParticleSystemTypeClassExtension)
-            + sizeof(IsometricTileTypeClassExtension)
-            + sizeof(OverlayTypeClassExtension)
-            + sizeof(SmudgeTypeClassExtension)
-            + sizeof(TerrainTypeClassExtension)
-            + sizeof(HouseTypeClassExtension)
-            + sizeof(SideClassExtension)
-            + sizeof(CampaignClassExtension)
-            + sizeof(TiberiumClassExtension)
-            + sizeof(TechnoClassExtension)
-            + sizeof(AircraftClassExtension)
-            + sizeof(BuildingClassExtension)
-            + sizeof(InfantryClassExtension)
-            + sizeof(UnitClassExtension)
-            + sizeof(TerrainClassExtension)
-            + sizeof(WaveClassExtension)
-            + sizeof(SuperClassExtension)
-;
+unsigned ViniferaSaveGameVersion = 10000;
 
 
 /**
@@ -147,8 +104,8 @@ typedef struct ViniferaSaveFileHeaderStruct
 
 private:
     char _padding[1024
-                 - sizeof(Marker)
-                 - sizeof(CommitHash)];
+                  - sizeof(Marker)
+                  - sizeof(CommitHash)];
 };
 static_assert(sizeof(ViniferaSaveFileHeaderStruct), "ViniferaSaveFileHeaderStruct must be 1024 bytes in size!");
 
@@ -212,134 +169,6 @@ static bool Vinifera_Load_Header(IStream *pStm)
 }
 
 
-static bool Vinifera_Save_RulesExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-
-    if (!RulesExtension) {
-        return false;
-    }
-
-    RulesExtension->Save(pStm, true);
-
-    return true;
-}
-
-
-static bool Vinifera_Load_RulesExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-    
-    if (!RulesExtension) {
-        return false;
-    }
-
-    RulesExtension->Load(pStm);
-
-    return true;
-}
-
-
-static bool Vinifera_Save_SessionExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-
-    if (!SessionExtension) {
-        return false;
-    }
-
-    SessionExtension->Save(pStm, true);
-
-    return true;
-}
-
-
-static bool Vinifera_Load_SessionExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-    
-    if (!SessionExtension) {
-        return false;
-    }
-
-    SessionExtension->Load(pStm);
-
-    return true;
-}
-
-
-static bool Vinifera_Save_ScenarioExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-
-    if (!ScenarioExtension) {
-        return false;
-    }
-
-    ScenarioExtension->Save(pStm, true);
-
-    return true;
-}
-
-
-static bool Vinifera_Load_ScenarioExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-    
-    if (!ScenarioExtension) {
-        return false;
-    }
-
-    ScenarioExtension->Load(pStm);
-
-    return true;
-}
-
-
-static bool Vinifera_Save_TacticalExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-
-    if (!TacticalExtension) {
-        return false;
-    }
-
-    TacticalExtension->Save(pStm, true);
-
-    return true;
-}
-
-
-static bool Vinifera_Load_TacticalExtension(IStream *pStm)
-{
-    if (!pStm) {
-        return false;
-    }
-    
-    if (!TacticalExtension) {
-        return false;
-    }
-
-    TacticalExtension->Load(pStm);
-
-    return true;
-}
-
-
 /**
  *  Save all Vinifera data to the file stream.
  * 
@@ -347,7 +176,6 @@ static bool Vinifera_Load_TacticalExtension(IStream *pStm)
  */
 bool Vinifera_Put_All(IStream *pStm)
 {
-#if 0
     /**
      *  Save the Vinifera data marker which can be used to verify
      *  the state of the data to follow on load.
@@ -361,34 +189,8 @@ bool Vinifera_Put_All(IStream *pStm)
     /**
      *  Save class extensions here.
      */
-    DEBUG_INFO("Saving extended class data...\n");
-
-    DEBUG_INFO("Saving RulesExtension\n");
-    if (!Vinifera_Save_RulesExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
-    DEBUG_INFO("Saving SessionExtension\n");
-    if (!Vinifera_Save_SessionExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
-    DEBUG_INFO("Saving ScenarioExtension\n");
-    if (!Vinifera_Save_ScenarioExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
-    DEBUG_INFO("Saving TacticalExtension\n");
-    if (!Vinifera_Save_TacticalExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
     DEBUG_INFO("Saving class extensions\n");
-    if (!Save_Extensions(pStm)) {
+    if (!Extension::Save(pStm)) {
         DEBUG_ERROR("\t***** FAILED!\n");
         return false;
     }
@@ -397,7 +199,7 @@ bool Vinifera_Put_All(IStream *pStm)
      *  Save global data and values here.
      */
     DEBUG_INFO("Saving global data...\n");
-#endif
+
     return true;
 }
 
@@ -409,7 +211,6 @@ bool Vinifera_Put_All(IStream *pStm)
  */
 bool Vinifera_Load_All(IStream *pStm)
 {
-#if 0
     /**
      *  Load the Vinifera data marker which can be used to verify
      *  the state of the data to follow.
@@ -445,34 +246,8 @@ bool Vinifera_Load_All(IStream *pStm)
     /**
      *  Load class extensions here.
      */
-    DEBUG_INFO("Loading extended class data...\n");
-
-    DEBUG_INFO("Loading RulesExtension\n");
-    if (!Vinifera_Load_RulesExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
-    DEBUG_INFO("Loading SessionExtension\n");
-    if (!Vinifera_Load_SessionExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
-    DEBUG_INFO("Loading ScenarioExtension\n");
-    if (!Vinifera_Load_ScenarioExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
-    DEBUG_INFO("Loading TacticalExtension\n");
-    if (!Vinifera_Load_TacticalExtension(pStm)) {
-        DEBUG_ERROR("\t***** FAILED!\n");
-        return false;
-    }
-
     DEBUG_INFO("Loading class extensions\n");
-    if (!Load_Extensions(pStm)) {
+    if (!Extension::Load(pStm)) {
         DEBUG_ERROR("\t***** FAILED!\n");
         return false;
     }
@@ -481,6 +256,24 @@ bool Vinifera_Load_All(IStream *pStm)
      *  Load global data and values here.
      */
     DEBUG_INFO("Loading global data...\n");
-#endif
+
+    return true;
+}
+
+
+/**
+ *  Request remapping of all the extension pointers so the swizzle manager
+ *  can fix up any reference to extension classes.
+ * 
+ *  @author: CCHyper
+ */
+bool Vinifera_Remap_Extension_Pointers()
+{
+    DEBUG_INFO("Remapping extension pointers\n");
+    if (!Extension::Request_Pointer_Remap()) {
+        DEBUG_ERROR("\t***** FAILED!\n");
+        return false;
+    }
+
     return true;
 }

@@ -26,7 +26,6 @@
  *
  ******************************************************************************/
 #include "objecttypeext_hooks.h"
-#include "objecttypeext_init.h"
 #include "objecttypeext.h"
 #include "objecttype.h"
 #include "theatertype.h"
@@ -37,6 +36,9 @@
 #include "debughandler.h"
 #include "asserthandler.h"
 
+#include "hooker.h"
+#include "hooker_macros.h"
+
 
 /**
  *  A fake class for implementing new member functions which allow
@@ -45,7 +47,7 @@
  *  @note: This must not contain a constructor or deconstructor!
  *  @note: All functions must be prefixed with "_" to prevent accidental virtualization.
  */
-static class ObjectTypeClassFake final : public ObjectTypeClass
+static class ObjectTypeClassExt final : public ObjectTypeClass
 {
     public:
         void _Assign_Theater_Name(char *buffer, TheaterType theater);
@@ -58,7 +60,7 @@ static class ObjectTypeClassFake final : public ObjectTypeClass
  * 
  *  @author: CCHyper
  */
-void ObjectTypeClassFake::_Assign_Theater_Name(char *buffer, TheaterType theater)
+void ObjectTypeClassExt::_Assign_Theater_Name(char *buffer, TheaterType theater)
 {
     if (theater != THEATER_NONE && theater < TheaterTypes.Count()) {
 
@@ -108,7 +110,7 @@ DECLARE_PATCH(_ObjectTypeClass_Load_Theater_Art_Assign_Theater_Name_Theater_Patc
  * 
  *  @author: CCHyper
  */
-const ShapeFileStruct * ObjectTypeClassFake::_Get_Image_Data() const
+const ShapeFileStruct * ObjectTypeClassExt::_Get_Image_Data() const
 {
     if (Image == nullptr) {
         DEBUG_WARNING("Object %s has NULL image data!\n", Name());
@@ -123,12 +125,7 @@ const ShapeFileStruct * ObjectTypeClassFake::_Get_Image_Data() const
  */
 void ObjectTypeClassExtension_Hooks()
 {
-    /**
-     *  Initialises the extended class.
-     */
-    ObjectTypeClassExtension_Init();
-
-    //Patch_Jump(0x004101A0, &ObjectTypeClassFake::_Get_Image_Data);
-    Patch_Jump(0x00588D00, &ObjectTypeClassFake::_Assign_Theater_Name);
+    //Patch_Jump(0x004101A0, &ObjectTypeClassExt::_Get_Image_Data);
+    Patch_Jump(0x00588D00, &ObjectTypeClassExt::_Assign_Theater_Name);
     Patch_Jump(0x0058891D, &_ObjectTypeClass_Load_Theater_Art_Assign_Theater_Name_Theater_Patch);
 }

@@ -28,6 +28,7 @@
 #include "vinifera_functions.h"
 #include "vinifera_globals.h"
 #include "vinifera_newdel.h"
+#include "tibsun_globals.h"
 #include "cncnet4.h"
 #include "cncnet4_globals.h"
 #include "cncnet5_globals.h"
@@ -45,8 +46,10 @@
 #include "tacticalext.h"
 #include "tclassfactory.h"
 #include "testlocomotion.h"
+#include "extension.h"
 #include "theatertype.h"
 #include "debughandler.h"
+#include "asserthandler.h"
 #include <string>
 
 
@@ -571,6 +574,17 @@ bool Vinifera_Shutdown()
     EBoltClass::Clear_All();
     TheaterTypes.Clear();
 
+    /**
+     *  Cleanup global extension instances.
+     */
+    delete OptionsExtension;
+    OptionsExtension = nullptr;
+
+    /**
+     *  Cleanup additional extension instances.
+     */
+    ThemeControlExtensions.Clear();
+
     DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 
     return true;
@@ -646,8 +660,11 @@ bool Vinifera_Register_Com_Objects()
 {
     DEBUG_INFO("Registering new com objects...\n");
 
-    DEBUG_INFO("  TestLocomotionClass\n");
+    //DEBUG_INFO("  TestLocomotionClass\n");
     REGISTER_CLASS(TestLocomotionClass);
+    
+    //DEBUG_INFO("  Extension classes\n");
+    Extension::Register_Class_Factories();
 
     DEBUG_INFO("  ...OK!\n");
 

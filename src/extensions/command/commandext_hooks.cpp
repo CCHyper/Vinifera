@@ -38,6 +38,9 @@
 #include "asserthandler.h"
 #include "debughandler.h"
 
+#include "hooker.h"
+#include "hooker_macros.h"
+
 
 /**
  *  This function reimplements the chunk of code that populates the keyboard

@@ -39,6 +39,7 @@
 #include "iomap.h"
 #include "theme.h"
 #include "extension_saveload.h"
+#include "extension.h"
 #include "loadoptions.h"
 #include "language.h"
 #include "vinifera_gitinfo.h"
@@ -334,21 +335,6 @@ DECLARE_PATCH(_Save_Game_Put_Game_Version)
     static int version;
     version = ViniferaSaveGameVersion;
 
-    /**
-     *  If we are in developer mode, offset the build number as these save
-     *  files should not appear in normal game modes.
-     * 
-     *  For debug builds, we force an offset so they don't appear in any
-     *  other builds or releases.
-     */
-#ifndef NDEBUG
-    version *= 3;
-#else
-    if (Vinifera_DeveloperMode) {
-        version *= 2;
-    }
-#endif
-
     _asm { mov edx, version };
 
     JMP(0x005D5064);
@@ -356,7 +342,7 @@ DECLARE_PATCH(_Save_Game_Put_Game_Version)
 
 
 /**
- *  x
+ *  Sanity check on the return value of Load_All().
  * 
  *  @author: CCHyper
  */
@@ -389,24 +375,21 @@ failure:
  */
 DECLARE_PATCH(_LoadOptionsClass_Read_File_Check_Game_Version)
 {
-    GET_REGISTER_STATIC(int, version, eax);
-    static int ver;
+    GET_REGISTER_STATIC(FileEntryClass *, file, ebp);
+    GET_REGISTER_STATIC(int, file_version, eax);
+    GET_REGISTER_OFFSET_STATIC(WIN32_FIND_DATA *, wfd, esp, 0x348);
+    //GET_REGISTER_OFFSET_STATIC(WWSaveLoadClass *, saveload, esp, 0x0C);
 
     /**
      *  If the version in the save file does not match our build
      *  version exactly, then don't add this file to the listing.
      */
-    ver = ViniferaSaveGameVersion;
-#ifndef NDEBUG
-    ver *= 3;
-#else
-    if (Vinifera_DeveloperMode) {
-        ver *= 2;
-    }
-#endif
-    if (version != ver) {
+    if (file_version != ViniferaSaveGameVersion) {
+        DEBUG_WARNING("Save file \"%s\" is incompatible! File version %d, Expected version %d.\n", wfd->cFileName, file_version, ViniferaSaveGameVersion);
         JMP(0x00505AAD);
     }
+    
+    DEV_DEBUG_INFO("Save file \"%s\" is compatible.\n", wfd->cFileName);
 
     JMP(0x00505ABB);
 }
@@ -567,6 +550,11 @@ DECLARE_PATCH(_Load_All_Vinifera_Data)
     }
 
     /**
+     *  We have finished loading the game data, reset the load flag.
+     */
+    Vinifera_PerformingLoad = false;
+
+    /**
      *  Stolen bytes/code.
      */
 original_code:
@@ -631,33 +619,26 @@ retry_dialog:
         {
 #if !defined(RELEASE) && defined(NDEBUG)
             /**
-             *  We disable loading in non-release builds or if extensions are disabled.
+             *  We disable loading in non-release.
              */
-            if (!Vinifera_ClassExtensionsDisabled) {
-                Vinifera_Do_WWMessageBox("Saving and Loading is disabled for non-release builds.", Text_String(TXT_OK));
+            Vinifera_Do_WWMessageBox("Saving and Loading is disabled for non-release builds.", Text_String(TXT_OK));
+#else
+            /**
+             *  If no save games are available, notify the user and return back
+             *  and reissue the main dialog.
+             */
+            if (!_Save_Games_Available()) {
+                Vinifera_Do_WWMessageBox("No saved games available.", Text_String(TXT_OK));
+                goto retry_dialog;
+            }
 
-            } else {
-#endif
-
-                /**
-                 *  If no save games are available, notify the user and return back
-                 *  and reissue the main dialog.
-                 */
-                if (!_Save_Games_Available()) {
-                    Vinifera_Do_WWMessageBox("No saved games available.", Text_String(TXT_OK));
-                    goto retry_dialog;
-                }
-
-                /**
-                 *  Show the load game dialog.
-                 */
-                ret = _Do_Load_Dialog();
-                if (ret) {
-                    Theme.Stop();
-                    JMP(0x005DCE48);
-                }
-
-#if !defined(RELEASE) && defined(NDEBUG)
+            /**
+             *  Show the load game dialog.
+             */
+            ret = _Do_Load_Dialog();
+            if (ret) {
+                Theme.Stop();
+                JMP(0x005DCE48);
             }
 #endif
 
@@ -779,16 +760,16 @@ void Vinifera_Hooks()
     Patch_Jump(0x0060DBFF, &_SwizzleManagerClass_Process_Tables_Remap_Failed_Error);
 
     /**
-     *  Enable and hook the new save and load system only if extensions are disabled.
+     *  Enable and hook the new save and load system for class extensions.
      */
-    if (Vinifera_ClassExtensionsDisabled) {
-        Patch_Jump(0x005D68F7, &_Put_All_Vinifera_Data);
-        Patch_Jump(0x005D78ED, &_Load_All_Vinifera_Data);
+    Patch_Jump(0x005D68F7, &_Put_All_Vinifera_Data);
+    Patch_Jump(0x005D78ED, &_Load_All_Vinifera_Data);
 
-        Patch_Jump(0x004B6D96, &_SaveLoad_Disable_Buttons);
-        Patch_Jump(0x0057FF8B, &_NewMenuClass_Process_Disable_Load_Button_Firestorm);
-        Patch_Jump(0x0058004D, &_NewMenuClass_Process_Disable_Load_Button_TiberianSun);
-    }
+    /**
+     *  Set the save game version.
+     */
+    ViniferaSaveGameVersion = Extension::Get_Save_Version_Number();
+    DEBUG_INFO("Save game version number: %d\n", ViniferaSaveGameVersion);
 
     Patch_Jump(0x005DCDFD, &_Do_Lose_Create_Lose_WWMessageBox);
 

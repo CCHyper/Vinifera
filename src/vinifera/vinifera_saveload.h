@@ -8,7 +8,7 @@
  *
  *  @authors       CCHyper
  *
- *  @brief         
+ *  @brief         Utility functions for saving and loading.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -49,7 +49,7 @@
     { \
         Wstring funcname = __FUNCTION__; \
         funcname += "()"; \
-        ((ViniferaSwizzleManagerClass &)SwizzleManager).Swizzle_Dbg(pointer, __FILE__, __LINE__, funcname.Peek_Buffer(), variable); \
+        ((ViniferaSwizzleManagerClass &)SwizzleManager).Swizzle_Dbg((void **)&pointer, __FILE__, __LINE__, funcname.Peek_Buffer(), variable); \
     }
 
 #define VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP_LIST(vector, variable) \
@@ -65,7 +65,7 @@
     { \
         Wstring funcname = __FUNCTION__; \
         funcname += "()"; \
-        ((ViniferaSwizzleManagerClass &)SwizzleManager).Fetch_Swizzle_ID_Dbg(pointer, id, __FILE__, __LINE__, funcname.Peek_Buffer(), variable); \
+        ((ViniferaSwizzleManagerClass &)SwizzleManager).Fetch_Swizzle_ID_Dbg((void *)pointer, (LONG *)&id, __FILE__, __LINE__, funcname.Peek_Buffer(), variable); \
     }
 
 #define VINIFERA_SWIZZLE_REGISTER_POINTER(id, pointer, variable) \
