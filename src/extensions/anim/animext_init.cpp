@@ -51,7 +51,6 @@
 DECLARE_PATCH(_AnimClass_Constructor_Patch)
 {
     GET_REGISTER_STATIC(AnimClass *, this_ptr, esi); // Current "this" pointer.
-    static AnimClassExtension *exttype_ptr;
     static AnimTypeClassExtension *animtypeext;
 
     /**
@@ -173,6 +172,15 @@ original_code:
 DECLARE_PATCH(_AnimClass_Destructor_Patch)
 {
     GET_REGISTER_STATIC(AnimClass *, this_ptr, esi);
+
+    /**
+     *  If this anim instance was destoryed because it has a NULL class type, then
+     *  it would not have created an extension instance, so we can skip the destroy
+     *  call here.
+     */
+    if (!this_ptr->Class) {
+        goto original_code;
+    }
 
     /**
      *  Remove the extended class from the global index.
