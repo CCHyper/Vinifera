@@ -138,7 +138,7 @@ class NewSidebarClass : public PowerClass
                 void One_Time(int id);
                 void Init_Clear();
                 void Init_IO(int id);
-                const char *Help_Text(int text);
+                const char *Help_Text(int index);
                 bool Recalc();
                 void Activate();
                 void Deactivate();
@@ -347,7 +347,7 @@ class NewSidebarClass : public PowerClass
          */
         //virtual HRESULT Load(IStream *pStm) override;
         //virtual HRESULT Save(IStream *pStm) override;
-        virtual const char *Help_Text(int text) override;
+        virtual const char *Help_Text(int index) override;
         virtual void entry_84() override;
 
         /**

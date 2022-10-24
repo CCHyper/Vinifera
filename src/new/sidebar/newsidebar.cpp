@@ -1541,34 +1541,39 @@ bool NewSidebarClass::StripClass::AI(KeyNumType & input, Point2D & xy) // TODO
  * HISTORY:                                                                                    *
  *   11/18/1994 JLB : Created.                                                                 *
  *=============================================================================================*/
-const char *NewSidebarClass::StripClass::Help_Text(int text) // DONE
+const char *NewSidebarClass::StripClass::Help_Text(int index) // DONE
 {
     static char _buffer[84];
 
-    int v2 = text + TopIndex;
+    int i = index + TopIndex;
 
-    if (!GameActive) {
-        return nullptr;
+    if (GameActive) {
+
+        if (i < BuildableCount && BuildableCount < MAX_BUILDABLES) {
+
+            if (Buildables[i].BuildableType == RTTI_SPECIAL) {
+                return SuperWeaponTypes[Buildables[i].BuildableID]->Full_Name();
+            }
+
+            const TechnoTypeClass *ttype = Fetch_Techno_Type(Buildables[i].BuildableType, Buildables[i].BuildableID);
+
+            // BUGFIX from YR.
+            if (!ttype) {
+                return nullptr;
+            }
+
+            if (Map.field_1CD4) {
+                std::snprintf(_buffer, sizeof(_buffer), Fetch_String(TXT_MONEY_FORMAT_1), ttype->Cost_Of(PlayerPtr));
+
+            } else {
+                std::snprintf(_buffer, sizeof(_buffer), Fetch_String(TXT_MONEY_FORMAT_2), ttype->Full_Name(), ttype->Cost_Of(PlayerPtr));
+            }
+
+            return _buffer;
+        }
     }
 
-    if (v2 >= BuildableCount || BuildableCount >= MAX_BUILDABLES) {
-        return nullptr;
-    }
-
-    if (Buildables[v2].BuildableType == RTTI_SPECIAL) {
-        return SuperWeaponTypes[Buildables[v2].BuildableID]->Full_Name();
-    }
-
-    const TechnoTypeClass *ttype = Fetch_Techno_Type(Buildables[v2].BuildableType, Buildables[v2].BuildableID);
-
-    if (Map.field_1CD4) {
-        std::snprintf(_buffer, sizeof(_buffer), Fetch_String(TXT_MONEY_FORMAT_1), ttype->Cost_Of(PlayerPtr));
-
-    } else {
-        std::snprintf(_buffer, sizeof(_buffer), Fetch_String(TXT_MONEY_FORMAT_2), ttype->Full_Name(), ttype->Cost_Of(PlayerPtr));
-    }
-
-    return _buffer;
+    return nullptr;
 }
 
 
@@ -2514,13 +2519,13 @@ void NewSidebarClass::entry_84()
  * HISTORY:                                                                                    *
  *   11/18/1994 JLB : Created.                                                                 *
  *=============================================================================================*/
-const char *NewSidebarClass::Help_Text(int text) // DONE
+const char *NewSidebarClass::Help_Text(int index) // DONE
 {
-    const char * t = PowerClass::Help_Text(text);
+    const char * t = PowerClass::Help_Text(index);
     if ( !t ) {
-        int column = (text - 1000) / 256;
+        int column = (index - 1000) / 256;
         if (column >= 0 && column < ARRAY_SIZE(Column)) {
-            t = Column[column].Help_Text((text + 24));
+            t = Column[column].Help_Text((index + 24));
         }
     }
 
