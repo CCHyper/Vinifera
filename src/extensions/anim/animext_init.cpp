@@ -63,11 +63,6 @@ DECLARE_PATCH(_AnimClass_Constructor_Patch)
     }
 
     /**
-     *  Create an extended class instance.
-     */
-    Extension::Make<AnimClassExtension>(this_ptr);
-
-    /**
      *  This following code was moved here due to a patching address conflict
      *  in animext_hooks.cpp and is not the normal approach when extending
      *  a game class. - CCHyper
@@ -83,6 +78,11 @@ DECLARE_PATCH(_AnimClass_Constructor_Patch)
     if (!this_ptr->Class) {
         goto destroy_anim;
     }
+
+    /**
+     *  Create an extended class instance.
+     */
+    Extension::Make<AnimClassExtension>(this_ptr);
 
     /**
      *  #issue-561
