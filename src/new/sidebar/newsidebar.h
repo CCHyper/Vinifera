@@ -138,6 +138,7 @@ class NewSidebarClass : public PowerClass
                 void One_Time(int id);
                 void Init_Clear();
                 void Init_IO(int id);
+                const char *Help_Text(int text);
                 bool Recalc();
                 void Activate();
                 void Deactivate();
@@ -145,6 +146,17 @@ class NewSidebarClass : public PowerClass
                 bool Factory_Link(FactoryClass * factory, RTTIType type, int id);
                 const ShapeFileStruct * Get_Special_Cameo(SpecialWeaponType type);
                 inline void Set_Position(int x, int y) { X = x; Y = y; }
+
+                bool Is_On_Sidebar(RTTIType type, int id) const
+                {
+                    for (int i = 0; i < BuildableCount; ++i) {
+                        BuildType build = Buildables[i];
+                        if (build.BuildableType == type && build.BuildableID == id) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
 
             private:
                 static int Max_Visible();
@@ -321,12 +333,27 @@ class NewSidebarClass : public PowerClass
         NewSidebarClass(const NoInitClass & x);
         virtual ~NewSidebarClass() {}
 
+        /**
+         *  GScreenClass
+         */
         virtual void One_Time() override;
         virtual void Init_Clear() override;
         virtual void Init_IO() override;
-
         virtual void AI(KeyNumType & input, Point2D & xy) override;
         virtual void Draw_It(bool complete) override;
+
+        /**
+         *  DisplayClass
+         */
+        //virtual HRESULT Load(IStream *pStm) override;
+        //virtual HRESULT Save(IStream *pStm) override;
+        virtual const char *Help_Text(int text) override;
+        virtual void entry_84() override;
+
+        /**
+         *  RadarClass
+         */
+        virtual void Init_For_House() override;
 
         bool Abandon_Production(RTTIType type, FactoryClass * factory);
         bool Activate(int control);
@@ -340,6 +367,14 @@ class NewSidebarClass : public PowerClass
         bool Activate_Demolish(int control);
         int Which_Column(RTTIType type);
         void Radar_Mode_Control();
+
+        bool Is_On_Sidebar(RTTIType type, int id)
+        {
+            int column = Which_Column(type);
+            return Column[column].Is_On_Sidebar(type, id);
+        }
+
+        void Redraw_Sidebar() { IsToRedraw = true; Flag_To_Redraw(); }
 
     private:
         /**

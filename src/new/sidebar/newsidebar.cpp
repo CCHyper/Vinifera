@@ -65,6 +65,7 @@
 #include "vox.h"
 #include "voc.h"
 #include "iomap.h"
+#include "language.h"
 #include "drawshape.h"
 #include "techno.h"
 #include "technotype.h"
@@ -314,6 +315,95 @@ void NewSidebarClass::Init_IO() // DONE
             Activate(1);
         }
     }
+}
+
+
+void NewSidebarClass::Init_For_House() // TODO
+{
+#if 0
+    char *v1; // eax
+    int v2; // ecx
+    void *v3; // eax
+    int i; // esi
+    int v5; // eax
+    char *v6; // ecx
+    ConvertClass *v7; // eax
+    ShapeFileStruct *v8; // eax
+    ShapeFileStruct *v9; // eax
+    ShapeFileStruct *v10; // eax
+    ShapeFileStruct *v11; // eax
+    int j; // esi
+    ShapeFileStruct *v13; // eax
+    ShapeFileStruct *v14; // eax
+    int result; // eax
+    __int16 v16; // [esp+8h] [ebp-304h]
+    PaletteClass Dst; // [esp+Ch] [ebp-300h] BYREF
+
+    PowerClass::Init_For_House(&this->p);
+    v1 = &Dst.One.b;
+    v2 = 256;
+    do
+    {
+        *(v1 - offsetof(RGB, b)) = 0;
+        *(v1 - offsetof(RGB, g)) = 0;
+        *v1 = 0;
+        v1 += sizeof(RGB);
+        --v2;
+    }
+    while ( v2 );
+    v3 = MixFileClass<CCFileClass>::Retrieve("SIDEBAR.PAL");
+    memmove(&Dst, v3, 0x300u);
+    for ( i = 0; i < 256; ++i )
+    {
+        v5 = 3 * (i % 256);
+        v6 = &Dst.One.r + v5;
+        LOBYTE(v16) = 4 * *(&Dst.One.r + v5);
+        HIBYTE(v16) = 4 * *(&Dst.One.g + v5);
+        LOBYTE(v5) = 4 * *(&Dst.One.b + v5);
+        *v6 = v16;
+        v6[2] = v5;
+    }
+    if ( SidebarDrawer )
+    {
+        (*SidebarDrawer->vftble)(SidebarDrawer, 1);
+        SidebarDrawer = 0;
+    }
+    v7 = operator new(0x190u);
+    if ( v7 )
+    {
+        SidebarDrawer = ConvertClass::ConvertClass(v7, &Dst, &Dst, &PrimarySurface->x.s, 1, 0);
+    }
+    else
+    {
+        SidebarDrawer = 0;
+    }
+    v8 = MixFileClass<CCFileClass>::Retrieve("SELL.SHP");
+    ShapeButtonClass::Set_Shape(&SidebarClass::Sell, v8, 0, 0);
+    SidebarClass::Sell.__Drawer = SidebarDrawer;
+    v9 = MixFileClass<CCFileClass>::Retrieve("POWER.SHP");
+    ShapeButtonClass::Set_Shape(&SidebarClass::Power, v9, 0, 0);
+    SidebarClass::Power.__Drawer = SidebarDrawer;
+    v10 = MixFileClass<CCFileClass>::Retrieve("WAYP.SHP");
+    ShapeButtonClass::Set_Shape(&SidebarClass::Waypoint, v10, 0, 0);
+    SidebarClass::Waypoint.__Drawer = SidebarDrawer;
+    v11 = MixFileClass<CCFileClass>::Retrieve("REPAIR.SHP");
+    ShapeButtonClass::Set_Shape(&SidebarClass::Repair, v11, 0, 0);
+    SidebarClass::Repair.__Drawer = SidebarDrawer;
+    SidebarClass::SidebarShape = MixFileClass<CCFileClass>::Retrieve("SIDE1.SHP");
+    SidebarClass::SidebarMiddle = MixFileClass<CCFileClass>::Retrieve("SIDE2.SHP");
+    SidebarClass::SidebarBottom = MixFileClass<CCFileClass>::Retrieve("SIDE3.SHP");
+    SidebarClass::AddonShape = MixFileClass<CCFileClass>::Retrieve("ADDON.SHP");
+    for ( j = 0; j < ARRAY_SIZE(Column); ++j )
+    {
+        v13 = MixFileClass<CCFileClass>::Retrieve("R-UP.SHP");
+        ShapeButtonClass::Set_Shape(&SidebarClass::StripClass::RightUpButton[j], v13, 0, 0);
+        SidebarClass::StripClass::RightUpButton[j].__Drawer = SidebarDrawer;
+        v14 = MixFileClass<CCFileClass>::Retrieve("R-DN.SHP");
+        ShapeButtonClass::Set_Shape(&SidebarClass::StripClass::RightDownButton[j], v14, 0, 0);
+        SidebarClass::StripClass::RightDownButton[j].__Drawer = SidebarDrawer;
+    }
+    return result;
+#endif
 }
 
 
@@ -698,7 +788,6 @@ void NewSidebarClass::Draw_It(bool complete) // TODO
 
     //BEnd(BENCH_SIDEBAR);
 }
-
 
 /***********************************************************************************************
  * NewSidebarClass::AI -- Handles player clicking on sidebar area.                                *
@@ -1434,6 +1523,52 @@ bool NewSidebarClass::StripClass::AI(KeyNumType & input, Point2D & xy) // TODO
         Flag_To_Redraw();
     }
     return redraw;
+}
+
+
+/***********************************************************************************************
+ * HelpClass::Help_Text -- Assigns text as the current help text.                              *
+ *                                                                                             *
+ *    Use this routine to change the help text that will pop up if the cursor isn't moved      *
+ *    for the help delay duration. Call this routine as often as desired.                      *
+ *                                                                                             *
+ * INPUT:   text  -- The text number for the help text to use.                                 *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   11/18/1994 JLB : Created.                                                                 *
+ *=============================================================================================*/
+const char *NewSidebarClass::StripClass::Help_Text(int text) // DONE
+{
+    static char _buffer[84];
+
+    int v2 = text + TopIndex;
+
+    if (!GameActive) {
+        return nullptr;
+    }
+
+    if (v2 >= BuildableCount || BuildableCount >= MAX_BUILDABLES) {
+        return nullptr;
+    }
+
+    if (Buildables[v2].BuildableType == RTTI_SPECIAL) {
+        return SuperWeaponTypes[Buildables[v2].BuildableID]->Full_Name();
+    }
+
+    const TechnoTypeClass *ttype = Fetch_Techno_Type(Buildables[v2].BuildableType, Buildables[v2].BuildableID);
+
+    if (Map.field_1CD4) {
+        std::snprintf(_buffer, sizeof(_buffer), Fetch_String(TXT_MONEY_FORMAT_1), ttype->Cost_Of(PlayerPtr));
+
+    } else {
+        std::snprintf(_buffer, sizeof(_buffer), Fetch_String(TXT_MONEY_FORMAT_2), ttype->Full_Name(), ttype->Cost_Of(PlayerPtr));
+    }
+
+    return _buffer;
 }
 
 
@@ -2181,10 +2316,216 @@ void NewSidebarClass::Radar_Mode_Control()
 }
 
 
-// entry_84
+void NewSidebarClass::entry_84()
+{
+#if 0
+    int v1; // ebp
+    int i; // ebx
+    int j; // esi
+    int v4; // ecx
+    int v5; // eax
+    int v6; // edi
+    RadarClass *v7; // edx
+    int *v8; // ebx
+    int v9; // eax
+    int v10; // edi
+    int v11; // eax
+    int v12; // esi
+    int v13; // edx
+    int v14; // edx
+    int v15; // esi
+    int v16; // eax
+    int v17; // [esp-4h] [ebp-48h]
+    int v18; // [esp-4h] [ebp-48h]
+    int k; // [esp+8h] [ebp-3Ch]
+    int v20; // [esp+Ch] [ebp-38h]
+    int v21; // [esp+10h] [ebp-34h]
+    int v23; // [esp+14h] [ebp-30h]
+    int v24; // [esp+18h] [ebp-2Ch]
+    ToolTip a2; // [esp+2Ch] [ebp-18h] BYREF
+
+    v1 = 0;
+    if ( options.SidebarSide )
+    {
+        SidebarRect.X = mouseclass_vp__TacPixel.X + mouseclass_vp__TacPixel.Width;
+    }
+    else
+    {
+        SidebarRect.X = 0;
+    }
+    SidebarRect.Y = 148;
+    SidebarRect.Width = 168;
+    SidebarRect.Height = mouseclass_vp__TacPixel.Y + mouseclass_vp__TacPixel.Height - 148;
+    PowerClass::entry_84(this);
+    if ( !SidebarClass::SidebarShape )
+    {
+        SidebarClass::SidebarShape = MixFileClass<CCFileClass>::Retrieve("SIDEGDI1.SHP");
+        SidebarClass::SidebarMiddle = MixFileClass<CCFileClass>::Retrieve("SIDEGDI2.SHP");
+        SidebarClass::SidebarBottom = MixFileClass<CCFileClass>::Retrieve("SIDEGDI3.SHP");
+    }
+    GadgetClass::Set_Position(&SidebarClass::CameoStrip, SidebarRect.X + 16, mouseclass_vp__TacPixel.Y);
+    GadgetClass::Flag_To_Redraw(&SidebarClass::CameoStrip);
+    GadgetClass::Set_Position(&SidebarClass::Repair.t.c.ga, SidebarRect.X + 31, SidebarRect.Y - 9);
+    GadgetClass::Flag_To_Redraw(&SidebarClass::Repair.t.c.ga);
+    SidebarClass::Repair.DrawX = -SidebarRect.X;
+    GadgetClass::Set_Position(&SidebarClass::Sell.t.c.ga, SidebarClass::Repair.t.c.ga.X + 27, SidebarClass::Power.t.c.ga.Y);
+    GadgetClass::Flag_To_Redraw(&SidebarClass::Sell.t.c.ga);
+    SidebarClass::Sell.DrawX = -SidebarRect.X;
+    GadgetClass::Set_Position(&SidebarClass::Power.t.c.ga, SidebarClass::Sell.t.c.ga.X + 27, SidebarClass::Repair.t.c.ga.Y);
+    GadgetClass::Flag_To_Redraw(&SidebarClass::Power.t.c.ga);
+    SidebarClass::Power.DrawX = -SidebarRect.X;
+    GadgetClass::Set_Position(&SidebarClass::Waypoint.t.c.ga, SidebarClass::Power.t.c.ga.X + 27, SidebarClass::Sell.t.c.ga.Y);
+    GadgetClass::Flag_To_Redraw(&SidebarClass::Waypoint.t.c.ga);
+    SidebarClass::Waypoint.DrawX = -SidebarRect.X;
+    if ( ToolTipManager )
+    {
+        a2.dwfield_0 = 0;
+        a2.dwfield_4 = 0;
+        a2.dwfield_8 = 0;
+        *&a2.dwfield_C = 0i64;
+        a2.dwfield_14 = 0;
+        for ( i = 0; i < ARRAY_SIZE(Column); ++i )
+        {
+            for ( j = 0; j < 100; ++j )
+            {
+                ToolTipManager::Remove(ToolTipManager, (j | (i << 8)) + 1000);
+            }
+        }
+        v4 = SidebarRect.X;
+        if ( SidebarSurface && SidebarClass::SidebarShape )
+        {
+            v5 = (SidebarRect.Height - SidebarClass::SidebarBottom->FrameWidth - SidebarClass::SidebarShape->FrameWidth) / SidebarClass::SidebarMiddle->FrameWidth;
+        }
+        else
+        {
+            v5 = 4;
+        }
+        v20 = 0;
+        v21 = 0;
+        v6 = 17 * v5 + SidebarRect.Y + 34 * v5 + 25;
+        v7 = this;
+        v24 = v6;
+        v23 = 0;
+        v8 = &v7[1].d.m.ZoneConnections.ActiveCount;
+        while ( 1 )
+        {
+            GadgetClass::Set_Position((SidebarClass::StripClass::RightUpButton + v1), v4 + *v8 + 5, v6);
+            GadgetClass::Flag_To_Redraw((SidebarClass::StripClass::RightUpButton + v1));
+            v9 = SidebarRect.X;
+            *(&SidebarClass::StripClass::RightUpButton[0].DrawX + v1) = -SidebarRect.X;
+            GadgetClass::Set_Position((SidebarClass::StripClass::RightDownButton + v1), v9 + *v8 + 34, v6);
+            GadgetClass::Flag_To_Redraw((SidebarClass::StripClass::RightDownButton + v1));
+            v4 = SidebarRect.X;
+            v10 = 0;
+            *(&SidebarClass::StripClass::RightDownButton[0].DrawX + v1) = -SidebarRect.X;
+            for ( k = 0; ; k += 51 )
+            {
+                v11 = SidebarSurface && SidebarClass::SidebarShape ? (SidebarRect.Height - SidebarClass::SidebarBottom->FrameWidth - SidebarClass::SidebarShape->FrameWidth)
+                                                                   / SidebarClass::SidebarMiddle->FrameWidth : 4;
+                if ( v10 >= v11 )
+                {
+                    break;
+                }
+                v12 = v10 + v21;
+                GadgetClass::Set_Position((SidebarClass::StripClass::SelectButton + v12 * 52), *v8 + v4, SidebarRect.Y + k + v8[1]);
+                GadgetClass::Flag_To_Redraw((SidebarClass::StripClass::SelectButton + v12 * 52));
+                v13 = SidebarClass::StripClass::SelectButton[0][v12].c.ga.X;
+                a2.dwfield_8 = SidebarClass::StripClass::SelectButton[0][v12].c.ga.Y;
+                a2.dwfield_4 = v13;
+                v14 = SidebarClass::StripClass::SelectButton[0][v12].c.ga.Height;
+                a2.dwfield_0 = (v10 | (v20 << 8)) + 1000;
+                a2.dwfield_C = SidebarClass::StripClass::SelectButton[0][v12].c.ga.Width;
+                a2.dwfield_14 = 0;
+                a2.dwfield_10 = v14;
+                ToolTipManager::Add(ToolTipManager, &a2);
+                v4 = SidebarRect.X;
+                v1 = v23;
+                ++v10;
+            }
+            v1 += 76;
+            v8 += 245;
+            ++v20;
+            v23 = v1;
+            v21 += 20;
+            if ( v1 >= 152 )
+            {
+                break;
+            }
+            v6 = v24;
+        }
+        a2.dwfield_4 = SidebarClass::Repair.t.c.ga.X;
+        a2.dwfield_8 = SidebarClass::Repair.t.c.ga.Y;
+        *&a2.dwfield_C = *&SidebarClass::Repair.t.c.ga.Width;
+        a2.dwfield_0 = 101;
+        a2.dwfield_14 = 101;
+        ToolTipManager::Remove(ToolTipManager, 101);
+        ToolTipManager::Add(ToolTipManager, &a2);
+        a2.dwfield_4 = SidebarClass::Power.t.c.ga.X;
+        a2.dwfield_0 = 102;
+        a2.dwfield_14 = 105;
+        a2.dwfield_8 = SidebarClass::Power.t.c.ga.Y;
+        *&a2.dwfield_C = *&SidebarClass::Power.t.c.ga.Width;
+        ToolTipManager::Remove(ToolTipManager, 102);
+        ToolTipManager::Add(ToolTipManager, &a2);
+        a2.dwfield_4 = SidebarClass::Sell.t.c.ga.X;
+        a2.dwfield_8 = SidebarClass::Sell.t.c.ga.Y;
+        *&a2.dwfield_C = *&SidebarClass::Sell.t.c.ga.Width;
+        a2.dwfield_0 = 103;
+        a2.dwfield_14 = 103;
+        ToolTipManager::Remove(ToolTipManager, 103);
+        ToolTipManager::Add(ToolTipManager, &a2);
+        a2.dwfield_4 = SidebarClass::Waypoint.t.c.ga.X;
+        a2.dwfield_0 = 105;
+        a2.dwfield_14 = 135;
+        a2.dwfield_8 = SidebarClass::Waypoint.t.c.ga.Y;
+        *&a2.dwfield_C = *&SidebarClass::Waypoint.t.c.ga.Width;
+        ToolTipManager::Remove(ToolTipManager, 105);
+        ToolTipManager::Add(ToolTipManager, &a2);
+    }
+    v15 = RadarClass::RadarButton.Height + RadarClass::RadarButton.Y;
+    v17 = RadarClass::RadarButton.Height + RadarClass::RadarButton.Y;
+    if ( options.SidebarSide )
+    {
+        GadgetClass::Set_Position(&SidebarClass::CameoStrip, mouseclass_vp__TacPixel.X + mouseclass_vp__TacPixel.Width, v17);
+    }
+    else
+    {
+        GadgetClass::Set_Position(&SidebarClass::CameoStrip, 0, v17);
+    }
+    v18 = SidebarSurface->x.s.vftble->Get_Height(SidebarSurface) - v15;
+    v16 = SidebarSurface->x.s.vftble->Get_Width(SidebarSurface);
+    GadgetClass::Set_Size(&SidebarClass::CameoStrip, v16, v18);
+#endif
+}
 
 
-// Help_Text
+/***********************************************************************************************
+ * HelpClass::Help_Text -- Assigns text as the current help text.                              *
+ *                                                                                             *
+ *    Use this routine to change the help text that will pop up if the cursor isn't moved      *
+ *    for the help delay duration. Call this routine as often as desired.                      *
+ *                                                                                             *
+ * INPUT:   text  -- The text number for the help text to use.                                 *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   11/18/1994 JLB : Created.                                                                 *
+ *=============================================================================================*/
+const char *NewSidebarClass::Help_Text(int text) // DONE
+{
+    const char * t = PowerClass::Help_Text(text);
+    if ( !t ) {
+        int column = (text - 1000) / 256;
+        if (column >= 0 && column < ARRAY_SIZE(Column)) {
+            t = Column[column].Help_Text((text + 24));
+        }
+    }
+
+    return t;
+}
 
 
 int NewSidebarClass::StripClass::Max_Visible() // DONE
@@ -2198,7 +2539,7 @@ int NewSidebarClass::StripClass::Max_Visible() // DONE
 // Print_Cameo_Text
 
 
-// Load
+// Load // NO NEEDED
 
 
-// Save
+// Save // NO NEEDED
