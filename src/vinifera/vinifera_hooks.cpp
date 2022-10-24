@@ -377,6 +377,9 @@ failure:
  */
 DECLARE_PATCH(_LoadOptionsClass_Read_File_Check_Game_Version)
 {
+    //GET_REGISTER_OFFSET_STATIC(WWSaveLoadClass *, saveload, esp, 0x0C);
+    GET_REGISTER_OFFSET_STATIC(const char *, filename, esp, 0x348);
+    GET_REGISTER_STATIC(FileEntryClass *, file, ebp);
     GET_REGISTER_STATIC(int, file_version, eax);
 
     /**
@@ -384,6 +387,7 @@ DECLARE_PATCH(_LoadOptionsClass_Read_File_Check_Game_Version)
      *  version exactly, then don't add this file to the listing.
      */
     if (file_version != ViniferaSaveGameVersion) {
+        DEBUG_WARNING("Save file \"%s\" (%s) has version %d, expected version %d!\n", filename, file_version, ViniferaSaveGameVersion);
         JMP(0x00505AAD);
     }
 
