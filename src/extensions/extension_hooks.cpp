@@ -50,115 +50,94 @@
 #include "housetypeext_hooks.h"
 #include "infantryext_hooks.h"
 #include "infantrytypeext_hooks.h"
-//RTTI_ISOTILE
+//#include "isotileext_hooks.h"
 #include "isotiletypeext_hooks.h"
-//RTTI_LIGHT
-//RTTI_OVERLAY
+//#include "buildinglightext_hooks.h"
+//#include "overlayext_hooks.h"
 #include "overlaytypeext_hooks.h"
-//RTTI_PARTICLE
+//#include "particleext_hooks.h"
 #include "particletypeext_hooks.h"
 #include "particlesysext_hooks.h"
 #include "particlesystypeext_hooks.h"
-//RTTI_SCRIPT
-//RTTI_SCRIPTTYPE
+//#include "scriptext_hooks.h"
+//#include "scripttypeext_hooks.h"
 #include "sideext_hooks.h"
-//RTTI_SMUDGE
+//#include "smudgeext_hooks.h"
 #include "smudgetypeext_hooks.h"
 #include "supertypeext_hooks.h"
-//RTTI_TASKFORCE
+//#include "taskforceext_hooks.h"
 #include "teamext_hooks.h"
-//RTTI_TEAMTYPE
+//#include "teamtypeext_hooks.h"
 #include "terrainext_hooks.h"
 #include "terraintypeext_hooks.h"
-//RTTI_TRIGGER
-//RTTI_TRIGGERTYPE
+//#include "triggerext_hooks.h"
+//#include "triggertypeext_hooks.h"
 #include "unittypeext_hooks.h"
-//RTTI_VOXELANIM
+//#include "voxelanimext_hooks.h"
 #include "voxelanimtypeext_hooks.h"
 #include "waveext_hooks.h"
-//RTTI_TAG
-//RTTI_TAGTYPE
+//#include "tagext_hooks.h"
+//#include "tagtypeext_hooks.h"
 #include "tiberiumext_hooks.h"
 #include "tactionext_hooks.h"
-//RTTI_EVENT
+//#include "teventext_hooks.h"
 #include "weapontypeext_hooks.h"
 #include "warheadtypeext_hooks.h"
-//RTTI_WAYPOINT
-//RTTI_TUBE
-//RTTI_LIGHTSOURCE
+//#include "waypointeext_hooks.h"
+//#include "tubeext_hooks.h"
+//#include "lightsourceext_hooks.h"
 #include "empulseext_hooks.h"
 #include "tacticalext_hooks.h"
 #include "superext_hooks.h"
-//RTTI_AITRIGGER
-//RTTI_AITRIGGERTYPE
-//RTTI_NEURON
-//RTTI_FOGGEDOBJECT
-//RTTI_ALPHASHAPE
-//RTTI_VEINHOLEMONSTER
+//#include "aitriggerext_hooks.h"
+//#include "aitriggertypeext_hooks.h"
+//#include "neuronext_hooks.h"
+//#include "foggedobjectext_hooks.h"
+//#include "alphashapeext_hooks.h"
+//#include "veinholemonsterext_hooks.h"
 
 #include "rulesext_hooks.h"
 #include "scenarioext_hooks.h"
 #include "sessionext_hooks.h"
+#include "optionsext_hooks.h"
 
+#include "themeext_hooks.h"
 
-
-
+#include "displayext_hooks.h"
+#include "sidebarext_hooks.h"
 
 #include "initext_hooks.h"
 #include "mainloopext_hooks.h"
 #include "newmenuext_hooks.h"
-
-#include "displayext_hooks.h"
-#include "sidebarext_hooks.h"
-#include "tooltipext_hooks.h"
 #include "commandext_hooks.h"
-#include "optionsext_hooks.h"
-#include "msglistext_hooks.h"
 #include "cdext_hooks.h"
-
 #include "playmovie_hooks.h"
 #include "vqaext_hooks.h"
-#include "themeext_hooks.h"
-
-
-
-
-
-
-
-
-#include "combatext_hooks.h"
-
-#include "empulseext_hooks.h"
-#include "waveext_hooks.h"
-
-#include "txtlabelext_hooks.h"
-
-#include "dropshipext_hooks.h"
-#include "endgameext_hooks.h"
-
-#include "mapseedext_hooks.h"
-#include "multiscoreext_hooks.h"
-#include "multimissionext_hooks.h"
-
 #include "cciniext_hooks.h"
 #include "rawfileext_hooks.h"
 #include "ccfileext_hooks.h"
 
-#include "theatertype_hooks.h"
+#include "msglistext_hooks.h"
+#include "txtlabelext_hooks.h"
+#include "tooltipext_hooks.h"
 
-#include "fetchres_hooks.h"
+#include "combatext_hooks.h"
+#include "dropshipext_hooks.h"
+#include "endgameext_hooks.h"
+#include "mapseedext_hooks.h"
+#include "multiscoreext_hooks.h"
+#include "multimissionext_hooks.h"
 
 #include "skirmishdlg_hooks.h"
 
 #include "filepcx_hooks.h"
+#include "fetchres_hooks.h"
 
+#include "theatertype_hooks.h"
 
-
-
-
-
+#include "tibsun_functions.h"
 #include "iomap.h"
+#include "tracker.h"
 
 #include "extension.h"
 #include "swizzle.h"
@@ -167,151 +146,176 @@
 #include "hooker_macros.h"
 
 
-
-#include "tracker.h"
-static void _Detach_This_From_All_Intercept(TARGET target, bool all)
+/**
+ *  This function is for intercepting the calls to Detach_This_From_All to also
+ *  process the object through the extension interface.
+ * 
+ *  @author: CCHyper
+ */
+static void _Extension_Detach_This_From_All_Intercept(TARGET target, bool all)
 {
     Extension::Detach_This_From_All(target, all);
 
     Detach_This_From_All(target, all);
 }
 
-#include "tibsun_functions.h"
-static void _Free_Heaps_Intercept()
+
+/**
+ *  This function is for intercepting the calls to Free_Heaps to also process
+ *  the extension interface.
+ * 
+ *  @author: CCHyper
+ */
+static void _Extension_Free_Heaps_Intercept()
 {
     Extension::Free_Heaps();
 
     Free_Heaps();
 }
 
-DECLARE_PATCH(_Print_CRCs_Hook)
+
+/**
+ *  This patch calls the Print_CRCs function from extension interface.
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Extension_Print_CRCs_Hook)
 {
     GET_REGISTER_STATIC(FILE *, fp, esi);
     GET_REGISTER_OFFSET_STATIC(EventClass *, ev, esp, 0x48); // TODO
+
+    // Fixup WWCRCEngine stack.
+    _asm { add esp, 0x4 }
+
+    /**
+     *  Print the extension class CRCs.
+     */
+    Extension::Print_CRCs(fp, ev);
 
     _asm { push esi }
     _asm { mov eax, 0x006B6944 }
     _asm { call eax } //_fclose
 
-    _asm { add esp, 0x8 }
-
-    Extension::Print_CRCs(fp, ev);
+    _asm { add esp, 0x4 }
 
     JMP(0x005B8464);
 }
 
 
+/**
+ *  Patch in the extension class intercept hooks.
+ */
+static void Extension_Intercept_Hooks()
+{
+    Patch_Call(0x0053DF7A, &_Extension_Free_Heaps_Intercept); // MapSeedClass::Init_Random
+    Patch_Call(0x005DC590, &_Extension_Free_Heaps_Intercept); // Clear_Scenario
+    Patch_Call(0x00601BA2, &_Extension_Free_Heaps_Intercept); // Game_Shutdown
+
+    Patch_Call(0x0040DBB3, &_Extension_Detach_This_From_All_Intercept); // AircraftClass::~AircraftClass
+    Patch_Call(0x0040F123, &_Extension_Detach_This_From_All_Intercept); // AircraftClass_Fall_To_Death
+    Patch_Call(0x0040FCD3, &_Extension_Detach_This_From_All_Intercept); // AircraftTypeClass::~AircraftTypeClass
+    Patch_Call(0x00410223, &_Extension_Detach_This_From_All_Intercept); // AircraftTypeClass::~AircraftTypeClass
+    Patch_Call(0x004142C6, &_Extension_Detach_This_From_All_Intercept); // AnimClass::~AnimClass
+    Patch_Call(0x00426662, &_Extension_Detach_This_From_All_Intercept); // BuildingClass::~BuildingClass
+    Patch_Call(0x0043F94D, &_Extension_Detach_This_From_All_Intercept); // BuildingTypeClass::~BuildingTypeClass
+    Patch_Call(0x0044407D, &_Extension_Detach_This_From_All_Intercept); // BuildingTypeClass::~BuildingTypeClass
+    Patch_Call(0x004445F3, &_Extension_Detach_This_From_All_Intercept); // BulletClass::~BulletClass
+    Patch_Call(0x004474D3, &_Extension_Detach_This_From_All_Intercept); // BulletClass::~BulletClass
+    Patch_Call(0x00447DC3, &_Extension_Detach_This_From_All_Intercept); // BulletTypeClass::~BulletTypeClass
+    Patch_Call(0x00448723, &_Extension_Detach_This_From_All_Intercept); // BulletTypeClass::~BulletTypeClass
+    Patch_Call(0x00448AE3, &_Extension_Detach_This_From_All_Intercept); // CampaignClass::~CampaignClass
+    Patch_Call(0x00448EF3, &_Extension_Detach_This_From_All_Intercept); // CampaignClass::~CampaignClass
+    Patch_Call(0x00456A26, &_Extension_Detach_This_From_All_Intercept); // CellClass::Wall_Update
+    Patch_Call(0x00456A58, &_Extension_Detach_This_From_All_Intercept); // CellClass::Wall_Update
+    Patch_Call(0x00456A7F, &_Extension_Detach_This_From_All_Intercept); // CellClass::Wall_Update
+    Patch_Call(0x00456AAB, &_Extension_Detach_This_From_All_Intercept); // CellClass::Wall_Update
+    Patch_Call(0x00456AD2, &_Extension_Detach_This_From_All_Intercept); // CellClass::Wall_Update
+    Patch_Call(0x004571F9, &_Extension_Detach_This_From_All_Intercept); // CellClass::Reduce_Wall
+    Patch_Call(0x004927D3, &_Extension_Detach_This_From_All_Intercept); // EMPulseClass::~EMPulseClass
+    Patch_Call(0x004931E3, &_Extension_Detach_This_From_All_Intercept); // EMPulseClass::~EMPulseClass
+    Patch_Call(0x00496DB3, &_Extension_Detach_This_From_All_Intercept); // FactoryClass::~FactoryClass
+    Patch_Call(0x00497AA3, &_Extension_Detach_This_From_All_Intercept); // FactoryClass::~FactoryClass
+    Patch_Call(0x004BB6DB, &_Extension_Detach_This_From_All_Intercept); // HouseClass::~HouseClass
+    Patch_Call(0x004CDE93, &_Extension_Detach_This_From_All_Intercept); // HouseTypeClass::~HouseTypeClass
+    Patch_Call(0x004CE603, &_Extension_Detach_This_From_All_Intercept); // HouseTypeClass::~HouseTypeClass
+    Patch_Call(0x004D22DC, &_Extension_Detach_This_From_All_Intercept); // InfantryClass::~InfantryClass
+    Patch_Call(0x004DA3B4, &_Extension_Detach_This_From_All_Intercept); // InfantryTypeClass::~InfantryTypeClass
+    Patch_Call(0x004DB133, &_Extension_Detach_This_From_All_Intercept); // InfantryTypeClass::~InfantryTypeClass
+    Patch_Call(0x004F2173, &_Extension_Detach_This_From_All_Intercept); // IsometricTileClass::~IsometricTileClass
+    Patch_Call(0x004F23E3, &_Extension_Detach_This_From_All_Intercept); // IsometricTileClass::~IsometricTileClass
+    Patch_Call(0x004F3344, &_Extension_Detach_This_From_All_Intercept); // IsometricTileTypeClass::~IsometricTileTypeClass
+    Patch_Call(0x005015E3, &_Extension_Detach_This_From_All_Intercept); // LightSourceClass::~LightSourceClass
+    Patch_Call(0x00501DA3, &_Extension_Detach_This_From_All_Intercept); // LightSourceClass::~LightSourceClass
+    Patch_Call(0x00585F9E, &_Extension_Detach_This_From_All_Intercept); // ObjectClass::Detach_All
+    Patch_Call(0x00586DB5, &_Extension_Detach_This_From_All_Intercept); // ObjectClass::entry_E4
+    Patch_Call(0x0058B563, &_Extension_Detach_This_From_All_Intercept); // OverlayClass::~OverlayClass
+    Patch_Call(0x0058CB13, &_Extension_Detach_This_From_All_Intercept); // OverlayClass::~OverlayClass
+    Patch_Call(0x0058D196, &_Extension_Detach_This_From_All_Intercept); // OverlayTypeClass::~OverlayTypeClass
+    Patch_Call(0x0058DC86, &_Extension_Detach_This_From_All_Intercept); // OverlayTypeClass::~OverlayTypeClass
+    Patch_Call(0x005A32FA, &_Extension_Detach_This_From_All_Intercept); // ParticleClass::~ParticleClass
+    Patch_Call(0x005A503A, &_Extension_Detach_This_From_All_Intercept); // ParticleClass::~ParticleClass
+    Patch_Call(0x005A56D4, &_Extension_Detach_This_From_All_Intercept); // ParticleSystemClass::~ParticleSystemClass
+    Patch_Call(0x005AE573, &_Extension_Detach_This_From_All_Intercept); // ParticleSystemTypeClass::~ParticleSystemTypeClass
+    Patch_Call(0x005AEC63, &_Extension_Detach_This_From_All_Intercept); // ParticleSystemTypeClass::~ParticleSystemTypeClass
+    Patch_Call(0x005AF153, &_Extension_Detach_This_From_All_Intercept); // ParticleTypeClass::~ParticleTypeClass
+    Patch_Call(0x005AFC33, &_Extension_Detach_This_From_All_Intercept); // ParticleTypeClass::~ParticleTypeClass
+    Patch_Call(0x005E78C3, &_Extension_Detach_This_From_All_Intercept); // ScriptClass::~ScriptClass
+    Patch_Call(0x005E7B83, &_Extension_Detach_This_From_All_Intercept); // ScriptTypeClass::~ScriptTypeClass
+    Patch_Call(0x005E81E3, &_Extension_Detach_This_From_All_Intercept); // ScriptClass::~ScriptClass
+    Patch_Call(0x005E8293, &_Extension_Detach_This_From_All_Intercept); // ScriptTypeClass::~ScriptTypeClass
+    Patch_Call(0x005F1AE3, &_Extension_Detach_This_From_All_Intercept); // SideClass::~SideClass
+    Patch_Call(0x005F1D93, &_Extension_Detach_This_From_All_Intercept); // SideClass::~SideClass
+    Patch_Call(0x005FAAD3, &_Extension_Detach_This_From_All_Intercept); // SmudgeClass::~SmudgeClass
+    Patch_Call(0x005FAF03, &_Extension_Detach_This_From_All_Intercept); // SmudgeClass::~SmudgeClass
+    Patch_Call(0x005FB313, &_Extension_Detach_This_From_All_Intercept); // SmudgeTypeClass::~SmudgeTypeClass
+    Patch_Call(0x005FC023, &_Extension_Detach_This_From_All_Intercept); // SmudgeTypeClass::~SmudgeTypeClass
+    Patch_Call(0x00618D03, &_Extension_Detach_This_From_All_Intercept); // TActionClass::~TActionClass
+    Patch_Call(0x0061DAD3, &_Extension_Detach_This_From_All_Intercept); // TActionClass::~TActionClass
+    Patch_Call(0x0061E4B6, &_Extension_Detach_This_From_All_Intercept); // TagClass::~TagClass
+    Patch_Call(0x0061E73B, &_Extension_Detach_This_From_All_Intercept); // TagClass::~TagClass
+    Patch_Call(0x0061E9AA, &_Extension_Detach_This_From_All_Intercept); // TagClass::Spring
+    Patch_Call(0x0061F164, &_Extension_Detach_This_From_All_Intercept); // TagTypeClass::~TagTypeClass
+    Patch_Call(0x00621503, &_Extension_Detach_This_From_All_Intercept); // TaskForceClass::~TaskForceClass
+    Patch_Call(0x00621E43, &_Extension_Detach_This_From_All_Intercept); // TaskForceClass::~TaskForceClass
+    Patch_Call(0x006224E3, &_Extension_Detach_This_From_All_Intercept); // TeamClass::~TeamClass
+    Patch_Call(0x00627EF3, &_Extension_Detach_This_From_All_Intercept); // TeamTypeClass::~TeamTypeClass
+    Patch_Call(0x00629293, &_Extension_Detach_This_From_All_Intercept); // TeamTypeClass::~TeamTypeClass
+    Patch_Call(0x0063F188, &_Extension_Detach_This_From_All_Intercept); // TerrainClass::~TerrainClass
+    Patch_Call(0x00640C38, &_Extension_Detach_This_From_All_Intercept); // TerrainClass::~TerrainClass
+    Patch_Call(0x00641653, &_Extension_Detach_This_From_All_Intercept); // TerrainTypeClass::~TerrainTypeClass
+    Patch_Call(0x00641D83, &_Extension_Detach_This_From_All_Intercept); // TerrainTypeClass::~TerrainTypeClass
+    Patch_Call(0x00642223, &_Extension_Detach_This_From_All_Intercept); // TEventClass::~TEventClass
+    Patch_Call(0x00642F23, &_Extension_Detach_This_From_All_Intercept); // TEventClass::~TEventClass
+    Patch_Call(0x00644A45, &_Extension_Detach_This_From_All_Intercept); // TiberiumClass::~TiberiumClass
+    Patch_Call(0x006491A3, &_Extension_Detach_This_From_All_Intercept); // TriggerClass::~TriggerClass
+    Patch_Call(0x00649943, &_Extension_Detach_This_From_All_Intercept); // TriggerClass::~TriggerClass
+    Patch_Call(0x00649E03, &_Extension_Detach_This_From_All_Intercept); // TriggerTypeClass::~TriggerTypeClass
+    Patch_Call(0x0064AFD3, &_Extension_Detach_This_From_All_Intercept); // TubeClass::~TubeClass
+    Patch_Call(0x0064B603, &_Extension_Detach_This_From_All_Intercept); // TubeClass::~TubeClass
+    Patch_Call(0x0064D8A9, &_Extension_Detach_This_From_All_Intercept); // UnitClass::~UnitClass
+    Patch_Call(0x0065BAD3, &_Extension_Detach_This_From_All_Intercept); // UnitTypeClass::~UnitTypeClass
+    Patch_Call(0x0065C793, &_Extension_Detach_This_From_All_Intercept); // UnitTypeClass::~UnitTypeClass
+    Patch_Call(0x0065DF23, &_Extension_Detach_This_From_All_Intercept); // VoxelAnimClass::~VoxelAnimClass
+    Patch_Call(0x0065F5A3, &_Extension_Detach_This_From_All_Intercept); // VoxelAnimTypeClass::~VoxelAnimTypeClass
+    Patch_Call(0x00660093, &_Extension_Detach_This_From_All_Intercept); // VoxelAnimTypeClass::~VoxelAnimTypeClass
+    Patch_Call(0x00661227, &_Extension_Detach_This_From_All_Intercept); // VeinholeMonsterClass::~VeinholeMonsterClass
+    Patch_Call(0x00661C00, &_Extension_Detach_This_From_All_Intercept); // VeinholeMonsterClass::Take_Damage
+    Patch_Call(0x0066EF73, &_Extension_Detach_This_From_All_Intercept); // WarheadTypeClass::~WarheadTypeClass
+    Patch_Call(0x0066FA93, &_Extension_Detach_This_From_All_Intercept); // WarheadTypeClass::~WarheadTypeClass
+    Patch_Call(0x006702D4, &_Extension_Detach_This_From_All_Intercept); // WaveClass::~WaveClass
+    Patch_Call(0x00672E73, &_Extension_Detach_This_From_All_Intercept); // WaveClass::~WaveClass
+    Patch_Call(0x00673563, &_Extension_Detach_This_From_All_Intercept); // WaypointPathClass::~WaypointPathClass
+    Patch_Call(0x00673AA3, &_Extension_Detach_This_From_All_Intercept); // WaypointPathClass::~WaypointPathClass
+    Patch_Call(0x00680C54, &_Extension_Detach_This_From_All_Intercept); // WeaponTypeClass::~WeaponTypeClass
+    Patch_Call(0x006818F4, &_Extension_Detach_This_From_All_Intercept); // WeaponTypeClass::~WeaponTypeClass
+
+    Patch_Jump(0x005B845B, &_Extension_Print_CRCs_Hook);
+}
+
 
 void Extension_Hooks()
 {
-    Patch_Call(0x0053DF7A, &_Free_Heaps_Intercept); // MapSeedClass::Init_Random
-    Patch_Call(0x005DC590, &_Free_Heaps_Intercept); // Clear_Scenario
-    Patch_Call(0x00601BA2, &_Free_Heaps_Intercept); // Game_Shutdown
-
-    Patch_Call(0x0040DBB3, &_Detach_This_From_All_Intercept); // AircraftClass::~AircraftClass
-    Patch_Call(0x0040F123, &_Detach_This_From_All_Intercept); // AircraftClass_Fall_To_Death
-    Patch_Call(0x0040FCD3, &_Detach_This_From_All_Intercept); // AircraftTypeClass::~AircraftTypeClass
-    Patch_Call(0x00410223, &_Detach_This_From_All_Intercept); // AircraftTypeClass::~AircraftTypeClass
-    Patch_Call(0x004142C6, &_Detach_This_From_All_Intercept); // AnimClass::~AnimClass
-    Patch_Call(0x00426662, &_Detach_This_From_All_Intercept); // BuildingClass::~BuildingClass
-    Patch_Call(0x0043F94D, &_Detach_This_From_All_Intercept); // BuildingTypeClass::~BuildingTypeClass
-    Patch_Call(0x0044407D, &_Detach_This_From_All_Intercept); // BuildingTypeClass::~BuildingTypeClass
-    Patch_Call(0x004445F3, &_Detach_This_From_All_Intercept); // BulletClass::~BulletClass
-    Patch_Call(0x004474D3, &_Detach_This_From_All_Intercept); // BulletClass::~BulletClass
-    Patch_Call(0x00447DC3, &_Detach_This_From_All_Intercept); // BulletTypeClass::~BulletTypeClass
-    Patch_Call(0x00448723, &_Detach_This_From_All_Intercept); // BulletTypeClass::~BulletTypeClass
-    Patch_Call(0x00448AE3, &_Detach_This_From_All_Intercept); // CampaignClass::~CampaignClass
-    Patch_Call(0x00448EF3, &_Detach_This_From_All_Intercept); // CampaignClass::~CampaignClass
-    Patch_Call(0x00456A26, &_Detach_This_From_All_Intercept); // CellClass::Wall_Update
-    Patch_Call(0x00456A58, &_Detach_This_From_All_Intercept); // CellClass::Wall_Update
-    Patch_Call(0x00456A7F, &_Detach_This_From_All_Intercept); // CellClass::Wall_Update
-    Patch_Call(0x00456AAB, &_Detach_This_From_All_Intercept); // CellClass::Wall_Update
-    Patch_Call(0x00456AD2, &_Detach_This_From_All_Intercept); // CellClass::Wall_Update
-    Patch_Call(0x004571F9, &_Detach_This_From_All_Intercept); // CellClass::Reduce_Wall
-    Patch_Call(0x004927D3, &_Detach_This_From_All_Intercept); // EMPulseClass::~EMPulseClass
-    Patch_Call(0x004931E3, &_Detach_This_From_All_Intercept); // EMPulseClass::~EMPulseClass
-    Patch_Call(0x00496DB3, &_Detach_This_From_All_Intercept); // FactoryClass::~FactoryClass
-    Patch_Call(0x00497AA3, &_Detach_This_From_All_Intercept); // FactoryClass::~FactoryClass
-    Patch_Call(0x004BB6DB, &_Detach_This_From_All_Intercept); // HouseClass::~HouseClass
-    Patch_Call(0x004CDE93, &_Detach_This_From_All_Intercept); // HouseTypeClass::~HouseTypeClass
-    Patch_Call(0x004CE603, &_Detach_This_From_All_Intercept); // HouseTypeClass::~HouseTypeClass
-    Patch_Call(0x004D22DC, &_Detach_This_From_All_Intercept); // InfantryClass::~InfantryClass
-    Patch_Call(0x004DA3B4, &_Detach_This_From_All_Intercept); // InfantryTypeClass::~InfantryTypeClass
-    Patch_Call(0x004DB133, &_Detach_This_From_All_Intercept); // InfantryTypeClass::~InfantryTypeClass
-    Patch_Call(0x004F2173, &_Detach_This_From_All_Intercept); // IsometricTileClass::~IsometricTileClass
-    Patch_Call(0x004F23E3, &_Detach_This_From_All_Intercept); // IsometricTileClass::~IsometricTileClass
-    Patch_Call(0x004F3344, &_Detach_This_From_All_Intercept); // IsometricTileTypeClass::~IsometricTileTypeClass
-    Patch_Call(0x005015E3, &_Detach_This_From_All_Intercept); // LightSourceClass::~LightSourceClass
-    Patch_Call(0x00501DA3, &_Detach_This_From_All_Intercept); // LightSourceClass::~LightSourceClass
-    Patch_Call(0x00585F9E, &_Detach_This_From_All_Intercept); // ObjectClass::Detach_All
-    Patch_Call(0x00586DB5, &_Detach_This_From_All_Intercept); // ObjectClass::entry_E4
-    Patch_Call(0x0058B563, &_Detach_This_From_All_Intercept); // OverlayClass::~OverlayClass
-    Patch_Call(0x0058CB13, &_Detach_This_From_All_Intercept); // OverlayClass::~OverlayClass
-    Patch_Call(0x0058D196, &_Detach_This_From_All_Intercept); // OverlayTypeClass::~OverlayTypeClass
-    Patch_Call(0x0058DC86, &_Detach_This_From_All_Intercept); // OverlayTypeClass::~OverlayTypeClass
-    Patch_Call(0x005A32FA, &_Detach_This_From_All_Intercept); // ParticleClass::~ParticleClass
-    Patch_Call(0x005A503A, &_Detach_This_From_All_Intercept); // ParticleClass::~ParticleClass
-    Patch_Call(0x005A56D4, &_Detach_This_From_All_Intercept); // ParticleSystemClass::~ParticleSystemClass
-    Patch_Call(0x005AE573, &_Detach_This_From_All_Intercept); // ParticleSystemTypeClass::~ParticleSystemTypeClass
-    Patch_Call(0x005AEC63, &_Detach_This_From_All_Intercept); // ParticleSystemTypeClass::~ParticleSystemTypeClass
-    Patch_Call(0x005AF153, &_Detach_This_From_All_Intercept); // ParticleTypeClass::~ParticleTypeClass
-    Patch_Call(0x005AFC33, &_Detach_This_From_All_Intercept); // ParticleTypeClass::~ParticleTypeClass
-    Patch_Call(0x005E78C3, &_Detach_This_From_All_Intercept); // ScriptClass::~ScriptClass
-    Patch_Call(0x005E7B83, &_Detach_This_From_All_Intercept); // ScriptTypeClass::~ScriptTypeClass
-    Patch_Call(0x005E81E3, &_Detach_This_From_All_Intercept); // ScriptClass::~ScriptClass
-    Patch_Call(0x005E8293, &_Detach_This_From_All_Intercept); // ScriptTypeClass::~ScriptTypeClass
-    Patch_Call(0x005F1AE3, &_Detach_This_From_All_Intercept); // SideClass::~SideClass
-    Patch_Call(0x005F1D93, &_Detach_This_From_All_Intercept); // SideClass::~SideClass
-    Patch_Call(0x005FAAD3, &_Detach_This_From_All_Intercept); // SmudgeClass::~SmudgeClass
-    Patch_Call(0x005FAF03, &_Detach_This_From_All_Intercept); // SmudgeClass::~SmudgeClass
-    Patch_Call(0x005FB313, &_Detach_This_From_All_Intercept); // SmudgeTypeClass::~SmudgeTypeClass
-    Patch_Call(0x005FC023, &_Detach_This_From_All_Intercept); // SmudgeTypeClass::~SmudgeTypeClass
-    Patch_Call(0x00618D03, &_Detach_This_From_All_Intercept); // TActionClass::~TActionClass
-    Patch_Call(0x0061DAD3, &_Detach_This_From_All_Intercept); // TActionClass::~TActionClass
-    Patch_Call(0x0061E4B6, &_Detach_This_From_All_Intercept); // TagClass::~TagClass
-    Patch_Call(0x0061E73B, &_Detach_This_From_All_Intercept); // TagClass::~TagClass
-    Patch_Call(0x0061E9AA, &_Detach_This_From_All_Intercept); // TagClass::Spring
-    Patch_Call(0x0061F164, &_Detach_This_From_All_Intercept); // TagTypeClass::~TagTypeClass
-    Patch_Call(0x00621503, &_Detach_This_From_All_Intercept); // TaskForceClass::~TaskForceClass
-    Patch_Call(0x00621E43, &_Detach_This_From_All_Intercept); // TaskForceClass::~TaskForceClass
-    Patch_Call(0x006224E3, &_Detach_This_From_All_Intercept); // TeamClass::~TeamClass
-    Patch_Call(0x00627EF3, &_Detach_This_From_All_Intercept); // TeamTypeClass::~TeamTypeClass
-    Patch_Call(0x00629293, &_Detach_This_From_All_Intercept); // TeamTypeClass::~TeamTypeClass
-    Patch_Call(0x0063F188, &_Detach_This_From_All_Intercept); // TerrainClass::~TerrainClass
-    Patch_Call(0x00640C38, &_Detach_This_From_All_Intercept); // TerrainClass::~TerrainClass
-    Patch_Call(0x00641653, &_Detach_This_From_All_Intercept); // TerrainTypeClass::~TerrainTypeClass
-    Patch_Call(0x00641D83, &_Detach_This_From_All_Intercept); // TerrainTypeClass::~TerrainTypeClass
-    Patch_Call(0x00642223, &_Detach_This_From_All_Intercept); // TEventClass::~TEventClass
-    Patch_Call(0x00642F23, &_Detach_This_From_All_Intercept); // TEventClass::~TEventClass
-    Patch_Call(0x00644A45, &_Detach_This_From_All_Intercept); // TiberiumClass::~TiberiumClass
-    Patch_Call(0x006491A3, &_Detach_This_From_All_Intercept); // TriggerClass::~TriggerClass
-    Patch_Call(0x00649943, &_Detach_This_From_All_Intercept); // TriggerClass::~TriggerClass
-    Patch_Call(0x00649E03, &_Detach_This_From_All_Intercept); // TriggerTypeClass::~TriggerTypeClass
-    Patch_Call(0x0064AFD3, &_Detach_This_From_All_Intercept); // TubeClass::~TubeClass
-    Patch_Call(0x0064B603, &_Detach_This_From_All_Intercept); // TubeClass::~TubeClass
-    Patch_Call(0x0064D8A9, &_Detach_This_From_All_Intercept); // UnitClass::~UnitClass
-    Patch_Call(0x0065BAD3, &_Detach_This_From_All_Intercept); // UnitTypeClass::~UnitTypeClass
-    Patch_Call(0x0065C793, &_Detach_This_From_All_Intercept); // UnitTypeClass::~UnitTypeClass
-    Patch_Call(0x0065DF23, &_Detach_This_From_All_Intercept); // VoxelAnimClass::~VoxelAnimClass
-    Patch_Call(0x0065F5A3, &_Detach_This_From_All_Intercept); // VoxelAnimTypeClass::~VoxelAnimTypeClass
-    Patch_Call(0x00660093, &_Detach_This_From_All_Intercept); // VoxelAnimTypeClass::~VoxelAnimTypeClass
-    Patch_Call(0x00661227, &_Detach_This_From_All_Intercept); // VeinholeMonsterClass::~VeinholeMonsterClass
-    Patch_Call(0x00661C00, &_Detach_This_From_All_Intercept); // VeinholeMonsterClass::Take_Damage
-    Patch_Call(0x0066EF73, &_Detach_This_From_All_Intercept); // WarheadTypeClass::~WarheadTypeClass
-    Patch_Call(0x0066FA93, &_Detach_This_From_All_Intercept); // WarheadTypeClass::~WarheadTypeClass
-    Patch_Call(0x006702D4, &_Detach_This_From_All_Intercept); // WaveClass::~WaveClass
-    Patch_Call(0x00672E73, &_Detach_This_From_All_Intercept); // WaveClass::~WaveClass
-    Patch_Call(0x00673563, &_Detach_This_From_All_Intercept); // WaypointPathClass::~WaypointPathClass
-    Patch_Call(0x00673AA3, &_Detach_This_From_All_Intercept); // WaypointPathClass::~WaypointPathClass
-    Patch_Call(0x00680C54, &_Detach_This_From_All_Intercept); // WeaponTypeClass::~WeaponTypeClass
-    Patch_Call(0x006818F4, &_Detach_This_From_All_Intercept); // WeaponTypeClass::~WeaponTypeClass
-
-    Patch_Jump(0x005B845B, &_Print_CRCs_Hook);
-
-
-
-
-
+    Extension_Intercept_Hooks();
 
     /**
      *  Abstract and stack class extensions here.
@@ -346,53 +350,51 @@ void Extension_Hooks()
     HouseTypeClassExtension_Hooks();
     InfantryClassExtension_Hooks();
     InfantryTypeClassExtension_Hooks();
-    //RTTI_ISOTILE                        // <- Not yet implemented
+    //IsometricTileClassExtension_Hooks();                  // <- Not yet implemented
     IsometricTileTypeClassExtension_Hooks();
-    //RTTI_LIGHT                          // <- Not yet implemented
-    //RTTI_OVERLAY                        // <- Not yet implemented
+    //BuildingLightExtension_Hooks();                       // <- Not yet implemented
+    //OverlayClassExtension_Hooks();                        // <- Not yet implemented
     OverlayTypeClassExtension_Hooks();
-    //RTTI_PARTICLE                       // <- Not yet implemented
+    //ParticleClassExtension_Hooks();                       // <- Not yet implemented
     ParticleTypeClassExtension_Hooks();
     ParticleSystemClassExtension_Hooks();
     ParticleSystemTypeClassExtension_Hooks();
-    //RTTI_SCRIPT                         // <- Not yet implemented
-    //RTTI_SCRIPTTYPE                     // <- Not yet implemented
+    //ScriptClassExtension_Hooks();                         // <- Not yet implemented
+    //ScriptTypeClassExtension_Hooks();                     // <- Not yet implemented
     SideClassExtension_Hooks();
-    //RTTI_SMUDGE                         // <- Not yet implemented
+    //SmudgeClassExtension_Hooks();                         // <- Not yet implemented
     SmudgeTypeClassExtension_Hooks();
-    //RTTI_SPECIAL                        // <- Do not save!
     SuperWeaponTypeClassExtension_Hooks();
-    //RTTI_TASKFORCE                      // <- Not yet implemented
+    //TaskForceClassExtension_Hooks();                      // <- Not yet implemented
     TeamClassExtension_Hooks();
-    //RTTI_TEAMTYPE                       // <- Not yet implemented
+    //TeamTypeClassExtension_Hooks();                       // <- Not yet implemented
     TerrainClassExtension_Hooks();
     TerrainTypeClassExtension_Hooks();
-    //RTTI_TRIGGER                        // <- Not yet implemented
-    //RTTI_TRIGGERTYPE                    // <- Not yet implemented
+    //TriggerTypeExtension_Hooks();                         // <- Not yet implemented
+    //TriggerTypeClassExtension_Hooks();                    // <- Not yet implemented
     UnitTypeClassExtension_Hooks();
-    //RTTI_VOXELANIM                      // <- Not yet implemented
+    //VoxelAnimClassExtension_Hooks();                      // <- Not yet implemented
     VoxelAnimTypeClassExtension_Hooks();
     WaveClassExtension_Hooks();
-    //RTTI_TAG                            // <- Not yet implemented
-    //RTTI_TAGTYPE                        // <- Not yet implemented
+    //TagClassExtension_Hooks();                            // <- Not yet implemented
+    //TagTypeClassExtension_Hooks();                        // <- Not yet implemented
     TiberiumClassExtension_Hooks();
-    //RTTI_ACTION                         // <- Not yet implemented
-    //RTTI_EVENT                          // <- Not yet implemented
+    //TActionClassExtension_Hooks();                        // <- Not yet implemented
+    //TEventClassExtension_Hooks();                         // <- Not yet implemented
     WeaponTypeClassExtension_Hooks();
     WarheadTypeClassExtension_Hooks();
-    //RTTI_WAYPOINT                       // <- Not yet implemented
-    //RTTI_ABSTRACT                       // <- Do not save!
-    //RTTI_TUBE                           // <- Not yet implemented
-    //RTTI_LIGHTSOURCE                    // <- Not yet implemented
+    //WaypointClassExtension_Hooks();                       // <- Not yet implemented
+    //TubeClassExtension_Hooks();                           // <- Not yet implemented
+    //LightSourceClassExtension_Hooks();                    // <- Not yet implemented
     EMPulseClassExtension_Hooks();
     TacticalExtension_Hooks();
     SuperClassExtension_Hooks();
-    //RTTI_AITRIGGER                      // <- Not yet implemented
-    //RTTI_AITRIGGERTYPE                  // <- Not yet implemented
-    //RTTI_NEURON                         // <- Not yet implemented
-    //RTTI_FOGGEDOBJECT                   // <- Not yet implemented
-    //RTTI_ALPHASHAPE                     // <- Not yet implemented
-    //RTTI_VEINHOLEMONSTER                // <- Not yet implemented
+    //AITriggerClassExtension_Hooks();                      // <- Not yet implemented
+    //AITriggerTypeClassExtension_Hooks();                  // <- Not yet implemented
+    //NeuronClassExtension_Hooks();                         // <- Not yet implemented
+    //FoggedObjectClassExtension_Hooks();                   // <- Not yet implemented
+    //AlphaShapeClassExtension_Hooks();                     // <- Not yet implemented
+    //VeinholeMonsterClassExtension_Hooks();                // <- Not yet implemented
 
     /**
      *  All global class extensions here.
@@ -406,11 +408,6 @@ void Extension_Hooks()
 
     DisplayClassExtension_Hooks();
     SidebarClassExtension_Hooks();
-
-    /**
-     *  New classes and interfaces.
-     */
-    TheaterTypeClassExtension_Hooks();
 
     /**
      *  Various modules and functions.
@@ -447,4 +444,9 @@ void Extension_Hooks()
      */
     FilePCXExtension_Hooks();
     FetchRes_Hooks();
+
+    /**
+     *  New classes and interfaces.
+     */
+    TheaterTypeClassExtension_Hooks();
 }

@@ -28,11 +28,11 @@
 #pragma once
 
 #include "always.h"
-#include "extension_singleton.h"
+#include "extension.h"
 #include "session.h"
 
 
-class SessionClassExtension final : public ExtensionSingleton<SessionClass>
+class SessionClassExtension final : public GlobalExtensionClass<SessionClass>
 {
     public:
         IFACEMETHOD(Load)(IStream *pStm);

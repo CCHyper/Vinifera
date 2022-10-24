@@ -41,7 +41,7 @@
  *  @author: CCHyper
  */
 ScenarioClassExtension::ScenarioClassExtension(const ScenarioClass *this_ptr) :
-    ExtensionSingleton(this_ptr)
+    GlobalExtensionClass(this_ptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("ScenarioClassExtension::ScenarioClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 
@@ -58,7 +58,7 @@ ScenarioClassExtension::ScenarioClassExtension(const ScenarioClass *this_ptr) :
  *  @author: CCHyper
  */
 ScenarioClassExtension::ScenarioClassExtension(const NoInitClass &noinit) :
-    ExtensionSingleton(noinit)
+    GlobalExtensionClass(noinit)
 {
     //EXT_DEBUG_TRACE("ScenarioClassExtension::ScenarioClassExtension(NoInitClass) - 0x%08X\n", (uintptr_t)(ThisPtr));
 }
@@ -84,7 +84,7 @@ HRESULT ScenarioClassExtension::Load(IStream *pStm)
 {
     //EXT_DEBUG_TRACE("ScenarioClassExtension::Load - 0x%08X\n", (uintptr_t)(This()));
 
-    HRESULT hr = ExtensionSingleton::Load(pStm);
+    HRESULT hr = GlobalExtensionClass::Load(pStm);
     if (FAILED(hr)) {
         return E_FAIL;
     }
@@ -104,7 +104,7 @@ HRESULT ScenarioClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
     //EXT_DEBUG_TRACE("ScenarioClassExtension::Save - 0x%08X\n", (uintptr_t)(This()));
 
-    HRESULT hr = ExtensionSingleton::Save(pStm, fClearDirty);
+    HRESULT hr = GlobalExtensionClass::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
     }

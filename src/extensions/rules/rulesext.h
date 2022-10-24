@@ -30,14 +30,14 @@
 #include "always.h"
 #include "tibsun_defines.h"
 #include "rules.h"
-#include "extension_singleton.h"
+#include "extension.h"
 #include "tpoint.h"
 
 
 class CCINIClass;
 
 
-class RulesClassExtension final : public ExtensionSingleton<RulesClass>
+class RulesClassExtension final : public GlobalExtensionClass<RulesClass>
 {
     public:
         IFACEMETHOD(Load)(IStream *pStm);

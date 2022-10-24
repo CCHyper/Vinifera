@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          EXTENSION_GLOBALS.CPP
+ *  @file          EXTENSION.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         
+ *  @brief         The file contains the functions required for the extension system.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -105,22 +105,25 @@
 #include "sessionext.h"
 #include "tacticalext.h"
 
+#include "themeext.h"
+
 #include <iostream>
 
 
 /**
- *  x
+ *  Use this macro when you want to get or set the extension pointer from the abstract object.
  */
-#define ABSTRACT_EXTENSION_POINTER_CAST_MACRO(ptr)    (*(uintptr_t *)(((unsigned char *)ptr) + 0x10))
+#define ABSTRACT_EXTENSION_POINTER_CAST_MACRO(_abstract)    (*(uintptr_t *)(((unsigned char *)_abstract) + 0x10))
 
 /**
- *  x
+ *  Use this macro when fetching the extension pointer from the abstract object
+ *  for pointer remapping purposes.
  */
-#define ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(ptr)    (uintptr_t **)(((unsigned char *)ptr) + 0x10);
+#define ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(_abstract)    (uintptr_t **)(((unsigned char *)_abstract) + 0x10);
 
 
 /**
- *  x
+ *  Set the extension pointer to the input abstract object.
  * 
  *  @author: CCHyper
  */
@@ -134,7 +137,7 @@ static void Extension_Set_Abstract_Pointer(const AbstractClass *abstract, const 
 
 
 /**
- *  x
+ *  Get the extension pointer from the input abstract object.
  * 
  *  @author: CCHyper
  */
@@ -147,7 +150,7 @@ static AbstractClassExtension *Extension_Get_Abstract_Pointer(const AbstractClas
 
 
 /**
- *  x
+ *  Invalidate the extension pointer from the input abstract object.
  * 
  *  @author: CCHyper
  */
@@ -164,71 +167,12 @@ static void Extension_Clear_Abstract_Pointer(const AbstractClass *abstract)
  * 
  *  0x00870000 -> End of GAME.EXE .data segment virtual address.
  *  0x20000000 -> Arbitrary address VINIFERA.DLL 'should' never get to.
+ * 
+ *  @author: CCHyper
  */
 static bool Extension_Is_Valid_Pointer(const AbstractClassExtension *abstract_extension)
 {
     return ((uintptr_t)abstract_extension) >= 0x00870000 || ((uintptr_t)abstract_extension) < 0x20000000;
-}
-
-
-/**
- *  x
- * 
- *  @author: CCHyper
- */
-static const char *Extension_Get_Abstract_Name(const AbstractClass *abstract)
-{
-#if 0
-    if (abstract) {
-        if (Is_Object(abstract)) {
-            return reinterpret_cast<const ObjectClass *>(abstract)->Name();
-        }
-        if (Is_TypeClass(abstract)) {
-            return reinterpret_cast<const ObjectTypeClass *>(abstract)->Name();
-        }
-        switch (abstract->What_Am_I()) {
-            case RTTI_HOUSE:
-            {
-                /**
-                 *  In most cases Class is null, so we use IniName as the default.
-                 */
-                const char *name = reinterpret_cast<const HouseClass *>(abstract)->IniName;
-        
-                HouseTypeClass *htptr = reinterpret_cast<const HouseClass *>(abstract)->Class;
-                if (htptr) {
-                    name = htptr->Name(); // IHouse interface's Name() returns BSTR (wide), so call the Class one instead.
-                }
-                return name;
-            }
-            case RTTI_SUPERWEAPON:
-                return reinterpret_cast<const SuperClass *>(abstract)->Name();
-            default:
-                break;
-        };
-    }
-#endif
-    return "<unknown>";
-}
-
-
-/**
- *  x
- * 
- *  @author: CCHyper
- */
-static Wstring Extension_Get_ExtPtr_Name(const AbstractClass *abstract)
-{
-    Wstring str;
-
-    str += Extension::Utility::Get_TypeID_Name(abstract).c_str();
-
-    str += "::ExtPtr";
-    //str += " -> ";
-
-    //AbstractClassExtension *ext_ptr = Extension_Get_Abstract_Pointer(abstract);
-    //str += Extension::Private::Get_Extension_TypeID_Name(ext_ptr).c_str();
-
-    return str;
 }
 
 
@@ -240,13 +184,11 @@ static Wstring Extension_Get_ExtPtr_Name(const AbstractClass *abstract)
 template<class BASE_CLASS, class EXT_CLASS>
 static EXT_CLASS * Extension_Make(const BASE_CLASS *abstract_ptr)
 {
-    //EXT_DEBUG_INFO("Extension_Make... %s %s %s\n", Extension_Get_Abstract_Name(abstract_ptr), Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str(), Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
-
     const BASE_CLASS *abs_ptr = reinterpret_cast<const BASE_CLASS *>(abstract_ptr);
     EXT_CLASS *ext_ptr = reinterpret_cast<EXT_CLASS *>(Extension_Get_Abstract_Pointer(abs_ptr));
     
     /**
-     *  x
+     *  Create an instance of the extension linked to the abstract object.
      */
     ext_ptr = new EXT_CLASS(reinterpret_cast<const BASE_CLASS *>(abs_ptr));
     ASSERT(ext_ptr != nullptr);
@@ -285,8 +227,9 @@ static EXT_CLASS * Extension_Make(const BASE_CLASS *abstract_ptr)
 template<class BASE_CLASS, class EXT_CLASS>
 static bool Extension_Destroy(const BASE_CLASS *abstract_ptr)
 {
-    //EXT_DEBUG_INFO("Extension_Destroy... %s %s %s\n", Extension_Get_Abstract_Name(abstract_ptr), Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str(), Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
-
+    /**
+     *  Fetch the extension instance from the abstract object.
+     */
     EXT_CLASS *ext_ptr = reinterpret_cast<EXT_CLASS *>(Extension_Get_Abstract_Pointer(abstract_ptr));
     if (!ext_ptr) {
         EXT_DEBUG_WARNING("Extension_Destroy: \"%s\" extension pointer is null!\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
@@ -310,13 +253,16 @@ static bool Extension_Destroy(const BASE_CLASS *abstract_ptr)
 
 
 /**
- *  List version.
+ *  Saves all active objects to the data stream.
  * 
  *  @author: CCHyper
  */
 template<class BASE_CLASS, class EXT_CLASS>
 static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> &list)
 {
+    /**
+     *  Save the number of instances of this class.
+     */
     int count = list.Count();
     HRESULT hr = pStm->Write(&count, sizeof(count), nullptr);
     if (FAILED(hr)) {
@@ -330,6 +276,9 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
 
     DEBUG_INFO("Saving \"%s\" extensions (Count: %d)\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str(), list.Count());
 
+    /**
+     *  Save each instance of this class.
+     */
     for (int index = 0; index < count; ++index) {
 
         EXT_CLASS *ptr = list[index];
@@ -344,12 +293,18 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
             return false;
         }
 
+        /**
+         *  Save the object itself.
+         */
         hr = OleSaveToStream(lpPS, pStm);
         if (FAILED(hr)) {
             DEBUG_ERROR("OleSaveToStream failed for extension \"%s\" (Index: %d)!\n", Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str(), index);
             return false;
         }
 
+        /**
+         *  Release the interface.
+         */
         hr = lpPS->Release();
         if (FAILED(hr)) {
             DEBUG_ERROR("Failed to release extension \"%s\" stream!\n", Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
@@ -358,7 +313,7 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
 
         EXT_CLASS * ext_ptr = reinterpret_cast<EXT_CLASS *>(lpPS);
 
-        if (ext_ptr->What_Am_I() != RTTI_WAVE) {
+        if (ext_ptr->What_Am_I() != RTTI_WAVE || ext_ptr->What_Am_I() != RTTI_LIGHT) {
             EXT_DEBUG_INFO("  -> %s\n", ext_ptr->Name());
         }
     }
@@ -368,13 +323,16 @@ static bool Extension_Save(IStream *pStm, const DynamicVectorClass<EXT_CLASS *> 
 
 
 /**
- *  List version.
+ *  Loads all active objects form the data stream.
  * 
  *  @author: CCHyper
  */
 template<class BASE_CLASS, class EXT_CLASS>
 static bool Extension_Load(IStream *pStm, DynamicVectorClass<EXT_CLASS *> &list)
 {
+    /**
+     *  Read the number of instances of this class.
+     */
     int count = 0;
     HRESULT hr = pStm->Read(&count, sizeof(count), nullptr);
     if (FAILED(hr)) {
@@ -385,10 +343,17 @@ static bool Extension_Load(IStream *pStm, DynamicVectorClass<EXT_CLASS *> &list)
         DEBUG_INFO("List for \"%s\" has a count of zero, skipping load.\n", Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
         return true;
     }
+
     DEBUG_INFO("Loading \"%s\" extensions (Count: %d)\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str(), count);
     
+    /**
+     *  Read each class instance.
+     */
     for (int index = 0; index < count; ++index) {
         
+        /**
+         *  Load the object.
+         */
         IUnknown *spUnk = nullptr;
         hr = OleLoadFromStream(pStm, __uuidof(IUnknown), (LPVOID *)&spUnk);
         if (FAILED(hr)) {
@@ -403,7 +368,7 @@ static bool Extension_Load(IStream *pStm, DynamicVectorClass<EXT_CLASS *> &list)
 
 
 /**
- *  List version.
+ *  Request remap of all the extension pointers from all the active abstract objects.
  * 
  *  @author: CCHyper
  */
@@ -427,10 +392,12 @@ static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
                 continue; //return false;
             }
 
-            Wstring extptr_name = Extension_Get_ExtPtr_Name(object);
+            Wstring extptr_name;
+            extptr_name += Extension::Utility::Get_TypeID_Name(object).c_str();
+            extptr_name += "::ExtPtr";
 
             /**
-             *  
+             *  Inform the swizzle manager that we need to remap the pointer.
              */
             uintptr_t **ext_ptr_addr = ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(object);
             VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(*ext_ptr_addr, extptr_name.Peek_Buffer());
@@ -444,7 +411,7 @@ static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
 
 
 /**
- *  x
+ *  Detaches the object from the list of active object.
  * 
  *  @author: CCHyper
  */
@@ -458,37 +425,7 @@ static void Extension_Detach_This_From_All(DynamicVectorClass<EXT_CLASS *> &list
 
 
 /**
- *  x
- * 
- *  @author: CCHyper
- */
-template<class EXT_CLASS>
-static void Extension_Print_Sync_Data(DynamicVectorClass<EXT_CLASS *> &list, FILE *fp, EventClass *ev)
-{
-#if 0
-    for (int house = 0; house <= Houses.Count(); ++house) {
-        HouseClass *housep = Houses[house];
-        if (housep) {
-            GameCRC = 0;
-            std::fprintf(fp, "------------- %s %s ------------\n", housep->Class->Name(), Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
-            for (int index = 0; index < list.Count(); ++index) {
-                EXT_CLASS *ptr = list[index];
-                if (ptr->Owner() == house) {
-                    Add_CRC(&GameCRC, (int)ptr->Coord + (int)ptr->PrimaryFacing);
-                    std::fprintf(fp, "COORD:%x   Facing:%d   Mission:%d   Type:%d   Tgt:%x\n",
-                                ptr->This()->Coord, (int)ptr->This()->PrimaryFacing, ptr->This()->Get_Mission(),
-                                ptr->This()->Class->Type, ptr->This()->As_Target());
-                }
-            }
-            EXT_DEBUG_INFO("%s %s:%x\n", housep->Class->Name(), Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str(), GameCRC);
-        }
-    }
-#endif
-}
-
-
-/**
- *  x
+ *  Prints extension class information to a data file, used for finding networking sync bugs.
  * 
  *  @author: CCHyper
  */
@@ -513,7 +450,8 @@ static void Extension_Print_CRCs(DynamicVectorClass<EXT_CLASS *> &list, FILE *fp
 
 
 /**
- *  x
+ *  Internal function that performs the creation of the extension object and
+ *  associates it with the abstract object.
  * 
  *  @author: CCHyper
  */
@@ -530,63 +468,60 @@ AbstractClassExtension *Extension::Private::Make_Internal(const AbstractClass *a
         case RTTI_ANIM: { extptr = Extension_Make<AnimClass, AnimClassExtension>(reinterpret_cast<const AnimClass *>(abstract)); break; }
         case RTTI_ANIMTYPE: { extptr = Extension_Make<AnimTypeClass, AnimTypeClassExtension>(reinterpret_cast<const AnimTypeClass *>(abstract)); break; }
         case RTTI_BUILDING: { extptr = Extension_Make<BuildingClass, BuildingClassExtension>(reinterpret_cast<const BuildingClass *>(abstract)); break; }
-        case RTTI_BUILDINGTYPE: { extptr = Extension_Make<BuildingTypeClass, BuildingTypeClassExtension>(reinterpret_cast<const BuildingTypeClass *>(abstract));break; }
-        //case RTTI_BULLET: { }                   // <- Not yet implemented
-        case RTTI_BULLETTYPE: { extptr = Extension_Make<BulletTypeClass, BulletTypeClassExtension>(reinterpret_cast<const BulletTypeClass *>(abstract));break; }
+        case RTTI_BUILDINGTYPE: { extptr = Extension_Make<BuildingTypeClass, BuildingTypeClassExtension>(reinterpret_cast<const BuildingTypeClass *>(abstract)); break; }
+        //case RTTI_BULLET: { extptr = Extension_Make<BulletClass, BulletClassExtension>(reinterpret_cast<const BulletClass *>(abstract)); break; } // Not yet implemented
+        case RTTI_BULLETTYPE: { extptr = Extension_Make<BulletTypeClass, BulletTypeClassExtension>(reinterpret_cast<const BulletTypeClass *>(abstract)); break; }
         case RTTI_CAMPAIGN: { extptr = Extension_Make<CampaignClass, CampaignClassExtension>(reinterpret_cast<const CampaignClass *>(abstract)); break; }
-        //case RTTI_CELL: { }                     // <- Not yet implemented
-        //case RTTI_FACTORY: { }                  // <- Not yet implemented
+        //case RTTI_CELL: { extptr = Extension_Make<CellClass, CellClassExtension>(reinterpret_cast<const CellClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_FACTORY: { extptr = Extension_Make<FactoryClass, FactoryClassExtension>(reinterpret_cast<const FactoryClass *>(abstract)); break; } // Not yet implemented
         case RTTI_HOUSE: { extptr = Extension_Make<HouseClass, HouseClassExtension>(reinterpret_cast<const HouseClass *>(abstract)); break; }
         case RTTI_HOUSETYPE: { extptr = Extension_Make<HouseTypeClass, HouseTypeClassExtension>(reinterpret_cast<const HouseTypeClass *>(abstract)); break; }
         case RTTI_INFANTRY: {  extptr = Extension_Make<InfantryClass, InfantryClassExtension>(reinterpret_cast<const InfantryClass *>(abstract)); break; }
         case RTTI_INFANTRYTYPE: {  extptr = Extension_Make<InfantryTypeClass, InfantryTypeClassExtension>(reinterpret_cast<const InfantryTypeClass *>(abstract)); break; }
-        //case RTTI_ISOTILE: { }                  // <- Not yet implemented
+        //case RTTI_ISOTILE: { extptr = Extension_Make<IsometricTileClass, IsometricTileClassExtension>(reinterpret_cast<const IsometricTileClass *>(abstract)); break; } // Not yet implemented
         case RTTI_ISOTILETYPE: { extptr = Extension_Make<IsometricTileTypeClass, IsometricTileTypeClassExtension>(reinterpret_cast<const IsometricTileTypeClass *>(abstract)); break; }
-        //case RTTI_LIGHT: { }                    // <- Not yet implemented
-        //case RTTI_OVERLAY: { }                  // <- Not yet implemented
+        //case RTTI_LIGHT: { extptr = Extension_Make<BuildingLightClass, BuildingLightClassExtension>(reinterpret_cast<const BuildingLightClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_OVERLAY: { extptr = Extension_Make<OverlayClass, OverlayClassExtension>(reinterpret_cast<const OverlayClass *>(abstract)); break; } // Not yet implemented
         case RTTI_OVERLAYTYPE: { extptr = Extension_Make<OverlayTypeClass, OverlayTypeClassExtension>(reinterpret_cast<const OverlayTypeClass *>(abstract)); break; }
-        //case RTTI_PARTICLE: { }                 // <- Not yet implemented
+        //case RTTI_PARTICLE: { extptr = Extension_Make<ParticleClass, ParticleClassExtension>(reinterpret_cast<const ParticleClass *>(abstract)); break; } // Not yet implemented
         case RTTI_PARTICLETYPE: { extptr = Extension_Make<ParticleTypeClass, ParticleTypeClassExtension>(reinterpret_cast<const ParticleTypeClass *>(abstract)); break; }
-        //case RTTI_PARTICLESYSTEM: { }           // <- Not yet implemented
+        //case RTTI_PARTICLESYSTEM: { extptr = Extension_Make<ParticleSystemClass, ParticleSystemExtension>(reinterpret_cast<const ParticleSystem *>(abstract)); break; } // Not yet implemented
         case RTTI_PARTICLESYSTEMTYPE: { extptr = Extension_Make<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(reinterpret_cast<const ParticleSystemTypeClass *>(abstract)); break; }
-        //case RTTI_SCRIPT: { }                   // <- Not yet implemented
-        //case RTTI_SCRIPTTYPE: { }               // <- Not yet implemented
+        //case RTTI_SCRIPT: { extptr = Extension_Make<ScriptClass, ScriptClassExtension>(reinterpret_cast<const ScriptClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_SCRIPTTYPE: { extptr = Extension_Make<ScriptTypeClass, Extension>(reinterpret_cast<const ScriptTypeClass *>(abstract)); break; } // Not yet implemented
         case RTTI_SIDE: { extptr = Extension_Make<SideClass, SideClassExtension>(reinterpret_cast<const SideClass *>(abstract)); break; }
-        //case RTTI_SMUDGE: { }                   // <- Not yet implemented
+        //case RTTI_SMUDGE: { extptr = Extension_Make<SmudgeClass, SmudgeClassExtension>(reinterpret_cast<const SmudgeClass *>(abstract)); break; } // Not yet implemented
         case RTTI_SMUDGETYPE: { extptr = Extension_Make<SmudgeTypeClass, SmudgeTypeClassExtension>(reinterpret_cast<const SmudgeTypeClass *>(abstract)); break; }
-        //case RTTI_SPECIAL: { }                  // <- Special case, does not actually "exist".
         case RTTI_SUPERWEAPONTYPE: { extptr = Extension_Make<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(reinterpret_cast<const SuperWeaponTypeClass *>(abstract)); break; }
-        //case RTTI_TASKFORCE: { }                // <- Not yet implemented
-        //case RTTI_TEAM: { }                     // <- Not yet implemented
-        //case RTTI_TEAMTYPE: { }                 // <- Not yet implemented
+        //case RTTI_TASKFORCE: { extptr = Extension_Make<TaskForceClass, TaskForceClassExtension>(reinterpret_cast<const TaskForceClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_TEAM: { extptr = Extension_Make<TeamClass, TeamClassExtension>(reinterpret_cast<const TeamClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_TEAMTYPE: { extptr = Extension_Make<TeamTypeClass, TeamTypeClassExtension>(reinterpret_cast<const TeamTypeClass *>(abstract)); break; } // Not yet implemented
         case RTTI_TERRAIN: { extptr = Extension_Make<TerrainClass, TerrainClassExtension>(reinterpret_cast<const TerrainClass *>(abstract)); break; }
         case RTTI_TERRAINTYPE: { extptr = Extension_Make<TerrainTypeClass, TerrainTypeClassExtension>(reinterpret_cast<const TerrainTypeClass *>(abstract)); break; }
-        //case RTTI_TRIGGER: { }                  // <- Not yet implemented
-        //case RTTI_TRIGGERTYPE: { }              // <- Not yet implemented
+        //case RTTI_TRIGGER: { extptr = Extension_Make<TriggerClass, TriggerClassExtension>(reinterpret_cast<const TriggerClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_TRIGGERTYPE: { extptr = Extension_Make<TriggerTypeClass, TriggerTypeClassExtension>(reinterpret_cast<const TriggerTypeClass *>(abstract)); break; } // Not yet implemented
         case RTTI_UNITTYPE: { extptr = Extension_Make<UnitTypeClass, UnitTypeClassExtension>(reinterpret_cast<const UnitTypeClass *>(abstract)); break; }
-        //case RTTI_VOXELANIM: { }                // <- Not yet implemented
+        //case RTTI_VOXELANIM: { extptr = Extension_Make<VoxelAnimClass, VoxelAnimClassExtension>(reinterpret_cast<const VoxelAnimClass *>(abstract)); break; } // Not yet implemented
         case RTTI_VOXELANIMTYPE: { extptr = Extension_Make<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(reinterpret_cast<const VoxelAnimTypeClass *>(abstract)); break; }
         case RTTI_WAVE: { extptr = Extension_Make<WaveClass, WaveClassExtension>(reinterpret_cast<const WaveClass *>(abstract)); break; }
-        //case RTTI_TAG: { }                      // <- Not yet implemented
-        //case RTTI_TAGTYPE: { }                  // <- Not yet implemented
+        //case RTTI_TAG: { extptr = Extension_Make<TagClass, TagClassExtension>(reinterpret_cast<const TagClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_TAGTYPE: { extptr = Extension_Make<TagTypeClass, Extension>(reinterpret_cast<const TagTypeClass *>(abstract)); break; } // Not yet implemented
         case RTTI_TIBERIUM: { extptr = Extension_Make<TiberiumClass, TiberiumClassExtension>(reinterpret_cast<const TiberiumClass *>(abstract)); break; }
-        //case RTTI_ACTION: { }                   // <- Not yet implemented
-        //case RTTI_EVENT: { }                    // <- Not yet implemented
+        //case RTTI_ACTION: { extptr = Extension_Make<TActionClass, TActionClassExtension>(reinterpret_cast<const TActionClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_EVENT: { extptr = Extension_Make<TEventClass, TEventClassExtension>(reinterpret_cast<const TEventClass *>(abstract)); break; } // Not yet implemented
         case RTTI_WEAPONTYPE: { extptr = Extension_Make<WeaponTypeClass, WeaponTypeClassExtension>(reinterpret_cast<const WeaponTypeClass *>(abstract)); break; }
         case RTTI_WARHEADTYPE: { extptr = Extension_Make<WarheadTypeClass, WarheadTypeClassExtension>(reinterpret_cast<const WarheadTypeClass *>(abstract)); break; }
-        //case RTTI_WAYPOINT: { }                 // <- Not yet implemented
-        //case RTTI_ABSTRACT: { }                 // <- Special case, does not actually "exist".
-        //case RTTI_TUBE: { }                     // <- Not yet implemented
-        //case RTTI_LIGHTSOURCE: { }              // <- Not yet implemented
-        //case RTTI_EMPULSE: { }                  // <- Not yet implemented
-        //case RTTI_TACTICALMAP: { extptr = Extension_Make<Tactical, TacticalExtension>(reinterpret_cast<const Tactical *>(abstract)); break; }
+        //case RTTI_WAYPOINT: { extptr = Extension_Make<WaypointClass, WaypointClassExtension>(reinterpret_cast<const WaypointClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_TUBE: { extptr = Extension_Make<TubeClass, TubeClassExtension>(reinterpret_cast<const TubeClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_LIGHTSOURCE: { extptr = Extension_Make<LightSourceClass, LightSourceClassExtension>(reinterpret_cast<const LightSourceClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_EMPULSE: { extptr = Extension_Make<EMPulseClass, EMPulseClassExtension>(reinterpret_cast<const EMPulseClass *>(abstract)); break; } // Not yet implemented
         case RTTI_SUPERWEAPON: { extptr = Extension_Make<SuperClass, SuperClassExtension>(reinterpret_cast<const SuperClass *>(abstract)); break; }
-        //case RTTI_AITRIGGER: { }                // <- Not yet implemented
-        //case RTTI_AITRIGGERTYPE: { }            // <- Not yet implemented
-        //case RTTI_NEURON: { }                   // <- Not yet implemented
-        //case RTTI_FOGGEDOBJECT: { }             // <- Not yet implemented
-        //case RTTI_ALPHASHAPE: { }               // <- Not yet implemented
-        //case RTTI_VEINHOLEMONSTER: { }          // <- Not yet implemented
+        //case RTTI_AITRIGGER: { extptr = Extension_Make<AITriggerClass, AITriggerClassExtension>(reinterpret_cast<const AITriggerClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_AITRIGGERTYPE: { extptr = Extension_Make<AITriggerTypeClass, AITriggerTypeClassExtension>(reinterpret_cast<const AITriggerTypeClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_NEURON: { extptr = Extension_Make<NeuronClass, NeuronClassExtension>(reinterpret_cast<const NeuronClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_FOGGEDOBJECT: { extptr = Extension_Make<FoggedObjectClass, FoggedObjectClassExtension>(reinterpret_cast<const FoggedObjectClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_ALPHASHAPE: { extptr = Extension_Make<AlphaShapeClass, AlphaShapeClassExtension>(reinterpret_cast<const AlphaShapeClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_VEINHOLEMONSTER: { extptr = Extension_Make<VeinholeMonsterClass, VeinholeMonsterClassExtension>(reinterpret_cast<const VeinholeMonsterClass *>(abstract)); break; } // Not yet implemented
         default: { DEBUG_ERROR("Extension::Make: No extension support for \"%s\" implemented!\n", Name_From_RTTI((RTTIType)abstract->What_Am_I())); break; }
     };
 
@@ -595,7 +530,8 @@ AbstractClassExtension *Extension::Private::Make_Internal(const AbstractClass *a
 
 
 /**
- *  x
+ *  Internal function that performs the destruction of the extension object
+ *  associated with the abstract object.
  * 
  *  @author: CCHyper
  */
@@ -612,63 +548,60 @@ bool Extension::Private::Destroy_Internal(const AbstractClass *abstract)
         case RTTI_ANIM: { removed = Extension_Destroy<AnimClass, AnimClassExtension>(reinterpret_cast<const AnimClass *>(abstract)); break; }
         case RTTI_ANIMTYPE: { removed = Extension_Destroy<AnimTypeClass, AnimTypeClassExtension>(reinterpret_cast<const AnimTypeClass *>(abstract)); break; }
         case RTTI_BUILDING: { removed = Extension_Destroy<BuildingClass, BuildingClassExtension>(reinterpret_cast<const BuildingClass *>(abstract)); break; }
-        case RTTI_BUILDINGTYPE: { removed = Extension_Destroy<BuildingTypeClass, BuildingTypeClassExtension>(reinterpret_cast<const BuildingTypeClass *>(abstract));break; }
-        //case RTTI_BULLET: { }                   // <- Not yet implemented
-        case RTTI_BULLETTYPE: { removed = Extension_Destroy<BulletTypeClass, BulletTypeClassExtension>(reinterpret_cast<const BulletTypeClass *>(abstract));break; }
+        case RTTI_BUILDINGTYPE: { removed = Extension_Destroy<BuildingTypeClass, BuildingTypeClassExtension>(reinterpret_cast<const BuildingTypeClass *>(abstract)); break; }
+        //case RTTI_BULLET: { removed = Extension_Destroy<BulletClass, BulletClassExtension>(reinterpret_cast<const BulletClass *>(abstract)); break; } // Not yet implemented
+        case RTTI_BULLETTYPE: { removed = Extension_Destroy<BulletTypeClass, BulletTypeClassExtension>(reinterpret_cast<const BulletTypeClass *>(abstract)); break; }
         case RTTI_CAMPAIGN: { removed = Extension_Destroy<CampaignClass, CampaignClassExtension>(reinterpret_cast<const CampaignClass *>(abstract)); break; }
-        //case RTTI_CELL: { }                     // <- Not yet implemented
-        //case RTTI_FACTORY: { }                  // <- Not yet implemented
+        //case RTTI_CELL: { removed = Extension_Destroy<CellClass, CellClassExtension>(reinterpret_cast<const CellClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_FACTORY: { removed = Extension_Destroy<FactoryClass, FactoryClassExtension>(reinterpret_cast<const FactoryClass *>(abstract)); break; } // Not yet implemented
         case RTTI_HOUSE: { removed = Extension_Destroy<HouseClass, HouseClassExtension>(reinterpret_cast<const HouseClass *>(abstract)); break; }
         case RTTI_HOUSETYPE: { removed = Extension_Destroy<HouseTypeClass, HouseTypeClassExtension>(reinterpret_cast<const HouseTypeClass *>(abstract)); break; }
         case RTTI_INFANTRY: {  removed = Extension_Destroy<InfantryClass, InfantryClassExtension>(reinterpret_cast<const InfantryClass *>(abstract)); break; }
         case RTTI_INFANTRYTYPE: {  removed = Extension_Destroy<InfantryTypeClass, InfantryTypeClassExtension>(reinterpret_cast<const InfantryTypeClass *>(abstract)); break; }
-        //case RTTI_ISOTILE: { }                  // <- Not yet implemented
+        //case RTTI_ISOTILE: { removed = Extension_Destroy<IsometricTileClass, IsometricTileClassExtension>(reinterpret_cast<const IsometricTileClass *>(abstract)); break; } // Not yet implemented
         case RTTI_ISOTILETYPE: { removed = Extension_Destroy<IsometricTileTypeClass, IsometricTileTypeClassExtension>(reinterpret_cast<const IsometricTileTypeClass *>(abstract)); break; }
-        //case RTTI_LIGHT: { }                    // <- Not yet implemented
-        //case RTTI_OVERLAY: { }                  // <- Not yet implemented
+        //case RTTI_LIGHT: { removed = Extension_Destroy<BuildingLightClass, BuildingLightClassExtension>(reinterpret_cast<const BuildingLightClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_OVERLAY: { removed = Extension_Destroy<OverlayClass, OverlayClassExtension>(reinterpret_cast<const OverlayClass *>(abstract)); break; } // Not yet implemented
         case RTTI_OVERLAYTYPE: { removed = Extension_Destroy<OverlayTypeClass, OverlayTypeClassExtension>(reinterpret_cast<const OverlayTypeClass *>(abstract)); break; }
-        //case RTTI_PARTICLE: { }                 // <- Not yet implemented
+        //case RTTI_PARTICLE: { removed = Extension_Destroy<ParticleClass, ParticleClassExtension>(reinterpret_cast<const ParticleClass *>(abstract)); break; } // Not yet implemented
         case RTTI_PARTICLETYPE: { removed = Extension_Destroy<ParticleTypeClass, ParticleTypeClassExtension>(reinterpret_cast<const ParticleTypeClass *>(abstract)); break; }
-        //case RTTI_PARTICLESYSTEM: { }           // <- Not yet implemented
+        //case RTTI_PARTICLESYSTEM: { removed = Extension_Destroy<ParticleSystemClass, ParticleSystemExtension>(reinterpret_cast<const ParticleSystem *>(abstract)); break; } // Not yet implemented
         case RTTI_PARTICLESYSTEMTYPE: { removed = Extension_Destroy<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(reinterpret_cast<const ParticleSystemTypeClass *>(abstract)); break; }
-        //case RTTI_SCRIPT: { }                   // <- Not yet implemented
-        //case RTTI_SCRIPTTYPE: { }               // <- Not yet implemented
+        //case RTTI_SCRIPT: { removed = Extension_Destroy<ScriptClass, ScriptClassExtension>(reinterpret_cast<const ScriptClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_SCRIPTTYPE: { removed = Extension_Destroy<ScriptTypeClass, Extension>(reinterpret_cast<const ScriptTypeClass *>(abstract)); break; } // Not yet implemented
         case RTTI_SIDE: { removed = Extension_Destroy<SideClass, SideClassExtension>(reinterpret_cast<const SideClass *>(abstract)); break; }
-        //case RTTI_SMUDGE: { }                   // <- Not yet implemented
+        //case RTTI_SMUDGE: { removed = Extension_Destroy<SmudgeClass, SmudgeClassExtension>(reinterpret_cast<const SmudgeClass *>(abstract)); break; } // Not yet implemented
         case RTTI_SMUDGETYPE: { removed = Extension_Destroy<SmudgeTypeClass, SmudgeTypeClassExtension>(reinterpret_cast<const SmudgeTypeClass *>(abstract)); break; }
-        //case RTTI_SPECIAL: { }                  // <- Special case, does not actually "exist".
         case RTTI_SUPERWEAPONTYPE: { removed = Extension_Destroy<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(reinterpret_cast<const SuperWeaponTypeClass *>(abstract)); break; }
-        //case RTTI_TASKFORCE: { }                // <- Not yet implemented
-        //case RTTI_TEAM: { }                     // <- Not yet implemented
-        //case RTTI_TEAMTYPE: { }                 // <- Not yet implemented
+        //case RTTI_TASKFORCE: { removed = Extension_Destroy<TaskForceClass, TaskForceClassExtension>(reinterpret_cast<const TaskForceClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_TEAM: { removed = Extension_Destroy<TeamClass, TeamClassExtension>(reinterpret_cast<const TeamClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_TEAMTYPE: { removed = Extension_Destroy<TeamTypeClass, TeamTypeClassExtension>(reinterpret_cast<const TeamTypeClass *>(abstract)); break; } // Not yet implemented
         case RTTI_TERRAIN: { removed = Extension_Destroy<TerrainClass, TerrainClassExtension>(reinterpret_cast<const TerrainClass *>(abstract)); break; }
         case RTTI_TERRAINTYPE: { removed = Extension_Destroy<TerrainTypeClass, TerrainTypeClassExtension>(reinterpret_cast<const TerrainTypeClass *>(abstract)); break; }
-        //case RTTI_TRIGGER: { }                  // <- Not yet implemented
-        //case RTTI_TRIGGERTYPE: { }              // <- Not yet implemented
+        //case RTTI_TRIGGER: { removed = Extension_Destroy<TriggerClass, TriggerClassExtension>(reinterpret_cast<const TriggerClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_TRIGGERTYPE: { removed = Extension_Destroy<TriggerTypeClass, TriggerTypeClassExtension>(reinterpret_cast<const TriggerTypeClass *>(abstract)); break; } // Not yet implemented
         case RTTI_UNITTYPE: { removed = Extension_Destroy<UnitTypeClass, UnitTypeClassExtension>(reinterpret_cast<const UnitTypeClass *>(abstract)); break; }
-        //case RTTI_VOXELANIM: { }                // <- Not yet implemented
+        //case RTTI_VOXELANIM: { removed = Extension_Destroy<VoxelAnimClass, VoxelAnimClassExtension>(reinterpret_cast<const VoxelAnimClass *>(abstract)); break; } // Not yet implemented
         case RTTI_VOXELANIMTYPE: { removed = Extension_Destroy<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(reinterpret_cast<const VoxelAnimTypeClass *>(abstract)); break; }
         case RTTI_WAVE: { removed = Extension_Destroy<WaveClass, WaveClassExtension>(reinterpret_cast<const WaveClass *>(abstract)); break; }
-        //case RTTI_TAG: { }                      // <- Not yet implemented
-        //case RTTI_TAGTYPE: { }                  // <- Not yet implemented
+        //case RTTI_TAG: { removed = Extension_Destroy<TagClass, TagClassExtension>(reinterpret_cast<const TagClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_TAGTYPE: { removed = Extension_Destroy<TagTypeClass, Extension>(reinterpret_cast<const TagTypeClass *>(abstract)); break; } // Not yet implemented
         case RTTI_TIBERIUM: { removed = Extension_Destroy<TiberiumClass, TiberiumClassExtension>(reinterpret_cast<const TiberiumClass *>(abstract)); break; }
-        //case RTTI_ACTION: { }                   // <- Not yet implemented
-        //case RTTI_EVENT: { }                    // <- Not yet implemented
+        //case RTTI_ACTION: { removed = Extension_Destroy<TActionClass, TActionClassExtension>(reinterpret_cast<const TActionClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_EVENT: { removed = Extension_Destroy<TEventClass, TEventClassExtension>(reinterpret_cast<const TEventClass *>(abstract)); break; } // Not yet implemented
         case RTTI_WEAPONTYPE: { removed = Extension_Destroy<WeaponTypeClass, WeaponTypeClassExtension>(reinterpret_cast<const WeaponTypeClass *>(abstract)); break; }
         case RTTI_WARHEADTYPE: { removed = Extension_Destroy<WarheadTypeClass, WarheadTypeClassExtension>(reinterpret_cast<const WarheadTypeClass *>(abstract)); break; }
-        //case RTTI_WAYPOINT: { }                 // <- Not yet implemented
-        //case RTTI_ABSTRACT: { }                 // <- Special case, does not actually "exist".
-        //case RTTI_TUBE: { }                     // <- Not yet implemented
-        //case RTTI_LIGHTSOURCE: { }              // <- Not yet implemented
-        //case RTTI_EMPULSE: { }                  // <- Not yet implemented
-        //case RTTI_TACTICALMAP: { removed = Extension_Destroy<Tactical, TacticalExtension>(reinterpret_cast<const Tactical *>(abstract)); break; }
+        //case RTTI_WAYPOINT: { removed = Extension_Destroy<WaypointClass, WaypointClassExtension>(reinterpret_cast<const WaypointClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_TUBE: { removed = Extension_Destroy<TubeClass, TubeClassExtension>(reinterpret_cast<const TubeClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_LIGHTSOURCE: { removed = Extension_Destroy<LightSourceClass, LightSourceClassExtension>(reinterpret_cast<const LightSourceClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_EMPULSE: { removed = Extension_Destroy<EMPulseClass, EMPulseClassExtension>(reinterpret_cast<const EMPulseClass *>(abstract)); break; } // Not yet implemented
         case RTTI_SUPERWEAPON: { removed = Extension_Destroy<SuperClass, SuperClassExtension>(reinterpret_cast<const SuperClass *>(abstract)); break; }
-        //case RTTI_AITRIGGER: { }                // <- Not yet implemented
-        //case RTTI_AITRIGGERTYPE: { }            // <- Not yet implemented
-        //case RTTI_NEURON: { }                   // <- Not yet implemented
-        //case RTTI_FOGGEDOBJECT: { }             // <- Not yet implemented
-        //case RTTI_ALPHASHAPE: { }               // <- Not yet implemented
-        //case RTTI_VEINHOLEMONSTER: { }          // <- Not yet implemented
+        //case RTTI_AITRIGGER: { removed = Extension_Destroy<AITriggerClass, AITriggerClassExtension>(reinterpret_cast<const AITriggerClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_AITRIGGERTYPE: { removed = Extension_Destroy<AITriggerTypeClass, AITriggerTypeClassExtension>(reinterpret_cast<const AITriggerTypeClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_NEURON: { removed = Extension_Destroy<NeuronClass, NeuronClassExtension>(reinterpret_cast<const NeuronClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_FOGGEDOBJECT: { removed = Extension_Destroy<FoggedObjectClass, FoggedObjectClassExtension>(reinterpret_cast<const FoggedObjectClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_ALPHASHAPE: { removed = Extension_Destroy<AlphaShapeClass, AlphaShapeClassExtension>(reinterpret_cast<const AlphaShapeClass *>(abstract)); break; } // Not yet implemented
+        //case RTTI_VEINHOLEMONSTER: { removed = Extension_Destroy<VeinholeMonsterClass, VeinholeMonsterClassExtension>(reinterpret_cast<const VeinholeMonsterClass *>(abstract)); break; } // Not yet implemented
         default: { DEBUG_ERROR("Extension::Destroy: No extension support for \"%s\" implemented!\n", Name_From_RTTI((RTTIType)abstract->What_Am_I())); break; }
     };
 
@@ -679,7 +612,7 @@ bool Extension::Private::Destroy_Internal(const AbstractClass *abstract)
 
 
 /**
- *  x
+ *  Internal function for fetching the extension object associated with the abstract object.
  * 
  *  @author: CCHyper
  */
@@ -690,7 +623,7 @@ AbstractClassExtension *Extension::Private::Fetch_Internal(const AbstractClass *
     AbstractClassExtension *ext_ptr = Extension_Get_Abstract_Pointer(abstract);
 
     if (!ext_ptr) {
-        DEBUG_ERROR("Extension::Fetch: Extension for \"%s\" is null!\n", Extension_Get_Abstract_Name(abstract));
+        DEBUG_ERROR("Extension::Fetch: Extension for \"%s\" is null!\n", Extension::Utility::Get_TypeID_Name(abstract).c_str());
         return nullptr;
     }
 
@@ -698,7 +631,7 @@ AbstractClassExtension *Extension::Private::Fetch_Internal(const AbstractClass *
      *  Check for a malformed extension pointer.
      */
     if (!Extension_Is_Valid_Pointer(ext_ptr)) {
-        DEBUG_ERROR("Extension::Fetch: Corrupt extension pointer for \"%s\"!\n", Extension_Get_Abstract_Name(abstract));
+        DEBUG_ERROR("Extension::Fetch: Corrupt extension pointer for \"%s\"!\n", Extension::Utility::Get_TypeID_Name(abstract).c_str());
         return nullptr;
     }
 
@@ -706,11 +639,11 @@ AbstractClassExtension *Extension::Private::Fetch_Internal(const AbstractClass *
      *  Its still possible the pointer could be invalid, so perform a final check.
      */
     if (ext_ptr->What_Am_I() <= RTTI_NONE || ext_ptr->What_Am_I() >= RTTI_COUNT) {
-        DEBUG_ERROR("Extension::Fetch: Invalid extension rtti type for \"%s\"!\n", Extension_Get_Abstract_Name(abstract));
+        DEBUG_ERROR("Extension::Fetch: Invalid extension rtti type for \"%s\"!\n", Extension::Utility::Get_TypeID_Name(abstract).c_str());
         return nullptr;
     }
 
-    //EXT_DEBUG_INFO("Extension::Fetch: Abstract \"%s\", got extension \"%s\".\n", Extension_Get_Abstract_Name(abstract), ext_ptr->Name());
+    //EXT_DEBUG_INFO("Extension::Fetch: Abstract \"%s\", got extension \"%s\".\n", Extension::Utility::Get_TypeID_Name(abstract).c_str(), ext_ptr->Name());
 
     return ext_ptr;
 }
@@ -729,7 +662,7 @@ bool Extension::Save(IStream *pStm)
         return false;
     }
 
-    DEBUG_INFO("Extension::Save(enter)\n");
+    DEV_DEBUG_INFO("Extension::Save(enter)\n");
     
     /**
      *  #NOTE: The order of these calls must match the relevent RTTIType order!
@@ -741,62 +674,59 @@ bool Extension::Save(IStream *pStm)
     if (!Extension_Save<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions)) { return false; }
     if (!Extension_Save<BuildingClass, BuildingClassExtension>(pStm, BuildingExtensions)) { return false; }
     if (!Extension_Save<BuildingTypeClass, BuildingTypeClassExtension>(pStm, BuildingTypeExtensions)) { return false; }
-    //RTTI_BULLET                         // <- Not yet implemented
+    //if (!Extension_Save<BulletClass, BulletClassExtension>(pStm, BulletExtensions)) { return false; }                 // Not yet implemented
     if (!Extension_Save<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
-    //RTTI_CAMPAIGN                       // Supported, but Campaign's are not saved to file.
-    //RTTI_CELL                           // <- Not yet implemented
-    //RTTI_FACTORY                        // <- Not yet implemented
+    //if (!Extension_Save<CampaignClass, CampaignClassExtension>(pStm, CampaignExtensions)) { return false; }           // Supported, but Campaign's are not saved to file.
+    //if (!Extension_Save<CellClass, CellClassExtension>(pStm, CellExtensions)) { return false; }                       // Not yet implemented
+    //if (!Extension_Save<FactoryClass, FactoryClassExtension>(pStm, FactoryExtensions)) { return false; }              // Not yet implemented
     if (!Extension_Save<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
     if (!Extension_Save<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
     if (!Extension_Save<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
     if (!Extension_Save<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
-    //RTTI_ISOTILE                        // <- Not yet implemented
-    //RTTI_ISOTILETYPE                    // Supported, but IsoTileTypes's are not saved to file.
-    //RTTI_LIGHT                          // <- Not yet implemented
-    //RTTI_OVERLAY                        // <- Not yet implemented
+    //if (!Extension_Save<IsometricTileClass, IsometricTileClassExtension>(pStm, IsometricTileExtensions)) { return false; } // Not yet implemented
+    //if (!Extension_Save<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions)) { return false; } // Supported, but IsoTileTypes's are not saved to file.
+    //if (!Extension_Save<BuildingLightClass, BuildingLightClassExtension>(pStm, BuildingLightExtensions)) { return false; } // Not yet implemented
+    //if (!Extension_Save<OverlayClass, OverlayClassExtension>(pStm, OverlayExtensions)) { return false; }              // Not yet implemented
     if (!Extension_Save<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
-    //RTTI_PARTICLE                       // <- Not yet implemented
+    //if (!Extension_Save<ParticleClass, ParticleClassExtension>(pStm, ParticleClassExtensions)) { return false; }      // Not yet implemented
     if (!Extension_Save<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
-    //RTTI_PARTICLESYSTEM                 // <- Not yet implemented
+    //if (!Extension_Save<ParticleSystemClass, ParticleSystemClassExtension>(pStm, ParticleSystemExtensions)) { return false; } // Not yet implemented
     if (!Extension_Save<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
-    //RTTI_SCRIPT                         // <- Not yet implemented
-    //RTTI_SCRIPTTYPE                     // <- Not yet implemented
+    //if (!Extension_Save<ScriptClass, ScriptClassExtension>(pStm, ScriptExtensions)) { return false; }                 // Not yet implemented
+    //if (!Extension_Save<ScriptTypeClass, ScriptTypeClassExtension>(pStm, ScriptTypeExtensions)) { return false; }     // Not yet implemented
     if (!Extension_Save<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
-    //RTTI_SMUDGE                         // <- Not yet implemented
+    //if (!Extension_Save<SmudgeClass, SmudgeClassExtension>(pStm, SmudgeExtensions)) { return false; }                 // Not yet implemented
     if (!Extension_Save<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
-    //RTTI_SPECIAL                        // Special case for sidebar cameos, nothing to save!
     if (!Extension_Save<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
-    //RTTI_TASKFORCE                      // <- Not yet implemented
-    //RTTI_TEAM                           // <- Not yet implemented
-    //RTTI_TEAMTYPE                       // <- Not yet implemented
+    //if (!Extension_Save<TaskForceClass, TaskForceClassExtension>(pStm, TaskForceExtensions)) { return false; }        // Not yet implemented
+    //if (!Extension_Save<TeamClass, TeamClassExtension>(pStm, TeamExtensions)) { return false; }                       // Not yet implemented
+    //if (!Extension_Save<TeamTypeClass, TeamTypeClassExtension>(pStm, TeamTypeExtensions)) { return false; }           // Not yet implemented
     if (!Extension_Save<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions)) { return false; }
     if (!Extension_Save<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions)) { return false; }
-    //RTTI_TRIGGER                        // <- Not yet implemented
-    //RTTI_TRIGGERTYPE                    // <- Not yet implemented
+    //if (!Extension_Save<TriggerClass, TriggerClassExtension>(pStm, TriggerExtensions)) { return false; }              // Not yet implemented
+    //if (!Extension_Save<TriggerTypeClass, TriggerTypeClassExtension>(pStm, TriggerTypeExtensions)) { return false; }  // Not yet implemented
     if (!Extension_Save<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions)) { return false; }
-    //RTTI_VOXELANIM                      // <- Not yet implemented
+    //if (!Extension_Save<VoxelAnimClass, VoxelAnimClassExtension>(pStm, VoxelAnimExtensions)) { return false; }        // Not yet implemented
     if (!Extension_Save<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions)) { return false; }
     if (!Extension_Save<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
-    //RTTI_TAG                            // <- Not yet implemented
-    //RTTI_TAGTYPE                        // <- Not yet implemented
+    //if (!Extension_Save<TagClass, TagClassExtension>(pStm, TagExtensions)) { return false; }                          // Not yet implemented
+    //if (!Extension_Save<TagTypeClass, TagTypeClassExtension>(pStm, TagTypeExtensions)) { return false; }              // Not yet implemented
     if (!Extension_Save<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions)) { return false; }
-    //RTTI_ACTION                         // <- Not yet implemented
-    //RTTI_EVENT                          // <- Not yet implemented
+    //if (!Extension_Save<TActionClass, TActionClassExtension>(pStm, TActionExtensions)) { return false; }              // Not yet implemented
+    //if (!Extension_Save<TEventClass, TEventClassExtension>(pStm, TEventExtensions)) { return false; }                 // Not yet implemented
     if (!Extension_Save<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
     if (!Extension_Save<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
-    //RTTI_WAYPOINT                       // <- Not yet implemented
-    //RTTI_ABSTRACT                       // Special case for identifying classes with no What_Am_I() implemented, nothing to save!
-    //RTTI_TUBE                           // <- Not yet implemented
-    //RTTI_LIGHTSOURCE                    // <- Not yet implemented
-    //RTTI_EMPULSE                        // <- Not yet implemented
-    //RTTI_TACTICALMAP
+    //if (!Extension_Save<WaypointClass, WaypointClassExtension>(pStm, WaypointExtensions)) { return false; }           // Not yet implemented
+    //if (!Extension_Save<TubeClass, TubeClassExtension>(pStm, TubeExtensions)) { return false; }                       // Not yet implemented
+    //if (!Extension_Save<LightSourceClass, LightSourceClassExtension>(pStm, LightSourceExtensions)) { return false; }  // Not yet implemented
+    //if (!Extension_Save<EMPulseClass, EMPulseClassExtension>(pStm, EMPulseExtensions)) { return false; }              // Not yet implemented
     if (!Extension_Save<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
-    //RTTI_AITRIGGER                      // <- Not yet implemented
-    //RTTI_AITRIGGERTYPE                  // <- Not yet implemented
-    //RTTI_NEURON                         // <- Not yet implemented
-    //RTTI_FOGGEDOBJECT                   // <- Not yet implemented
-    //RTTI_ALPHASHAPE                     // <- Not yet implemented
-    //RTTI_VEINHOLEMONSTER                // <- Not yet implemented
+    //if (!Extension_Save<AITriggerClass, AITriggerClassExtension>(pStm, AITriggerExtensions)) { return false; }        // Not yet implemented
+    //if (!Extension_Save<AITriggerTypeClass, AITriggerTypeClassExtension>(pStm, AITriggerExtensions)) { return false; } // Not yet implemented
+    //if (!Extension_Save<NeuronClass, NeuronClassExtension>(pStm, NeuronExtensions)) { return false; }                 // Not yet implemented
+    //if (!Extension_Save<FoggedObjectClass, FoggedObjectClassExtension>(pStm, FoggedObjectExtensions)) { return false; } // Not yet implemented
+    //if (!Extension_Save<AlphaShapeClass, AlphaShapeClassExtension>(pStm, AlphaShapeExtensions)) { return false; }     // Not yet implemented
+    //if (!Extension_Save<VeinholeMonsterClass, VeinholeMonsterClassExtension>(pStm, VeinholeMonsterExtensions)) { return false; } // Not yet implemented
 
     if (FAILED(TacticalMapExtension->Save(pStm, true))) { return false; }
     DEBUG_INFO("Saved \"%s\" extension.\n", TacticalMapExtension->Name());
@@ -810,7 +740,7 @@ bool Extension::Save(IStream *pStm)
     if (FAILED(SessionExtension->Save(pStm, true))) { return false; }
     DEBUG_INFO("Saved \"%s\" extension\n", SessionExtension->Name());
 
-    DEBUG_INFO("Extension::Save(exit)\n");
+    DEV_DEBUG_INFO("Extension::Save(exit)\n");
 
     return true;
 }
@@ -829,7 +759,7 @@ bool Extension::Load(IStream *pStm)
         return false;
     }
 
-    DEBUG_INFO("Extension::Load(enter)\n");
+    DEV_DEBUG_INFO("Extension::Load(enter)\n");
 
     /**
      *  #NOTE: The order of these calls must match the relevent RTTIType order!
@@ -841,62 +771,59 @@ bool Extension::Load(IStream *pStm)
     if (!Extension_Load<AnimTypeClass, AnimTypeClassExtension>(pStm, AnimTypeExtensions)) { return false; }
     if (!Extension_Load<BuildingClass, BuildingClassExtension>(pStm, BuildingExtensions)) { return false; }
     if (!Extension_Load<BuildingTypeClass, BuildingTypeClassExtension>(pStm, BuildingTypeExtensions)) { return false; }
-    //RTTI_BULLET                         // <- Not yet implemented
+    //if (!Extension_Load<BulletClass, BulletClassExtension>(pStm, BulletExtensions)) { return false; }                 // Not yet implemented
     if (!Extension_Load<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
-    //RTTI_CAMPAIGN                       // Supported, but Campaign's are not saved to file.
-    //RTTI_CELL                           // <- Not yet implemented
-    //RTTI_FACTORY                        // <- Not yet implemented
+    //if (!Extension_Load<CampaignClass, CampaignClassExtension>(pStm, CampaignExtensions)) { return false; }           // Supported, but Campaign's are not saved to file.
+    //if (!Extension_Load<CellClass, CellClassExtension>(pStm, CellExtensions)) { return false; }                       // Not yet implemented
+    //if (!Extension_Load<FactoryClass, FactoryClassExtension>(pStm, FactoryExtensions)) { return false; }              // Not yet implemented
     if (!Extension_Load<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
     if (!Extension_Load<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
     if (!Extension_Load<InfantryClass, InfantryClassExtension>(pStm, InfantryExtensions)) { return false; }
     if (!Extension_Load<InfantryTypeClass, InfantryTypeClassExtension>(pStm, InfantryTypeExtensions)) { return false; }
-    //RTTI_ISOTILE                        // <- Not yet implemented
-    //RTTI_ISOTILETYPE                    // Supported, but IsoTileTypes's are not saved to file.
-    //RTTI_LIGHT                          // <- Not yet implemented
-    //RTTI_OVERLAY                        // <- Not yet implemented
+    //if (!Extension_Load<IsometricTileClass, IsometricTileClassExtension>(pStm, IsometricTileExtensions)) { return false; } // Not yet implemented
+    //if (!Extension_Load<IsometricTileTypeClass, IsometricTileTypeClassExtension>(pStm, IsometricTileTypeExtensions)) { return false; } // Supported, but IsoTileTypes's are not saved to file.
+    //if (!Extension_Load<BuildingLightClass, BuildingLightClassExtension>(pStm, BuildingLightExtensions)) { return false; } // Not yet implemented
+    //if (!Extension_Load<OverlayClass, OverlayClassExtension>(pStm, OverlayExtensions)) { return false; }              // Not yet implemented
     if (!Extension_Load<OverlayTypeClass, OverlayTypeClassExtension>(pStm, OverlayTypeExtensions)) { return false; }
-    //RTTI_PARTICLE                       // <- Not yet implemented
+    //if (!Extension_Load<ParticleClass, ParticleClassExtension>(pStm, ParticleClassExtensions)) { return false; }      // Not yet implemented
     if (!Extension_Load<ParticleTypeClass, ParticleTypeClassExtension>(pStm, ParticleTypeExtensions)) { return false; }
-    //RTTI_PARTICLESYSTEM                 // <- Not yet implemented
+    //if (!Extension_Load<ParticleSystemClass, ParticleSystemClassExtension>(pStm, ParticleSystemExtensions)) { return false; } // Not yet implemented
     if (!Extension_Load<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(pStm, ParticleSystemTypeExtensions)) { return false; }
-    //RTTI_SCRIPT                         // <- Not yet implemented
-    //RTTI_SCRIPTTYPE                     // <- Not yet implemented
+    //if (!Extension_Load<ScriptClass, ScriptClassExtension>(pStm, ScriptExtensions)) { return false; }                 // Not yet implemented
+    //if (!Extension_Load<ScriptTypeClass, ScriptTypeClassExtension>(pStm, ScriptTypeExtensions)) { return false; }     // Not yet implemented
     if (!Extension_Load<SideClass, SideClassExtension>(pStm, SideExtensions)) { return false; }
-    //RTTI_SMUDGE                         // <- Not yet implemented
+    //if (!Extension_Load<SmudgeClass, SmudgeClassExtension>(pStm, SmudgeExtensions)) { return false; }                 // Not yet implemented
     if (!Extension_Load<SmudgeTypeClass, SmudgeTypeClassExtension>(pStm, SmudgeTypeExtensions)) { return false; }
-    //RTTI_SPECIAL                        // Special case for sidebar cameos, nothing to save!
     if (!Extension_Load<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(pStm, SuperWeaponTypeExtensions)) { return false; }
-    //RTTI_TASKFORCE                      // <- Not yet implemented
-    //RTTI_TEAM                           // <- Not yet implemented
-    //RTTI_TEAMTYPE                       // <- Not yet implemented
+    //if (!Extension_Load<TaskForceClass, TaskForceClassExtension>(pStm, TaskForceExtensions)) { return false; }        // Not yet implemented
+    //if (!Extension_Load<TeamClass, TeamClassExtension>(pStm, TeamExtensions)) { return false; }                       // Not yet implemented
+    //if (!Extension_Load<TeamTypeClass, TeamTypeClassExtension>(pStm, TeamTypeExtensions)) { return false; }           // Not yet implemented
     if (!Extension_Load<TerrainClass, TerrainClassExtension>(pStm, TerrainExtensions)) { return false; }
     if (!Extension_Load<TerrainTypeClass, TerrainTypeClassExtension>(pStm, TerrainTypeExtensions)) { return false; }
-    //RTTI_TRIGGER                        // <- Not yet implemented
-    //RTTI_TRIGGERTYPE                    // <- Not yet implemented
+    //if (!Extension_Load<TriggerClass, TriggerClassExtension>(pStm, TriggerExtensions)) { return false; }              // Not yet implemented
+    //if (!Extension_Load<TriggerTypeClass, TriggerTypeClassExtension>(pStm, TriggerTypeExtensions)) { return false; }  // Not yet implemented
     if (!Extension_Load<UnitTypeClass, UnitTypeClassExtension>(pStm, UnitTypeExtensions)) { return false; }
-    //RTTI_VOXELANIM                      // <- Not yet implemented
+    //if (!Extension_Load<VoxelAnimClass, VoxelAnimClassExtension>(pStm, VoxelAnimExtensions)) { return false; }        // Not yet implemented
     if (!Extension_Load<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(pStm, VoxelAnimTypeExtensions)) { return false; }
     if (!Extension_Load<WaveClass, WaveClassExtension>(pStm, WaveExtensions)) { return false; }
-    //RTTI_TAG                            // <- Not yet implemented
-    //RTTI_TAGTYPE                        // <- Not yet implemented
+    //if (!Extension_Load<TagClass, TagClassExtension>(pStm, TagExtensions)) { return false; }                          // Not yet implemented
+    //if (!Extension_Load<TagTypeClass, TagTypeClassExtension>(pStm, TagTypeExtensions)) { return false; }              // Not yet implemented
     if (!Extension_Load<TiberiumClass, TiberiumClassExtension>(pStm, TiberiumExtensions)) { return false; }
-    //RTTI_ACTION                         // <- Not yet implemented
-    //RTTI_EVENT                          // <- Not yet implemented
+    //if (!Extension_Load<TActionClass, TActionClassExtension>(pStm, TActionExtensions)) { return false; }              // Not yet implemented
+    //if (!Extension_Load<TEventClass, TEventClassExtension>(pStm, TEventExtensions)) { return false; }                 // Not yet implemented
     if (!Extension_Load<WeaponTypeClass, WeaponTypeClassExtension>(pStm, WeaponTypeExtensions)) { return false; }
     if (!Extension_Load<WarheadTypeClass, WarheadTypeClassExtension>(pStm, WarheadTypeExtensions)) { return false; }
-    //RTTI_WAYPOINT                       // <- Not yet implemented
-    //RTTI_ABSTRACT                       // Special case for identifying classes with no What_Am_I() implemented, nothing to save!
-    //RTTI_TUBE                           // <- Not yet implemented
-    //RTTI_LIGHTSOURCE                    // <- Not yet implemented
-    //RTTI_EMPULSE                        // <- Not yet implemented
-    //RTTI_TACTICALMAP
+    //if (!Extension_Load<WaypointClass, WaypointClassExtension>(pStm, WaypointExtensions)) { return false; }           // Not yet implemented
+    //if (!Extension_Load<TubeClass, TubeClassExtension>(pStm, TubeExtensions)) { return false; }                       // Not yet implemented
+    //if (!Extension_Load<LightSourceClass, LightSourceClassExtension>(pStm, LightSourceExtensions)) { return false; }  // Not yet implemented
+    //if (!Extension_Load<EMPulseClass, EMPulseClassExtension>(pStm, EMPulseExtensions)) { return false; }              // Not yet implemented
     if (!Extension_Load<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
-    //RTTI_AITRIGGER                      // <- Not yet implemented
-    //RTTI_AITRIGGERTYPE                  // <- Not yet implemented
-    //RTTI_NEURON                         // <- Not yet implemented
-    //RTTI_FOGGEDOBJECT                   // <- Not yet implemented
-    //RTTI_ALPHASHAPE                     // <- Not yet implemented
-    //RTTI_VEINHOLEMONSTER                // <- Not yet implemented
+    //if (!Extension_Load<AITriggerClass, AITriggerClassExtension>(pStm, AITriggerExtensions)) { return false; }        // Not yet implemented
+    //if (!Extension_Load<AITriggerTypeClass, AITriggerTypeClassExtension>(pStm, AITriggerExtensions)) { return false; } // Not yet implemented
+    //if (!Extension_Load<NeuronClass, NeuronClassExtension>(pStm, NeuronExtensions)) { return false; }                 // Not yet implemented
+    //if (!Extension_Load<FoggedObjectClass, FoggedObjectClassExtension>(pStm, FoggedObjectExtensions)) { return false; } // Not yet implemented
+    //if (!Extension_Load<AlphaShapeClass, AlphaShapeClassExtension>(pStm, AlphaShapeExtensions)) { return false; }     // Not yet implemented
+    //if (!Extension_Load<VeinholeMonsterClass, VeinholeMonsterClassExtension>(pStm, VeinholeMonsterExtensions)) { return false; } // Not yet implemented
 
     if (FAILED(TacticalMapExtension->Load(pStm))) { return false; }
     DEBUG_INFO("Loaded \"%s\" extension.\n", TacticalMapExtension->Name());
@@ -914,12 +841,13 @@ bool Extension::Load(IStream *pStm)
     DEBUG_INFO("Loaded \"%s\" extension.\n", SessionExtension->Name());
     SessionExtension->Assign_This(&Session);
 
-    DEBUG_INFO("Extension::Load(exit)\n");
-
     /**
-     *  x
+     *  Now we have sucessfully loaded the class data, request the remapping
+     *  of all the abstract extension pointers.
      */
     if (!Extension::Request_Pointer_Remap()) { return false; }
+
+    DEV_DEBUG_INFO("Extension::Load(exit)\n");
 
     return true;
 }
@@ -944,75 +872,72 @@ bool Extension::Request_Pointer_Remap()
     if (!Extension_Request_Pointer_Remap<AnimTypeClass, AnimTypeClassExtension>(AnimTypes)) { return false; }
     if (!Extension_Request_Pointer_Remap<BuildingClass, BuildingClassExtension>(Buildings)) { return false; }
     if (!Extension_Request_Pointer_Remap<BuildingTypeClass, BuildingTypeClassExtension>(BuildingTypes)) { return false; }
-    //RTTI_BULLET                         // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<BulletClass, BulletClassExtension>(Bullets)) { return false; }               // Not yet implemented
     if (!Extension_Request_Pointer_Remap<BulletTypeClass, BulletTypeClassExtension>(BulletTypes)) { return false; }
-    //RTTI_CAMPAIGN                       // Does not need to be processed.
-    //RTTI_CELL                           // <- Not yet implemented
-    //RTTI_FACTORY                        // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<CampaignClass, CampaignClassExtension>(Campaigns)) { return false; }         // Does not need to be processed for pointer remapping.
+    //if (!Extension_Request_Pointer_Remap<CellClass, CellClassExtension>()) { return false; }                          // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<FactoryClass, FactoryClassExtension>(Factories)) { return false; }           // Not yet implemented
     if (!Extension_Request_Pointer_Remap<HouseClass, HouseClassExtension>(Houses)) { return false; }
     if (!Extension_Request_Pointer_Remap<HouseTypeClass, HouseTypeClassExtension>(HouseTypes)) { return false; }
     if (!Extension_Request_Pointer_Remap<InfantryClass, InfantryClassExtension>(Infantry)) { return false; }
     if (!Extension_Request_Pointer_Remap<InfantryTypeClass, InfantryTypeClassExtension>(InfantryTypes)) { return false; }
-    //RTTI_ISOTILE                        // <- Not yet implemented
-    //RTTI_ISOTILETYPE                    // Does not need to be processed.
-    //RTTI_LIGHT                          // <- Not yet implemented
-    //RTTI_OVERLAY                        // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<IsometricTileClass, IsometricTileClassExtension>(IsoTiles)) { return false; } // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<IsometricTileTypeClass, IsometricTileTypeClassExtension>(IsoTileTypes)) { return false; } // Does not need to be processed.
+    //if (!Extension_Request_Pointer_Remap<BuildingLightClass, BuildingLightClassExtension>(BuildingLights)) { return false; } // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<OverlayClass, OverlayClassExtension>(Overlays)) { return false; }            // Not yet implemented
     if (!Extension_Request_Pointer_Remap<OverlayTypeClass, OverlayTypeClassExtension>(OverlayTypes)) { return false; }
-    //RTTI_PARTICLE                       // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<ParticleClass, ParticleClassExtension>(Particles)) { return false; }         // Not yet implemented
     if (!Extension_Request_Pointer_Remap<ParticleTypeClass, ParticleTypeClassExtension>(ParticleTypes)) { return false; }
-    //RTTI_PARTICLESYSTEM                 // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<ParticleSystemClass, ParticleSystemClassExtension>(ParticleSystems)) { return false; } // Not yet implemented
     if (!Extension_Request_Pointer_Remap<ParticleSystemTypeClass, ParticleSystemTypeClassExtension>(ParticleSystemTypes)) { return false; }
-    //RTTI_SCRIPT                         // <- Not yet implemented
-    //RTTI_SCRIPTTYPE                     // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<ScriptClass, ScriptClassExtension>(Scripts)) { return false; }               // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<ScriptTypeClass, ScriptTypeClassExtension>(ScriptTypes)) { return false; }   // Not yet implemented
     if (!Extension_Request_Pointer_Remap<SideClass, SideClassExtension>(Sides)) { return false; }
-    //RTTI_SMUDGE                         // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<SmudgeClass, SmudgeClassExtension>(Smudges)) { return false; }               // Not yet implemented
     if (!Extension_Request_Pointer_Remap<SmudgeTypeClass, SmudgeTypeClassExtension>(SmudgeTypes)) { return false; }
-    //RTTI_SPECIAL                        // <- Special case, does not actually "exist".
     if (!Extension_Request_Pointer_Remap<SuperWeaponTypeClass, SuperWeaponTypeClassExtension>(SuperWeaponTypes)) { return false; }
-    //RTTI_TASKFORCE                      // <- Not yet implemented
-    //RTTI_TEAM                           // <- Not yet implemented
-    //RTTI_TEAMTYPE                       // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<TaskForceClass, TaskForceClassExtension>(TaskForces)) { return false; }      // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<TeamClass, TeamClassExtension>(Teams)) { return false; }                     // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<TeamTypeClass, TeamTypeClassExtension>(TeamTypes)) { return false; }         // Not yet implemented
     if (!Extension_Request_Pointer_Remap<TerrainClass, TerrainClassExtension>(Terrains)) { return false; }
     if (!Extension_Request_Pointer_Remap<TerrainTypeClass, TerrainTypeClassExtension>(TerrainTypes)) { return false; }
-    //RTTI_TRIGGER                        // <- Not yet implemented
-    //RTTI_TRIGGERTYPE                    // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<TriggerClass, TriggerClassExtension>(Triggers)) { return false; }            // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<TriggerTypeClass, TriggerTypeClassExtension>(TriggerTypes)) { return false; } // Not yet implemented
     if (!Extension_Request_Pointer_Remap<UnitTypeClass, UnitTypeClassExtension>(UnitTypes)) { return false; }
-    //RTTI_VOXELANIM                      // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<VoxelAnimClass, VoxelAnimClassExtension>(VoxelAnims)) { return false; }      // Not yet implemented
     if (!Extension_Request_Pointer_Remap<VoxelAnimTypeClass, VoxelAnimTypeClassExtension>(VoxelAnimTypes)) { return false; }
     if (!Extension_Request_Pointer_Remap<WaveClass, WaveClassExtension>(Waves)) { return false; }
-    //RTTI_TAG                            // <- Not yet implemented
-    //RTTI_TAGTYPE                        // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<TagClass, TagClassExtension>(Tags)) { return false; }                        // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<TagTypeClass, TagTypeClassExtension>(TagTypes)) { return false; }            // Not yet implemented
     if (!Extension_Request_Pointer_Remap<TiberiumClass, TiberiumClassExtension>(Tiberiums)) { return false; }
-    //RTTI_ACTION                         // <- Not yet implemented
-    //RTTI_EVENT                          // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<TActionClass, TActionClassExtension>(TActions)) { return false; }            // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<TEventClass, TEventClassExtension>(TEvents)) { return false; }               // Not yet implemented
     if (!Extension_Request_Pointer_Remap<WeaponTypeClass, WeaponTypeClassExtension>(WeaponTypes)) { return false; }
     if (!Extension_Request_Pointer_Remap<WarheadTypeClass, WarheadTypeClassExtension>(WarheadTypes)) { return false; }
-    //RTTI_WAYPOINT                       // <- Not yet implemented
-    //RTTI_ABSTRACT                       // <- Special case, does not actually "exist".
-    //RTTI_TUBE                           // <- Not yet implemented
-    //RTTI_LIGHTSOURCE                    // <- Not yet implemented
-    //RTTI_EMPULSE                        // <- Not yet implemented
-    //RTTI_TACTICALMAP
+    //if (!Extension_Request_Pointer_Remap<WaypointClass, WaypointClassExtension>(Waypoints)) { return false; }         // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<TubeClass, TubeClassExtension>(Tubes)) { return false; }                     // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<LightSourceClass, LightSourceClassExtension>(LightSources)) { return false; } // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<EMPulseClass, EMPulseClassExtension>(EMPulses)) { return false; }            // Not yet implemented
     if (!Extension_Request_Pointer_Remap<SuperClass, SuperClassExtension>(Supers)) { return false; }
-    //RTTI_AITRIGGER                      // <- Not yet implemented
-    //RTTI_AITRIGGERTYPE                  // <- Not yet implemented
-    //RTTI_NEURON                         // <- Not yet implemented
-    //RTTI_FOGGEDOBJECT                   // <- Not yet implemented
-    //RTTI_ALPHASHAPE                     // <- Not yet implemented
-    //RTTI_VEINHOLEMONSTER                // <- Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<AITriggerClass, AITriggerClassExtension>(AITriggers)) { return false; }      // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<AITriggerTypeClass, AITriggerTypeExtension>(AITriggerTypes)) { return false; } // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<NeuronClass, NeuronClassExtension>(Neurons)) { return false; }               // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<FoggedObjectClass, FoggedObjectClassExtension>(FoggedObjects)) { return false; } // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<AlphaShapeClass, AlphaShapeClassExtension>(AlphaShapes)) { return false; }   // Not yet implemented
+    //if (!Extension_Request_Pointer_Remap<VeinholeMonsterClass, VeinholeMonsterClassExtension>(VeinholeMonsters)) { return false; } // Not yet implemented
 
     return true;
 }
 
 
 /**
- *  x
+ *  Register the extension class COM factories.
  * 
  *  @author: CCHyper
  */
 bool Extension::Register_Class_Factories()
 {
-    DEBUG_INFO("Extension::Register_Class_Factories(enter)\n");
+    DEV_DEBUG_INFO("Extension::Register_Class_Factories(enter)\n");
 
     /**
      *  #NOTE: The order of these calls must match the relevent RTTIType order!
@@ -1024,77 +949,75 @@ bool Extension::Register_Class_Factories()
     REGISTER_CLASS(AnimTypeClassExtension);
     REGISTER_CLASS(BuildingClassExtension);
     REGISTER_CLASS(BuildingTypeClassExtension);
-    //RTTI_BULLET                         // <- Not yet implemented
+    //REGISTER_CLASS(BulletClassExtension);                                     // Not yet implemented
     REGISTER_CLASS(BulletTypeClassExtension);
     REGISTER_CLASS(CampaignClassExtension);
-    //RTTI_CELL                           // <- Not yet implemented
-    //RTTI_FACTORY                        // <- Not yet implemented
+    //REGISTER_CLASS(CellClassExtension);                                       // Not yet implemented
+    //REGISTER_CLASS(FactoryClassExtension);                                    // Not yet implemented
     REGISTER_CLASS(HouseClassExtension);
     REGISTER_CLASS(HouseTypeClassExtension);
     REGISTER_CLASS(InfantryClassExtension);
     REGISTER_CLASS(InfantryTypeClassExtension);
-    //RTTI_ISOTILE                        // <- Not yet implemented
+    //REGISTER_CLASS(IsometricTileClassExtension);                              // Not yet implemented
     REGISTER_CLASS(IsometricTileTypeClassExtension);
-    //RTTI_LIGHT                          // <- Not yet implemented
-    //RTTI_OVERLAY                        // <- Not yet implemented
+    //REGISTER_CLASS(BuildingLightClassExtension);                              // Not yet implemented
+    //REGISTER_CLASS(OverlayClassExtension);                                    // Not yet implemented
     REGISTER_CLASS(OverlayTypeClassExtension);
-    //RTTI_PARTICLE                       // <- Not yet implemented
+    //REGISTER_CLASS(ParticleClassExtension);                                   // Not yet implemented
     REGISTER_CLASS(ParticleTypeClassExtension);
-    //RTTI_PARTICLESYSTEM                 // <- Not yet implemented
+    //REGISTER_CLASS(ParticleSystemClassExtension);                             // Not yet implemented
     REGISTER_CLASS(ParticleSystemTypeClassExtension);
-    //RTTI_SCRIPT                         // <- Not yet implemented
-    //RTTI_SCRIPTTYPE                     // <- Not yet implemented
+    //REGISTER_CLASS(ScriptClassExtension);                                     // Not yet implemented
+    //REGISTER_CLASS(ScriptTypeClassExtension);                                 // Not yet implemented
     REGISTER_CLASS(SideClassExtension);
-    //RTTI_SMUDGE                         // <- Not yet implemented
+    //REGISTER_CLASS(SmudgeClassExtension);                                     // Not yet implemented
     REGISTER_CLASS(SmudgeTypeClassExtension);
-    //RTTI_SPECIAL                        // <- Special case, does not actually "exist".
     REGISTER_CLASS(SuperWeaponTypeClassExtension);
-    //RTTI_TASKFORCE                      // <- Not yet implemented
-    //RTTI_TEAM                           // <- Not yet implemented
-    //RTTI_TEAMTYPE                       // <- Not yet implemented
+    //REGISTER_CLASS(TaskForceClassExtension);                                  // Not yet implemented
+    //REGISTER_CLASS(TeamClassExtension);                                       // Not yet implemented
+    //REGISTER_CLASS(TeamTypeClassExtension);                                   // Not yet implemented
     REGISTER_CLASS(TerrainClassExtension);
     REGISTER_CLASS(TerrainTypeClassExtension);
-    //RTTI_TRIGGER                        // <- Not yet implemented
-    //RTTI_TRIGGERTYPE                    // <- Not yet implemented
+    //REGISTER_CLASS(TriggerClassExtension);                                    // Not yet implemented
+    //REGISTER_CLASS(TriggerTypeClassExtension);                                // Not yet implemented
     REGISTER_CLASS(UnitTypeClassExtension);
-    //RTTI_VOXELANIM                      // <- Not yet implemented
+    //REGISTER_CLASS(VoxelAnimClassExtension);                                  // Not yet implemented
     REGISTER_CLASS(VoxelAnimTypeClassExtension);
     REGISTER_CLASS(WaveClassExtension);
-    //RTTI_TAG                            // <- Not yet implemented
-    //RTTI_TAGTYPE                        // <- Not yet implemented
+    //REGISTER_CLASS(TagClassExtension);                                        // Not yet implemented
+    //REGISTER_CLASS(TagTypeClassExtension);                                    // Not yet implemented
     REGISTER_CLASS(TiberiumClassExtension);
-    //RTTI_ACTION                         // <- Not yet implemented
-    //RTTI_EVENT                          // <- Not yet implemented
+    //REGISTER_CLASS(TActionClassExtension);                                    // Not yet implemented
+    //REGISTER_CLASS(TEventClassExtension);                                     // Not yet implemented
     REGISTER_CLASS(WeaponTypeClassExtension);
     REGISTER_CLASS(WarheadTypeClassExtension);
-    //RTTI_WAYPOINT                       // <- Not yet implemented
-    //RTTI_ABSTRACT                       // <- Special case, does not actually "exist".
-    //RTTI_TUBE                           // <- Not yet implemented
-    //RTTI_LIGHTSOURCE                    // <- Not yet implemented
-    //RTTI_EMPULSE                        // <- Not yet implemented
-    //REGISTER_CLASS(TacticalExtension);
+    //REGISTER_CLASS(WaypointClassExtension);                                   // Not yet implemented
+    //REGISTER_CLASS(TubeClassExtension);                                       // Not yet implemented
+    //REGISTER_CLASS(LightSourceClassExtension);                                // Not yet implemented
+    //REGISTER_CLASS(EMPulseClassExtension);                                    // Not yet implemented
+    //REGISTER_CLASS(TacticalExtension);                                        // Tactical extension is now a global class and no longer uses COM, so we don't need to register it.
     REGISTER_CLASS(SuperClassExtension);
-    //RTTI_AITRIGGER                      // <- Not yet implemented
-    //RTTI_AITRIGGERTYPE                  // <- Not yet implemented
-    //RTTI_NEURON                         // <- Not yet implemented
-    //RTTI_FOGGEDOBJECT                   // <- Not yet implemented
-    //RTTI_ALPHASHAPE                     // <- Not yet implemented
-    //RTTI_VEINHOLEMONSTER                // <- Not yet implemented
+    //REGISTER_CLASS(AITriggerClassExtension);                                  // Not yet implemented
+    //REGISTER_CLASS(AITriggerTypeClassExtension);                              // Not yet implemented
+    //REGISTER_CLASS(NeuronClassExtension);                                     // Not yet implemented
+    //REGISTER_CLASS(FoggedObjectClassExtension);                               // Not yet implemented
+    //REGISTER_CLASS(AlphaShapeClassExtension);                                 // Not yet implemented
+    //REGISTER_CLASS(VeinholeMonsterClassExtension););                          // Not yet implemented
     
-    DEBUG_INFO("Extension::Register_Class_Factories(exit)\n");
+    DEV_DEBUG_INFO("Extension::Register_Class_Factories(exit)\n");
 
     return true;
 }
 
 
 /**
- *  x
+ *  Clear out the extension class heaps.
  * 
  *  @author: CCHyper
  */
 void Extension::Free_Heaps()
 {
-    DEBUG_INFO("Extension::Free_Heaps(enter)\n");
+    DEV_DEBUG_INFO("Extension::Free_Heaps(enter)\n");
 
     ++ScenarioInit;
 
@@ -1108,68 +1031,65 @@ void Extension::Free_Heaps()
     AnimTypeExtensions.Clear();
     BuildingExtensions.Clear();
     BuildingTypeExtensions.Clear();
-    //RTTI_BULLET                         // <- Not yet implemented
+    //BulletExtensions.Clear();                                                 // Not yet implemented
     BulletTypeExtensions.Clear();
-    //CampaignExtensions.Clear(); // Campaign's do not need to be processed.
-    //RTTI_CELL                           // <- Not yet implemented
-    //RTTI_FACTORY                        // <- Not yet implemented
+    //CampaignExtensions.Clear();                                               // Campaign's do not need to be processed.
+    //CellExtensions.Clear();                                                   // Not yet implemented
+    //FactoryExtensions.Clear();                                                // Not yet implemented
     HouseExtensions.Clear();
     HouseTypeExtensions.Clear();
     InfantryExtensions.Clear();
     InfantryTypeExtensions.Clear();
-    //RTTI_ISOTILE                        // <- Not yet implemented
-    //IsometricTileTypeExtensions.Clear(); // IsoTileType's not need to be processed.
-    //RTTI_LIGHT                          // <- Not yet implemented
-    //RTTI_OVERLAY                        // <- Not yet implemented
+    //IsometricTileExtensions.Clear();                                          // Not yet implemented
+    //IsometricTileTypeExtensions.Clear();                                      // IsoTileType's not need to be processed.
+    //BuildingLightExtensions.Clear();                                          // Not yet implemented
+    //OverlayExtensions.Clear();                                                // Not yet implemented
      OverlayTypeExtensions.Clear();
-    //RTTI_PARTICLE                       // <- Not yet implemented
+    //ParticleExtensions.Clear();                                               // Not yet implemented
     ParticleTypeExtensions.Clear();
-    //RTTI_PARTICLESYSTEM                 // <- Not yet implemented
+    //ParticleSystemExtensions.Clear();                                         // Not yet implemented
     ParticleSystemTypeExtensions.Clear();
-    //RTTI_SCRIPT                         // <- Not yet implemented
-    //RTTI_SCRIPTTYPE                     // <- Not yet implemented
+    //ScriptExtensions.Clear();                                                 // Not yet implemented
+    //ScriptTypeExtensions.Clear();                                             // Not yet implemented
     SideExtensions.Clear();
-    //RTTI_SMUDGE                         // <- Not yet implemented
+    //SmudgeExtensions.Clear();                                                 // Not yet implemented
     SmudgeTypeExtensions.Clear();
-    //RTTI_SPECIAL                        // <- Special case, does not actually "exist".
     SuperWeaponTypeExtensions.Clear();
-    //RTTI_TASKFORCE                      // <- Not yet implemented
-    //RTTI_TEAM                           // <- Not yet implemented
-    //RTTI_TEAMTYPE                       // <- Not yet implemented
+    //TaskForceExtensions.Clear();                                              // Not yet implemented
+    //TeamExtensions.Clear();                                                   // Not yet implemented
+    //TeamTypeExtensions.Clear();                                               // Not yet implemented
     TerrainExtensions.Clear();
     TerrainTypeExtensions.Clear();
-    //RTTI_TRIGGER                        // <- Not yet implemented
-    //RTTI_TRIGGERTYPE                    // <- Not yet implemented
+    //TriggerExtensions.Clear();                                                // Not yet implemented
+    //TriggerTypeExtensions.Clear();                                            // Not yet implemented
     UnitTypeExtensions.Clear();
-    //RTTI_VOXELANIM                      // <- Not yet implemented
+    //VoxelAnimExtensions.Clear();                                              // Not yet implemented
     VoxelAnimTypeExtensions.Clear();
     WaveExtensions.Clear();
-    //RTTI_TAG                            // <- Not yet implemented
-    //RTTI_TAGTYPE                        // <- Not yet implemented
+    //TagExtensions.Clear();                                                    // Not yet implemented
+    //TagTypeExtensions.Clear();                                                // Not yet implemented
     TiberiumExtensions.Clear();
-    //RTTI_ACTION                         // <- Not yet implemented
-    //RTTI_EVENT                          // <- Not yet implemented
+    //TActionExtensions.Clear();                                                // Not yet implemented
+    //TEventExtensions.Clear();                                                 // Not yet implemented
      WeaponTypeExtensions.Clear();
     WarheadTypeExtensions.Clear();
-    //RTTI_WAYPOINT                       // <- Not yet implemented
-    //RTTI_ABSTRACT                       // <- Special case, does not actually "exist".
-    //RTTI_TUBE                           // <- Not yet implemented
-    //RTTI_LIGHTSOURCE                    // <- Not yet implemented
-    //RTTI_EMPULSE                        // <- Not yet implemented
-    //RTTI_TACTICALMAP                    // Does not need to be processed.
+    //WaypointExtensions.Clear();                                               // Not yet implemented
+    //TubeExtensions.Clear();                                                   // Not yet implemented
+    //LightSourceExtensions.Clear();                                            // Not yet implemented
+    //EMPulseExtensions.Clear();                                                // Not yet implemented
+    //delete TacticalMapExtension;                                              // Does not need to be processed here, class has been promoted to a global.
     SuperExtensions.Clear();
-    //RTTI_AITRIGGER                      // <- Not yet implemented
-    //RTTI_AITRIGGERTYPE                  // <- Not yet implemented
-    //RTTI_NEURON                         // <- Not yet implemented
-    //RTTI_FOGGEDOBJECT                   // <- Not yet implemented
-    //RTTI_ALPHASHAPE                     // <- Not yet implemented
-    //RTTI_VEINHOLEMONSTER                // <- Not yet implemented
+    //AITriggerExtensions.Clear();                                              // Not yet implemented
+    //AITriggerTypeExtensions.Clear();                                          // Not yet implemented
+    //NeuronExtensions.Clear();                                                 // Not yet implemented
+    //FoggedObjectExtensions.Clear();                                           // Not yet implemented
+    //AlphaShapeExtensions.Clear();                                             // Not yet implemented
+    //VeinholeMonsterExtensions.Clear();                                        // Not yet implemented
 
     --ScenarioInit;
 
-    DEBUG_INFO("Extension::Free_Heaps(exit)\n");
+    DEV_DEBUG_INFO("Extension::Free_Heaps(exit)\n");
 }
-
 
 
 /**
@@ -1179,13 +1099,172 @@ void Extension::Free_Heaps()
  */
 void Extension::Print_CRCs(FILE *fp, EventClass *ev)
 {
-    DEBUG_INFO("Extension::Print_CRCs(enter)\n");
+    DEV_DEBUG_INFO("Extension::Print_CRCs(enter)\n");
 
-    Extension_Print_Sync_Data(InfantryExtensions, fp, ev);
-    Extension_Print_Sync_Data(UnitExtensions, fp, ev);
-    Extension_Print_Sync_Data(BuildingExtensions, fp, ev);
-    Extension_Print_Sync_Data(AircraftExtensions, fp, ev);
+    /**
+     *  Infantry
+     */
+    for (int house = 0; house <= Houses.Count(); ++house) {
+        HouseClass *housep = Houses[house];
+        if (housep) {
+            GameCRC = 0;
+            std::fprintf(fp, "------------- %s (%d) %s ------------\n", housep->Class->Name(), housep->ID, Extension::Utility::Get_TypeID_Name<InfantryClassExtension>().c_str());
+            for (int index = 0; index < InfantryExtensions.Count(); ++index) {
+                InfantryClassExtension *ext_ptr = InfantryExtensions[index];
+                InfantryClass *ptr = ext_ptr->This();
+                if (ptr->Owner() == house) {
+                    Add_CRC(&GameCRC, (int)((ptr->Get_Coord().X / 10) << 16) + (int)(ptr->Get_Coord().Y / 10) + (int)ptr->PrimaryFacing.Current().Get_Dir());
 
+                    const char *tarcom_name = "None";
+                    Coordinate tarcom_coord;
+
+                    const char *navcom_name = "None";
+                    Coordinate navcom_coord;
+
+                    if (ptr->TarCom) {
+                        tarcom_name = Name_From_RTTI((RTTIType)ptr->TarCom->What_Am_I());
+                        tarcom_coord = ptr->TarCom->Center_Coord();
+                    }
+
+                    if (ptr->NavCom) {
+                        navcom_name = Name_From_RTTI((RTTIType)ptr->NavCom->What_Am_I());
+                        navcom_coord = ptr->TarCom->Center_Coord();
+                    }
+
+                    std::fprintf(fp, "COORD:%d,%d,%d  Facing:%d  Mission:%d  Type:%d(%s)  Speed:%d  TarCom:%s(%d,%d,%d)  NavCom:%s(%d,%d,%d)\n",
+                                ptr->Center_Coord().X, ptr->Center_Coord().Y, ptr->Center_Coord().Z,
+                                (int)ptr->PrimaryFacing.Current().Get_Dir(), ptr->Get_Mission(),
+                                ptr->Class->Type, ptr->Class->Name(),
+                                (int)(ptr->Speed * 256.0),
+                                tarcom_name, tarcom_coord.X, tarcom_coord.Y, tarcom_coord.Z,
+                                navcom_name, navcom_coord.X, navcom_coord.Y, navcom_coord.Z);
+                }
+            }
+            EXT_DEBUG_INFO("%s %s:%x\n", housep->Class->Name(), Extension::Utility::Get_TypeID_Name<InfantryClassExtension>().c_str(), GameCRC);
+        }
+    }
+
+    /**
+     *  Units
+     */
+    for (int house = 0; house <= Houses.Count(); ++house) {
+        HouseClass *housep = Houses[house];
+        if (housep) {
+            GameCRC = 0;
+            std::fprintf(fp, "------------- %s (%d) %s ------------\n", housep->Class->Name(), housep->ID, Extension::Utility::Get_TypeID_Name<UnitClassExtension>().c_str());
+            for (int index = 0; index < UnitExtensions.Count(); ++index) {
+                UnitClassExtension *ext_ptr = UnitExtensions[index];
+                UnitClass *ptr = ext_ptr->This();
+                if (ptr->Owner() == house) {
+                    Add_CRC(&GameCRC, (int)((ptr->Get_Coord().X / 10) << 16) + (int)(ptr->Get_Coord().Y / 10) + (int)ptr->PrimaryFacing.Current().Get_Dir());
+
+                    const char *tarcom_name = "None";
+                    Coordinate tarcom_coord;
+
+                    const char *navcom_name = "None";
+                    Coordinate navcom_coord;
+
+                    if (ptr->TarCom) {
+                        tarcom_name = Name_From_RTTI((RTTIType)ptr->TarCom->What_Am_I());
+                        tarcom_coord = ptr->TarCom->Center_Coord();
+                    }
+
+                    if (ptr->NavCom) {
+                        navcom_name = Name_From_RTTI((RTTIType)ptr->NavCom->What_Am_I());
+                        navcom_coord = ptr->TarCom->Center_Coord();
+                    }
+
+                    std::fprintf(fp, "COORD:%d,%d,%d  Facing:%d  Facing2:%d  Mission:%d  Type:%d(%s)  TarCom:%s(%d,%d,%d)  NavCom:%s(%d,%d,%d)  TrkNum:%d  TrkInd:%d  SpdAcc:%d\n",
+                                ptr->Center_Coord().X, ptr->Center_Coord().Y, ptr->Center_Coord().Z,
+                                (int)ptr->PrimaryFacing.Current().Get_Dir(), (int)ptr->SecondaryFacing.Current().Get_Dir(), ptr->Get_Mission(),
+                                ptr->Class->Type, ptr->Class->Name(),
+                                tarcom_name, tarcom_coord.X, tarcom_coord.Y, tarcom_coord.Z,
+                                navcom_name, navcom_coord.X, navcom_coord.Y, navcom_coord.Z,
+                                ptr->Locomotor_Ptr()->Get_Track_Number(), ptr->Locomotor_Ptr()->Get_Track_Number(), ptr->Locomotor_Ptr()->Get_Speed_Accum());
+                }
+            }
+            EXT_DEBUG_INFO("%s %s:%x\n", housep->Class->Name(), Extension::Utility::Get_TypeID_Name<UnitClassExtension>().c_str(), GameCRC);
+        }
+    }
+
+    /**
+     *  Buildings
+     */
+    for (int house = 0; house <= Houses.Count(); ++house) {
+        HouseClass *housep = Houses[house];
+        if (housep) {
+            GameCRC = 0;
+            std::fprintf(fp, "------------- %s (%d) %s ------------\n", housep->Class->Name(), housep->ID, Extension::Utility::Get_TypeID_Name<BuildingClassExtension>().c_str());
+            for (int index = 0; index < BuildingExtensions.Count(); ++index) {
+                BuildingClassExtension *ext_ptr = BuildingExtensions[index];
+                BuildingClass *ptr = ext_ptr->This();
+                if (ptr->Owner() == house) {
+                    Add_CRC(&GameCRC, (int)((ptr->Get_Coord().X / 10) << 16) + (int)(ptr->Get_Coord().Y / 10) + (int)ptr->PrimaryFacing.Current().Get_Dir());
+
+                    const char *tarcom_name = "None";
+                    Coordinate tarcom_coord;
+
+                    if (ptr->TarCom) {
+                        tarcom_name = Name_From_RTTI((RTTIType)ptr->TarCom->What_Am_I());
+                        tarcom_coord = ptr->TarCom->Center_Coord();
+                    }
+
+                    std::fprintf(fp, "COORD:%d,%d,%d  Facing:%d  Mission:%d  Type:%d(%s)  TarCom:%s(%d,%d,%d)\n",
+                                ptr->Center_Coord().X, ptr->Center_Coord().Y, ptr->Center_Coord().Z,
+                                (int)ptr->PrimaryFacing.Current().Get_Dir(), ptr->Get_Mission(),
+                                ptr->Class->Type, ptr->Class->Name(),
+                                tarcom_name, tarcom_coord.X, tarcom_coord.Y, tarcom_coord.Z);
+                }
+            }
+            EXT_DEBUG_INFO("%s %s:%x\n", housep->Class->Name(), Extension::Utility::Get_TypeID_Name<BuildingClassExtension>().c_str(), GameCRC);
+        }
+    }
+
+    /**
+     *  Units
+     */
+    for (int house = 0; house <= Houses.Count(); ++house) {
+        HouseClass *housep = Houses[house];
+        if (housep) {
+            GameCRC = 0;
+            std::fprintf(fp, "------------- %s (%d) %s ------------\n", housep->Class->Name(), housep->ID, Extension::Utility::Get_TypeID_Name<AircraftClassExtension>().c_str());
+            for (int index = 0; index < AircraftExtensions.Count(); ++index) {
+                AircraftClassExtension *ext_ptr = AircraftExtensions[index];
+                AircraftClass *ptr = ext_ptr->This();
+                if (ptr->Owner() == house) {
+                    Add_CRC(&GameCRC, (int)((ptr->Get_Coord().X / 10) << 16) + (int)(ptr->Get_Coord().Y / 10) + (int)ptr->PrimaryFacing.Current().Get_Dir());
+
+                    const char *tarcom_name = "None";
+                    Coordinate tarcom_coord;
+
+                    const char *navcom_name = "None";
+                    Coordinate navcom_coord;
+
+                    if (ptr->TarCom) {
+                        tarcom_name = Name_From_RTTI((RTTIType)ptr->TarCom->What_Am_I());
+                        tarcom_coord = ptr->TarCom->Center_Coord();
+                    }
+
+                    if (ptr->NavCom) {
+                        navcom_name = Name_From_RTTI((RTTIType)ptr->NavCom->What_Am_I());
+                        navcom_coord = ptr->TarCom->Center_Coord();
+                    }
+
+                    std::fprintf(fp, "COORD:%d,%d,%d  Facing:%d  Mission:%d  Type:%d(%s)  TarCom:%s(%d,%d,%d)  NavCom:%s(%d,%d,%d)\n",
+                                ptr->Center_Coord().X, ptr->Center_Coord().Y, ptr->Center_Coord().Z,
+                                (int)ptr->PrimaryFacing.Current().Get_Dir(), ptr->Get_Mission(),
+                                ptr->Class->Type, ptr->Class->Name(),
+                                tarcom_name, tarcom_coord.X, tarcom_coord.Y, tarcom_coord.Z,
+                                navcom_name, navcom_coord.X, navcom_coord.Y, navcom_coord.Z);
+                }
+            }
+            EXT_DEBUG_INFO("%s %s:%x\n", housep->Class->Name(), Extension::Utility::Get_TypeID_Name<AircraftClassExtension>().c_str(), GameCRC);
+        }
+    }
+
+    /**
+     *  Print instance CRC's.
+     */
     Extension_Print_CRCs(UnitExtensions, fp);
     Extension_Print_CRCs(AircraftExtensions, fp);
     Extension_Print_CRCs(AircraftTypeExtensions, fp);
@@ -1193,75 +1272,72 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
     Extension_Print_CRCs(AnimTypeExtensions, fp);
     Extension_Print_CRCs(BuildingExtensions, fp);
     Extension_Print_CRCs(BuildingTypeExtensions, fp);
-    //RTTI_BULLET                         // <- Not yet implemented
+    //Extension_Print_CRCs(BulletExtensions, fp);                               // Not yet implemented
     Extension_Print_CRCs(BulletTypeExtensions, fp);
-    //RTTI_CAMPAIGN                       // Does not need to be processed.
-    //RTTI_CELL                           // <- Not yet implemented
-    //RTTI_FACTORY                        // <- Not yet implemented
+    //Extension_Print_CRCs(CampaignExtensions, fp);                             // Does not need to be processed as these have no impact on networking.
+    //Extension_Print_CRCs(CellExtensions, fp);                                 // Not yet implemented
+    //Extension_Print_CRCs(FactoryExtensions, fp);                              // Not yet implemented
     Extension_Print_CRCs(HouseExtensions, fp);
     Extension_Print_CRCs(HouseTypeExtensions, fp);
     Extension_Print_CRCs(InfantryExtensions, fp);
     Extension_Print_CRCs(InfantryTypeExtensions, fp);
-    //RTTI_ISOTILE                        // <- Not yet implemented
+    //Extension_Print_CRCs(IsometricTileExtensions, fp);                        // Not yet implemented
     Extension_Print_CRCs(IsometricTileTypeExtensions, fp);
-    //RTTI_LIGHT                          // <- Not yet implemented
-    //RTTI_OVERLAY                        // <- Not yet implemented
+    //Extension_Print_CRCs(BuildingLightExtensions, fp);                        // Not yet implemented
+    //Extension_Print_CRCs(OverlayExtensions, fp);                              // Not yet implemented
     Extension_Print_CRCs(OverlayTypeExtensions, fp);
-    //RTTI_PARTICLE                       // <- Not yet implemented
+    //Extension_Print_CRCs(ParticleExtensions, fp);                             // Not yet implemented
     Extension_Print_CRCs(ParticleTypeExtensions, fp);
-    //RTTI_PARTICLESYSTEM                 // <- Not yet implemented
+    //Extension_Print_CRCs(ParticleSystemExtensions, fp);                       // Not yet implemented
     Extension_Print_CRCs(ParticleSystemTypeExtensions, fp);
-    //RTTI_SCRIPT                         // <- Not yet implemented
-    //RTTI_SCRIPTTYPE                     // <- Not yet implemented
+    //Extension_Print_CRCs(ScriptExtensions, fp);                               // Not yet implemented
+    //Extension_Print_CRCs(ScriptTypeExtensions, fp);                           // Not yet implemented
     Extension_Print_CRCs(SideExtensions, fp);
-    //RTTI_SMUDGE                         // <- Not yet implemented
+    //Extension_Print_CRCs(SmudgeExtensions, fp);                               // Not yet implemented
     Extension_Print_CRCs(SmudgeTypeExtensions, fp);
-    //RTTI_SPECIAL                        // <- Special case, does not actually "exist".
     Extension_Print_CRCs(SuperWeaponTypeExtensions, fp);
-    //RTTI_TASKFORCE                      // <- Not yet implemented
-    //RTTI_TEAM                           // <- Not yet implemented
-    //RTTI_TEAMTYPE                       // <- Not yet implemented
+    //Extension_Print_CRCs(TaskForceExtensions, fp);                            // Not yet implemented
+    //Extension_Print_CRCs(TeamExtensions, fp);                                 // Not yet implemented
+    //Extension_Print_CRCs(TeamTypeExtensions, fp);                             // Not yet implemented
     Extension_Print_CRCs(TerrainExtensions, fp);
     Extension_Print_CRCs(TerrainTypeExtensions, fp);
-    //RTTI_TRIGGER                        // <- Not yet implemented
-    //RTTI_TRIGGERTYPE                    // <- Not yet implemented
+    //Extension_Print_CRCs(TriggerExtensions, fp);                              // Not yet implemented
+    //Extension_Print_CRCs(TriggerTypeExtensions, fp);                          // Not yet implemented
     Extension_Print_CRCs(UnitTypeExtensions, fp);
-    //RTTI_VOXELANIM                      // <- Not yet implemented
+    //Extension_Print_CRCs(VoxelAnimExtensions, fp);                            // Not yet implemented
     Extension_Print_CRCs(VoxelAnimTypeExtensions, fp);
     Extension_Print_CRCs(WaveExtensions, fp);
-    //RTTI_TAG                            // <- Not yet implemented
-    //RTTI_TAGTYPE                        // <- Not yet implemented
+    //Extension_Print_CRCs(TagExtensions, fp);                                  // Not yet implemented
+    //Extension_Print_CRCs(TagTypeExtensions, fp);                              // Not yet implemented
     Extension_Print_CRCs(TiberiumExtensions, fp);
-    //RTTI_ACTION                         // <- Not yet implemented
-    //RTTI_EVENT                          // <- Not yet implemented
+    //Extension_Print_CRCs(TActionExtensions, fp);                              // Not yet implemented
+    //Extension_Print_CRCs(TEventExtensions, fp);                               // Not yet implemented
     Extension_Print_CRCs(WeaponTypeExtensions, fp);
     Extension_Print_CRCs(WarheadTypeExtensions, fp);
-    //RTTI_WAYPOINT                       // <- Not yet implemented
-    //RTTI_ABSTRACT                       // <- Special case, does not actually "exist".
-    //RTTI_TUBE                           // <- Not yet implemented
-    //RTTI_LIGHTSOURCE                    // <- Not yet implemented
-    //RTTI_EMPULSE                        // <- Not yet implemented
-    //RTTI_TACTICALMAP                    // Does not need to be processed.
+    //Extension_Print_CRCs(WaypointExtensions, fp);                             // Not yet implemented
+    //Extension_Print_CRCs(TubeExtensions, fp);                                 // Not yet implemented
+    //Extension_Print_CRCs(LightSourceExtensions, fp);                          // Not yet implemented
+    //Extension_Print_CRCs(EMPulseExtensions, fp);                              // Not yet implemented
     Extension_Print_CRCs(SuperExtensions, fp);
-    //RTTI_AITRIGGER                      // <- Not yet implemented
-    //RTTI_AITRIGGERTYPE                  // <- Not yet implemented
-    //RTTI_NEURON                         // <- Not yet implemented
-    //RTTI_FOGGEDOBJECT                   // <- Not yet implemented
-    //RTTI_ALPHASHAPE                     // <- Not yet implemented
-    //RTTI_VEINHOLEMONSTER                // <- Not yet implemented
+    //Extension_Print_CRCs(AITriggerExtensions, fp);                            // Not yet implemented
+    //Extension_Print_CRCs(AITriggerTypeExtensions, fp);                        // Not yet implemented
+    //Extension_Print_CRCs(NeuronExtensions, fp);                               // Not yet implemented
+    //Extension_Print_CRCs(FoggedObjectExtensions, fp);                         // Not yet implemented
+    //Extension_Print_CRCs(AlphaShapeExtensions, fp);                           // Not yet implemented
+    //Extension_Print_CRCs(VeinholeMonsterExtensions, fp);                      // Not yet implemented
 
-    DEBUG_INFO("Extension::Print_CRCs(exit)\n");
+    DEV_DEBUG_INFO("Extension::Print_CRCs(exit)\n");
 }
 
 
 /**
- *  x
+ *  Detaches this object from all active extension classes.
  * 
  *  @author: CCHyper
  */
 void Extension::Detach_This_From_All(TARGET target, bool all)
 {
-    //DEBUG_INFO("Extension::Detach_This_From_All(enter)\n");
+    //DEV_DEBUG_INFO("Extension::Detach_This_From_All(enter)\n");
 
     /**
      *  #NOTE: The order of these calls must match the relevent RTTIType order!
@@ -1273,69 +1349,66 @@ void Extension::Detach_This_From_All(TARGET target, bool all)
     Extension_Detach_This_From_All(AnimTypeExtensions, target, all);
     Extension_Detach_This_From_All(BuildingExtensions, target, all);
     Extension_Detach_This_From_All(BuildingTypeExtensions, target, all);
-    //RTTI_BULLET                         // <- Not yet implemented
+    //Extension_Detach_This_From_All(BulletExtensions, target, all);            // Not yet implemented
     Extension_Detach_This_From_All(BulletTypeExtensions, target, all);
-    //RTTI_CAMPAIGN                       // Does not need to be processed.
-    //RTTI_CELL                           // <- Not yet implemented
-    //RTTI_FACTORY                        // <- Not yet implemented
+    //Extension_Detach_This_From_All(CampaignExtensions, target, all);          // Does not need to be processed.
+    //Extension_Detach_This_From_All(CellExtensions, target, all);              // Not yet implemented
+    //Extension_Detach_This_From_All(FactoryExtensions, target, all);           // Not yet implemented
     Extension_Detach_This_From_All(HouseExtensions, target, all);
     Extension_Detach_This_From_All(HouseTypeExtensions, target, all);
     Extension_Detach_This_From_All(InfantryExtensions, target, all);
     Extension_Detach_This_From_All(InfantryTypeExtensions, target, all);
-    //RTTI_ISOTILE                        // <- Not yet implemented
+    //Extension_Detach_This_From_All(IsometricTileExtensions, target, all);     // Not yet implemented
     Extension_Detach_This_From_All(IsometricTileTypeExtensions, target, all);
-    //RTTI_LIGHT                          // <- Not yet implemented
-    //RTTI_OVERLAY                        // <- Not yet implemented
+    //Extension_Detach_This_From_All(BuildingLightExtensions, target, all);     // Not yet implemented
+    //Extension_Detach_This_From_All(OverlayExtensions, target, all);           // Not yet implemented
     Extension_Detach_This_From_All(OverlayTypeExtensions, target, all);
-    //RTTI_PARTICLE                       // <- Not yet implemented
+    //Extension_Detach_This_From_All(ParticleExtensions, target, all);          // Not yet implemented
     Extension_Detach_This_From_All(ParticleTypeExtensions, target, all);
-    //RTTI_PARTICLESYSTEM                 // <- Not yet implemented
+    //Extension_Detach_This_From_All(ParticleSystemExtensions, target, all);    // Not yet implemented
     Extension_Detach_This_From_All(ParticleSystemTypeExtensions, target, all);
-    //RTTI_SCRIPT                         // <- Not yet implemented
-    //RTTI_SCRIPTTYPE                     // <- Not yet implemented
+    //Extension_Detach_This_From_All(ScriptExtensions, target, all);            // Not yet implemented
+    //Extension_Detach_This_From_All(ScriptTypeExtensions, target, all);        // Not yet implemented
     Extension_Detach_This_From_All(SideExtensions, target, all);
-    //RTTI_SMUDGE                         // <- Not yet implemented
+    //Extension_Detach_This_From_All(SmudgeExtensions, target, all);            // Not yet implemented
     Extension_Detach_This_From_All(SmudgeTypeExtensions, target, all);
-    //RTTI_SPECIAL                        // <- Special case, does not actually "exist".
     Extension_Detach_This_From_All(SuperWeaponTypeExtensions, target, all);
-    //RTTI_TASKFORCE                      // <- Not yet implemented
-    //RTTI_TEAM                           // <- Not yet implemented
-    //RTTI_TEAMTYPE                       // <- Not yet implemented
+    //Extension_Detach_This_From_All(TaskForceExtensions, target, all);         // Not yet implemented
+    //Extension_Detach_This_From_All(TeamExtensions, target, all);              // Not yet implemented
+    //Extension_Detach_This_From_All(TeamTypeExtensions, target, all);          // Not yet implemented
     Extension_Detach_This_From_All(TerrainExtensions, target, all);
     Extension_Detach_This_From_All(TerrainTypeExtensions, target, all);
-    //RTTI_TRIGGER                        // <- Not yet implemented
-    //RTTI_TRIGGERTYPE                    // <- Not yet implemented
+    //Extension_Detach_This_From_All(TriggerExtensions, target, all);           // Not yet implemented
+    //Extension_Detach_This_From_All(TriggerTypeExtensions, target, all);       // Not yet implemented
     Extension_Detach_This_From_All(UnitTypeExtensions, target, all);
-    //RTTI_VOXELANIM                      // <- Not yet implemented
+    //Extension_Detach_This_From_All(VoxelAnimExtensions, target, all);         // Not yet implemented
     Extension_Detach_This_From_All(VoxelAnimTypeExtensions, target, all);
     Extension_Detach_This_From_All(WaveExtensions, target, all);
-    //RTTI_TAG                            // <- Not yet implemented
-    //RTTI_TAGTYPE                        // <- Not yet implemented
+    //Extension_Detach_This_From_All(TagExtensions, target, all);               // Not yet implemented
+    //Extension_Detach_This_From_All(TagTypeExtensions, target, all);           // Not yet implemented
     Extension_Detach_This_From_All(TiberiumExtensions, target, all);
-    //RTTI_ACTION                         // <- Not yet implemented
-    //RTTI_EVENT                          // <- Not yet implemented
+    //Extension_Detach_This_From_All(TActionExtensions, target, all);           // Not yet implemented
+    //Extension_Detach_This_From_All(TEventExtensions, target, all);            // Not yet implemented
     Extension_Detach_This_From_All(WeaponTypeExtensions, target, all);
     Extension_Detach_This_From_All(WarheadTypeExtensions, target, all);
-    //RTTI_WAYPOINT                       // <- Not yet implemented
-    //RTTI_ABSTRACT                       // <- Special case, does not actually "exist".
-    //RTTI_TUBE                           // <- Not yet implemented
-    //RTTI_LIGHTSOURCE                    // <- Not yet implemented
-    //RTTI_EMPULSE                        // <- Not yet implemented
-    //RTTI_TACTICALMAP
+    //Extension_Detach_This_From_All(WaypointExtensions, target, all);          // Not yet implemented
+    //Extension_Detach_This_From_All(TubeExtensions, target, all);              // Not yet implemented
+    //Extension_Detach_This_From_All(LightSourceExtensions, target, all);       // Not yet implemented
+    //Extension_Detach_This_From_All(EMPulseExtensions, target, all);           // Not yet implemented
     Extension_Detach_This_From_All(SuperExtensions, target, all);
-    //RTTI_AITRIGGER                      // <- Not yet implemented
-    //RTTI_AITRIGGERTYPE                  // <- Not yet implemented
-    //RTTI_NEURON                         // <- Not yet implemented
-    //RTTI_FOGGEDOBJECT                   // <- Not yet implemented
-    //RTTI_ALPHASHAPE                     // <- Not yet implemented
-    //RTTI_VEINHOLEMONSTER                // <- Not yet implemented
+    //Extension_Detach_This_From_All(AITriggerExtensions, target, all);         // Not yet implemented
+    //Extension_Detach_This_From_All(AITriggerTypeExtensions, target, all);     // Not yet implemented
+    //Extension_Detach_This_From_All(NeuronExtensions, target, all);            // Not yet implemented
+    //Extension_Detach_This_From_All(FoggedObjectExtensions, target, all);      // Not yet implemented
+    //Extension_Detach_This_From_All(AlphaShapeExtensions, target, all);        // Not yet implemented
+    //Extension_Detach_This_From_All(VeinholeMonsterExtensions, target, all);   // Not yet implemented
 
     TacticalMapExtension->Detach(target, all);
     RuleExtension->Detach(target, all);
     ScenExtension->Detach(target, all);
     SessionExtension->Detach(target, all);
 
-    //DEBUG_INFO("Extension::Detach_This_From_All(exit)\n");
+    //DEV_DEBUG_INFO("Extension::Detach_This_From_All(exit)\n");
 }
 
 
@@ -1358,70 +1431,72 @@ unsigned Extension::Get_Save_Version_Number()
     version += sizeof(AnimTypeClassExtension);
     version += sizeof(BuildingClassExtension);
     version += sizeof(BuildingTypeClassExtension);
-    //RTTI_BULLET                         // <- Not yet implemented
+    //version += sizeof(BulletClassExtension);                                  // Not yet implemented
     version += sizeof(BulletTypeClassExtension);
     version += sizeof(CampaignClassExtension);
-    //RTTI_CELL                           // <- Not yet implemented
-    //RTTI_FACTORY                        // <- Not yet implemented
+    //version += sizeof(CellClassExtension);                                    // Not yet implemented
+    //version += sizeof(FactoryClassExtension);                                 // Not yet implemented
     version += sizeof(HouseClassExtension);
     version += sizeof(HouseTypeClassExtension);
     version += sizeof(InfantryClassExtension);
     version += sizeof(InfantryTypeClassExtension);
-    //RTTI_ISOTILE                        // <- Not yet implemented
+    //version += sizeof(IsometricTileClassExtension);                           // Not yet implemented
     version += sizeof(IsometricTileTypeClassExtension);
-    //RTTI_LIGHT                          // <- Not yet implemented
-    //RTTI_OVERLAY                        // <- Not yet implemented
+    //version += sizeof(BuildingLightClassExtension);                           // Not yet implemented
+    //version += sizeof(OverlayClassExtension);                                 // Not yet implemented
     version += sizeof(OverlayTypeClassExtension);
-    //RTTI_PARTICLE                       // <- Not yet implemented
+    //version += sizeof(ParticleClassExtension);                                // Not yet implemented
     version += sizeof(ParticleTypeClassExtension);
-    //RTTI_PARTICLESYSTEM                 // <- Not yet implemented
+    //version += sizeof(ParticleSystemClassExtension);                          // Not yet implemented
     version += sizeof(ParticleSystemTypeClassExtension);
-    //RTTI_SCRIPT                         // <- Not yet implemented
-    //RTTI_SCRIPTTYPE                     // <- Not yet implemented
+    //version += sizeof(ScriptClassExtension);                                  // Not yet implemented
+    //version += sizeof(ScriptTypeClassExtension);                              // Not yet implemented
     version += sizeof(SideClassExtension);
-    //RTTI_SMUDGE                         // <- Not yet implemented
+    //version += sizeof(SmudgeClassExtension);                                  // Not yet implemented
     version += sizeof(SmudgeTypeClassExtension);
-    //RTTI_SPECIAL                        // <- Special case, does not actually "exist".
     version += sizeof(SuperWeaponTypeClassExtension);
-    //RTTI_TASKFORCE                      // <- Not yet implemented
-    //RTTI_TEAM                           // <- Not yet implemented
-    //RTTI_TEAMTYPE                       // <- Not yet implemented
+    //version += sizeof(TaskForceClassExtension);                               // Not yet implemented
+    //version += sizeof(TeamClassExtension);                                    // Not yet implemented
+    //version += sizeof(TeamTypeClassExtension);                                // Not yet implemented
     version += sizeof(TerrainClassExtension);
     version += sizeof(TerrainTypeClassExtension);
-    //RTTI_TRIGGER                        // <- Not yet implemented
-    //RTTI_TRIGGERTYPE                    // <- Not yet implemented
+    //version += sizeof(TriggerClassExtension);                                 // Not yet implemented
+    //version += sizeof(TriggerTypeClassExtension);                             // Not yet implemented
     version += sizeof(UnitTypeClassExtension);
-    //RTTI_VOXELANIM                      // <- Not yet implemented
+    //version += sizeof(VoxelAnimClassExtension);                               // Not yet implemented
     version += sizeof(VoxelAnimTypeClassExtension);
     version += sizeof(WaveClassExtension);
-    //RTTI_TAG                            // <- Not yet implemented
-    //RTTI_TAGTYPE                        // <- Not yet implemented
+    //version += sizeof(TagClassExtension);                                     // Not yet implemented
+    //version += sizeof(TagTypeClassExtension);                                 // Not yet implemented
     version += sizeof(TiberiumClassExtension);
-    //RTTI_ACTION                         // <- Not yet implemented
-    //RTTI_EVENT                          // <- Not yet implemented
+    //version += sizeof(TActionClassExtension);                                 // Not yet implemented
+    //version += sizeof(TEventClassExtension);                                  // Not yet implemented
     version += sizeof(WeaponTypeClassExtension);
     version += sizeof(WarheadTypeClassExtension);
-    //RTTI_WAYPOINT                       // <- Not yet implemented
-    //RTTI_ABSTRACT                       // <- Special case, does not actually "exist".
-    //RTTI_TUBE                           // <- Not yet implemented
-    //RTTI_LIGHTSOURCE                    // <- Not yet implemented
-    //RTTI_EMPULSE                        // <- Not yet implemented
-    //RTTI_TACTICALMAP                    // <- We ignore the fact that Tactical is an abstract derived class, as we treat it as a global.
+    //version += sizeof(WaypointClassExtension);                                // Not yet implemented
+    //version += sizeof(TubeClassExtension);                                    // Not yet implemented
+    //version += sizeof(LightSourceClassExtension);                             // Not yet implemented
+    //version += sizeof(EMPulseClassExtension);                                 // Not yet implemented
     version += sizeof(SuperClassExtension);
-    //RTTI_AITRIGGER                      // <- Not yet implemented
-    //RTTI_AITRIGGERTYPE                  // <- Not yet implemented
-    //RTTI_NEURON                         // <- Not yet implemented
-    //RTTI_FOGGEDOBJECT                   // <- Not yet implemented
-    //RTTI_ALPHASHAPE                     // <- Not yet implemented
-    //RTTI_VEINHOLEMONSTER                // <- Not yet implemented
+    //version += sizeof(AITriggerClassExtension);                               // Not yet implemented
+    //version += sizeof(AITriggerTypeClassExtension);                           // Not yet implemented
+    //version += sizeof(NeuronClassExtension);                                  // Not yet implemented
+    //version += sizeof(FoggedObjectClassExtension);                            // Not yet implemented
+    //version += sizeof(AlphaShapeClassExtension);                              // Not yet implemented
+    //version += sizeof(VeinholeMonsterClassExtension);                         // Not yet implemented
 
     /**
     *  Global classes.
     */
-    version += sizeof(TacticalExtension);
+    version += sizeof(TacticalExtension);                                       // We ignore the fact that Tactical is an abstract derived class, as we treat the extension as a global.
     version += sizeof(RulesClassExtension);
     version += sizeof(ScenarioClassExtension);
     version += sizeof(SessionClassExtension);
+
+    /**
+    *  All other classes.
+    */
+    version += sizeof(ThemeControlExtension);
 
     return version;
 }

@@ -342,7 +342,7 @@ DECLARE_PATCH(_Save_Game_Put_Game_Version)
 
 
 /**
- *  x
+ *  Sanity check on the return value of Load_All().
  * 
  *  @author: CCHyper
  */

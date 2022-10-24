@@ -8,7 +8,7 @@
  *
  *  @author        CCHyper
  *
- *  @brief         
+ *  @brief         The file contains the functions required for the extension system.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -32,15 +32,18 @@
 #include "extension_globals.h"
 #include "abstract.h"
 #include "abstractext.h"
+#include "swizzle.h"
+#include "noinit.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include <unknwn.h> // for IStream
-#include <string>
 #include <typeinfo>
+#include <string>
 
 
 class EventClass;
+class WWCRCEngine;
 
 
 namespace Extension
@@ -63,6 +66,8 @@ namespace Utility
 
 /**
  *  Erase First Occurrence of given substring from main string.
+ * 
+ *  @author: CCHyper
  */
 inline void Erase_Sub_String(std::string &str, const std::string &erase)
 {
@@ -81,6 +86,8 @@ inline void Erase_Sub_String(std::string &str, const std::string &erase)
 
 /**
  *  Wrapper for "typeid(T).name()", removes the "class" or "struct" prefix on the string.
+ * 
+ *  @author: CCHyper
  */
 template<typename T>
 std::string Get_TypeID_Name()
@@ -94,14 +101,14 @@ std::string Get_TypeID_Name()
 static std::string Get_TypeID_Name(const AbstractClass *abstract)
 {
     std::string str = typeid(*abstract).name();
-    str.erase(0, 6);
+    Erase_Sub_String(str, "class ");
     return str;
 }
 
 static std::string Get_TypeID_Name(const AbstractClassExtension *abstract_ext)
 {
     std::string str = typeid(*abstract_ext).name();
-    str.erase(0, 6);
+    Erase_Sub_String(str, "class ");
     return str;
 }
 
@@ -111,7 +118,7 @@ namespace Singleton
 {
 
 /**
- *  x
+ *  Create an isntance of the singleton class.
  * 
  *  @author: CCHyper
  */
@@ -129,7 +136,7 @@ EXT_CLASS *Make(const BASE_CLASS *base)
 }
 
 /**
- *  x
+ *  Destroy an instance of the singleton class.
  * 
  *  @author: CCHyper
  */
@@ -149,7 +156,7 @@ namespace List
 {
 
 /**
- *  x
+ *  Fetch an extension instance from a list whose extension pointer points to the base class.
  * 
  *  @author: CCHyper
  */
@@ -170,7 +177,7 @@ EXT_CLASS *Fetch(const BASE_CLASS *base, DynamicVectorClass<EXT_CLASS *> &list)
 }
 
 /**
- *  x
+ *  Creation an instance of the extension class and add it to the list.
  * 
  *  @author: CCHyper
  */
@@ -190,7 +197,7 @@ EXT_CLASS *Make(const BASE_CLASS *base, DynamicVectorClass<EXT_CLASS *> &list)
 }
 
 /**
- *  x
+ *  Destroy an instance of the extension and remove it from the list.
  * 
  *  @author: CCHyper
  */
@@ -214,7 +221,7 @@ void Destroy(const BASE_CLASS *base, DynamicVectorClass<EXT_CLASS *> &list)
 }; // namespace "Extension::List".
 
 /**
- *  x
+ *  Fetch the extension instance linked to this abstract object. 
  * 
  *  @author: CCHyper
  */
@@ -227,7 +234,7 @@ EXT_CLASS *Fetch(const AbstractClass *abstract)
 }
 
 /**
- *  x
+ *  Create an instance of the extension class and link it to the abstract object.
  * 
  *  @author: CCHyper
  */
@@ -240,7 +247,7 @@ EXT_CLASS *Make(const AbstractClass *abstract)
 }
 
 /**
- *  x
+ *  Destory an instance of the extension class linked to this abstract object.
  * 
  *  @author: CCHyper
  */
@@ -261,15 +268,189 @@ bool Request_Pointer_Remap();
 unsigned Get_Save_Version_Number();
 
 /**
- *  
+ *  Tracking, announcement, and debugging functions.
  */
 void Detach_This_From_All(TARGET target, bool all = true);
+bool Register_Class_Factories();
 void Free_Heaps();
 void Print_CRCs(FILE *fp, EventClass *ev);
 
-/**
- *  
- */
-bool Register_Class_Factories();
-
 }; // namespace "Extension".
+
+
+/**
+ * 
+ *  Base class for all global extension classes.
+ * 
+ */
+template<class T>
+class GlobalExtensionClass
+{
+    public:
+        STDMETHOD(Load)(IStream *pStm);
+        STDMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
+
+    public:
+        GlobalExtensionClass(const T *this_ptr = nullptr);
+        GlobalExtensionClass(const NoInitClass &noinit);
+        virtual ~GlobalExtensionClass();
+
+        /**
+         *  Return the raw size of class data for save/load purposes.
+         *  
+         *  @note: This must be overridden by the extended class!
+         */
+        virtual int Size_Of() const = 0;
+
+        /**
+         *  Removes the specified target from any targeting and reference trackers.
+         *  
+         *  @note: This must be overridden by the extended class!
+         */
+        virtual void Detach(TARGET target, bool all = true) = 0;
+
+        /**
+         *  Compute a unique crc value for this instance.
+         *  
+         *  @note: This must be overridden by the extended class!
+         */
+        virtual void Compute_CRC(WWCRCEngine &crc) const = 0;
+
+        /**
+         *  Access to the class instance we extend.
+         */
+        virtual T *This() const { return const_cast<T *>(ThisPtr); }
+        virtual const T *This_Const() const { return ThisPtr; }
+
+        /**
+         *  Assign the class instance that we extend.
+         */
+        virtual void Assign_This(const T *this_ptr) { ASSERT(this_ptr != nullptr); ThisPtr = this_ptr; }
+
+        /**
+         *  Returns the name of this object type.
+         *  
+         *  @note: This must be overridden by the extended class!
+         */
+        virtual const char *Name() const = 0;
+
+        /**
+         *  Returns the full name of this object type.
+         *  
+         *  @note: This must be overridden by the extended class!
+         */
+        virtual const char *Full_Name() const = 0;
+
+    private:
+        /**
+         *  Pointer to the class we are extending. This provides us with a way of
+         *  quickly referencing the base class without doing a look-up each time.
+         */
+        const T *ThisPtr;
+
+    private:
+        GlobalExtensionClass(const GlobalExtensionClass &) = delete;
+        void operator = (const GlobalExtensionClass &) = delete;
+
+    public:
+};
+
+
+/**
+ *  Class constructor
+ * 
+ *  @author: CCHyper
+ */
+template<class T>
+GlobalExtensionClass<T>::GlobalExtensionClass(const T *this_ptr) :
+    ThisPtr(this_ptr)
+{
+    //if (this_ptr) EXT_DEBUG_TRACE("GlobalExtensionClass<%s>::GlobalExtensionClass - 0x%08X\n", typeid(T).name(), (uintptr_t)(ThisPtr));
+    //ASSERT(ThisPtr != nullptr);      // NULL ThisPtr is valid when performing a Load state operation.
+}
+
+
+/**
+ *  Class no-init constructor.
+ * 
+ *  @author: CCHyper
+ */
+template<class T>
+GlobalExtensionClass<T>::GlobalExtensionClass(const NoInitClass &noinit)
+{
+    //EXT_DEBUG_TRACE("GlobalExtensionClass<%s>::GlobalExtensionClass(NoInitClass) - 0x%08X\n", typeid(T).name(), (uintptr_t)(ThisPtr));
+}
+
+
+/**
+ *  Class destructor
+ * 
+ *  @author: CCHyper
+ */
+template<class T>
+GlobalExtensionClass<T>::~GlobalExtensionClass()
+{
+    //EXT_DEBUG_TRACE("GlobalExtensionClass<%s>::~GlobalExtensionClass - 0x%08X\n", typeid(T).name(), (uintptr_t)(ThisPtr));
+
+    ThisPtr = nullptr;
+}
+
+
+/**
+ *  Loads the object from the stream and requests a new pointer to
+ *  the class we extended post-load.
+ * 
+ *  As singleton is static data, we do not need to request
+ *  pointer remap of "ThisPtr" after loading has finished.
+ * 
+ *  @author: CCHyper, tomsons26
+ */
+template<class T>
+HRESULT GlobalExtensionClass<T>::Load(IStream *pStm)
+{
+    //EXT_DEBUG_TRACE("GlobalExtensionClass<%s>::Load - 0x%08X\n", typeid(T).name(), (uintptr_t)(ThisPtr));
+
+    if (!pStm) {
+        return E_POINTER;
+    }
+
+    HRESULT hr;
+
+    /**
+     *  Read this classes binary blob data directly into this instance.
+     */
+    hr = pStm->Read(this, Size_Of(), nullptr);
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    return hr;
+}
+
+
+/**
+ *  Saves the object to the stream.
+ * 
+ *  @author: CCHyper, tomsons26
+ */
+template<class T>
+HRESULT GlobalExtensionClass<T>::Save(IStream *pStm, BOOL fClearDirty)
+{
+    //EXT_DEBUG_TRACE("GlobalExtensionClass<%s>::Save - 0x%08X\n", typeid(T).name(), (uintptr_t)(ThisPtr));
+
+    if (!pStm) {
+        return E_POINTER;
+    }
+
+    HRESULT hr;
+    
+    /**
+     *  Write this class instance as a binary blob.
+     */
+    hr = pStm->Write(this, Size_Of(), nullptr);
+    if (FAILED(hr)) {
+        return hr;
+    }
+
+    return hr;
+}

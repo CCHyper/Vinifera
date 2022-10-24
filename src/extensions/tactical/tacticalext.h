@@ -28,7 +28,7 @@
 #pragma once
 
 #include "abstractext.h"
-#include "extension_singleton.h"
+#include "extension.h"
 #include "tactical.h"
 #include "ttimer.h"
 #include "stimer.h"
@@ -50,7 +50,7 @@ enum InfoTextPosType {
 };
 
 
-class TacticalExtension final : public ExtensionSingleton<Tactical>
+class TacticalExtension final : public GlobalExtensionClass<Tactical>
 {
     public:
         IFACEMETHOD(Load)(IStream *pStm);

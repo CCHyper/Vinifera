@@ -40,7 +40,7 @@
  *  A fake class for implementing new member functions which allow
  *  access to the "this" pointer of the intended class.
  * 
- *  @note: This must not contain a constructor or deconstructor.
+ *  @note: This must not contain a constructor or destructor.
  * 
  *  @note: All functions must not be virtual and must also be prefixed
  *         with "_" to prevent accidental virtualization.
@@ -77,8 +77,8 @@ DECLARE_PATCH(_AbstractClass_Constructor_Extension)
     _asm { mov [eax+0x8], 0xFFFFFFFF } // ID
     _asm { mov [eax+0x0C], ecx } // HeapID
 
-    // AbstractClass * ExtPtr;
-    _asm { mov [eax+0x10], ecx } // IsDirty, now reused as a extension pointer, so we need to clear the DWORD.
+    // AbstractClassExtension * ExtPtr;
+    _asm { mov [eax+0x10], ecx } // IsDirty, now reused as a extension pointer, so we need to clear the whole DWORD.
 
     _asm { mov [eax+0x0], 0x006CAA6C } // offset const AbstractClass::`vftable'
     _asm { mov [eax+0x4], 0x006CAA54 } // offset const AbstractClass::`vftable' for IRTTITypeInfo
@@ -95,7 +95,7 @@ void AbstractClassExtension_Init()
     Patch_Jump(0x00405E00, &AbstractClassExt::Is_Dirty);
 
     /**
-     *  Removes the branch from AbstractClass::Abstract_Save which clears IsDirty.
+     *  Removes the branch from AbstractClass::Internal_Save which clears IsDirty.
      */
     Patch_Byte_Range(0x00405CF8, 0x90, 12);
 

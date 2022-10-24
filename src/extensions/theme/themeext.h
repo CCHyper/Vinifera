@@ -28,14 +28,14 @@
 #pragma once
 
 #include "always.h"
-#include "extension_singleton.h"
+#include "extension.h"
 #include "theme.h"
 
 
 class CCINIClass;
 
 
-class ThemeControlExtension final : public ExtensionSingleton<ThemeClass::ThemeControl>
+class ThemeControlExtension final : public GlobalExtensionClass<ThemeClass::ThemeControl>
 {
     public:
         IFACEMETHOD(Load)(IStream *pStm);

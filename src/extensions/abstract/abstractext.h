@@ -40,7 +40,8 @@ class WWCRCEngine;
 
 
 /**
- *  x
+ *  This class is the base class for all game objects we can extend that have an
+ *  existence on the battlefield.
  */
 class AbstractClassExtension : public IPersistStream
 {
@@ -109,12 +110,16 @@ class AbstractClassExtension : public IPersistStream
         virtual RTTIType What_Am_I() const = 0; // { return RTTI_ABSTRACT; }
 
         /**
-         *  x
+         *  Returns the name of this object type.
+         *  
+         *  @note: This must be overridden by the extended class!
          */
         virtual const char *Name() const = 0;
 
         /**
-         *  x
+         *  Returns the full name of this object type.
+         *  
+         *  @note: This must be overridden by the extended class!
          */
         virtual const char *Full_Name() const = 0;
 

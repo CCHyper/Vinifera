@@ -113,7 +113,7 @@ HRESULT AbstractTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 
 
 /**
- *  x 
+ *  Returns the name of this object type.
  *  
  *  @author: CCHyper
  */
@@ -128,7 +128,7 @@ const char *AbstractTypeClassExtension::Name() const
 
 
 /**
- *  x 
+ *  Returns the full name of this object type.
  *  
  *  @author: CCHyper
  */

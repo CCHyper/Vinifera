@@ -28,14 +28,14 @@
 #pragma once
 
 #include "always.h"
-#include "extension_singleton.h"
+#include "extension.h"
 #include "options.h"
 
 
 class CCINIClass;
 
 
-class OptionsClassExtension final : public ExtensionSingleton<OptionsClass>
+class OptionsClassExtension final : public GlobalExtensionClass<OptionsClass>
 {
     public:
         IFACEMETHOD(Load)(IStream *pStm);

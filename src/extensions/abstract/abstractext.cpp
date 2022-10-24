@@ -38,7 +38,7 @@
 
 
 /**
- *  x
+ *  Class constructor
  * 
  *  @author: CCHyper
  */
@@ -51,7 +51,7 @@ AbstractClassExtension::AbstractClassExtension(const AbstractClass *this_ptr) :
 
 
 /**
- *  x
+ *  Class no-init constructor.
  * 
  *  @author: CCHyper
  */
@@ -62,7 +62,7 @@ AbstractClassExtension::AbstractClassExtension(const NoInitClass &noinit)
 
 
 /**
- *  x
+ *  Class destructor
  * 
  *  @author: CCHyper
  */
@@ -179,7 +179,7 @@ HRESULT AbstractClassExtension::Internal_Load(IStream *pStm)
     Wstring this_name = Wstring(Extension::Utility::Get_TypeID_Name(this).c_str()) + ":" + Wstring("ThisPtr");
 
     /**
-     *  x
+     *  Register this instance to be available for remapping references to.
      */
     VINIFERA_SWIZZLE_REGISTER_POINTER(id, this, this_name.Peek_Buffer());
 
@@ -213,7 +213,7 @@ HRESULT AbstractClassExtension::Internal_Save(IStream *pStm, BOOL fClearDirty)
     Wstring this_name = Wstring(Extension::Utility::Get_TypeID_Name(this).c_str()) + ":" + Wstring("ThisPtr");
 
     /**
-     *  x
+     *  Fetch the save id for this instance.
      */
     LONG id;
     VINIFERA_SWIZZLE_FETCH_SWIZZLE_ID(this, id, this_name.Peek_Buffer());

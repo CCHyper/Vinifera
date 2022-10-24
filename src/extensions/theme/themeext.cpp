@@ -38,7 +38,7 @@
  *  @author: CCHyper
  */
 ThemeControlExtension::ThemeControlExtension(const ThemeClass::ThemeControl *this_ptr) :
-    ExtensionSingleton(this_ptr),
+    GlobalExtensionClass(this_ptr),
     RequiredAddon(ADDON_NONE)
 {
     //EXT_DEBUG_TRACE("ThemeControlExtension::ThemeControlExtension - 0x%08X\n", (uintptr_t)(This()));
@@ -51,7 +51,7 @@ ThemeControlExtension::ThemeControlExtension(const ThemeClass::ThemeControl *thi
  *  @author: CCHyper
  */
 ThemeControlExtension::ThemeControlExtension(const NoInitClass &noinit) :
-    ExtensionSingleton(noinit)
+    GlobalExtensionClass(noinit)
 {
     //EXT_DEBUG_TRACE("ThemeControlExtension::ThemeControlExtension(NoInitClass) - 0x%08X\n", (uintptr_t)(This()));
 }
@@ -77,7 +77,7 @@ HRESULT ThemeControlExtension::Load(IStream *pStm)
 {
     //EXT_DEBUG_TRACE("ThemeControlExtension::Load - 0x%08X\n", (uintptr_t)(This()));
 
-    HRESULT hr = ExtensionSingleton::Load(pStm);
+    HRESULT hr = GlobalExtensionClass::Load(pStm);
     if (FAILED(hr)) {
         return E_FAIL;
     }
@@ -97,7 +97,7 @@ HRESULT ThemeControlExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
     //EXT_DEBUG_TRACE("ThemeControlExtension::Save - 0x%08X\n", (uintptr_t)(This()));
 
-    HRESULT hr = ExtensionSingleton::Save(pStm, fClearDirty);
+    HRESULT hr = GlobalExtensionClass::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
     }

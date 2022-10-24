@@ -28,11 +28,11 @@
 #pragma once
 
 #include "always.h"
-#include "extension_singleton.h"
+#include "extension.h"
 #include "scenario.h"
 
 
-class ScenarioClassExtension final : public ExtensionSingleton<ScenarioClass>
+class ScenarioClassExtension final : public GlobalExtensionClass<ScenarioClass>
 {
     public:
         IFACEMETHOD(Load)(IStream *pStm);

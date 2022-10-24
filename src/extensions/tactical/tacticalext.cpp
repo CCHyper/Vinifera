@@ -61,7 +61,7 @@
  *  @author: CCHyper
  */
 TacticalExtension::TacticalExtension(const Tactical *this_ptr) :
-    ExtensionSingleton(this_ptr),
+    GlobalExtensionClass(this_ptr),
     IsInfoTextSet(false),
     InfoTextBuffer(),
     InfoTextPosition(BOTTOM_LEFT),
@@ -80,7 +80,7 @@ TacticalExtension::TacticalExtension(const Tactical *this_ptr) :
  *  @author: CCHyper
  */
 TacticalExtension::TacticalExtension(const NoInitClass &noinit) :
-    ExtensionSingleton(noinit),
+    GlobalExtensionClass(noinit),
     InfoTextTimer(noinit)
 {
     //EXT_DEBUG_TRACE("TacticalExtension::TacticalExtension(NoInitClass) - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
@@ -99,7 +99,7 @@ TacticalExtension::~TacticalExtension()
 
 
 /**
- *  x
+ *  Initializes an object from the stream where it was saved previously.
  *  
  *  @author: CCHyper
  */
@@ -107,7 +107,7 @@ HRESULT TacticalExtension::Load(IStream *pStm)
 {
     //EXT_DEBUG_TRACE("TacticalExtension::Load - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
-    HRESULT hr = ExtensionSingleton::Load(pStm);
+    HRESULT hr = GlobalExtensionClass::Load(pStm);
     if (FAILED(hr)) {
         return E_FAIL;
     }
@@ -119,7 +119,7 @@ HRESULT TacticalExtension::Load(IStream *pStm)
 
 
 /**
- *  x
+ *  Saves an object to the specified stream.
  *  
  *  @author: CCHyper
  */
@@ -127,7 +127,7 @@ HRESULT TacticalExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
     //EXT_DEBUG_TRACE("TacticalExtension::Save - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
-    HRESULT hr = ExtensionSingleton::Save(pStm, fClearDirty);
+    HRESULT hr = GlobalExtensionClass::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
     }

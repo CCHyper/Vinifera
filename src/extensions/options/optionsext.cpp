@@ -42,7 +42,7 @@
  *  @author: CCHyper
  */
 OptionsClassExtension::OptionsClassExtension(const OptionsClass *this_ptr) :
-    ExtensionSingleton(this_ptr)
+    GlobalExtensionClass(this_ptr)
 {
     //EXT_DEBUG_TRACE("OptionsClassExtension::OptionsClassExtension - 0x%08X\n", (uintptr_t)(This()));
 }
@@ -54,7 +54,7 @@ OptionsClassExtension::OptionsClassExtension(const OptionsClass *this_ptr) :
  *  @author: CCHyper
  */
 OptionsClassExtension::OptionsClassExtension(const NoInitClass &noinit) :
-    ExtensionSingleton(noinit)
+    GlobalExtensionClass(noinit)
 {
     //EXT_DEBUG_TRACE("OptionsClassExtension::OptionsClassExtension(NoInitClass) - 0x%08X\n", (uintptr_t)(This()));
 }
@@ -80,7 +80,7 @@ HRESULT OptionsClassExtension::Load(IStream *pStm)
 {
     //EXT_DEBUG_TRACE("OptionsClassExtension::Load - 0x%08X\n", (uintptr_t)(This()));
 
-    HRESULT hr = ExtensionSingleton::Load(pStm);
+    HRESULT hr = GlobalExtensionClass::Load(pStm);
     if (FAILED(hr)) {
         return E_FAIL;
     }
@@ -100,7 +100,7 @@ HRESULT OptionsClassExtension::Save(IStream *pStm, BOOL fClearDirty)
 {
     //EXT_DEBUG_TRACE("OptionsClassExtension::Save - 0x%08X\n", (uintptr_t)(This()));
 
-    HRESULT hr = ExtensionSingleton::Save(pStm, fClearDirty);
+    HRESULT hr = GlobalExtensionClass::Save(pStm, fClearDirty);
     if (FAILED(hr)) {
         return hr;
     }
