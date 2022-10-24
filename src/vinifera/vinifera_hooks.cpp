@@ -350,8 +350,6 @@ DECLARE_PATCH(_Load_Game_Check_Return_Value)
 {
     GET_REGISTER_STATIC(const char *, filename, esi);
 
-    Vinifera_PerformingLoad = true;
-
     _asm { mov ecx, [esp+0x20] }
     _asm { xor dl, dl }
     _asm { mov eax, 0x005D6BE0 }
@@ -549,6 +547,9 @@ DECLARE_PATCH(_Load_All_Vinifera_Data)
         goto failed;
     }
 
+    /**
+     *  We have finished loading the game data, reset the load flag.
+     */
     Vinifera_PerformingLoad = false;
 
     /**

@@ -135,6 +135,7 @@
 
 #include "theatertype_hooks.h"
 
+#include "vinifera_globals.h"
 #include "tibsun_functions.h"
 #include "iomap.h"
 #include "tracker.h"
@@ -171,6 +172,26 @@ static void _Extension_Free_Heaps_Intercept()
     Extension::Free_Heaps();
 
     Free_Heaps();
+}
+
+
+/**
+ *  This function is for intercepting the call to Clear_Scenarion in Load_All
+ *  to flag that we are performing a load operation, which stops the game from
+ *  creating extensions while the Windows API calsl the class factories to create
+ *  the instances.
+ * 
+ *  @author: tomsons26
+ */
+static void _Extension_On_Load_Clear_Scenario_Intercept()
+{
+    Clear_Scenario();
+
+    /**
+     *  Now the scenario data has been cleaned up, we can now tell the extension
+     *  hooks that we will be creating the extension classes via the class factories.
+     */
+    Vinifera_PerformingLoad = true;
 }
 
 
@@ -308,6 +329,8 @@ static void Extension_Intercept_Hooks()
     Patch_Call(0x00673AA3, &_Extension_Detach_This_From_All_Intercept); // WaypointPathClass::~WaypointPathClass
     Patch_Call(0x00680C54, &_Extension_Detach_This_From_All_Intercept); // WeaponTypeClass::~WeaponTypeClass
     Patch_Call(0x006818F4, &_Extension_Detach_This_From_All_Intercept); // WeaponTypeClass::~WeaponTypeClass
+
+    Patch_Call(0x005D6BEC, &_Extension_On_Load_Clear_Scenario_Intercept); // Load_All
 
     Patch_Jump(0x005B845B, &_Extension_Print_CRCs_Hook);
 }
