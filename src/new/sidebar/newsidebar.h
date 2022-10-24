@@ -138,6 +138,7 @@ class NewSidebarClass : public PowerClass
                 void One_Time(int id);
                 void Init_Clear();
                 void Init_IO(int id);
+                void Init_For_House(int id);
                 const char *Help_Text(int index);
                 bool Recalc();
                 void Activate();
@@ -312,7 +313,8 @@ class NewSidebarClass : public PowerClass
                  *  
                  */
                 static const ShapeFileStruct * DarkenShape;
-
+                
+            public:
                 static ShapeButtonClass UpButton[COLUMNS];
                 static ShapeButtonClass DownButton[COLUMNS];
                 static SelectClass SelectButton[COLUMNS][MAX_VISIBLE];
@@ -345,8 +347,8 @@ class NewSidebarClass : public PowerClass
         /**
          *  DisplayClass
          */
-        //virtual HRESULT Load(IStream *pStm) override;
-        //virtual HRESULT Save(IStream *pStm) override;
+        virtual HRESULT Load(IStream *pStm) override;
+        virtual HRESULT Save(IStream *pStm) override;
         virtual const char *Help_Text(int index) override;
         virtual void entry_84() override;
 
@@ -367,6 +369,7 @@ class NewSidebarClass : public PowerClass
         bool Activate_Demolish(int control);
         int Which_Column(RTTIType type);
         void Radar_Mode_Control();
+        void Set_Cameo_Text(bool enable);
 
         bool Is_On_Sidebar(RTTIType type, int id)
         {
@@ -417,13 +420,13 @@ class NewSidebarClass : public PowerClass
         static const ShapeFileStruct * ClockShape;
         static const ShapeFileStruct * RechargeClockShape;
 
-        static ShapeFileStruct * SidebarShape;
-        static ShapeFileStruct * SidebarMiddleShape;
-        static ShapeFileStruct * SidebarBottomShape;
-        static ShapeFileStruct * SidebarAddonShape;
+        static const ShapeFileStruct * SidebarShape;
+        static const ShapeFileStruct * SidebarMiddleShape;
+        static const ShapeFileStruct * SidebarBottomShape;
+        static const ShapeFileStruct * SidebarAddonShape;
 
         static ShapeButtonClass Waypoint;
-        static ShapeButtonClass Demolish;
+        static ShapeButtonClass Upgrade;
         static ShapeButtonClass Power;
         static ShapeButtonClass Repair;
         static SBGadgetClass Background;
