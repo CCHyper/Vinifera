@@ -139,7 +139,7 @@ class NewSidebarClass : public PowerClass
                 void Init_Clear();
                 void Init_IO(int id);
                 void Init_For_House(int id);
-                const char *Help_Text(int index);
+                const char *Help_Text(int gadget_id);
                 bool Recalc();
                 void Activate();
                 void Deactivate();
@@ -349,7 +349,7 @@ class NewSidebarClass : public PowerClass
          */
         virtual HRESULT Load(IStream *pStm) override;
         virtual HRESULT Save(IStream *pStm) override;
-        virtual const char *Help_Text(int index) override;
+        virtual const char *Help_Text(int gadget_id) override;
         virtual void entry_84() override;
 
         /**

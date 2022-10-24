@@ -754,7 +754,7 @@ void NewSidebarClass::AI(KeyNumType & input, Point2D & xy) // TODO
             Waypoint_Mode_Control(-1, false);
         }
 
-        if (input == (BUTTON_DEMOLISH|KN_BUTTON)) {
+        if (input == (BUTTON_UPGRADE|KN_BUTTON)) {
             Sell_Mode_Control(-1);
         }
 
@@ -775,11 +775,11 @@ void NewSidebarClass::AI(KeyNumType & input, Point2D & xy) // TODO
         Upgrade.Turn_Off();
     }
 
-    if (!IsSellMode && Power.IsOn) {
+    if (!IsPowerMode && Power.IsOn) {
         Power.Turn_Off();
     }
 
-    if (!IsSellMode && Waypoint.IsOn) {
+    if (!IsWaypointMode && Waypoint.IsOn) {
         Waypoint.Turn_Off();
     }
 
@@ -1448,11 +1448,11 @@ bool NewSidebarClass::StripClass::AI(KeyNumType & input, Point2D & xy) // TODO
  * HISTORY:                                                                                    *
  *   11/18/1994 JLB : Created.                                                                 *
  *=============================================================================================*/
-const char *NewSidebarClass::StripClass::Help_Text(int index) // DONE
+const char *NewSidebarClass::StripClass::Help_Text(int gadget_id) // DONE
 {
     static char _buffer[84];
 
-    int i = index + TopIndex;
+    int i = gadget_id + TopIndex;
 
     if (GameActive) {
 
@@ -2426,17 +2426,17 @@ void NewSidebarClass::entry_84()
  * HISTORY:                                                                                    *
  *   11/18/1994 JLB : Created.                                                                 *
  *=============================================================================================*/
-const char *NewSidebarClass::Help_Text(int index) // DONE
+const char *NewSidebarClass::Help_Text(int gadget_id) // DONE
 {
-    const char * t = PowerClass::Help_Text(index);
-    if ( !t ) {
-        int column = (index - 1000) / 256;
+    const char * text = PowerClass::Help_Text(gadget_id);
+    if (!text) {
+        int column = (gadget_id - 1000) >> 8;
         if (column >= 0 && column < ARRAY_SIZE(Column)) {
-            t = Column[column].Help_Text((index + 24));
+            text = Column[column].Help_Text((gadget_id + 24));
         }
     }
 
-    return t;
+    return text;
 }
 
 
