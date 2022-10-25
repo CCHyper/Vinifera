@@ -117,6 +117,7 @@
 #include "ccfileext_hooks.h"
 
 #include "theatertype_hooks.h"
+#include "newsidebar_hooks.h"
 
 #include "fetchres_hooks.h"
 
@@ -201,6 +202,7 @@ void Extension_Hooks()
      *  New classes and interfaces.
      */
     TheaterTypeClassExtension_Hooks();
+    NewSidebarClassExtension_Hooks();
 
     /**
      *  Various modules and functions.

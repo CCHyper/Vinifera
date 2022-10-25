@@ -1,20 +1,30 @@
-/***********************************************************************************************
- ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
- ***********************************************************************************************
- *                                                                                             *
- *                 Project Name : Command & Conquer                                            *
- *                                                                                             *
- *                    File Name : SIDEBAR.H                                                    *
- *                                                                                             *
- *                   Programmer : Joe L. Bostic                                                *
- *                                                                                             *
- *                   Start Date : October 20, 1994                                             *
- *                                                                                             *
- *                  Last Update : October 20, 1994   [JLB]                                     *
- *                                                                                             *
- *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/*******************************************************************************
+/*                 O P E N  S O U R C E  --  V I N I F E R A                  **
+/*******************************************************************************
+ *
+ *  @project       Vinifera
+ *
+ *  @file          NEWSIDEBAR.H
+ *
+ *  @author        CCHyper
+ *
+ *  @brief         
+ *
+ *  @license       Vinifera is free software: you can redistribute it and/or
+ *                 modify it under the terms of the GNU General Public License
+ *                 as published by the Free Software Foundation, either version
+ *                 3 of the License, or (at your option) any later version.
+ *
+ *                 Vinifera is distributed in the hope that it will be
+ *                 useful, but WITHOUT ANY WARRANTY; without even the implied
+ *                 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *                 PURPOSE. See the GNU General Public License for more details.
+ *
+ *                 You should have received a copy of the GNU General Public
+ *                 License along with this program.
+ *                 If not, see <http://www.gnu.org/licenses/>.
+ *
+ ******************************************************************************/
 #pragma once
 
 #include "always.h"
@@ -163,7 +173,7 @@ class NewSidebarClass : public PowerClass
             public:
                 static int Max_Visible();
 
-            private:                
+            public:                
                 /**
                  *  This is the coordinate of the upper left corner that this side strip
                  *  uses for rendering.
@@ -308,6 +318,7 @@ class NewSidebarClass : public PowerClass
                     FactoryClass * Factory;                                // Production manager.
                 } BuildType;
                 BuildType Buildables[MAX_BUILDABLES];
+                //DynamicVectorClass<BuildType> Buildables;
                 
             private:
                 /**
@@ -321,6 +332,7 @@ class NewSidebarClass : public PowerClass
                 static SelectClass SelectButton[COLUMNS][MAX_VISIBLE];
 
         } Column[COLUMNS];
+        //DynamicVectorClass<StripClass> Column;
 
     public:
         class SBGadgetClass: public GadgetClass

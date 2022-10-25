@@ -1,62 +1,30 @@
-/***********************************************************************************************
- ***            C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
- ***********************************************************************************************
- *                                                                                             *
- *                 Project Name : Command & Conquer                                            *
- *                                                                                             *
- *                    File Name : SIDEBAR.CPP                                                  *
- *                                                                                             *
- *                   Programmer : Joe L. Bostic                                                *
- *                                                                                             *
- *                   Start Date : October 20, 1994                                             *
- *                                                                                             *
- *                  Last Update : October 9, 1996 [JLB]                                        *
- *                                                                                             *
- *---------------------------------------------------------------------------------------------*
- * Functions:                                                                                  *
- *   NewSidebarClass::AI -- Handles player clicking on sidebar area.                              *
- *   NewSidebarClass::Abandon_Production -- Stops production of the object specified.             *
- *   NewSidebarClass::Activate -- Controls the sidebar activation.                                *
- *   NewSidebarClass::Activate_Upgrade -- Controls the demolish button on the sidebar.           *
- *   NewSidebarClass::Activate_Repair -- Controls the repair button on the sidebar.               *
- *   NewSidebarClass::Activate_Upgrade -- Controls the upgrade button on the sidebar.             *
- *   NewSidebarClass::Add -- Adds a game object to the sidebar list.                              *
- *   NewSidebarClass::Draw_It -- Renders the sidebar display.                                     *
- *   NewSidebarClass::Factory_Link -- Links a factory to a sidebar strip.                         *
- *   NewSidebarClass::Init_Clear -- Sets sidebar to a known (and deactivated) state               *
- *   NewSidebarClass::Init_IO -- Adds buttons to the button list                                  *
- *   NewSidebarClass::Init_Theater -- Performs theater-specific initialization                    *
- *   NewSidebarClass::One_Time -- Handles the one time game initializations.                      *
- *   NewSidebarClass::One_Time -- Handles the one time game initializations.                      *
- *   NewSidebarClass::Recalc -- Examines the sidebar data and updates it as necessary.            *
- *   NewSidebarClass::Refresh_Cells -- Intercepts the refresh, looking for sidebar controls.      *
- *   NewSidebarClass::SBGadgetClass::Action -- Special function that controls the mouse over the s*
- *   NewSidebarClass::Scroll -- Handles scrolling the sidebar object strip.                       *
- *   NewSidebarClass::Set_Current -- Sets a specified object that controls the sidebar display.   *
- *   NewSidebarClass::NewSidebarClass -- Default constructor for the sidebar.                        *
- *   NewSidebarClass::NewSidebarClass -- This is the no initialization constructor for the sidebar.  *
- *   NewSidebarClass::StripClass::AI -- Input and AI processing for the side strip.               *
- *   NewSidebarClass::StripClass::Abandon_Produ -- Abandons production associated with sidebar.   *
- *   NewSidebarClass::StripClass::Activate -- Adds the strip buttons to the input system.         *
- *   NewSidebarClass::StripClass::Add -- Add an object to the side strip.                         *
- *   NewSidebarClass::StripClass::Deactivate -- Removes the side strip buttons from the input syst*
- *   NewSidebarClass::StripClass::Draw_It -- Render the sidebar display.                          *
- *   NewSidebarClass::StripClass::Factory_Link -- Links a factory to a sidebar button.            *
- *   NewSidebarClass::StripClass::Flag_To_Redra -- Flags the sidebar strip to be redrawn.         *
- *   NewSidebarClass::StripClass::Get_Special_Cameo -- Fetches the special event cameo shape.     *
- *   NewSidebarClass::StripClass::Init_Clear -- Sets sidebar to a known (and deactivated) state   *
- *   NewSidebarClass::StripClass::Init_IO -- Adds buttons to the button list                      *
- *   NewSidebarClass::StripClass::Init_Theater -- Performs theater-specific initialization        *
- *   NewSidebarClass::StripClass::One_Time -- Performs one time actions necessary for the side str*
- *   NewSidebarClass::StripClass::Recalc -- Revalidates the current sidebar list of objects.      *
- *   NewSidebarClass::StripClass::Scroll -- Causes the side strip to scroll.                      *
- *   NewSidebarClass::StripClass::SelectClass:: -- Action function when buildable cameo is selecte*
- *   NewSidebarClass::StripClass::SelectClass:: -- Assigns special values to a buildable select bu*
- *   NewSidebarClass::StripClass::SelectClass::SelectClass -- Default constructor.                *
- *   NewSidebarClass::StripClass::StripClass -- Default constructor for the side strip class.     *
- *   NewSidebarClass::Which_Column -- Determines which column a given type should appear.         *
- *   NewSidebarClass::Zoom_Mode_Control -- Handles the zoom mode toggle operation.                *
- * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+/*******************************************************************************
+/*                 O P E N  S O U R C E  --  V I N I F E R A                  **
+/*******************************************************************************
+ *
+ *  @project       Vinifera
+ *
+ *  @file          NEWSIDEBAR.CPP
+ *
+ *  @author        CCHyper
+ *
+ *  @brief         
+ *
+ *  @license       Vinifera is free software: you can redistribute it and/or
+ *                 modify it under the terms of the GNU General Public License
+ *                 as published by the Free Software Foundation, either version
+ *                 3 of the License, or (at your option) any later version.
+ *
+ *                 Vinifera is distributed in the hope that it will be
+ *                 useful, but WITHOUT ANY WARRANTY; without even the implied
+ *                 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *                 PURPOSE. See the GNU General Public License for more details.
+ *
+ *                 You should have received a copy of the GNU General Public
+ *                 License along with this program.
+ *                 If not, see <http://www.gnu.org/licenses/>.
+ *
+ ******************************************************************************/
 #include "newsidebar.h"
 #include "tibsun_globals.h"
 #include "tibsun_functions.h"
@@ -497,6 +465,52 @@ bool NewSidebarClass::Activate_Upgrade(int control) // DONE
 
 
 /***********************************************************************************************
+ * SidebarClass::Activate_Demolish -- Controls the demolish button on the sidebar.             *
+ *                                                                                             *
+ *    Use this routine to turn the demolish/dismantle sidebar button on and off. Typically,    *
+ *    the button is enabled when a friendly building is selected and disabled otherwise.       *
+ *                                                                                             *
+ * INPUT:   control  -- The controls how the button is to be activated or deactivated;         *
+ *                      0  -- Turn button off.                                                 *
+ *                      1  -- Turn button on.                                                  *
+ *                      -1 -- Toggle button state.                                             *
+ *                                                                                             *
+ * OUTPUT:  bool; Was the button previously activated?                                         *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   12/24/1994 JLB : Created.                                                                 *
+ *=============================================================================================*/
+bool NewSidebarClass::Activate_Demolish(int control) // DONE
+{
+	bool old = IsDemolishActive;
+
+	if (control == -1) {
+		control = IsDemolishActive ? 0 : 1;
+	}
+	switch (control) {
+		case 1:
+			IsDemolishActive = true;
+			break;
+
+		default:
+		case 0:
+			IsDemolishActive = false;
+			break;
+	}
+	if (old != IsDemolishActive) {
+		Flag_To_Redraw(false);
+		IsToRedraw = true;
+		if (!IsDemolishActive) {
+			Set_Default_Mouse(MOUSE_NORMAL, false);
+		}
+	}
+	return old;
+}
+
+
+/***********************************************************************************************
  * NewSidebarClass::Add -- Adds a game object to the sidebar list.                                *
  *                                                                                             *
  *    This routine is used to add a game object to the sidebar. Call this routine when a       *
@@ -644,29 +658,44 @@ void NewSidebarClass::Draw_It(bool complete) // TODO
 {
     PowerClass::Draw_It(complete);
 
+    DSurface *logicsurface = TempSurface;
+    TempSurface = SidebarSurface;
+
     //BStart(BENCH_SIDEBAR);
 
     if (IsSidebarActive && (IsToRedraw || complete) && !Debug_Map) {
-        IsToRedraw = false;
 
-        //if (LogicPage->Lock()) {
-        //   /*
-        //   **  Draw the outline box around the sidebar buttons.
-        //   */
-        //   int shape = complete ? 0 : 1;
-        //
-        //   /*
-        //   ** The sidebar shape is too big in 640x400 so it needs to be drawn in three chunks.
-        //   */
-        //   CC_Draw_Shape(SidebarShape, 0, SIDE_X, 8, WINDOW_MAIN, SHAPE_WIN_REL);
-        //   CC_Draw_Shape(SidebarMiddleShape, shape, SIDE_X, (8+80), WINDOW_MAIN, SHAPE_WIN_REL);
-        //   CC_Draw_Shape(SidebarBottomShape, shape, SIDE_X, (8+80+50), WINDOW_MAIN, SHAPE_WIN_REL);
-        //
-        //   Repair.Draw_Me true;
-        //   Upgrade.Draw_Me true;
-        //   Zoom.Draw_Me true;
-        //   LogicPage->Unlock();
-        //}
+        if (complete || Column[0].IsToRedraw || Column[1].IsToRedraw) {
+
+            IsToRedraw = false;
+
+            /*
+            **  Draw the outline box around the sidebar buttons.
+            */
+            int shape = complete ? 0 : 1;
+        
+            /*
+            ** The sidebar shape is too big in 640x400 so it needs to be drawn in three chunks.
+            */
+            CC_Draw_Shape(SidebarSurface, SidebarDrawer, SidebarShape, 0, SIDE_X, 8);
+
+            for (int index = 0; index < StripClass::Max_Visible(); ++index) {
+                CC_Draw_Shape(SidebarSurface, SidebarDrawer, SidebarMiddleShape, shape, SIDE_X, (8+80));
+            }
+
+            CC_Draw_Shape(SidebarSurface, SidebarDrawer, SidebarBottomShape, shape, SIDE_X, (8+80+50));
+
+            Column[0].IsToRedraw = true;
+            Column[1].IsToRedraw = true;
+        
+            Repair.Draw_Me(true);
+            Upgrade.Draw_Me(true);
+            Power.Draw_Me(true);
+            Waypoint.Draw_Me(true);
+            //SidebarBlitRequested_FullRedraw = 1;
+
+        }
+
     }
 
     /*
@@ -675,14 +704,34 @@ void NewSidebarClass::Draw_It(bool complete) // TODO
     if (IsSidebarActive) {
         Column[0].Draw_It(complete);
         Column[1].Draw_It(complete);
-
-        if (complete || IsToRedraw) {
-            Repair.Draw_Me(true);
-            //Upgrade.Draw_Me(true);
-            //Zoom.Draw_Me(true);
-        }
     }
+
+    if (Repair.IsDrawn) {
+        //SidebarBlitRequested_FullRedraw = 1;
+        Repair.IsDrawn = false;
+    }
+    if (Upgrade.IsDrawn) {
+        //SidebarBlitRequested_FullRedraw = 1;
+        Upgrade.IsDrawn = false;
+    }
+    if (Power.IsDrawn) {
+        //SidebarBlitRequested_FullRedraw = 1;
+        Power.IsDrawn = false;
+    }
+    if (Waypoint.IsDrawn) {
+        //SidebarBlitRequested_FullRedraw = 1;
+        Waypoint.IsDrawn = false;
+    }
+
+    if (complete || IsToRedraw) {
+        Repair.Draw_Me(true);
+        //Upgrade.Draw_Me(true);
+        //Zoom.Draw_Me(true);
+    }
+
     IsToRedraw = false;
+
+    TempSurface = logicsurface;
 
     //BEnd(BENCH_SIDEBAR);
 }
@@ -709,25 +758,16 @@ void NewSidebarClass::Draw_It(bool complete) // TODO
  *   12/31/1994 JLB : Uses mouse coordinate parameters.                                        *
  *   06/27/1995 JLB : <TAB> key toggles sidebar.                                               *
  *=============================================================================================*/
-void NewSidebarClass::AI(KeyNumType & input, Point2D & xy) // TODO
+void NewSidebarClass::AI(KeyNumType & input, Point2D & xy) // DONE
 {
     bool redraw = false;
 
-    Point2D newxy(xy.X-SidebarRect.X, xy.Y);
-
-#if 0
-    /*
-    **  Toggle the sidebar in and out with the <TAB> key.
-    */
-    if (input == KN_TAB) {
-        Activate(-1);
-    }
-#endif
+    Point2D strip_xy(xy.X-SidebarRect.X, xy.Y);
 
     if (!Debug_Map) {
-        Activate(1);    // Force the sidebar always on.
-        Column[0].AI(input, newxy);
-        Column[1].AI(input, newxy);
+        Activate(1); // Force the sidebar always on.
+        Column[0].AI(input, strip_xy);
+        Column[1].AI(input, strip_xy);
     }
 
     if (IsSidebarActive) {
@@ -758,13 +798,6 @@ void NewSidebarClass::AI(KeyNumType & input, Point2D & xy) // TODO
             Sell_Mode_Control(-1);
         }
 
-        //if (redraw) {
-        //    //IsToRedraw = true;
-        //    Column[0].Flag_To_Redraw();
-        //    Column[1].Flag_To_Redraw();
-        //
-        //    Flag_To_Redraw();
-        //}
     }
 
     if (!IsRepairMode && Repair.IsOn) {
@@ -842,8 +875,9 @@ bool NewSidebarClass::Activate(int control) // TODO
 {
     bool old = IsSidebarActive;
 
-    if (Session.Play)
+    if (Session.Play) {
         return old;
+    }
 
     /*
     **  Determine the new state of the sidebar.
@@ -874,41 +908,37 @@ bool NewSidebarClass::Activate(int control) // TODO
         **  activate it on the left side of the screen.
         */
         if (IsSidebarActive /*&& X*/) {
-            //Set_View_Dimensions(0, 8, ((320-SIDE_WIDTH)/ICON_PIXEL_W));
+            entry_84();
             IsToRedraw = true;
-            //Help_Text(TXT_NONE);
             Repair.Zap();
             Add_A_Button(Repair);
-            //Upgrade.Zap();
-            //Add_A_Button(Upgrade);
-            //Zoom.Zap();
-            //Add_A_Button(Zoom);
+            Upgrade.Zap();
+            Add_A_Button(Upgrade);
+            Power.Zap();
+            Add_A_Button(Power);
             Column[0].Activate();
             Column[1].Activate();
             Background.Zap();
             Add_A_Button(Background);
             Map.RadarButton.Zap();
             Add_A_Button(Map.RadarButton);
-            //Map.PowerButton.Zap();
-            //Add_A_Button(Map.PowerButton);
         } else  {
-            //Help_Text(TXT_NONE);
-            //Set_View_Dimensions(0, 8);
+            //Play_Movie_DTOR_563C40();
             Remove_A_Button(Repair);
-            //Remove_A_Button(Upgrade);
-            //Remove_A_Button(Zoom);
+            Remove_A_Button(Upgrade);
+            Remove_A_Button(Power);
+            Remove_A_Button(Waypoint);
             Remove_A_Button(Background);
             Column[0].Deactivate();
             Column[1].Deactivate();
             Remove_A_Button(Map.RadarButton);
-            //Remove_A_Button(Map.PowerButton);
         }
 
         /*
         **  Since the sidebar status has changed, update the map so that the graphics
         **  will be rendered correctly.
         */
-        Flag_To_Redraw(true);
+        Flag_To_Redraw(2);
     }
 
     return old;
@@ -1066,7 +1096,7 @@ void NewSidebarClass::StripClass::Init_IO(int id) // DONE
         SelectClass & g = SelectButton[ID][index];
         g.ID = BUTTON_SELECT;
         g.X = SidebarRect.X + X;
-        g.Y = SidebarRect.Y + Y + (OBJECT_HEIGHT*index);
+        g.Y = SidebarRect.Y + Y + (OBJECT_HEIGHT * index);
         g.Width = OBJECT_WIDTH;
         g.Height = OBJECT_HEIGHT;
         g.Set_Owner(*this, index);
@@ -1075,10 +1105,11 @@ void NewSidebarClass::StripClass::Init_IO(int id) // DONE
 }
 
 
-void NewSidebarClass::StripClass::Init_For_House(int id)
+void NewSidebarClass::StripClass::Init_For_House(int id) // DONE
 {
     UpButton[id].Set_Shape(MFCC::RetrieveT<ShapeFileStruct>("R-UP.SHP"));
     UpButton[id].ShapeDrawer = SidebarDrawer;
+
     DownButton[id].Set_Shape(MFCC::RetrieveT<ShapeFileStruct>("R-DN.SHP"));
     DownButton[id].ShapeDrawer = SidebarDrawer;
 }
@@ -2231,87 +2262,55 @@ void NewSidebarClass::Zoom_Mode_Control()
 void NewSidebarClass::entry_84()
 {
 #if 0
-    int v1; // ebp
-    int i; // ebx
-    int j; // esi
-    int v4; // ecx
-    int v5; // eax
-    int v6; // edi
-    RadarClass *v7; // edx
-    int *v8; // ebx
-    int v9; // eax
-    int v10; // edi
-    int v11; // eax
-    int v12; // esi
-    int v13; // edx
-    int v14; // edx
-    int v15; // esi
-    int v16; // eax
-    int v17; // [esp-4h] [ebp-48h]
-    int v18; // [esp-4h] [ebp-48h]
-    int k; // [esp+8h] [ebp-3Ch]
-    int v20; // [esp+Ch] [ebp-38h]
-    int v21; // [esp+10h] [ebp-34h]
-    int v23; // [esp+14h] [ebp-30h]
-    int v24; // [esp+18h] [ebp-2Ch]
-    ToolTip a2; // [esp+2Ch] [ebp-18h] BYREF
-
-    v1 = 0;
-    if ( options.SidebarSide )
-    {
-        SidebarRect.X = mouseclass_vp__TacPixel.X + mouseclass_vp__TacPixel.Width;
-    }
-    else
-    {
-        SidebarRect.X = 0;
-    }
-    SidebarRect.Y = 148;
+    SidebarRect.X = Options.SidebarSide ? mouseclass_vp__TacPixel.X + mouseclass_vp__TacPixel.Width : 0;
+    SidebarRect.Y = SIDE_WIDTH;
     SidebarRect.Width = 168;
-    SidebarRect.Height = mouseclass_vp__TacPixel.Y + mouseclass_vp__TacPixel.Height - 148;
-    PowerClass::entry_84(this);
-    if ( !SidebarClass::SidebarShape )
-    {
-        NewSidebarClass::SidebarShape = MFCC::Retrieve("SIDEGDI1.SHP");
-        NewSidebarClass::SidebarMiddle = MFCC::Retrieve("SIDEGDI2.SHP");
-        NewSidebarClass::SidebarBottom = MFCC::Retrieve("SIDEGDI3.SHP");
+    SidebarRect.Height = mouseclass_vp__TacPixel.Y + mouseclass_vp__TacPixel.Height - SIDE_WIDTH;
+
+    PowerClass::entry_84();
+
+    if (!SidebarShape) {
+        SidebarShape = MFCC::Retrieve("SIDEGDI1.SHP");
+        SidebarMiddleShape = MFCC::Retrieve("SIDEGDI2.SHP");
+        SidebarBottomShape = MFCC::Retrieve("SIDEGDI3.SHP");
     }
-    GadgetClass::Set_Position(&SidebarClass::CameoStrip, SidebarRect.X + 16, mouseclass_vp__TacPixel.Y);
-    GadgetClass::Flag_To_Redraw(&SidebarClass::CameoStrip);
-    GadgetClass::Set_Position(&SidebarClass::Repair.t.c.ga, SidebarRect.X + 31, SidebarRect.Y - 9);
-    GadgetClass::Flag_To_Redraw(&SidebarClass::Repair.t.c.ga);
-    NewSidebarClass::Repair.DrawX = -SidebarRect.X;
-    GadgetClass::Set_Position(&SidebarClass::Sell.t.c.ga, NewSidebarClass::Repair.t.c.ga.X + 27, NewSidebarClass::Power.t.c.ga.Y);
-    GadgetClass::Flag_To_Redraw(&SidebarClass::Sell.t.c.ga);
-    NewSidebarClass::Sell.DrawX = -SidebarRect.X;
-    GadgetClass::Set_Position(&SidebarClass::Power.t.c.ga, NewSidebarClass::Sell.t.c.ga.X + 27, NewSidebarClass::Repair.t.c.ga.Y);
-    GadgetClass::Flag_To_Redraw(&SidebarClass::Power.t.c.ga);
-    NewSidebarClass::Power.DrawX = -SidebarRect.X;
-    GadgetClass::Set_Position(&SidebarClass::Waypoint.t.c.ga, NewSidebarClass::Power.t.c.ga.X + 27, NewSidebarClass::Sell.t.c.ga.Y);
-    GadgetClass::Flag_To_Redraw(&SidebarClass::Waypoint.t.c.ga);
-    NewSidebarClass::Waypoint.DrawX = -SidebarRect.X;
-    if ( ToolTipManager )
-    {
+
+    CameoStrip->Set_Position(SidebarRect.X + 16, mouseclass_vp__TacPixel.Y);
+    CameoStrip->Flag_To_Redraw();
+
+    Repair->Set_Position(SidebarRect.X + 31, SidebarRect.Y - 9);
+    Repair->Flag_To_Redraw();
+    Repair.DrawX = -SidebarRect.X;
+
+    Upgrade->Set_Position(Repair.X + 27, Power.Y);
+    Upgrade->Flag_To_Redraw();
+    Upgrade.DrawX = -SidebarRect.X;
+
+    Power->Set_Position(Upgrade.X + 27, Repair.Y);
+    Power->Flag_To_Redraw();
+    Power.DrawX = -SidebarRect.X;
+
+    Waypoint->Set_Position(Power.X + 27, Upgrade.Y);
+    Waypoint->Flag_To_Redraw(Waypoint);
+    Waypoint.DrawX = -SidebarRect.X;
+
+    if ( ToolTipManager ) {
         a2.dwfield_0 = 0;
         a2.dwfield_4 = 0;
         a2.dwfield_8 = 0;
         *&a2.dwfield_C = 0i64;
         a2.dwfield_14 = 0;
-        for ( i = 0; i < ARRAY_SIZE(Column); ++i )
-        {
-            for ( j = 0; j < 100; ++j )
-            {
+
+        for ( int i = 0; i < ARRAY_SIZE(Column); ++i ) {
+            for ( int j = 0; j < 100; ++j ) {
                 ToolTipManager::Remove(ToolTipManager, (j | (i << 8)) + 1000);
             }
         }
+
         v4 = SidebarRect.X;
-        if ( SidebarSurface && NewSidebarClass::SidebarShape )
-        {
-            v5 = (SidebarRect.Height - NewSidebarClass::SidebarBottom->FrameWidth - NewSidebarClass::SidebarShape->FrameWidth) / NewSidebarClass::SidebarMiddle->FrameWidth;
-        }
-        else
-        {
-            v5 = 4;
-        }
+
+        int v5 = Max_Visible();
+
         v20 = 0;
         v21 = 0;
         v6 = 17 * v5 + SidebarRect.Y + 34 * v5 + 25;
@@ -2321,15 +2320,15 @@ void NewSidebarClass::entry_84()
         v8 = &v7[1].d.m.ZoneConnections.ActiveCount;
         while ( 1 )
         {
-            GadgetClass::Set_Position((SidebarClass::StripClass::RightUpButton + v1), v4 + *v8 + 5, v6);
-            GadgetClass::Flag_To_Redraw((SidebarClass::StripClass::RightUpButton + v1));
+            Set_Position((SidebarClass::StripClass::RightUpButton + v1), v4 + *v8 + 5, v6);
+            Flag_To_Redraw((SidebarClass::StripClass::RightUpButton + v1));
             v9 = SidebarRect.X;
-            *(&SidebarClass::StripClass::RightUpButton[0].DrawX + v1) = -SidebarRect.X;
-            GadgetClass::Set_Position((SidebarClass::StripClass::RightDownButton + v1), v9 + *v8 + 34, v6);
-            GadgetClass::Flag_To_Redraw((SidebarClass::StripClass::RightDownButton + v1));
+            *(StripClass::RightUpButton[0].DrawX + v1) = -SidebarRect.X;
+            Set_Position((SidebarClass::StripClass::RightDownButton + v1), v9 + *v8 + 34, v6);
+            Flag_To_Redraw((SidebarClass::StripClass::RightDownButton + v1));
             v4 = SidebarRect.X;
             v10 = 0;
-            *(&SidebarClass::StripClass::RightDownButton[0].DrawX + v1) = -SidebarRect.X;
+            *(StripClass::RightDownButton[0].DrawX + v1) = -SidebarRect.X;
             for ( k = 0; ; k += 51 )
             {
                 v11 = SidebarSurface && NewSidebarClass::SidebarShape ? (SidebarRect.Height - NewSidebarClass::SidebarBottom->FrameWidth - NewSidebarClass::SidebarShape->FrameWidth)
@@ -2339,8 +2338,8 @@ void NewSidebarClass::entry_84()
                     break;
                 }
                 v12 = v10 + v21;
-                GadgetClass::Set_Position((SidebarClass::StripClass::SelectButton + v12 * 52), *v8 + v4, SidebarRect.Y + k + v8[1]);
-                GadgetClass::Flag_To_Redraw((SidebarClass::StripClass::SelectButton + v12 * 52));
+                Set_Position((SidebarClass::StripClass::SelectButton + v12 * 52), *v8 + v4, SidebarRect.Y + k + v8[1]);
+                Flag_To_Redraw((SidebarClass::StripClass::SelectButton + v12 * 52));
                 v13 = NewSidebarClass::StripClass::SelectButton[0][v12].c.ga.X;
                 a2.dwfield_8 = NewSidebarClass::StripClass::SelectButton[0][v12].c.ga.Y;
                 a2.dwfield_4 = v13;
@@ -2365,48 +2364,49 @@ void NewSidebarClass::entry_84()
             }
             v6 = v24;
         }
-        a2.dwfield_4 = NewSidebarClass::Repair.t.c.ga.X;
-        a2.dwfield_8 = NewSidebarClass::Repair.t.c.ga.Y;
-        *&a2.dwfield_C = *&SidebarClass::Repair.t.c.ga.Width;
+        a2.dwfield_4 = NewSidebarClass::Repair.X;
+        a2.dwfield_8 = NewSidebarClass::Repair.Y;
+        *&a2.dwfield_C = *Repair.Width;
         a2.dwfield_0 = 101;
         a2.dwfield_14 = 101;
         ToolTipManager::Remove(ToolTipManager, 101);
         ToolTipManager::Add(ToolTipManager, &a2);
-        a2.dwfield_4 = NewSidebarClass::Power.t.c.ga.X;
+        a2.dwfield_4 = NewSidebarClass::Power.X;
         a2.dwfield_0 = 102;
         a2.dwfield_14 = 105;
-        a2.dwfield_8 = NewSidebarClass::Power.t.c.ga.Y;
-        *&a2.dwfield_C = *&SidebarClass::Power.t.c.ga.Width;
+        a2.dwfield_8 = NewSidebarClass::Power.Y;
+        *&a2.dwfield_C = *Power.Width;
         ToolTipManager::Remove(ToolTipManager, 102);
         ToolTipManager::Add(ToolTipManager, &a2);
-        a2.dwfield_4 = NewSidebarClass::Sell.t.c.ga.X;
-        a2.dwfield_8 = NewSidebarClass::Sell.t.c.ga.Y;
-        *&a2.dwfield_C = *&SidebarClass::Sell.t.c.ga.Width;
+        a2.dwfield_4 = NewSidebarClass::Sell.X;
+        a2.dwfield_8 = NewSidebarClass::Sell.Y;
+        *&a2.dwfield_C = *Sell.Width;
         a2.dwfield_0 = 103;
         a2.dwfield_14 = 103;
         ToolTipManager::Remove(ToolTipManager, 103);
         ToolTipManager::Add(ToolTipManager, &a2);
-        a2.dwfield_4 = NewSidebarClass::Waypoint.t.c.ga.X;
+        a2.dwfield_4 = NewSidebarClass::Waypoint.X;
         a2.dwfield_0 = 105;
         a2.dwfield_14 = 135;
-        a2.dwfield_8 = NewSidebarClass::Waypoint.t.c.ga.Y;
-        *&a2.dwfield_C = *&SidebarClass::Waypoint.t.c.ga.Width;
+        a2.dwfield_8 = NewSidebarClass::Waypoint.Y;
+        *&a2.dwfield_C = *Waypoint.Width;
         ToolTipManager::Remove(ToolTipManager, 105);
         ToolTipManager::Add(ToolTipManager, &a2);
     }
-    v15 = RadarClass::RadarButton.Height + RadarClass::RadarButton.Y;
-    v17 = RadarClass::RadarButton.Height + RadarClass::RadarButton.Y;
-    if ( options.SidebarSide )
-    {
-        GadgetClass::Set_Position(&SidebarClass::CameoStrip, mouseclass_vp__TacPixel.X + mouseclass_vp__TacPixel.Width, v17);
+
+    int v15 = RadarClass::RadarButton.Height + RadarClass::RadarButton.Y;
+    int v17 = RadarClass::RadarButton.Height + RadarClass::RadarButton.Y;
+
+    if (Options.SidebarSide) {
+        CameoStrip->Set_Position(mouseclass_vp__TacPixel.X + mouseclass_vp__TacPixel.Width, v17);
+    } else {
+        CameoStrip->Set_Position(0, v17);
     }
-    else
-    {
-        GadgetClass::Set_Position(&SidebarClass::CameoStrip, 0, v17);
-    }
-    v18 = SidebarSurface->x.s.vftble->Get_Height(SidebarSurface) - v15;
-    v16 = SidebarSurface->x.s.vftble->Get_Width(SidebarSurface);
-    GadgetClass::Set_Size(&SidebarClass::CameoStrip, v16, v18);
+
+    int yy = SidebarSurface->Get_Height(SidebarSurface) - v15;
+    int xx = SidebarSurface->Get_Width(SidebarSurface);
+
+    CameoStrip->Set_Size(xx, yy);
 #endif
 }
 
