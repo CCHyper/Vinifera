@@ -32,18 +32,18 @@ class FactoryClass;
 
 class NewSidebarClass : public PowerClass
 {
-    private:
+    public:
         /**
          *  These constants are used to control the sidebar rendering.
          */
         enum SideBarClassEnums {
-            SIDEBAR_WID = 999,
-            BUTTON_ACTIVATOR=100,            // Button ID for the activator.
-            SIDE_X=320-80,                    // The X position of sidebar upper left corner.
-            SIDE_Y=7+70,    // The Y position of sidebar upper left corner.
-            SIDE_WIDTH=SIDEBAR_WID,            // Width of the entire sidebar (in pixels).
-            SIDE_HEIGHT=200-(7+70),            // Height of the entire sidebar (in pixels).
-            TOP_HEIGHT=13,                        // Height of top section (with repair/sell buttons).
+            BUTTON_ACTIVATOR=100,               // Button ID for the activator.
+
+            SIDE_X=320-80,                      // The X position of sidebar upper left corner.
+            SIDE_Y=7+70,                        // The Y position of sidebar upper left corner.
+            SIDE_WIDTH=168,                     // Width of the entire sidebar (in pixels).
+            SIDE_HEIGHT=200-(7+70),             // Height of the entire sidebar (in pixels).
+            TOP_HEIGHT=13,                      // Height of top section (with repair/sell buttons).
             COLUMN_ONE_X=(320-80)+8,            // Sidestrip upper left coordinates...
             COLUMN_ONE_Y=SIDE_Y+TOP_HEIGHT,
             COLUMN_TWO_X=(320-80)+8+((80-16)/2)+3,
@@ -51,16 +51,16 @@ class NewSidebarClass : public PowerClass
 
             BUTTON_ONE_WIDTH=32,                // Button width.
             BUTTON_TWO_WIDTH=20,                // Button width.
-            BUTTON_THREE_WIDTH=20,            // Button width.
+            BUTTON_THREE_WIDTH=20,              // Button width.
             BUTTON_HEIGHT=9,                    // Button height.
-            BUTTON_ONE_X=SIDE_X+2,            // Left button X coordinate.
-            BUTTON_ONE_Y=SIDE_Y+2,            // Left button Y coordinate.
-            BUTTON_TWO_X=SIDE_X+36,            // Right button X coordinate.
-            BUTTON_TWO_Y=SIDE_Y+2,            // Right button Y coordinate.
-            BUTTON_THREE_X=SIDE_X+58,            // Right button X coordinate.
+            BUTTON_ONE_X=SIDE_X+2,              // Left button X coordinate.
+            BUTTON_ONE_Y=SIDE_Y+2,              // Left button Y coordinate.
+            BUTTON_TWO_X=SIDE_X+36,             // Right button X coordinate.
+            BUTTON_TWO_Y=SIDE_Y+2,              // Right button Y coordinate.
+            BUTTON_THREE_X=SIDE_X+58,           // Right button X coordinate.
             BUTTON_THREE_Y=SIDE_Y+2,            // Right button Y coordinate.
 
-            COLUMNS=2                            // Number of side strips on sidebar.
+            COLUMNS=2                           // Number of side strips on sidebar.
         };
 
         typedef enum ButtonNumberType {
@@ -74,13 +74,13 @@ class NewSidebarClass : public PowerClass
             BUTTON_ZOOM
         } ButtonNumberType;
 
-    private:
+    public:
         /**
          *  Each side strip is managed by this class. It handles all strip specific actions.
          */
         class StripClass : public StageClass
         {
-            private:
+            public:
                 /**
                  *  Working numbers used when rendering and processing the side strip.
                  */
@@ -88,6 +88,7 @@ class NewSidebarClass : public PowerClass
                     BUTTON_UP = 200,
                     BUTTON_DOWN = 210,
                     BUTTON_SELECT = 220,
+
                     MAX_BUILDABLES = 75,             // Maximum number of object types in sidebar.
                     OBJECT_HEIGHT = 51,              // Pixel height of each buildable object.
                     OBJECT_WIDTH = 64,               // Pixel width of each buildable object.
@@ -105,13 +106,13 @@ class NewSidebarClass : public PowerClass
                     TEXT_Y_OFFSET = 15,              // Y offset to print "ready" text.
                 };
 
-            private:
+            public:
                 class SelectClass : public ControlClass
                 {
                     public:
                         SelectClass();
                         SelectClass(NoInitClass const & x) : ControlClass(x) {};
-                        ~SelectClass() {}
+                        virtual ~SelectClass() {}
 
                         void Set_Owner(StripClass & strip, int index);
 
@@ -119,7 +120,7 @@ class NewSidebarClass : public PowerClass
                         StripClass * Strip;
                         int Index;
 
-                    protected:
+                    public:
                         virtual bool Action(unsigned flags, KeyNumType & key) override;
                 };
 
@@ -159,7 +160,7 @@ class NewSidebarClass : public PowerClass
                     return false;
                 }
 
-            private:
+            public:
                 static int Max_Visible();
 
             private:                
@@ -321,12 +322,14 @@ class NewSidebarClass : public PowerClass
 
         } Column[COLUMNS];
 
-    private:
-        class SBGadgetClass: public GadgetClass {
+    public:
+        class SBGadgetClass: public GadgetClass
+        {
             public:
                 SBGadgetClass() : GadgetClass(0, 0, 1, 1, LEFTUP) {}
+                virtual ~SBGadgetClass() {}
 
-            protected:
+            public:
                 virtual bool Action(unsigned flags, KeyNumType & key) override;
         };
 
@@ -368,7 +371,7 @@ class NewSidebarClass : public PowerClass
         bool Activate_Upgrade(int control);
         bool Activate_Demolish(int control);
         int Which_Column(RTTIType type);
-        void Radar_Mode_Control();
+        void Zoom_Mode_Control();
         void Set_Cameo_Text(bool enable);
 
         bool Is_On_Sidebar(RTTIType type, int id)

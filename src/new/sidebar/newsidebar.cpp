@@ -318,7 +318,7 @@ void NewSidebarClass::Init_IO() // DONE
 }
 
 
-void NewSidebarClass::Init_For_House() // TODO
+void NewSidebarClass::Init_For_House() // DONE
 {
     PowerClass::Init_For_House();
 
@@ -2210,7 +2210,7 @@ bool NewSidebarClass::StripClass::Abandon_Production(FactoryClass * factory) // 
 }
 
 
-void NewSidebarClass::Radar_Mode_Control()
+void NewSidebarClass::Zoom_Mode_Control()
 {
 #if 0
     if (Session.Type != GAME_NORMAL) {
