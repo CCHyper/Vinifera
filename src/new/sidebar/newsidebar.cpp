@@ -312,7 +312,7 @@ void NewSidebarClass::Init_For_House() // DONE
     SidebarBottomShape = MFCC::RetrieveT<ShapeFileStruct>("SIDE3.SHP");
     SidebarAddonShape = MFCC::RetrieveT<ShapeFileStruct>("ADDON.SHP");
 
-    for (int i = 0; i < ARRAY_SIZE(Column); ++i) {
+    for (int i = 0; i < COLUMNS; ++i) {
         Column[i].Init_For_House(i);
     }
 }
@@ -875,7 +875,7 @@ bool NewSidebarClass::Activate(int control) // TODO
 {
     bool old = IsSidebarActive;
 
-    if (Session.Play) {
+    if (Session.Play && !Session.Singleplayer_Game()) {
         return old;
     }
 
@@ -916,6 +916,8 @@ bool NewSidebarClass::Activate(int control) // TODO
             Add_A_Button(Upgrade);
             Power.Zap();
             Add_A_Button(Power);
+            Waypoint.Zap();
+            Add_A_Button(Waypoint);
             Column[0].Activate();
             Column[1].Activate();
             Background.Zap();
@@ -1535,209 +1537,236 @@ const char *NewSidebarClass::StripClass::Help_Text(int gadget_id) // DONE
  *=============================================================================================*/
 void NewSidebarClass::StripClass::Draw_It(bool complete) // TODO
 {
-    if (IsToRedraw || complete) {
-        IsToRedraw = false;
-
-        //SidebarRedraws++;
-
-        /*
-        **  Fills the background to the side strip. We shouldnt need to do this if the strip
-        **  has a full complement of icons.
-        */
-        /*
-        ** New sidebar needs to be drawn not filled
-        */
-        if (BuildableCount < MAX_VISIBLE) {
-            //CC_Draw_Shape(LogoShapes, ID,    X+(2),    Y,    WINDOW_MAIN, SHAPE_WIN_REL|SHAPE_NORMAL,    0);
+    if (!IsToRedraw && !complete) {
+        if (StripClass::UpButton[ID].IsDrawn) {
+            Buttons_Redrawn_IsToRedraw = true;
+            StripClass::UpButton[ID].IsDrawn = false;
         }
 
-        /*
-        **  Redraw the scroll buttons.
-        */
-        UpButton[ID].Draw_Me(true);
-        DownButton[ID].Draw_Me(true);
-
-        /*
-        **  Loop through all the buildable objects that are visible in the strip and render
-        **  them. Their Y offset may be adjusted if the strip is in the process of scrolling.
-        */
-        for (int i = 0; i < MAX_VISIBLE + (IsScrolling ? 1 : 0); i++) {
-            bool production = false;
-            bool completed = false;
-            int stage = 0;
-            bool darken = false;
-            void const * shapefile = 0;
-            int shapenum = 0;
-            void const * remapper = 0;
-            FactoryClass * factory = 0;
-            int index = i+TopIndex;
-            int x = X;
-            int y = Y + (i*OBJECT_HEIGHT);
-
-            /*
-            **  If the strip is scrolling, then the offset is adjusted accordingly.
-            */
-            if (IsScrolling) {
-                y -= (OBJECT_HEIGHT - Slid);
-            }
-
-            /*
-            **  Fetch the shape number for the object type located at this current working
-            **  slot. This shape pointer is used to draw the underlying graphic there.
-            */
-            if (index < BuildableCount) {
-                ObjectTypeClass const * obj = nullptr;
-                SpecialWeaponType spc = SPECIAL_NONE;
-
-                if (Buildables[index].BuildableType != RTTI_SPECIAL) {
-
-                    obj = Fetch_Techno_Type(Buildables[index].BuildableType, Buildables[index].BuildableID);
-                    if (obj != nullptr) {
-
-                        /*
-                        **  Fetch the remap table that is appropriate for this object
-                        **  type.
-                        */
-                        //remapper = PlayerPtr->Remap_Table(false, ((TechnoTypeClass const *)obj)->Remap);
-
-                        /*
-                        **  If there is already a factory producing this kind of object, then all
-                        **  objects of this type are displays in a disabled state.
-                        */
-                        bool isbusy = (PlayerPtr->Fetch_Factory(Buildables[index].BuildableType) != nullptr);
-                        //if (!isbusy && PlayerPtr->Is_Hack_Prevented(Buildables[index].BuildableType, Buildables[index].BuildableID)) {
-                        //    isbusy = true;
-                        //}
-
-                        /*
-                        **  Infantry don't get remapped in the sidebar (special case).
-                        */
-                        if (Buildables[index].BuildableType == RTTI_INFANTRYTYPE) {
-                            remapper = 0;
-                        }
-
-                        shapefile = obj->Get_Cameo_Data();
-                        shapenum  = 0;
-                        if (Buildables[index].Factory) {
-                            production = true;
-                            completed = Buildables[index].Factory->Has_Completed();
-                            stage = Buildables[index].Factory->Completion();
-                            darken = false;
-                        } else {
-                            production = false;
-//                            darken = IsBuilding;
-
-                            /*
-                            **  Darken the imagery if a factory of a matching type is
-                            **  already busy.
-                            */
-                            darken = isbusy;
-                        }
-                    } else {
-                        //darken = PlayerPtr->Is_Hack_Prevented(Buildables[index].BuildableType, Buildables[index].BuildableID);
-                    }
-
-                } else  {
-
-                    spc = SpecialWeaponType(Buildables[index].BuildableID);
-                    shapefile = Get_Special_Cameo(spc);
-                    shapenum = 0;
-
-                    production = true;
-                    //completed = PlayerPtr->SuperWeapon[spc].Is_Ready();
-                    //stage = PlayerPtr->SuperWeapon[spc].Anim_Stage();
-                    darken = false;
-                }
-
-                if (obj != nullptr || spc != SPECIAL_NONE) {
-                    /*
-                    ** If this item is flashing then take care of it.
-                    **
-                    */
-                    if (Flasher == index && (Fetch_Stage() & 0x01)) {
-                        //remapper = Map.FadingLight;
-                    }
-
-                } else {
-                    //shapefile = LogoShapes;
-                    if (!darken) {
-                        shapenum = SB_BLANK;
-                    }
-                }
-            } else {
-                //shapefile = LogoShapes;
-                shapenum = SB_BLANK;
-                production = false;
-            }
-
-            remapper = 0;
-            /*
-            **  Now that the shape of the object at the current working slot has been found,
-            **  draw it and any graphic overlays as necessary.
-            **
-            ** Don't draw blank shapes over the new 640x400 sidebar art - ST 5/1/96 6:01PM
-            */
-            if (shapenum != SB_BLANK /*|| shapefile != LogoShapes*/) {
-                //CC_Draw_Shape(shapefile, shapenum,
-                //    x-(WindowList[WINDOW_SIDEBAR][WINDOWX])+(LEFT_EDGE_OFFSET),
-                //    y-WindowList[WINDOW_SIDEBAR][WINDOWY],
-                //    WINDOW_SIDEBAR,
-                //    SHAPE_NORMAL|SHAPE_WIN_REL| (remapper ? SHAPE_FADING : SHAPE_NORMAL),
-                //    remapper);
-                //
-                ///*
-                //**  Darken this object because it cannot be produced or is otherwise
-                //**  unavailable.
-                //*/
-                //if (darken) {
-                //    CC_Draw_Shape(ClockShapes, 0,
-                //            x-(WindowList[WINDOW_SIDEBAR][WINDOWX])+(LEFT_EDGE_OFFSET),
-                //            y-WindowList[WINDOW_SIDEBAR][WINDOWY],
-                //            WINDOW_SIDEBAR,
-                //            SHAPE_NORMAL|SHAPE_WIN_REL|SHAPE_GHOST,
-                //            nullptr, ClockTranslucentTable);
-                //}
-            }
-
-            /*
-            **  Draw the overlapping clock shape if this is object is being constructed.
-            **  If the object is completed, then display "Ready" with no clock shape.
-            */
-            if (production) {
-                //if (completed) {
-                //
-                //    /*
-                //    **  Display text showing that the object is ready to place.
-                //    */
-                //    CC_Draw_Shape(ObjectTypeClass::PipShapes, PIP_READY,
-                //    (x-(WindowList[WINDOW_SIDEBAR][WINDOWX]))+(LEFT_EDGE_OFFSET+15),
-                //    (y-WindowList[WINDOW_SIDEBAR][WINDOWY])+(4),
-                //    WINDOW_SIDEBAR, SHAPE_CENTER);
-                //} else {
-                //
-                //    CC_Draw_Shape(ClockShapes, stage+1,
-                //            x-(WindowList[WINDOW_SIDEBAR][WINDOWX])+(LEFT_EDGE_OFFSET),
-                //            y-WindowList[WINDOW_SIDEBAR][WINDOWY],
-                //            WINDOW_SIDEBAR,
-                //            SHAPE_NORMAL|SHAPE_WIN_REL|SHAPE_GHOST,
-                //            nullptr, ClockTranslucentTable);
-                //
-                //    /*
-                //    **  Display text showing that the construction is temporarily on hold.
-                //    */
-                //    if (factory && !factory->Is_Building()) {
-                //        CC_Draw_Shape(ObjectTypeClass::PipShapes, PIP_HOLDING,
-                //        (x-(WindowList[WINDOW_SIDEBAR][WINDOWX])) + ((LEFT_EDGE_OFFSET+15)),
-                //        (y-WindowList[WINDOW_SIDEBAR][WINDOWY])+(4),
-                //        WINDOW_SIDEBAR, SHAPE_CENTER);
-                //    }
-                //}
-            }
-
+        if (StripClass::DownButton[ID].IsDrawn) {
+            Buttons_Redrawn_IsToRedraw = true;
+            StripClass::DownButton[ID].IsDrawn = false;
         }
-
-        LastSlid = Slid;
+        return;
     }
+
+    IsToRedraw = false;
+
+    Buttons_Redrawn_IsToRedraw = true;
+
+    Rect rect(0, SidebarRect.Y, SidebarRect.Width, SidebarRect.Height);
+
+    Point2D xy;
+
+    /*
+    **  Redraw the scroll buttons.
+    */
+    UpButton[ID].Draw_Me(true);
+    DownButton[ID].Draw_Me(true);
+
+    int y = 26;
+    /*
+    **  Loop through all the buildable objects that are visible in the strip and render
+    **  them. Their Y offset may be adjusted if the strip is in the process of scrolling.
+    */
+    for (int i = 0; i < Max_Visible() + (IsScrolling ? 1 : 0); i++) {
+        bool production = false;
+        bool completed = false;
+        int stage = 0;
+        bool darken = false;
+        ShapeFileStruct const *shapefile = nullptr;
+        FactoryClass *factory = nullptr;
+        int index = i + TopIndex;
+        int x = X;
+
+        const char *state = nullptr;
+        bool somebool1 = false;
+
+        /*
+        **  If the strip is scrolling, then the offset is adjusted accordingly.
+        */
+        if (IsScrolling) {
+            y += (OBJECT_HEIGHT - Slid);
+        }
+
+        const char *name = nullptr;
+        TechnoTypeClass const *obj = nullptr;
+
+        /*
+        **  Fetch the shape number for the object type located at this current working
+        **  slot. This shape pointer is used to draw the underlying graphic there.
+        */
+        if (index < BuildableCount) {
+            SpecialWeaponType spc = SPECIAL_NONE;
+
+            if (Buildables[index].BuildableType != RTTI_SPECIAL) {
+
+                obj = Fetch_Techno_Type(Buildables[index].BuildableType, Buildables[index].BuildableID);
+                if (obj != nullptr) {
+
+                    name = obj->Full_Name();
+
+                    /*
+                    **  If there is already a factory producing this kind of object, then all
+                    **  objects of this type are displays in a disabled state.
+                    */
+                    bool isbusy = false;
+
+                    if (obj->What_Am_I() == RTTI_BUILDINGTYPE) {
+                        isbusy = PlayerPtr->Fetch_Factory(Buildables[index].BuildableType) != nullptr;
+                    }
+
+                    if (!obj->Who_Can_Build_Me(true, true, true, PlayerPtr)
+                        || !isbusy
+                        && PlayerPtr->Can_Build(Fetch_Techno_Type(Buildables[index].BuildableType, Buildables[index].BuildableID), false, false) == -1) {
+                        isbusy = true;
+                    }
+
+                    shapefile = obj->Get_Cameo_Data();
+                    factory = Buildables[index].Factory;
+                    if (factory != nullptr) {
+                        production = true;
+                        completed = factory->Has_Completed();
+                        if (completed) {
+                            state = Fetch_String(TXT_READY);
+                        }
+                        stage = factory->Completion();
+                        darken = false;
+                    } else {
+                        production = false;
+                        shapefile = LogoShapes;
+
+                        /*
+                        **	Darken the imagery if a factory of a matching type is
+                        **	already busy.
+                        */
+                        darken = isbusy; //may not be in TS, YR shows it tho
+                    }
+                } else {
+                    darken = false;
+                    shapefile = LogoShapes;
+                }
+
+            } else {
+
+                spc = SpecialWeaponType(Buildables[index].BuildableID);
+                name = SuperWeaponTypes[spc]->Full_Name();
+                shapefile = Get_Special_Cameo(spc);
+
+                production = true;
+                completed = PlayerPtr->SuperWeapon[spc]->Needs_Redrawing() == false;
+                somebool1 = PlayerPtr->SuperWeapon[spc]->Is_Ready();
+                state = PlayerPtr->SuperWeapon[spc]->Ready_String();
+                stage = PlayerPtr->SuperWeapon[spc]->Anim_Stage();
+                darken = false;
+            }
+
+            if (spc != SPECIAL_NONE) {
+                /*
+                ** If this item is flashing then take care of it.
+                **
+                */
+
+            } else {
+                shapefile = LogoShapes;
+            }
+        } else {
+            shapefile = LogoShapes;
+            production = false;
+        }
+
+        /*
+        **  Now that the shape of the object at the current working slot has been found,
+        **  draw it and any graphic overlays as necessary.
+        **
+        ** Don't draw blank shapes over the new 640x400 sidebar art - ST 5/1/96 6:01PM
+        */
+        if (shapefile != LogoShapes) {
+            if (shapefile != nullptr) {
+                xy.X = x;
+                xy.Y = y;
+                CC_Draw_Shape(SidebarSurface, CameoDrawer, shapefile, 0, &xy, &rect, SHAPE_400);
+            }
+
+            /*
+            **  Darken this object because it cannot be produced or is otherwise
+            **  unavailable.
+            */
+            if (darken) {
+                xy.X = x;
+                xy.Y = y;
+                CC_Draw_Shape(SidebarSurface, SidebarDrawer, StripClass::DarkenShape, 0, &xy, &rect, SHAPE_400 | SHAPE_DARKEN);
+            }
+        }
+
+        if (name != nullptr) {
+            xy.Y = y + 41;
+            xy.X = x;
+            Print_Cameo_Text(name, &xy, &rect, 62);
+        }
+
+        bool isqueued = false;
+
+        if (obj != nullptr) {
+            FactoryClass *qfactory = PlayerPtr->Fetch_Factory(obj->Kind_Of());
+            if (qfactory) {
+                int qcount = qfactory->Total_Queued(*obj);
+                if (qcount > 1
+                    || qcount > 0
+                    && (qfactory->Object == nullptr || qfactory->Object->Techno_Type_Class() && qfactory->Object->Techno_Type_Class() != obj)) {
+                    xy.X = x + 60;
+                    xy.Y = y + 2;
+                    Fancy_Text_Print("%d", SidebarSurface, &rect, &xy, ColorScheme::As_Pointer("LightGrey", 1), 0, TPF_RIGHT | TPF_FULLSHADOW | TPF_8POINT, qcount);
+                    isqueued = true;
+                }
+            }
+        }
+
+        /*
+        **  Draw the overlapping clock shape if this is object is being constructed.
+        */
+        if (production) {
+            if (state != nullptr) {
+                xy.X = x + 30;
+                xy.Y = y + 2;
+                Fancy_Text_Print(state, SidebarSurface, &rect, &xy, ColorScheme::As_Pointer("LightBlue", 1), 0, TPF_CENTER | TPF_FULLSHADOW | TPF_8POINT);
+            }
+
+            if (completed) {
+                /*
+                **	Display text showing that the object is ready to place.
+                */
+            } else {
+
+                xy.X = x;
+                xy.Y = y;
+                if (somebool1) {
+                    CC_Draw_Shape(SidebarSurface, SidebarDrawer, RechargeClockShape, stage + 1, &xy, &rect, SHAPE_400 | SHAPE_TRANS50);
+                } else {
+                    CC_Draw_Shape(SidebarSurface, SidebarDrawer, ClockShape, stage + 1, &xy, &rect, SHAPE_400 | SHAPE_TRANS50);
+
+                }
+
+                /*
+                **  Display text showing that the construction is temporarily on hold.
+                */
+                if (factory != nullptr && (!factory->Is_Building() || factory->IsSuspended)) {
+                    if (isqueued) {
+                        xy.X = x;
+                        xy.Y = y + 2;
+                        Fancy_Text_Print(TXT_HOLD, SidebarSurface, &rect, &xy, ColorScheme::As_Pointer("LightGrey", 1), 0, TPF_FULLSHADOW | TPF_8POINT);
+                    } else {
+                        xy.X = x + 30;
+                        xy.Y = y + 2;
+                        Fancy_Text_Print(TXT_HOLD, SidebarSurface, &rect, &xy, ColorScheme::As_Pointer("LightGrey", 1), 0, TPF_CENTER | TPF_FULLSHADOW | TPF_8POINT);
+                    }
+                }
+            }
+        }
+        y += (i * OBJECT_HEIGHT);
+    }
+
+    LastSlid = Slid;
 }
 
 
@@ -1807,7 +1836,7 @@ bool NewSidebarClass::StripClass::Recalc() // TODO
     **  If there are no more buildable objects to display, make the sidebar go away.
     */
     if (!BuildableCount) {
-        Map.NewSidebarClass::Activate(0);
+        Activate(0);
     }
 #endif
 
@@ -2301,7 +2330,7 @@ void NewSidebarClass::entry_84()
         *&a2.dwfield_C = 0i64;
         a2.dwfield_14 = 0;
 
-        for ( int i = 0; i < ARRAY_SIZE(Column); ++i ) {
+        for ( int i = 0; i < COLUMNS; ++i ) {
             for ( int j = 0; j < 100; ++j ) {
                 ToolTipManager::Remove(ToolTipManager, (j | (i << 8)) + 1000);
             }
@@ -2431,7 +2460,7 @@ const char *NewSidebarClass::Help_Text(int gadget_id) // DONE
     const char * text = PowerClass::Help_Text(gadget_id);
     if (!text) {
         int column = (gadget_id - 1000) >> 8;
-        if (column >= 0 && column < ARRAY_SIZE(Column)) {
+        if (column >= 0 && column < COLUMNS) {
             text = Column[column].Help_Text((gadget_id + 24));
         }
     }
