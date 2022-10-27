@@ -181,6 +181,10 @@ static bool Vinifera_Load_Exception_Database(const char *filename)
 
         tok = std::strtok(nullptr, ",");
         ASSERT(tok != nullptr);
+        einfo.ContinueAddress = std::strtoul(tok+2, nullptr, 16);
+
+        tok = std::strtok(nullptr, ",");
+        ASSERT(tok != nullptr);
         einfo.Ignore = std::strtoul(tok, nullptr, 10) ? true : false;
         
         tok = std::strtok(nullptr, ",");
@@ -199,9 +203,9 @@ static bool Vinifera_Load_Exception_Database(const char *filename)
     DEV_DEBUG_INFO("Exception database dump...\n");
     for (int i = 0; i < ExceptionInfoDatabase.Count(); ++i) {
         ExceptionInfoDatabaseStruct &e = ExceptionInfoDatabase[i];
-        DEV_DEBUG_INFO("  0x%08X %s %s \"%.32s...\"\n",
+        DEV_DEBUG_INFO("  0x%08X %s 0x%08X %s \"%.32s...\"\n",
                        e.Address, e.CanContinue ? "true " : "false",
-                       e.Ignore ? "true " : "false",
+                       e.ContinueAddress, e.Ignore ? "true " : "false",
                        e.Description);
     }
 #endif
