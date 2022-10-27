@@ -521,13 +521,12 @@ void TacticalExtension::Render_Post()
  */
 void TacticalExtension::Super_Draw_Timer(int row_index, ColorScheme *color, int time, const char *name, unsigned long *flash_time, bool *flash_state)
 {
-    static WWFontClass *_font = nullptr;
+    static WWFontClass *font = nullptr;
 
-    TextPrintType style = TPF_8POINT|TPF_RIGHT|TPF_NOSHADOW|TPF_METAL12|TPF_SOLIDBLACK_BG;
+    TextPrintType style = TPF_RIGHT|TPF_METAL12|TPF_DROPSHADOW;
+    style |= UIControls. ? TPF_METAL12 : TPF_8POINT;
 
-    if (!_font) {
-        _font = Font_Ptr(style);
-    }
+    WWFontClass *font = Font_Ptr(style);
 
     char fullbuff[128];
     char namebuff[128];
@@ -568,13 +567,13 @@ void TacticalExtension::Super_Draw_Timer(int row_index, ColorScheme *color, int 
     }
 
     Rect name_rect;
-    _font->String_Pixel_Rect(namebuff, &name_rect);
+    font->String_Pixel_Rect(namebuff, &name_rect);
 
     Rect timer_rect;
-    _font->String_Pixel_Rect(timerbuff, &timer_rect);
+    font->String_Pixel_Rect(timerbuff, &timer_rect);
 
-    int font_width = _font->Get_Font_Width();
-    int font_height = _font->Get_Font_Height();
+    int font_width = font->Get_Font_Width();
+    int font_height = font->Get_Font_Height();
 
     int y_pos = TacticalRect.Height - (row_index * (font_height + 2)) + 3;
 

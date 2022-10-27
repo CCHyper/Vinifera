@@ -203,7 +203,7 @@ static void _Extension_On_Load_Clear_Scenario_Intercept()
 DECLARE_PATCH(_Extension_Print_CRCs_Hook)
 {
     GET_REGISTER_STATIC(FILE *, fp, esi);
-    GET_REGISTER_OFFSET_STATIC(EventClass *, ev, esp, 0x48); // TODO
+    GET_REGISTER_OFFSET_STATIC(EventClass *, ev, esp, 0x174);
 
     // Fixup WWCRCEngine stack.
     _asm { add esp, 0x4 }
