@@ -125,6 +125,9 @@ static bool Vinifera_Load_Exception_Database(const char *filename)
     while (true) {
 
         char *tok = nullptr;
+
+        std::memset(line_buffer, 0, sizeof(line_buffer));
+        std::memset(&einfo, 0, sizeof(ExceptionInfoDatabaseStruct));
            
         /**
          *  Read the line into the buffer.

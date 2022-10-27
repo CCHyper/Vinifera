@@ -907,10 +907,13 @@ LONG Vinifera_Exception_Handler(unsigned int e_code, struct _EXCEPTION_POINTERS 
      */
     Exception_Find_Datbase_Entry(e_info->ContextRecord->Eip, ExceptionInfoCanContinue, ExceptionInfoIgnore, ExceptionInfoDescription);
 
+    DEV_DEBUG_INFO("CanContinue: %s  Ignore: %s\n", ExceptionInfoCanContinue ? "YES" : "NO", ExceptionInfoIgnore ? "YES" : "NO");
+
     /**
      *  Should we ignore this exception?
      */
     if (ExceptionInfoIgnore) {
+        DEV_DEBUG_WARNING("Ignoring exception: 0x%08X : \"%s\"\n", e_info->ContextRecord->Eip, ExceptionInfoDescription.Peek_Buffer());
         return EXCEPTION_CONTINUE_EXECUTION;
     }
 
