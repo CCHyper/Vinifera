@@ -521,10 +521,8 @@ void TacticalExtension::Render_Post()
  */
 void TacticalExtension::Super_Draw_Timer(int row_index, ColorScheme *color, int time, const char *name, unsigned long *flash_time, bool *flash_state)
 {
-    static WWFontClass *font = nullptr;
-
     TextPrintType style = TPF_RIGHT|TPF_METAL12|TPF_DROPSHADOW;
-    style |= UIControls. ? TPF_METAL12 : TPF_8POINT;
+    //style |= UIControls. ? TPF_METAL12 : TPF_8POINT;
 
     WWFontClass *font = Font_Ptr(style);
 

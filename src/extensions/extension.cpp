@@ -107,7 +107,18 @@
 
 #include "themeext.h"
 
+#include "tspp_gitinfo.h"
+#include "vinifera_gitinfo.h"
+
 #include <iostream>
+
+
+extern int Execute_Day;
+extern int Execute_Month;
+extern int Execute_Year;
+extern int Execute_Hour;
+extern int Execute_Min;
+extern int Execute_Sec;
 
 
 /**
@@ -435,14 +446,14 @@ static void Extension_Print_CRCs(DynamicVectorClass<EXT_CLASS *> &list, FILE *fp
     WWCRCEngine *crc = new WWCRCEngine;
 
     std::fprintf(fp, "\n\n********* %s CRCs ********\n\n", Extension::Utility::Get_TypeID_Name<EXT_CLASS>().c_str());
-    std::fprintf(fp, "Index     CRC\n");
+    std::fprintf(fp, "Index    CRC\n");
     std::fprintf(fp, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
     for (int index = 0; index < list.Count(); ++index) {
         EXT_CLASS *ptr = list[index];
         ptr->Compute_CRC(*crc);
-        std::fprintf(fp, "%05d      %08x\n", index, crc->CRC_Value());
-        EXT_DEBUG_INFO("%05d      %08x\n", index, crc->CRC_Value());
+        std::fprintf(fp, "%05d    %08x\n", index, crc->CRC_Value());
+        EXT_DEBUG_INFO("%05d %08x\n", index, crc->CRC_Value());
     }
 
     delete crc;
@@ -1097,9 +1108,69 @@ void Extension::Free_Heaps()
  * 
  *  @author: CCHyper
  */
-void Extension::Print_CRCs(FILE *fp, EventClass *ev)
+void Extension::Print_CRCs(/*FILE *fp, */EventClass *ev)
 {
     DEV_DEBUG_INFO("Extension::Print_CRCs(enter)\n");
+
+    /**
+     *  Create a unique filename for the sync log based on the time of execution and the player name.
+     */
+    char filename_buffer[512];
+    std::snprintf(filename_buffer, sizeof(filename_buffer), "%s\\SYNC_%s-%02d_%02u-%02u-%04u_%02u-%02u-%02u.TXT",
+        Vinifera_DebugDirectory,
+        PlayerPtr->IniName,
+        PlayerPtr->ID,
+        Execute_Day, Execute_Month, Execute_Year, Execute_Hour, Execute_Min, Execute_Sec);
+
+    /**
+     *  Reopen the sync log.
+     */
+    FILE *fp = std::fopen(filename_buffer, "w+");
+    if (fp == nullptr) {
+        DEBUG_ERROR("Failed to open sync log file for writing!\n");
+        return;
+    }
+
+    DEBUG_INFO("Writing extension sync data to file %s.\n", filename_buffer);
+
+#ifndef NDEBUG
+    const char *build_type = Vinifera_DeveloperMode ? "DEBUG (Dev mode enabled)" : "DEBUG";
+#else
+#if defined(NIGHTLY)
+    const char *build_type = Vinifera_DeveloperMode ? "NIGHTLY (Dev mode enabled)" : "NIGHTLY";
+#elif defined(PREVIEW)
+    const char *build_type = Vinifera_DeveloperMode ? "PREVIEW (Dev mode enabled)" : "PREVIEW";
+#else
+    const char *build_type = Vinifera_DeveloperMode ? "RELEASE (Dev mode enabled)" : "RELEASE";
+#endif
+#endif
+#if defined(TS_CLIENT)
+    char buffer[1024];
+    std::snprintf(buffer, sizeof(buffer), "%s [TS-Client]", build_type);
+    build_type = buffer;
+#endif
+
+    std::fprintf(fp, "--------------------------------------------------------------------------------\n");
+    std::fprintf(fp, "---------------------  V I N I F E R A   S Y N C   L O G  ----------------------\n");
+    std::fprintf(fp, "--------------------------------------------------------------------------------\n");
+    std::fprintf(fp, "\n");
+    std::fprintf(fp, "Build Type : %s\n", build_type);
+    std::fprintf(fp, "TS++ author: %s\n", TSPP_Git_Author());
+    std::fprintf(fp, "TS++ date: %s\n", TSPP_Git_DateTime());
+    std::fprintf(fp, "TS++ branch: %s\n", "master"); // TSPP_Git_Branch());
+    std::fprintf(fp, "TS++ commit: %s\n", TSPP_Git_Hash_Short());
+    std::fprintf(fp, "TS++ local changes: %s\n", TSPP_Git_Uncommitted_Changes() ? "YES" : "NO");
+    std::fprintf(fp, "Vinifera author: %s\n", Vinifera_Git_Author());
+    std::fprintf(fp, "Vinifera date: %s\n", Vinifera_Git_DateTime());
+    std::fprintf(fp, "Vinifera branch: %s\n", Vinifera_Git_Branch());
+    std::fprintf(fp, "Vinifera commit: %s\n", Vinifera_Git_Hash_Short());
+    std::fprintf(fp, "Vinifera local changes: %s\n", Vinifera_Git_Uncommitted_Changes() ? "YES" : "NO");
+    std::fprintf(fp, "\n");
+    std::fprintf(fp, "Player ID: %02d\n", PlayerPtr->ID);
+    std::fprintf(fp, "Player Name: %s\n", PlayerPtr->IniName);
+    std::fprintf(fp, "\n");
+    std::fprintf(fp, "--------------------------------------------------------------------------------\n");
+    std::fprintf(fp, "\n");
 
     /**
      *  Infantry
@@ -1142,6 +1213,7 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
             }
             EXT_DEBUG_INFO("%s %s:%x\n", housep->Class->Name(), Extension::Utility::Get_TypeID_Name<InfantryClassExtension>().c_str(), GameCRC);
         }
+        std::fprintf(fp, "\n");
     }
 
     /**
@@ -1185,6 +1257,7 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
             }
             EXT_DEBUG_INFO("%s %s:%x\n", housep->Class->Name(), Extension::Utility::Get_TypeID_Name<UnitClassExtension>().c_str(), GameCRC);
         }
+        std::fprintf(fp, "\n");
     }
 
     /**
@@ -1218,6 +1291,7 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
             }
             EXT_DEBUG_INFO("%s %s:%x\n", housep->Class->Name(), Extension::Utility::Get_TypeID_Name<BuildingClassExtension>().c_str(), GameCRC);
         }
+        std::fprintf(fp, "\n");
     }
 
     /**
@@ -1260,6 +1334,7 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
             }
             EXT_DEBUG_INFO("%s %s:%x\n", housep->Class->Name(), Extension::Utility::Get_TypeID_Name<AircraftClassExtension>().c_str(), GameCRC);
         }
+        std::fprintf(fp, "\n");
     }
 
     /**
@@ -1325,6 +1400,8 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
     //Extension_Print_CRCs(FoggedObjectExtensions, fp);                         // Not yet implemented
     //Extension_Print_CRCs(AlphaShapeExtensions, fp);                           // Not yet implemented
     //Extension_Print_CRCs(VeinholeMonsterExtensions, fp);                      // Not yet implemented
+
+    std::fclose(fp);
 
     DEV_DEBUG_INFO("Extension::Print_CRCs(exit)\n");
 }

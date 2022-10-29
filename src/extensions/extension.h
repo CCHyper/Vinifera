@@ -273,7 +273,7 @@ unsigned Get_Save_Version_Number();
 void Detach_This_From_All(TARGET target, bool all = true);
 bool Register_Class_Factories();
 void Free_Heaps();
-void Print_CRCs(FILE *fp, EventClass *ev);
+void Print_CRCs(/*FILE *fp,*/ EventClass *ev);
 
 }; // namespace "Extension".
 

@@ -202,22 +202,22 @@ static void _Extension_On_Load_Clear_Scenario_Intercept()
  */
 DECLARE_PATCH(_Extension_Print_CRCs_Hook)
 {
-    GET_REGISTER_STATIC(FILE *, fp, esi);
-    GET_REGISTER_OFFSET_STATIC(EventClass *, ev, esp, 0x174);
-
     // Fixup WWCRCEngine stack.
     _asm { add esp, 0x4 }
-
-    /**
-     *  Print the extension class CRCs.
-     */
-    Extension::Print_CRCs(fp, ev);
 
     _asm { push esi }
     _asm { mov eax, 0x006B6944 }
     _asm { call eax } //_fclose
 
     _asm { add esp, 0x4 }
+
+    //GET_REGISTER_STATIC(FILE *, fp, esi);
+    GET_REGISTER_OFFSET_STATIC(EventClass *, ev, esp, 0x54);
+
+    /**
+     *  Print the extension class CRCs.
+     */
+    Extension::Print_CRCs(/*fp, */ev);
 
     JMP(0x005B8464);
 }
