@@ -44,6 +44,48 @@
 #include "hooker_macros.h"
 
 
+
+
+
+
+#if 0
+#include "astarpath.h"
+class AStarPathFinderClassExt final : AStarPathFinderClass
+{
+public:
+    void _Optimize_Final_Path(PathType *path, FootClass *object);
+    PathType *_Find_Path_Regular(Cell *from, Cell *to, FootClass *object, FacingType *final_moves, int max_loops, bool a6 = false);
+    bool _Find_Path_Hierarchical(Cell *from, Cell *to, MZoneType mzone, FootClass *object);
+};
+
+PathType *AStarPathFinderClassExt::_Find_Path_Regular(Cell *from, Cell *to, FootClass *object, FacingType *final_moves, int max_loops, bool a6)
+{
+    DEBUG_INFO("Before Find_Path_Regular - from: %d,%d  to: %d,%d  object: %s  max_loops: %d\n", from->X, from->Y, to->X, to->Y, object->Name(), max_loops, max_loops);
+    return Find_Path_Regular(from, to, object, final_moves, max_loops, a6);
+}
+
+bool AStarPathFinderClassExt::_Find_Path_Hierarchical(Cell *from, Cell *to, MZoneType mzone, FootClass *object)
+{
+    DEBUG_INFO("Before Find_Path_Hierarchical - from: %d,%d  to: %d,%d  mzone: %d,  object: %s\n", from->X, from->Y, to->X, to->Y, mzone, object->Name());
+    return Find_Path_Hierarchical(from, to, mzone, object);
+}
+
+void AStarPathFinderClassExt::_Optimize_Final_Path(PathType *path, FootClass *object)
+{
+    DEBUG_INFO("Before Optimize_Final_Path - Start: %d,%d  Cost: %d  Length: %d\n", path->Start.X, path->Start.Y, path->Cost, path->Length);
+    Optimize_Final_Path(path, object);
+    DEBUG_INFO("After Optimize_Final_Path - Start: %d,%d  Cost: %d  Length: %d\n", path->Start.X, path->Start.Y, path->Cost, path->Length);
+}
+#endif
+
+
+
+
+
+
+
+
+
 /**
  *  #issue-315
  * 
@@ -294,7 +336,32 @@ DECLARE_PATCH(_Tactical_Render_Overlay_Patch)
     /**
      *  Various developer only debugging.
      */
-    //Tactical_Debug_Draw_Facings();
+//    //TacticalMapExtension->Debug_Draw_Tiberium_Nodes();
+//    TacticalMapExtension->Debug_Draw_Veinhole_Monster_Nodes();
+//
+//    TacticalMapExtension->Debug_Draw_Bridge_Info();
+//    TacticalMapExtension->Debug_Draw_Current_Cell();
+//    //TacticalMapExtension->Debug_Draw_Occupiers();
+//    TacticalMapExtension->Debug_Draw_CellTags();
+//    TacticalMapExtension->Debug_Draw_Waypoints();
+//    TacticalMapExtension->Debug_Draw_Missions();
+//    //TacticalMapExtension->Debug_Draw_Facings();
+//    //TacticalMapExtension->Debug_Draw_All_Cell_Info();
+//    //TacticalMapExtension->Debug_Draw_Veinhole_Monster_Info();
+//    //TacticalMapExtension->Draw_Debug_AStarPathFinder();
+//
+//    TacticalMapExtension->Debug_Draw_Mouse_Cell_Members();
+//    //TacticalMapExtension->Debug_Draw_Mouse_Cell_IsoTile_Members();
+//
+//    TacticalMapExtension->Debug_Draw_Tactical_Members();
+//
+//    //TacticalMapExtension->Debug_Draw_Selected_Object_State();;
+//
+//    //TacticalMapExtension->Debug_Draw_Invalid_Tiles();
+//
+//    TacticalMapExtension->Debug_Draw_Cell_Debug_Break();
+
+    TacticalMapExtension->Debug_Draw_Voxel_Caches();
 #endif
 
 #ifndef RELEASE
@@ -375,4 +442,15 @@ void TacticalExtension_Hooks()
      */
     Patch_Dword(0x006171C8+1, (TPF_CENTER|TPF_EFNT|TPF_FULLSHADOW));
     Patch_Jump(0x00616FDA, &_Tactical_Draw_Waypoint_Paths_Text_Color_Patch);
+
+
+
+
+
+
+
+
+    //Patch_Call(0x0041B20D, &AStarPathFinderClassExt::_Optimize_Final_Path);
+    //Patch_Call(0x0041D9CC, &AStarPathFinderClassExt::_Find_Path_Regular);
+    //Patch_Call(0x0041D070, &AStarPathFinderClassExt::_Find_Path_Hierarchical);
 }

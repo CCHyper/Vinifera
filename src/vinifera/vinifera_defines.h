@@ -51,7 +51,7 @@
  *  WARNING: This will slow the game down when many instances are created at once.
  */
 #ifndef NDEBUG
-#define VINIFERA_ENABLE_EXTENSION_DEBUG_PRINTING 1
+//#define VINIFERA_ENABLE_EXTENSION_DEBUG_PRINTING 1
 #endif
 
 

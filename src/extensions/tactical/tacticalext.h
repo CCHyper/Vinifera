@@ -50,6 +50,23 @@ enum InfoTextPosType {
 };
 
 
+enum DebugOverlayStateType
+{
+    DEBUG_STATE_ABSTRACT,
+    DEBUG_STATE_OBJECT,
+    DEBUG_STATE_TECHNO,
+    DEBUG_STATE_MISSION,
+    DEBUG_STATE_RADIO,
+    DEBUG_STATE_FOOT,
+    DEBUG_STATE_FINAL,          // Unit, Infantry, Building or Aircraft
+    DEBUG_STATE_LOCOMOTION,
+    DEBUG_STATE_FACING,
+
+    DEBUG_STATE_COUNT,
+    DEBUG_STATE_NONE = -1,
+};
+
+
 class TacticalExtension final : public GlobalExtensionClass<Tactical>
 {
     public:
@@ -80,6 +97,24 @@ class TacticalExtension final : public GlobalExtensionClass<Tactical>
 
 #ifndef NDEBUG
         bool Debug_Draw_Facings();
+        bool Debug_Draw_Current_Cell();
+        bool Debug_Draw_Occupiers();
+        bool Debug_Draw_CellTags();
+        bool Debug_Draw_Waypoints();
+        bool Debug_Draw_Missions();
+        bool Debug_Draw_All_Cell_Info();
+        bool Debug_Draw_Bridge_Info();
+        bool Debug_Draw_AStarPathFinder();
+        bool Debug_Draw_Veinhole_Monster_Info();
+        bool Debug_Draw_Tiberium_Nodes();
+        bool Debug_Draw_Veinhole_Monster_Nodes();
+        bool Debug_Draw_Invalid_Tiles();
+        bool Debug_Draw_Mouse_Cell_Members();
+        bool Debug_Draw_Mouse_Cell_IsoTile_Members();
+        bool Debug_Draw_Tactical_Members();
+        bool Debug_Draw_Selected_Object_State();
+        bool Debug_Draw_Cell_Debug_Break();
+        bool Debug_Draw_Voxel_Caches();
 #endif
 
     private:
@@ -120,4 +155,9 @@ class TacticalExtension final : public GlobalExtensionClass<Tactical>
          *  The lifetime timer for the information text.
          */
         CDTimerClass<MSTimerClass> InfoTextTimer;
+
+        /**
+         *
+         */
+        DebugOverlayStateType DebugOverlayState;
 };
