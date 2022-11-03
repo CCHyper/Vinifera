@@ -290,6 +290,12 @@ DECLARE_PATCH(_Tactical_Render_Overlay_Patch)
             }
 
         }
+
+        if (Debug_Map) {
+            if (TacticalExtension) {
+                TacticalExtension->Editor_Draw_Overlay();
+            }
+        }
     }
 
 #ifndef NDEBUG

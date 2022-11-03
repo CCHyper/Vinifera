@@ -687,7 +687,7 @@ static void Dump_Exception_Info(unsigned int e_code, struct _EXCEPTION_POINTERS 
     /**
      *  Calculate unique crc for the exception data (used for checking recursive exceptions).
      */
-    CurrentExceptionCRC = CRC32_Memory(ExceptionBuffer.Peek_Buffer(), ExceptionBuffer.Get_Length());
+    LastExceptionCRC = CRC32_Memory(ExceptionBuffer.Peek_Buffer(), ExceptionBuffer.Get_Length());
 
     DEBUG_WARNING("****************************** END EXEPTION DUMP ******************************!\n");
 }
@@ -719,6 +719,9 @@ static INT_PTR CALLBACK Exception_Dialog_Proc(HWND hDlg, UINT uMsg, WPARAM wPara
             switch (wParam) {
                 case IDC_EXCEPTION_SAVE: // Emergency save button
                     if (Debug_Map) {
+                        MessageBox(hDlg,
+                            "Failed to emergency save scenario, sorry!",
+                            "Tiberian Sun", MB_OK | MB_ICONEXCLAMATION);
                         EndDialog(hDlg, IDC_EXCEPTION_SAVE);
                         result = TRUE;
                     } else {
@@ -943,7 +946,7 @@ LONG Vinifera_Exception_Handler(unsigned int e_code, struct _EXCEPTION_POINTERS 
          */
         ExceptionFile.Write(ExceptionBuffer.Peek_Buffer(), ExceptionBuffer.Get_Length());
 
-        if (LastExceptionCRC && CurrentExceptionCRC == LastExceptionCRC) {
+        if (LastExceptionCRC == CRC32_Memory(ExceptionBuffer.Peek_Buffer(), ExceptionBuffer.Get_Length())) {
             DEBUG_WARNING("Exception dump is identical to the previous exception!\n");
         }
 

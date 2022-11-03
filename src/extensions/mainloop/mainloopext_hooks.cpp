@@ -29,6 +29,7 @@
 #include "vinifera_globals.h"
 #include "tibsun_globals.h"
 #include "tibsun_functions.h"
+#include "mapedit_functions.h"
 #include "iomap.h"
 #include "tactical.h"
 #include "house.h"
@@ -136,38 +137,49 @@ static bool Main_Loop_Intercept()
     bool ret = false;
 
     /**
-     *  Frame step mode enabled but no frames to process, so just perform
-     *  a basic redraw and update of the screen, no game logic.
+     *  Scenario-editor-mode: call the editor's main loop.
      */
-    if (Vinifera_Developer_FrameStep && !Vinifera_Developer_FrameStepCount) {
+    if (Debug_Map) {
 
-        ret = FrameStep_Main_Loop();
+        ret = Map_Edit_Loop();
 
-    /**
-     *  This is basically the original main loop, but now encapsulated by
-     *  the frame step logic to allow us to process the requested frames.
-     */
-    } else if ((Vinifera_Developer_FrameStep && Vinifera_Developer_FrameStepCount > 0)
-           || (!Vinifera_Developer_FrameStep && !Vinifera_Developer_FrameStepCount)) {
-
-        //DEV_DEBUG_INFO("Before Main_Loop()\n");
-
-        Before_Main_Loop();
+    } else {
 
         /**
-         *  The games main loop function.
+         *  Frame step mode enabled but no frames to process, so just perform
+         *  a basic redraw and update of the screen, no game logic.
          */
-        ret = Main_Loop();
+        if (Vinifera_Developer_FrameStep && !Vinifera_Developer_FrameStepCount) {
 
-        After_Main_Loop();
-
-        //DEV_DEBUG_INFO("After Main_Loop()\n");
+            ret = FrameStep_Main_Loop();
 
         /**
-         *  Decrement the frame step count.
+         *  This is basically the original main loop, but now encapsulated by
+         *  the frame step logic to allow us to process the requested frames.
          */
-        if (Vinifera_Developer_FrameStep && Vinifera_Developer_FrameStepCount > 0) {
-            --Vinifera_Developer_FrameStepCount;
+        } else if ((Vinifera_Developer_FrameStep && Vinifera_Developer_FrameStepCount > 0)
+               || (!Vinifera_Developer_FrameStep && !Vinifera_Developer_FrameStepCount)) {
+
+            //DEV_DEBUG_INFO("Before Main_Loop()\n");
+
+            Before_Main_Loop();
+
+            /**
+             *  The games main loop function.
+             */
+            ret = Main_Loop();
+
+            After_Main_Loop();
+
+            //DEV_DEBUG_INFO("After Main_Loop()\n");
+
+            /**
+             *  Decrement the frame step count.
+             */
+            if (Vinifera_Developer_FrameStep && Vinifera_Developer_FrameStepCount > 0) {
+                --Vinifera_Developer_FrameStepCount;
+            }
+
         }
 
     }

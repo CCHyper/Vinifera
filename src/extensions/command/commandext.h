@@ -1206,7 +1206,72 @@ class AIInstantSuperRechargeCommandClass : public ViniferaCommandClass
 };
 
 
-#ifndef DEBUG
+/**
+ *  x
+ */
+class ToggleScenarioEditorCommandClass : public ViniferaCommandClass
+{
+    public:
+        ToggleScenarioEditorCommandClass() : ViniferaCommandClass() { IsDeveloper = true; }
+        virtual ~ToggleScenarioEditorCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+#ifndef NDEBUG
+        virtual KeyNumType Default_Key() const override { return KeyNumType(KN_F2|KN_CTRL_BIT); }
+#else
+        virtual KeyNumType Default_Key() const override { return KeyNumType(KN_F2); }
+#endif
+};
+
+
+/**
+ *  x
+ */
+class EditorLowerCellCommandClass : public ViniferaCommandClass
+{
+    public:
+        EditorLowerCellCommandClass() : ViniferaCommandClass() { IsDeveloper = true; }
+        virtual ~EditorLowerCellCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+#ifndef NDEBUG
+        virtual KeyNumType Default_Key() const override { return KN_NONE; }
+#endif
+};
+
+
+/**
+ *  x
+ */
+class EditorRaiseCellCommandClass : public ViniferaCommandClass
+{
+    public:
+        EditorRaiseCellCommandClass() : ViniferaCommandClass() { IsDeveloper = true; }
+        virtual ~EditorRaiseCellCommandClass() {}
+
+        virtual const char *Get_Name() const override;
+        virtual const char *Get_UI_Name() const override;
+        virtual const char *Get_Category() const override;
+        virtual const char *Get_Description() const override;
+        virtual bool Process() override;
+
+#ifndef NDEBUG
+        virtual KeyNumType Default_Key() const override { return KN_NONE; }
+#endif
+};
+
+
+#ifndef NDEBUG
 /**
  *  Based class for all new developer/debug command classes.
  */

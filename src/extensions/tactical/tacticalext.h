@@ -76,8 +76,15 @@ class TacticalMapExtension final : public Extension<Tactical>
         bool Debug_Draw_Facings();
 #endif
 
+        bool Editor_Draw_Overlay();
+
     private:
         void Super_Draw_Timer(int row_index, ColorScheme *color, int time, const char *name, unsigned long *flash_time, bool *flash_state);
+
+        bool Editor_Draw_Labels();
+        bool Editor_Draw_Waypoints();
+        bool Editor_Draw_CellTags();
+        bool Editor_Draw_Occupiers();
 
     public:
         /**

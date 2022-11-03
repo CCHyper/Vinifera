@@ -45,8 +45,12 @@
 #include "superext.h"
 #include "supertype.h"
 #include "supertypeext.h"
+#include "tag.h"
+#include "tagtype.h"
 #include "rules.h"
 #include "rulesext.h"
+#include "waypoint.h"
+#include "iomap.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
@@ -523,6 +527,356 @@ void TacticalMapExtension::Draw_Information_Text()
         &Point2D(text_rect.X, text_rect.Y), text_color, COLOR_TBLACK, style);
 }
 
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+bool TacticalMapExtension::Editor_Draw_Occupiers()
+{
+    return true;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+bool TacticalMapExtension::Editor_Draw_Labels()
+{
+    RGBClass rgb_black(0, 0, 0);
+    unsigned color_black = DSurface::RGB_To_Pixel(0, 0, 0);
+    ColorScheme *text_color = ColorScheme::As_Pointer("White");
+
+    {
+        char buffer[128];
+        std::snprintf(buffer, sizeof(buffer), "Tiberium = %d", Map.TotalValue);
+
+        /**
+         *  Fetch the text occupy area.
+         */
+        Rect text_rect;
+        GradFont6Ptr->String_Pixel_Rect(buffer, &text_rect);
+
+        /**
+         *  Fill the background area.
+         */
+        Rect fill_rect;
+        fill_rect.X = TacticalRect.X;
+        fill_rect.Y = TacticalRect.Y;
+        fill_rect.Width = text_rect.Width + 4;
+        fill_rect.Height = 16;
+        CompositeSurface->Fill_Rect(fill_rect, color_black);
+
+        /**
+         *  Move rects into position.
+         */
+        text_rect.X = TacticalRect.X;
+        text_rect.Y = fill_rect.Y;
+        text_rect.Width += 2;
+        text_rect.Height += 3;
+
+        /**
+         *  Display the total value of all Tiberium on the map.
+         */
+        Fancy_Text_Print(buffer, CompositeSurface, &CompositeSurface->Get_Rect(),
+            &Point2D(text_rect.X, text_rect.Y), text_color, COLOR_BLACK, TextPrintType(TPF_6PT_GRAD|TPF_NOSHADOW));
+    }
+
+    {
+        char buffer[128];
+        std::snprintf(buffer, sizeof(buffer), "Percent = %d", Scen->Percent);
+
+        /**
+         * Fetch the text occupy area.
+         */
+        Rect text_rect;
+        GradFont6Ptr->String_Pixel_Rect(buffer, &text_rect);
+
+        /**
+         *  Fill the background area.
+         */
+        Rect fill_rect;
+        fill_rect.X = TacticalRect.X + TacticalRect.Width - text_rect.Width - 160 - 2;
+        fill_rect.Y = TacticalRect.Y;
+        fill_rect.Width = text_rect.Width + 4;
+        fill_rect.Height = 16;
+        CompositeSurface->Fill_Rect(fill_rect, color_black);
+
+        /**
+         *  Move rects into position.
+         */
+        text_rect.X = TacticalRect.X + TacticalRect.Width - text_rect.Width - 160 - 1;
+        text_rect.Y = fill_rect.Y;
+        text_rect.Width += 2;
+        text_rect.Height += 3;
+
+        /**
+         *  Display the total value of all Tiberium on the map.
+         */
+        Fancy_Text_Print(buffer, CompositeSurface, &CompositeSurface->Get_Rect(),
+            &Point2D(text_rect.X, text_rect.Y), text_color, COLOR_BLACK, TextPrintType(TPF_6PT_GRAD|TPF_NOSHADOW));
+    }
+
+    return true;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+bool TacticalMapExtension::Editor_Draw_Waypoints()
+{
+    unsigned color_dark_green = DSurface::RGB_To_Pixel(0, 128, 0);
+    unsigned color_white = DSurface::RGB_To_Pixel(255, 255, 255);
+    unsigned color_black = DSurface::RGB_To_Pixel(0, 0, 0);
+
+    ColorScheme *text_color = ColorScheme::As_Pointer("White");
+
+    /**
+     *  Reset the cell iterator.
+     */
+    Map.Iterator_Reset();
+
+    /**
+     *  Draw the waypoint markers.
+     */
+    for (int index = 0; index < WAYPT_COUNT; ++index) {
+
+        /**
+         *  Fetch cell pointer for this waypoint if it exits.
+         */
+        CellClass *cell = Scen->Get_Waypoint_Cell(index);
+        if (cell->IsWaypoint) {
+
+            Rect cellrect = cell->Get_Rect();
+
+            /**
+             *  Get the center point of the cell.
+             */
+            Point2D cell_center;
+            //cell_center.X = cellrect.X + CELL_PIXEL_W/2;
+            //cell_center.Y = cellrect.Y + CELL_PIXEL_H/2;
+            cell_center.X = cellrect.X + cellrect.Width / 2;
+            cell_center.Y = cellrect.Y + cellrect.Height / 2;
+
+            /**
+             *  Determine if the cell draw rect is within the viewport.
+             */
+            Rect intersect = Intersect(cellrect, TacticalRect);
+            if (intersect.Is_Valid()) {
+
+                const char *string = Waypoint_As_String(index);
+
+                /**
+                 *  Fetch the text occupy rect.
+                 */
+                Rect text_rect;
+                EditorFont->String_Pixel_Rect(string, &text_rect);
+
+                /**
+                 *  Move into position.
+                 */
+                text_rect.X = cell_center.X;
+                text_rect.Y = (cell_center.Y - text_rect.Height) - 21;
+                text_rect.Width += 4;
+                text_rect.Height += 2;
+
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X - 3, cell_center.Y - 3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X + 4, cell_center.Y - 4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+
+                unsigned rect_color = color_black;
+
+                /**
+                 *  Give special waypoints a different colour.
+                 */
+                if (index == WAYPT_HOME || index == WAYPT_REINF || index == WAYPT_SPECIAL) {
+                    rect_color = color_dark_green;
+                }
+
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, rect_color);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print(string,
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X + 1, text_rect.Y + 1), text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW));
+            }
+        }
+    }
+
+    return true;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+bool TacticalMapExtension::Editor_Draw_CellTags()
+{
+    unsigned color_dark_blue = DSurface::RGB_To_Pixel(0, 0, 128);
+    unsigned color_dark_red = DSurface::RGB_To_Pixel(128, 0, 0);
+    unsigned color_white = DSurface::RGB_To_Pixel(255, 255, 255);
+
+    ColorScheme *text_color = ColorScheme::As_Pointer("White");
+
+    /**
+     *  Reset the cell iterator.
+     */
+    Map.Iterator_Reset();
+
+    /**
+     *  Iterate over all the map cells.
+     */
+    for (CellClass *cell = Map.Iterator_Next_Cell(); cell != nullptr; cell = Map.Iterator_Next_Cell()) {
+
+        Rect cellrect = cell->Get_Rect();
+
+        /**
+         *  Determine if the cell draw rect is within the viewport.
+         */
+        Rect intersect = Intersect(cellrect, TacticalRect);
+        if (intersect.Is_Valid()) {
+
+            /**
+             *  Get the center point of the cell.
+             */
+            Point2D cell_center;
+            //cell_center.X = cellrect.X + CELL_PIXEL_W/2;
+            //cell_center.Y = cellrect.Y + CELL_PIXEL_H/2;
+            cell_center.X = cellrect.X + cellrect.Width / 2;
+            cell_center.Y = cellrect.Y + cellrect.Height / 2;
+
+            /**
+             *  Draw the cell tag marker.
+             */
+            if (cell->CellTag) {
+
+                const char *string = cell->CellTag->Class_Of()->Full_Name();
+
+                /**
+                 *  Fetch the text occupy rect.
+                 */
+                Rect text_rect;
+                EditorFont->String_Pixel_Rect(string, &text_rect);
+
+                /**
+                 *  Move into position.
+                 */
+                text_rect.X = cell_center.X;
+                text_rect.Y = (cell_center.Y - text_rect.Height) - 33;
+                text_rect.Width += 4;
+                text_rect.Height += 2;
+
+                /**
+                 *  Draw the arrow.
+                 */
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X - 3, cell_center.Y - 3), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X + 4, cell_center.Y - 4), color_white);
+                TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, text_rect.Y), color_white);
+
+                /**
+                 *  Draw the text tooltip.
+                 */
+                TempSurface->Fill_Rect(text_rect, color_dark_red);
+                TempSurface->Draw_Rect(text_rect, color_white);
+                Fancy_Text_Print(string,
+                    TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X + 1, text_rect.Y + 1), text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW));
+
+            } else {
+
+                /**
+                 *  This is a workaround for objects on the high bridges, which use the alternative occupier ptr.
+                 */
+                ObjectClass *occupier = cell->OccupierPtr;
+                if (cell->AltOccupierPtr) {
+                    occupier = cell->AltOccupierPtr;
+                }
+
+                /**
+                 *  If the cell has an occupier, draw its attached tag marker.
+                 */
+                if (occupier && occupier->Tag) {
+
+                    const char *string = occupier->Tag->Class_Of()->Full_Name();
+
+#if 0
+                    /**
+                     *  Fixup the position based on its current coord (as infantry have sub cell locations).
+                     */
+                    if (occupier->What_Am_I() == RTTI_INFANTRY) {
+                        Rect object_rect = occupier->entry_118();
+                        cell_center.X = object_rect.X + object_rect.Width / 2;
+                        cell_center.Y = object_rect.Y + object_rect.Height / 2;
+                    }
+#endif
+
+                    /**
+                     *  Fetch the text occupy rect.
+                     */
+                    Rect text_rect;
+                    EditorFont->String_Pixel_Rect(string, &text_rect);
+
+                    /**
+                     *  Move into position.
+                     */
+                    text_rect.X = cell_center.X + 10;
+                    text_rect.Y = (cell_center.Y - text_rect.Height) - 33;
+                    text_rect.Width += 4;
+                    text_rect.Height += 2;
+
+                    /**
+                     *  Draw the arrow.
+                     */
+                    TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X - 3, cell_center.Y - 3), color_white);
+                    TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X + 4, cell_center.Y - 4), color_white);
+                    TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y), Point2D(cell_center.X, cell_center.Y - 11), color_white);
+                    TempSurface->Draw_Line(Point2D(cell_center.X, cell_center.Y - 11), Point2D(cell_center.X + 11, cell_center.Y - 22), color_white);
+                    TempSurface->Draw_Line(Point2D(cell_center.X + 10, cell_center.Y - 22), Point2D(cell_center.X + 10, text_rect.Y), color_white);
+
+                    /**
+                     *  Draw the text tooltip.
+                     */
+                    TempSurface->Fill_Rect(text_rect, color_dark_blue);
+                    TempSurface->Draw_Rect(text_rect, color_white);
+                    Fancy_Text_Print(string,
+                        TempSurface, &TempSurface->Get_Rect(), &Point2D(text_rect.X + 1, text_rect.Y + 1), text_color, COLOR_TBLACK, TextPrintType(TPF_EFNT|TPF_FULLSHADOW));
+                }
+
+            }
+
+        }
+    }
+
+    return true;
+}
+
+
+/**
+ *  Draw any overlay for the scenario editor.
+ *
+ *  @author: CCHyper
+ */
+bool TacticalMapExtension::Editor_Draw_Overlay()
+{
+    Editor_Draw_Occupiers();
+    Editor_Draw_CellTags();
+    Editor_Draw_Waypoints();
+
+    Editor_Draw_Labels();
+
+    return true;
+}
 
 /**
  *  For drawing any new post-effects/systems.

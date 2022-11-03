@@ -65,6 +65,7 @@
 #include "wwcrc.h"
 #include "filepcx.h"
 #include "filepng.h"
+#include "mapedit_functions.h"
 #include "fatal.h"
 #include "minidump.h"
 #include "winutil.h"
@@ -77,6 +78,7 @@
  *  Handy defines for handling any adjustments.
  */
 #define CATEGORY_DEVELOPER "Developer"
+#define CATEGORY_EDITOR "Scenario Editor"
 
 
 /**
@@ -3221,7 +3223,7 @@ const char *AIInstantSuperRechargeCommandClass::Get_UI_Name() const
 
 const char *AIInstantSuperRechargeCommandClass::Get_Category() const
 {
-    return CATEGORY_DEVELOPER;
+    return CATEGORY_EDITOR;
 }
 
 const char *AIInstantSuperRechargeCommandClass::Get_Description() const
@@ -3236,6 +3238,161 @@ bool AIInstantSuperRechargeCommandClass::Process()
     }
 
     Vinifera_Developer_AIInstantSuperRecharge = !Vinifera_Developer_AIInstantSuperRecharge;
+
+    return true;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+const char *ToggleScenarioEditorCommandClass::Get_Name() const
+{
+    return "ToggleScenarioEditor";
+}
+
+const char *ToggleScenarioEditorCommandClass::Get_UI_Name() const
+{
+    return "Toggle Scenario Editor";
+}
+
+const char *ToggleScenarioEditorCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *ToggleScenarioEditorCommandClass::Get_Description() const
+{
+    return "Toggles between the scenario editor.";
+}
+
+bool ToggleScenarioEditorCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    Go_Editor(!Debug_Map);
+
+    return true;
+}
+
+
+#include "tspp.h"
+DEFINE_IMPLEMENTATION(void Slope_Add(Cell &cell), 0x005F83F0);
+DEFINE_IMPLEMENTATION(void Slope_Remove(Cell &cell), 0x005F8460);
+DEFINE_IMPLEMENTATION(bool Slope_Cell_Is_Morphable(CellClass &cell, bool a2), 0x005F84E0);
+DEFINE_IMPLEMENTATION(bool Slope_5F8580(CellClass &cell, bool a2), 0x005F8580);
+DEFINE_IMPLEMENTATION(void Slope_5F86B0(bool a1, int a2, Cell &cell), 0x005F86B0);
+DEFINE_IMPLEMENTATION(void Slope_5F8A20(), 0x005F8A20);
+DEFINE_IMPLEMENTATION(bool Slope_5F8EE0(bool a1, int a2, Cell &cell), 0x005F8EE0);
+DEFINE_IMPLEMENTATION(bool Slope_5F97E0(), 0x005F97E0);
+DEFINE_IMPLEMENTATION(bool Slope_5F9A10(CellClass &cell, bool a2, int a3, int a4), 0x005F9A10);
+DEFINE_IMPLEMENTATION(bool Slope_5F9C60(int a1, bool a2, Cell &, int), 0x005F9C60);
+DEFINE_IMPLEMENTATION(bool Slope_5F9DF0(CellClass &cell, bool a2, int a3, int a4), 0x005F9DF0);
+DEFINE_IMPLEMENTATION(int Slope_5FA090(CellClass &cell), 0x005FA090);
+DEFINE_IMPLEMENTATION(void Slope_5FA1C0(CellClass &cell, int a2), 0x005FA1C0);
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+const char *EditorRaiseCellCommandClass::Get_Name() const
+{
+    return "EditorRaiseCell";
+}
+
+const char *EditorRaiseCellCommandClass::Get_UI_Name() const
+{
+    return "Raise Cell";
+}
+
+const char *EditorRaiseCellCommandClass::Get_Category() const
+{
+    return CATEGORY_EDITOR;
+}
+
+const char *EditorRaiseCellCommandClass::Get_Description() const
+{
+    return "Raises the current mouse cell by 1 level.";
+}
+
+bool EditorRaiseCellCommandClass::Process()
+{
+    if (!Debug_Map) {
+        return false;
+    }
+
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    Cell mouse_cell = Get_Cell_Under_Mouse();
+    CellClass *cell = &Map[mouse_cell];
+    if (!cell) {
+        return false;
+    }
+
+    if (!Slope_Cell_Is_Morphable(*cell, true)) {
+        return false;
+    }
+
+    Slope_5F9C60(1, true, mouse_cell, Random_Pick(0, 3));
+
+    return true;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+const char *EditorLowerCellCommandClass::Get_Name() const
+{
+    return "EditorLowerCell";
+}
+
+const char *EditorLowerCellCommandClass::Get_UI_Name() const
+{
+    return "Lower Cell";
+}
+
+const char *EditorLowerCellCommandClass::Get_Category() const
+{
+    return CATEGORY_EDITOR;
+}
+
+const char *EditorLowerCellCommandClass::Get_Description() const
+{
+    return "Lowers the current mouse cell by 1 level.";
+}
+
+bool EditorLowerCellCommandClass::Process()
+{
+    if (!Debug_Map) {
+        return false;
+    }
+
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    Cell mouse_cell = Get_Cell_Under_Mouse();
+    CellClass *cell = &Map[mouse_cell];
+    if (!cell) {
+        return false;
+    }
+
+    if (!Slope_Cell_Is_Morphable(*cell, true)) {
+        return false;
+    }
+
+    Slope_5F9C60(-1, true, mouse_cell, Random_Pick(0, 3));
 
     return true;
 }
