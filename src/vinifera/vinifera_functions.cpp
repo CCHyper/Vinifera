@@ -529,11 +529,11 @@ bool Vinifera_Startup()
         MessageBox(MainWindow, "Invalid or corrupt exception database, please reinstall Vinifera.", "Vinifera", MB_OK);
         return false;
     }
-    if (!Vinifera_Load_Exception_Database(dbfile.File_Name())) {
-        DEBUG_ERROR("Failed to load the exception database!\n");
-        MessageBox(MainWindow, "Failed to load the exception database, please reinstall Vinifera.", "Vinifera", MB_OK);
-        return false;
-    }
+    //if (!Vinifera_Load_Exception_Database(dbfile.File_Name())) {
+    //    DEBUG_ERROR("Failed to load the exception database!\n");
+    //    MessageBox(MainWindow, "Failed to load the exception database, please reinstall Vinifera.", "Vinifera", MB_OK);
+    //    return false;
+    //}
 
     /**
      *  Initialise the CnCNet4 system.

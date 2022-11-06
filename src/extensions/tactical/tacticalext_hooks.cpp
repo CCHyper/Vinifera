@@ -506,4 +506,22 @@ void TacticalExtension_Hooks()
     Patch_Jump(0x00616FDA, &_Tactical_Draw_Waypoint_Paths_Text_Color_Patch);
 
     Patch_Jump(0x006165B2, &_Tactical_Draw_Band_Tint_Patch);
+
+
+
+
+
+    // remove tab
+    Patch_Jump(0x0060E44E, 0x0060E663); // TabClass::Draw_It
+    Patch_Jump(0x0060E995, 0x0060EA03); // TabClass::AI
+    Patch_Jump(0x0060E6E1, 0x0060E89E); // TabClass::Draw_Credits_Tab
+
+    Patch_Byte_Range(0x005D6CC8, 0x90, 3); // Load_All
+    Patch_Byte(0x005D6CDF+4, 0x00); //Load_All
+
+    Patch_Byte_Range(0x0050B022, 0x90, 3); // Change_Video_Mode
+    Patch_Byte(0x0050B039+4, 0x00); // Change_Video_Mode
+
+    Patch_Byte_Range(0x00475CF6, 0x90, 3); // DisplayClass::One_Time
+    Patch_Byte(0x00475D04+4, 0x00); // DisplayClass::One_Time
 }

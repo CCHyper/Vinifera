@@ -74,6 +74,7 @@ class TacticalExtension final : public GlobalExtensionClass<Tactical>
         void Draw_FrameStep_Overlay();
 
         void Draw_Information_Text();
+        void Draw_Mission_Timer();
         void Draw_Super_Timers();
 
         void Render_Post();
@@ -83,7 +84,7 @@ class TacticalExtension final : public GlobalExtensionClass<Tactical>
 #endif
 
     private:
-        void Super_Draw_Timer(int row_index, ColorScheme *color, int time, const char *name, unsigned long *flash_time, bool *flash_state);
+        void Draw_Timer(int row_index, ColorScheme *color, int time, const char *name, unsigned long *flash_time, bool *flash_state);
 
     public:
         /**
