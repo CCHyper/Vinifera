@@ -51,6 +51,12 @@ typedef struct TunnelInfoStruct
 extern bool IsActive;
 
 /**
+ *  x
+ */
+extern bool IsUseKCP;
+extern int KCPSessionNumber;
+
+/**
  *  Is the tunnel system active (set when tunnel information has been provided)?
  */
 extern bool IsTunnelActive;

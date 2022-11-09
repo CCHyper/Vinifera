@@ -327,6 +327,30 @@ endif()
 
 
 ################################################################################
+# Fetch the latest "kcp" source code
+################################################################################
+FetchContent_Declare(
+	kcp
+	GIT_REMOTE_UPDATE_STRATEGY REBASE
+	GIT_REPOSITORY https://github.com/skywind3000/kcp.git
+	GIT_TAG        origin/master
+	GIT_SUBMODULES ""
+)
+
+FetchContent_GetProperties(kcp)
+if(NOT kcp_POPULATED)
+    set(BUILD_TESTING OFF)
+	message(STATUS "Fetching kcp...")
+	FetchContent_Populate(kcp)
+	message(STATUS "  Source: ${kcp_SOURCE_DIR}")
+	message(STATUS "  Build: ${kcp_BINARY_DIR}")
+	add_subdirectory(${kcp_SOURCE_DIR} ${kcp_BINARY_DIR})
+else()
+	message(STATUS "Found kcp.")
+endif()
+
+
+################################################################################
 # Embed some git version information in the binary.
 ################################################################################
 message(STATUS "Fetching git repository information.")
@@ -646,6 +670,10 @@ add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_check_git)
 # Link to the robin-hood-hashing library.
 target_link_libraries(${PROJECT_NAME} robin_hood)
 add_dependencies(${PROJECT_NAME} robin_hood)
+
+# Link to the kcp library.
+target_link_libraries(${PROJECT_NAME} kcp)
+add_dependencies(${PROJECT_NAME} kcp)
 
 
 ################################################################################

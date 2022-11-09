@@ -34,6 +34,12 @@
 bool CnCNet5::IsActive = false;
 
 /**
+ *  x
+ */
+bool CnCNet5::IsUseKCP = false;
+int CnCNet5::KCPSessionNumber = -1;
+
+/**
  *  Is the tunnel system active (set when tunnel information has been provided)?
  */
 bool CnCNet5::IsTunnelActive = false;

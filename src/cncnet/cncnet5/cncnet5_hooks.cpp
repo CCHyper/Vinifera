@@ -28,6 +28,7 @@
 #include "cncnet5_hooks.h"
 #include "cncnet5_globals.h"
 #include "cncnet5_wspudp.h"
+#include "cncnet5_wspkcp.h"
 #include "wsproto.h"
 #include "wspipx.h"
 #include "wspudp.h"
@@ -49,11 +50,20 @@
 static void Create_PacketTransport()
 {
     if (CnCNet5::IsActive && CnCNet5::TunnelInfo.Is_Valid()) {
-        PacketTransport = new CnCNet5UDPInterfaceClass(
-                                CnCNet5::TunnelInfo.ID,
-                                CnCNet5::TunnelInfo.IP,
-                                CnCNet5::TunnelInfo.Port,
-                                CnCNet5::TunnelInfo.PortHack);
+        if (CnCNet5::IsUseKCP) {
+            PacketTransport = new CnCNet5UDPInterfaceClass(
+                CnCNet5::TunnelInfo.ID,
+                CnCNet5::TunnelInfo.IP,
+                CnCNet5::TunnelInfo.Port,
+                CnCNet5::TunnelInfo.PortHack);
+        } else {
+            PacketTransport = new CnCNet5KCPInterfaceClass(
+                CnCNet5::TunnelInfo.ID,
+                CnCNet5::TunnelInfo.IP,
+                CnCNet5::TunnelInfo.Port,
+                CnCNet5::TunnelInfo.PortHack
+                CnCNet5::KCPSessionNumber);
+        }
         if (!PacketTransport) {
             DEBUG_ERROR("Failed to create PacketTransport for CnCNet5!\n");
         }
