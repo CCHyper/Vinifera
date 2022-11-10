@@ -26,6 +26,7 @@
  *
  ******************************************************************************/
 #include "mainloopext_hooks.h"
+#include "mainloopext_functions.h"
 #include "vinifera_globals.h"
 #include "tibsun_globals.h"
 #include "tibsun_functions.h"
@@ -38,6 +39,66 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Queue_AI_Queue_Playback_Patch)
+{
+    Vinifera_Queue_Playback();
+
+    JMP(0x005B1490);
+}
+
+#include "session.h"
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Select_Game_Save_Recording_Values_Patch)
+{
+    Vinifera_Save_Recording_Values(Session.RecordFile);
+
+    JMP(0x004E2F84);
+}
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Select_Game_Load_Recording_Values_Patch)
+{
+    Vinifera_Load_Recording_Values(Session.RecordFile);
+
+    JMP(0x004E2C42);
+}
+
+
+
+
+
+
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Main_Loop_Do_Record_Playback_Patch)
+{
+    Vinifera_Do_Record_Playback();
+
+    JMP(0x0050918C);
+}
 
 
 /**
@@ -184,4 +245,20 @@ void MainLoop_Hooks()
     Patch_Call(0x00462A9C, &Main_Loop_Intercept);
     Patch_Call(0x005A0B85, &Main_Loop_Intercept);
     Patch_Jump(0x005B10F0, &_Queue_Options_Frame_Step_Check_Patch);
+    Patch_Jump(0x00508F08, &_Main_Loop_Do_Record_Playback_Patch);
+
+
+
+
+
+
+    Patch_Jump(0x005B1296, &_Queue_AI_Queue_Playback_Patch);
+
+
+    Patch_Jump(0x004E2EC8, &_Select_Game_Save_Recording_Values_Patch);
+    Patch_Jump(0x004E49D0, &Vinifera_Save_Recording_Values);
+
+    Patch_Jump(0x004E2B86, &_Select_Game_Load_Recording_Values_Patch);
+    Patch_Jump(0x004E1FCF, 0x004E2BBC); // Removes duplicate code.
+    Patch_Jump(0x004E4A70, &Vinifera_Load_Recording_Values);
 }

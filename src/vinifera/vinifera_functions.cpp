@@ -31,6 +31,7 @@
 #include "cncnet4.h"
 #include "cncnet4_globals.h"
 #include "cncnet5_globals.h"
+#include "tibsun_globals.h"
 #include "rulesext.h"
 #include "ccfile.h"
 #include "ccini.h"
@@ -40,6 +41,7 @@
 #include "ebolt.h"
 #include "optionsext.h"
 #include "rulesext.h"
+#include "session.h"
 #include "sessionext.h"
 #include "scenarioext.h"
 #include "tacticalext.h"
@@ -385,10 +387,89 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
             continue;
         }
 
+        /**
+         *  Set the filename for the attraction system to load.
+         */
+        if (stricmp(string, "-ATTRACT_FILENAME")) {
+            DEBUG_INFO("  - \"-ATTRACT_FILENAME\" argument detected.\n");
+            Session.RecordFile.Set_Name(string + std::strlen("ATTRACT_FILENAME"));
+            continue;
+        }
+
+        /**
+         *  Special command line control parsing (-O[options]).
+         */
+        if (strnicmp(string, "-O", std::strlen("-O")) == 0) {
+            string += std::strlen("-O");
+            while (*string) {
+                char code = *string++;
+                switch (toupper(code)) {
+
+                    /**
+                     *  Turn on super-record mode, which thrashes your disk terribly,
+                     *  but is really really cool. Well, sometimes it is, anyway.
+                     *  At least, it can be. Once in a while.
+                     *  This flag tells the recording system to re-open the file for
+                     *  each write, so the recording survives a crash.
+                     */
+                    case 'S':
+                        DEBUG_INFO("  - Enabling super record mode.\n");
+                        //Session.SuperRecord = true;
+                        break;
+
+                    /**
+                     *  "Record" a multi-player game.
+                     */
+                    case 'X':
+                        DEBUG_INFO("  - Enabling record mode.\n");
+                        Session.Record = true;
+                        break;
+
+                    /**
+                     *  "Play Back" a multi-player game.
+                     */
+                    case 'Y':
+                        DEBUG_INFO("  - Enabling playback mode.\n");
+                        Session.Play = true;
+                        break;
+
+                };
+
+            }
+
+        }
+
     }
 
     if (argc > 1) {
         DEBUG_INFO("Finished parsing command line arguments.\n");
+    }
+
+    /**
+     *  Record mode has priority over playback mode.
+     */
+    if (Session.Record) {
+        Session.Play = false;
+
+        // TEMP code!
+        extern int Execute_Day;
+        extern int Execute_Month;
+        extern int Execute_Year;
+        extern int Execute_Hour;
+        extern int Execute_Min;
+        extern int Execute_Sec;
+
+        char filename_buffer[512];
+        std::snprintf(filename_buffer, sizeof(filename_buffer), "%s\\REPLAY_%02u-%02u-%04u_%02u-%02u-%02u.BIN",
+            "Replays", //Vinifera_ReplayDirectory,
+            Execute_Day, Execute_Month, Execute_Year, Execute_Hour, Execute_Min, Execute_Sec);
+
+        Session.RecordFile.Set_Name(filename_buffer);
+    }
+
+    // TODO set play filename here manually.
+    if (Session.Play) {
+        Session.RecordFile.Set_Name("\\Replays\\Replay");
     }
 
     /**
