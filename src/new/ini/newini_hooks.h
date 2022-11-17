@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          VINIFERA_DEFINES.H
+ *  @file          NEWINI_HOOKS.H
  *
- *  @authors       CCHyper
+ *  @author        CCHyper
  *
- *  @brief         Vinifera defines and constants.
+ *  @brief         Contains the hooks for implementing the new ini class.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,37 +27,5 @@
  ******************************************************************************/
 #pragma once
 
-#include "always.h"
-#include "tibsun_defines.h"
 
-
-/**
- *  If defined, this will replace the SwizzleManagerClass with our own new implementation.
- */
-#define VINIFERA_USE_NEW_SWIZZLE_MANAGER 1
-
-/**
- *  Enable debug printing of the swizzle remapping process.
- * 
- *  WARNING: This will take cause the save/load process to take up to 10 minutes!
- */
-#ifndef NDEBUG
-//#define VINIFERA_ENABLE_SWIZZLE_DEBUG_PRINTING 1
-#endif
-
-/**
- *  If defined, this will replace the INIClass with our own new implementation.
- */
-#define VINIFERA_USE_NEW_INI 1
-
-
-/**
- *  This is the base CLSID for all COM objects. When defining a new COM CLSID,
- *  you must append the two digit hex number, incrementing from the previous.
- */
-#define		VINIFERA_BASE_CLSID		"EBE80B85-EED2-4DEF-92CA-BC0C99AF4A00"
-
-/**
- *  CLSID's for all new locomotors.
- */
-#define		CLSID_TEST_LOCOMOTOR	"EBE80B85-EED2-4DEF-92CA-BC0C99AF4A01"
+void NewINI_Hooks();
