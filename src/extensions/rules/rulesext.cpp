@@ -51,7 +51,8 @@ RulesClassExtension::RulesClassExtension(RulesClass *this_ptr) :
     IsMPAutoDeployMCV(false),
     IsMPPrePlacedConYards(false),
     IsBuildOffAlly(true),
-    IsShowSuperWeaponTimers(true)
+    IsShowSuperWeaponTimers(true),
+    IsMineAware(true)
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("RulesClassExtension constructor - 0x%08X\n", (uintptr_t)(ThisPtr));
@@ -314,6 +315,8 @@ bool RulesClassExtension::General(CCINIClass &ini)
     if (!ini.Is_Present(GENERAL)) {
         return false;
     }
+
+    IsMineAware = ini.Get_Bool(GENERAL, "MineAware", IsMineAware);
 
     return true;
 }

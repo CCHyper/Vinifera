@@ -58,6 +58,16 @@ class UnitTypeClassExtension final : public Extension<UnitTypeClass>
         bool IsTotable;
 
         /**
+         *  x
+         */
+        bool IsMineLayer;
+
+        /**
+         *  x
+         */
+        const BuildingTypeClass *MineClass;
+
+        /**
          *  The starting frame for the turret graphics in the units shape file.
          */
         int StartTurretFrame;

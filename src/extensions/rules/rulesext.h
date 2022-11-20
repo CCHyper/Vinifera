@@ -85,6 +85,11 @@ class RulesClassExtension final : public Extension<RulesClass>
          *  on the tactical view?
          */
         bool IsShowSuperWeaponTimers;
+
+        /**
+         *  Are friendly units automatically aware of mines so that they can avoid them?
+         */
+        bool IsMineAware;
 };
 
 

@@ -46,6 +46,8 @@ ExtensionMap<UnitTypeClass, UnitTypeClassExtension> UnitTypeClassExtensions;
 UnitTypeClassExtension::UnitTypeClassExtension(UnitTypeClass *this_ptr) :
     Extension(this_ptr),
     IsTotable(true),
+    IsMineLayer(false),
+    MineClass(nullptr),
     StartTurretFrame(-1),
     TurretFacings(32),		// Must default to 32 as all Tiberian Sun units have 32 facings for turrets.,
     StartIdleFrame(0),
@@ -101,6 +103,8 @@ HRESULT UnitTypeClassExtension::Load(IStream *pStm)
     }
 
     new (this) UnitTypeClassExtension(NoInitClass());
+
+    SWIZZLE_REQUEST_POINTER_REMAP(MineClass);
     
     return hr;
 }
@@ -187,6 +191,9 @@ bool UnitTypeClassExtension::Read_INI(CCINIClass &ini)
     //}
 
     IsTotable = ini.Get_Bool(ini_name, "Totable", IsTotable);
+    IsMineLayer = ini.Get_Bool(ini_name, "MineLayer", IsMineLayer);
+
+    MineClass = ini.Get_Building(ini_name, "MineLayer", MineClass);
 
     StartTurretFrame = ArtINI.Get_Int(graphic_name, "StartTurretFrame", StartTurretFrame);
     TurretFacings = ArtINI.Get_Int(graphic_name, "TurretFacings", TurretFacings);
