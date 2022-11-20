@@ -48,6 +48,7 @@
 #include "testlocomotion.h"
 #include "extension.h"
 #include "theatertype.h"
+#include "armortype.h"
 #include "uicontrol.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -639,6 +640,7 @@ bool Vinifera_Shutdown()
      */
     EBoltClass::Clear_All();
     TheaterTypes.Clear();
+    ArmorTypes.Clear();
 
     /**
      *  Cleanup global extension instances.
@@ -710,6 +712,7 @@ int Vinifera_Pre_Init_Game(int argc, char *argv[])
 int Vinifera_Post_Init_Game(int argc, char *argv[])
 {
     TheaterTypeClass::One_Time();
+    ArmorTypeClass::One_Time();
 
     CCFileClass theater_file("THEATERS.INI");
     CCINIClass theater_ini;
