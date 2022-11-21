@@ -47,6 +47,34 @@
 
 
 /**
+ *  x
+ */
+typedef enum ExtBAnimType
+{
+    BANIM_SUPER_ONE = BANIM_COUNT,
+    BANIM_SUPER_TWO,
+    BANIM_SUPER_THREE,
+    BANIM_SUPER_FOUR,
+
+    /**
+     *  The new number of available BAnimType's.
+     */
+    BANIM_NEW_COUNT,
+
+    /**
+     *  Use these when directly accessing the extended anim array.
+     */
+    EXT_BANIM_SUPER_ONE = 0,
+    EXT_BANIM_SUPER_TWO,
+    EXT_BANIM_SUPER_THREE,
+    EXT_BANIM_SUPER_FOUR,
+
+    EXT_BANIM_COUNT,
+};
+DEFINE_ENUMERATION_OPERATORS(ExtBAnimType);
+
+
+/**
  *  This is the base CLSID for all COM objects. When defining a new COM CLSID,
  *  you must append the two digit hex number, incrementing from the previous.
  */

@@ -54,7 +54,8 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(BuildingTypeClass *this_p
     ProduceCashBudget(0),
     IsStartupCashOneTime(false),
     IsResetBudgetOnCapture(false),
-    IsEligibleForAllyBuilding(false)
+    IsEligibleForAllyBuilding(false),
+    field_580_ext()
 {
     ASSERT(ThisPtr != nullptr);
     //EXT_DEBUG_TRACE("BuildingTypeClassExtension constructor - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
@@ -182,6 +183,7 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
     EXT_DEBUG_WARNING("BuildingTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", ThisPtr->Name(), (uintptr_t)(ThisPtr));
 
     const char *ini_name = ThisPtr->Name();
+    const char *graphic_name = ThisPtr->Graphic_Name();
 
     if (!ini.Is_Present(ini_name)) {
         return false;
@@ -199,6 +201,51 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IsEligibleForAllyBuilding = ini.Get_Bool(ini_name, "EligibleForAllyBuilding",
                                                     ThisPtr->IsConstructionYard ? true : IsEligibleForAllyBuilding);
+
+    static const char *const _banim_names[EXT_BANIM_COUNT] ={
+        "SuperAnim",
+        "SuperAnimTwo",
+        "SuperAnimThree",
+        "SuperAnimFour",
+    };
+
+    for (BAnimType anim = BANIM_FIRST; anim < EXT_BANIM_COUNT; ++anim) {
+
+        char entry_buffer[32];
+        char value_buffer[16];
+
+        std::snprintf(entry_buffer, sizeof(entry_buffer), "%s", _banim_names[anim]);
+        ArtINI.Get_String(graphic_name, entry_buffer, value_buffer, sizeof(value_buffer));
+        if (std::strlen(value_buffer)) { std::strcpy(field_580_ext[BANIM_SUPER_ONE].Anim, value_buffer); }
+
+        std::snprintf(entry_buffer, sizeof(entry_buffer), "%sDamaged", _banim_names[anim]);
+        ArtINI.Get_String(graphic_name, entry_buffer, value_buffer, sizeof(value_buffer));
+        if (std::strlen(value_buffer)) { std::strcpy(field_580_ext[BANIM_SUPER_ONE].AnimDamaged, value_buffer); }
+
+        if (!std::strlen(field_580_ext[BANIM_SUPER_ONE].AnimDamaged)) { std::strcpy(field_580_ext[BANIM_SUPER_ONE].AnimDamaged, field_580_ext[BANIM_SUPER_ONE].Anim); }
+
+        if (std::strlen(field_580_ext[BANIM_SUPER_ONE].Anim) || std::strlen(field_580_ext[BANIM_SUPER_ONE].AnimDamaged)) {
+
+            std::snprintf(entry_buffer, sizeof(entry_buffer), "%sX", _banim_names[anim]);
+            field_580_ext[BANIM_SUPER_ONE].Position.X = ArtINI.Get_Int(graphic_name, entry_buffer, field_580_ext[6].Position.X);
+
+            std::snprintf(entry_buffer, sizeof(entry_buffer), "%sY", _banim_names[anim]);
+            field_580_ext[BANIM_SUPER_ONE].Position.Y = ArtINI.Get_Int(graphic_name, entry_buffer, field_580_ext[6].Position.Y);
+
+            std::snprintf(entry_buffer, sizeof(entry_buffer), "%sZAdjust", _banim_names[anim]);
+            field_580_ext[BANIM_SUPER_ONE].ZAdjust = ArtINI.Get_Int(graphic_name, entry_buffer, field_580_ext[BANIM_SUPER_ONE].ZAdjust);
+
+            std::snprintf(entry_buffer, sizeof(entry_buffer), "%sYSort", _banim_names[anim]);
+            field_580_ext[BANIM_SUPER_ONE].YSort = ArtINI.Get_Int(graphic_name, entry_buffer, field_580_ext[BANIM_SUPER_ONE].YSort);
+
+            std::snprintf(entry_buffer, sizeof(entry_buffer), "%sPowered", _banim_names[anim]);
+            field_580_ext[BANIM_SUPER_ONE].Powered = ArtINI.Get_Bool(graphic_name, entry_buffer, field_580_ext[BANIM_SUPER_ONE].Powered);
+
+            std::snprintf(entry_buffer, sizeof(entry_buffer), "%sPoweredLight", _banim_names[anim]);
+            field_580_ext[BANIM_SUPER_ONE].PoweredLight = ArtINI.Get_Bool(graphic_name, entry_buffer, field_580_ext[BANIM_SUPER_ONE].PoweredLight);
+        }
+
+    }
     
     return true;
 }

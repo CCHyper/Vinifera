@@ -29,6 +29,7 @@
 
 #include "extension.h"
 #include "container.h"
+#include "vinifera_defines.h"
 
 
 class BuildingTypeClass;
@@ -96,6 +97,11 @@ class BuildingTypeClassExtension final : public Extension<BuildingTypeClass>
          *  Is this building eligible for proximity checks by players who are its owner's allies?
          */
         bool IsEligibleForAllyBuilding;
+
+        /**
+         *  x
+         */
+        BuildingTypeClass::Anim2Struct field_580_ext[EXT_BANIM_COUNT];
 };
 
 

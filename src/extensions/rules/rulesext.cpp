@@ -31,6 +31,7 @@
 #include "tiberium.h"
 #include "weapontype.h"
 #include "buildingtype.h"
+#include "buildingtypeext.h"
 #include "housetype.h"
 #include "side.h"
 #include "wstring.h"
@@ -487,4 +488,39 @@ void RulesClassExtension::Fixups()
 
     }
 
+    /**
+     *  #issue-XXX
+     * 
+     *  The GDI Firestorm Defense Generator . Now we have implemented SuperAnim1-4, we can
+     *  set this animation manually to fix the bug.
+     */
+    BuildingType building = BuildingTypeClass::From_Name("GAFSDF");
+    if (building != BUILDING_NONE && building < BuildingTypes.Count()) {
+
+        BuildingTypeClass *btype = BuildingTypes[building];
+        if (btype != nullptr) {
+
+            BuildingTypeClassExtension *btypeext = BuildingTypeClassExtensions.find(btype);
+            if (btypeext != nullptr) {
+
+                // Check if a animation has been set already.
+                if (!std::strlen(btypeext->field_580_ext[EXT_BANIM_SUPER_ONE].Anim)) {
+
+                    DEBUG_WARNING("Rules: Building \"%s\" (%d) TODO\n",
+                        btype->Name(), btype->Get_Heap_ID());
+
+                    /**
+                     *  Set the charged anim.
+                     */
+                    std::strncpy(btypeext->field_580_ext[EXT_BANIM_SUPER_ONE].Anim, "", sizeof(BuildingTypeClass::Anim2Struct::Anim));
+                    std::strncpy(btypeext->field_580_ext[EXT_BANIM_SUPER_ONE].AnimDamaged, "", sizeof(BuildingTypeClass::Anim2Struct::AnimDamaged));
+                    btypeext->field_580_ext[EXT_BANIM_SUPER_ONE].Location.X = 0;
+                    btypeext->field_580_ext[EXT_BANIM_SUPER_ONE].Location.Y = 0;
+                    btypeext->field_580_ext[EXT_BANIM_SUPER_ONE].ZAdjust = 0;
+                    btypeext->field_580_ext[EXT_BANIM_SUPER_ONE].YSort = 0;
+                    btypeext->field_580_ext[EXT_BANIM_SUPER_ONE].Powered = true;
+                }
+            }
+        }
+    }
 }
