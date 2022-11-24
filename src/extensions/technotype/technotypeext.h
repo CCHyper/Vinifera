@@ -151,4 +151,9 @@ class TechnoTypeClassExtension : public ObjectTypeClassExtension
          *  Pointer to the cameo image surface.
          */
         BSurface *CameoImageSurface;
+
+        /**
+         *  x
+         */
+        unsigned MinDebris;
 };

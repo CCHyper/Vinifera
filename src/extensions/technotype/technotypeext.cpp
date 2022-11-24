@@ -65,7 +65,8 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(const TechnoTypeClass *this_p
     VoiceDeploy(),
     VoiceHarvest(),
     IdleRate(0),
-    CameoImageSurface(nullptr)
+    CameoImageSurface(nullptr),
+    MinDebris(0)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TechnoTypeClassExtension::TechnoTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
@@ -270,6 +271,8 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     if (imagesurface) {
         CameoImageSurface = imagesurface;
     }
+
+    MinDebris = ini.Get_Int_Clamp(ini_name, "MinDebris", 0, This()->MaxDebris, MinDebris);
 
     return true;
 }
