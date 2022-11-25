@@ -60,7 +60,9 @@ AnimTypeClassExtension::AnimTypeClassExtension(const AnimTypeClass *this_ptr) :
     EndAnims(),
     EndAnimsCount(),
     EndAnimsMinimum(),
-    EndAnimsMaximum()
+    EndAnimsMaximum(),
+    BiggestFrameWidth(0),
+    BiggestFrameHeight(0)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("AnimTypeClassExtension::AnimTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
@@ -330,6 +332,39 @@ bool AnimTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!EndAnimsCount.Count()) {
         ASSERT_FATAL(EndAnims.Count() == EndAnimsMinimum.Count());
         ASSERT_FATAL(EndAnims.Count() == EndAnimsMaximum.Count());
+    }
+
+    /**
+     *  #issue-883
+     * 
+     *  The "biggest" frame of a animation is frame which should hide all cosmetic
+     *  changes to the underlaying ground (e.g. craters) that the animation causes,
+     *  so these effects are delayed until this frame is reached. TibSun calculates
+     *  this by scanning the entire shape file to find the largest visible frame, but
+     *  in some cases, this might not be ideal (e.g. the shape has consistent frame
+     *  dimensions). This new value allows the frame in which these effects are 
+     *  spawned be set.
+     * 
+     *  A special value of "-1" will set the biggest frame to the actual middle frame
+     *  of the shape file. This behavior was observed in Red Alert 2.
+     */
+    if (This()->Image != nullptr && This()->Image->Get_Frame_Count() > 0) {
+        ShapeFileStruct *image = const_cast<ShapeFileStruct *>(This()->Image);
+
+        int biggest = ini.Get_Int_Clamp(ini_name, "MiddleFrame", -1, image->Get_Frame_Count()-1, This()->Biggest);
+
+        if (biggest == -1 && image->Get_Frame_Count() >= 2) {
+
+            This()->Biggest = image->Get_Frame_Count() / 2;
+            BiggestFrameWidth = image->Get_Frame_Data(This()->Biggest)->FrameWidth;
+            BiggestFrameHeight = image->Get_Frame_Data(This()->Biggest)->FrameHeight;
+
+        } else if (biggest != This()->Biggest) {
+
+            This()->Biggest = biggest;
+            BiggestFrameWidth = image->Get_Frame_Data(This()->Biggest)->FrameWidth;
+            BiggestFrameHeight = image->Get_Frame_Data(This()->Biggest)->FrameHeight;
+        }
     }
     
     return true;
