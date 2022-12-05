@@ -53,6 +53,7 @@
 #include "progressscreen.h"
 #include "language.h"
 #include "wsproto.h"
+#include "rulesext.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -75,6 +76,14 @@ static void Init_Loading_Screen(const char *filename)
 
     bool solo = Session.Singleplayer_Game();
     int player_count = solo ? 1 : Session.Players.Count();
+
+    /**
+     *  #EDGE-CASE/#BUGFIX:
+     * 
+     *  We need to do the fixup even earlier now as we need to use the Side
+     *  value from the players HouseType.
+     */
+    RuleExtension->Fixups();
 
     /**
      *  For the campaign, we abuse the required CD to get the desired Side.
