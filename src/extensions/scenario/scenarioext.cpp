@@ -41,7 +41,8 @@
  *  @author: CCHyper
  */
 ScenarioClassExtension::ScenarioClassExtension(const ScenarioClass *this_ptr) :
-    GlobalExtensionClass(this_ptr)
+    GlobalExtensionClass(this_ptr),
+    SidebarSide(SIDE_NONE)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("ScenarioClassExtension::ScenarioClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 
