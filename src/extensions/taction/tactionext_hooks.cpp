@@ -26,12 +26,36 @@
  *
  ******************************************************************************/
 #include "tactionext_hooks.h"
+#include "tibsun_globals.h"
+#include "theme.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+DECLARE_PATCH(_TActionClass_operator_TAction_Play_Music)
+{
+    GET_REGISTER_STATIC(int, argument, ecx);
+
+    Theme.Play_Song(ThemeType(argument));
+
+    _asm { xor eax, eax }
+    JMP_REG(ecx, 0x00619F0C);
+}
+
+
+DECLARE_PATCH(_TActionClass_TAction_Play_Music)
+{
+    GET_REGISTER_STATIC(int, argument, eax);
+
+    Theme.Play_Song(ThemeType(argument));
+
+    _asm { xor eax, eax }
+    JMP_REG(ecx, 0x0061C03E);
+}
 
 
 /**
@@ -51,4 +75,7 @@ void TActionClassExtension_Hooks()
      *  @author: CCHyper
      */
     Patch_Dword(0x00619552+2, (0x007E4820+4)); // Foot vector to Technos vector.
+
+    Patch_Jump(0x00619F01, &_TActionClass_operator_TAction_Play_Music);
+    Patch_Jump(0x0061C033, &_TActionClass_TAction_Play_Music);
 }

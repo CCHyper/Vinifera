@@ -27,14 +27,38 @@
  ******************************************************************************/
 #include "teamext_hooks.h"
 #include "team.h"
+#include "tibsun_globals.h"
 #include "cell.h"
 #include "iomap.h"
+#include "theme.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+DECLARE_PATCH(_TActionClass_operator_TAction_Play_Music)
+{
+    GET_REGISTER_STATIC(int, argument, ecx);
+
+    Theme.Play_Song(ThemeType(argument));
+
+    _asm { xoreax, eax }
+    JMP_REG(ecx, 0x00619F0C);
+}
+
+
+DECLARE_PATCH(_TActionClass_TAction_Play_Music)
+{
+    GET_REGISTER_STATIC(int, argument, eax);
+
+    Theme.Play_Song(ThemeType(argument));
+
+    _asm { xoreax, eax }
+    JMP_REG(ecx, 0x0061C03E);
+}
 
 
 /**
@@ -88,4 +112,6 @@ coordinate_move:
 void TeamClassExtension_Hooks()
 {
     Patch_Jump(0x00622B2C, &_TeamClass_AI_MoveCell_FixCellCalc_Patch);
+    Patch_Jump(0x00622EB7, &_TeamClass_AI_TMission_Play_Music);
+    Patch_Jump(0x0062689B, &_TeamClass_TMission_Play_Music);
 }

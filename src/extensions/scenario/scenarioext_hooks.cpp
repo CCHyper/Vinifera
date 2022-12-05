@@ -38,12 +38,25 @@
 #include "ccfile.h"
 #include "ccini.h"
 #include "addon.h"
+#include "theme.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+DECLARE_PATCH(_Start_Scenario_TransitTheme)
+{
+    if (Scen->ActionMovie == VQ_NONE) {
+        Theme.Play_Song(Scen->TransitTheme);
+    }
+
+    Theme.Queue_Song(THEME_PICK_ANOTHER);
+
+    JMP(0x005DB410);
+}
 
 
 /**
@@ -178,4 +191,6 @@ void ScenarioClassExtension_Hooks()
     Patch_Jump(0x005DC9D4, &_Do_Win_Skip_MPlayer_Score_Screen_Patch);
     Patch_Jump(0x005DCD92, &_Do_Lose_Skip_MPlayer_Score_Screen_Patch);
     Patch_Jump(0x005DD8D5, &_Read_Scenario_INI_MPlayer_INI_Patch);
+
+    Patch_Jump(0x005DB3E3, &_Start_Scenario_TransitTheme);
 }
