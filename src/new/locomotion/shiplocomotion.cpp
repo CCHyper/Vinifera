@@ -389,10 +389,10 @@ IFACEMETHODIMP_(LayerType) ShipLocomotionClass::In_Which_Layer()         // DONE
  * 
  *  @author: CCHyper
  */
-IFACEMETHODIMP_(void) ShipLocomotionClass::Force_New_Slope(int ramp)     // DONE
+IFACEMETHODIMP_(void) ShipLocomotionClass::Force_New_Slope(TileRampType ramp)     // DONE
 {
-    CurrentRamp = TileRampType(ramp);
-    PreviousRamp = TileRampType(ramp);
+    CurrentRamp = ramp;
+    PreviousRamp = ramp;
     RampTransitionTimer = 0;
 }
 
@@ -423,7 +423,7 @@ IFACEMETHODIMP_(bool) ShipLocomotionClass::Is_Moving_Now()
  * 
  *  @author: CCHyper
  */
-IFACEMETHODIMP_(void) ShipLocomotionClass::Mark_All_Occupation_Bits(int mark) // NEEDS CONFIRMING
+IFACEMETHODIMP_(void) ShipLocomotionClass::Mark_All_Occupation_Bits(MarkType mark) // NEEDS CONFIRMING
 {
     if (HeadToCoord) {
         Mark_Track(HeadToCoord, MarkType(mark));
@@ -458,30 +458,26 @@ IFACEMETHODIMP_(bool) ShipLocomotionClass::Will_Jump_Tracks()
 #endif
 
 
-#if 0
 /**
  *  Locks the locomotor from being deleted.
  * 
  *  @author: CCHyper
  */
-IFACEMETHODIMP_(void) ShipLocomotionClass::Lock()
+IFACEMETHODIMP_(void) ShipLocomotionClass::Lock()                        // DONE
 {
-   // TODO
+   IsLocked = true;
 }
-#endif
 
 
-#if 0
 /**
  *  Unlocks the locomotor from being deleted.
  * 
  *  @author: CCHyper
  */
-IFACEMETHODIMP_(void) ShipLocomotionClass::Unlock()
+IFACEMETHODIMP_(void) ShipLocomotionClass::Unlock()                      // DONE
 {
-   // TODO
+    IsLocked = false;
 }
-#endif
 
 
 /**

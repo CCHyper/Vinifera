@@ -75,13 +75,13 @@ ShipLocomotionClass : public DriveLocomotionClass
         IFACEMETHOD_(void, Unlimbo)();
         //IFACEMETHOD_(void, Force_Track)(int track, Coordinate coord);
         IFACEMETHOD_(LayerType, In_Which_Layer)();
-        IFACEMETHOD_(void, Force_New_Slope)(int ramp);
+        IFACEMETHOD_(void, Force_New_Slope)(TileRampType ramp);
         //IFACEMETHOD_(bool, Is_Moving_Now)();
-        //IFACEMETHOD_(void, Mark_All_Occupation_Bits)(int mark);
+        IFACEMETHOD_(void, Mark_All_Occupation_Bits)(MarkType mark);
         IFACEMETHOD_(bool, Is_Moving_Here)(Coordinate to);
         //IFACEMETHOD_(bool, Will_Jump_Tracks)();
-        //IFACEMETHOD_(void, Lock)();
-        //IFACEMETHOD_(void, Unlock)();
+        IFACEMETHOD_(void, Lock)();
+        IFACEMETHOD_(void, Unlock)();
         IFACEMETHOD_(int, Get_Track_Number)();
         IFACEMETHOD_(int, Get_Track_Index)();
         IFACEMETHOD_(int, Get_Speed_Accum)();
@@ -156,14 +156,18 @@ ShipLocomotionClass : public DriveLocomotionClass
         static TrackType const Track2[];
         static TrackType const Track1[24];
 
+#if 0
     protected:
-        // TODO, copy DriveLoco
+
+        TileRampType CurrentRamp;
+        TileRampType PreviousRamp;
+        CDRateTimerClass<FrameTimerClass> RampTransitionTimer;
 
         /**
          *  This is the desired destination of the unit. The unit will attempt
          *  to head toward this target (avoiding intervening obstacles).
          */
-        //TARGET DestinationCoord;
+        TARGET DestinationCoord;
 
         /**
          *  This is the coordinate that the unit is heading to
@@ -172,14 +176,16 @@ ShipLocomotionClass : public DriveLocomotionClass
          *  is reached, then the next location in the path list becomes the
          *  next HeadTo coordinate.
          */
-        //Coordinate HeadToCoord;
+        Coordinate HeadToCoord;
 
         /**
          *  These speed values are used to accumulate movement and then
          *  convert them into pixel "steps" that are then translated through
          *  the currently running track so that the unit will move.
          */
-        //int SpeedAccum;
+        int SpeedAccum;
+
+        double field_50; // slope related, speed adjuster/multiplier?
 
         /**
          *  This the track control logic (used for ground vehicles only). The 'Track'
@@ -187,6 +193,39 @@ ShipLocomotionClass : public DriveLocomotionClass
          *  'TrackIndex' variable holds the current index into the specified track
          *  (starts at 0).
          */
-        //int TrackNumber;
-        //int TrackIndex;
+        int TrackNumber;
+        int TrackIndex;
+
+        /**
+         *  This vehicle could be processing a "short track". A short track is one that
+         *  doesn't actually go anywhere. Kind of like turning in place.
+         */
+        bool IsOnShortTrack;
+
+        /**
+         *  Some units must have their turret locked down to face their body direction.
+         *  When this flag is set, this condition is in effect. This flag is a more
+         *  accurate check than examining the TrackNumber since the turret may be
+         *  rotating into position so that a pending track may start. During this process
+         *  the track number does not indicate anything.
+         */
+        bool IsTurretLockedDown;
+
+        // TODO, this is RA's FootClass IsRotating?
+        bool IsRotating;
+
+        // TODO, this is RA's FootClass IsDriving?
+        bool IsDriving;
+
+        bool IsRocking;
+
+        bool IsLocked;
+
+        ILocomotionPtr Piggybacker;
+#endif
+
+    private:
+        // copy and assignment not implemented; prevent their use by declaring as private.
+        ShipLocomotionClass(const ShipLocomotionClass &) = delete;
+        ShipLocomotionClass &operator=(const ShipLocomotionClass &) = delete;
 };
