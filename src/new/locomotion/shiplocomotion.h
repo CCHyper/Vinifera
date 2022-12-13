@@ -69,13 +69,13 @@ ShipLocomotionClass : public DriveLocomotionClass
         IFACEMETHOD_(int, Z_Adjust)();
         IFACEMETHOD_(ZGradientType, Z_Gradient)();
         //IFACEMETHOD_(bool, Process)();
-        //IFACEMETHOD_(void, Move_To)(Coordinate to);
-        //IFACEMETHOD_(void, Stop_Moving)();
+        IFACEMETHOD_(void, Move_To)(Coordinate to);
+        IFACEMETHOD_(void, Stop_Moving)();
         IFACEMETHOD_(void, Do_Turn)(DirStruct coord);
         IFACEMETHOD_(void, Unlimbo)();
         //IFACEMETHOD_(void, Force_Track)(int track, Coordinate coord);
         IFACEMETHOD_(LayerType, In_Which_Layer)();
-        //IFACEMETHOD_(void, Force_New_Slope)(int ramp);
+        IFACEMETHOD_(void, Force_New_Slope)(int ramp);
         //IFACEMETHOD_(bool, Is_Moving_Now)();
         //IFACEMETHOD_(void, Mark_All_Occupation_Bits)(int mark);
         IFACEMETHOD_(bool, Is_Moving_Here)(Coordinate to);

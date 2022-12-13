@@ -31,6 +31,8 @@
 #include "iomap.h"
 #include "cell.h"
 #include "foot.h"
+#include "unit.h"
+#include "technotype.h"
 #include "tactical.h"
 #include "wwmath.h"
 #include "debughandler.h"
@@ -279,30 +281,58 @@ IFACEMETHODIMP_(bool) ShipLocomotionClass::Process()
 #endif
 
 
-#if 0
 /**
  *  Instruct to move to location specified.
  * 
  *  @author: CCHyper
  */
-IFACEMETHODIMP_(void) ShipLocomotionClass::Move_To(Coordinate to)
+IFACEMETHODIMP_(void) ShipLocomotionClass::Move_To(Coordinate to)        // DONE
 {
-   // TODO
+    /**
+     *  Object is still under the influence of an emp, do not move.
+     */
+    if (Linked_To()->EMPFramesRemaining > 0) {
+        return;
+    }
+
+    DestinationCoord = to;
+
+    if (Map[to].Bit2_16) {
+        DestinationCoord.Z += BridgeCellHeight;
+    }
 }
-#endif
 
 
-#if 0
 /**
  *  Stop moving at first opportunity.
  * 
  *  @author: CCHyper
  */
-IFACEMETHODIMP_(void) ShipLocomotionClass::Stop_Moving()
+IFACEMETHODIMP_(void) ShipLocomotionClass::Stop_Moving()                 // NEEDS CONFIRMING
 {
-   // TODO
+    if (DestinationCoord) {
+
+        if (Linked_To()->Techno_Type_Class()->IsTrain) {
+
+            UnitClass *unit_linked = reinterpret_cast<UnitClass *>(Linked_To());
+            if (unit_linked->IsFollowing) {
+                    
+                UnitClass *follower = unit_linked->FollowingMe;
+                while (follower) {
+                    follower->Locomotor_Ptr()->Stop_Moving();
+                    follower = follower->FollowingMe;
+                }
+            }
+        }
+
+    }
+
+    // Huh?
+    //SpeedAccum = SpeedAccum >= 0.3 ? 0.3 : SpeedAccum;
+    field_50 = std::min(field_50, 0.3);
+
+    DestinationCoord = 0;
 }
-#endif
 
 
 /**
@@ -354,17 +384,17 @@ IFACEMETHODIMP_(LayerType) ShipLocomotionClass::In_Which_Layer()         // DONE
 }
 
 
-#if 0
 /**
  *  Force a voxel unit to a given slope. Used in cratering.
  * 
  *  @author: CCHyper
  */
-IFACEMETHODIMP_(void) ShipLocomotionClass::Force_New_Slope(int ramp)
+IFACEMETHODIMP_(void) ShipLocomotionClass::Force_New_Slope(int ramp)     // DONE
 {
-    // TODO
+    CurrentRamp = TileRampType(ramp);
+    PreviousRamp = TileRampType(ramp);
+    RampTransitionTimer = 0;
 }
-#endif
 
 
 #if 0
