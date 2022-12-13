@@ -64,7 +64,7 @@ ShipLocomotionClass : public DriveLocomotionClass
         //IFACEMETHOD_(bool, Is_Moving)();
         IFACEMETHOD_(Coordinate, Destination)();
         IFACEMETHOD_(Coordinate, Head_To_Coord)();
-        //IFACEMETHOD_(Matrix3D, Draw_Matrix)(int *key);
+        IFACEMETHOD_(Matrix3D, Draw_Matrix)(int *key);
         IFACEMETHOD_(Matrix3D, Shadow_Matrix)(int *key);
         IFACEMETHOD_(int, Z_Adjust)();
         IFACEMETHOD_(ZGradientType, Z_Gradient)();

@@ -221,6 +221,25 @@ IFACEMETHODIMP_(Coordinate) ShipLocomotionClass::Head_To_Coord()         // DONE
 
 
 #if 0
+struct VoxelIndexKey : public VoxelKeyStruct
+{
+    unsigned Facing:5;
+    unsigned HasTurretOffset:5;
+    unsigned bitfield_10:6;
+    unsigned FrameIndex:8;
+    unsigned bitfield_24:8;
+};
+
+struct MainVoxelIndexKey : public VoxelKeyStruct
+{
+    unsigned FrameIndex:5;
+    unsigned Ramp:11;
+    unsigned UseAuxVoxel:1; // !(!pUnit->Type->NoSpawnAlt || pUnit->SpawnManager->Draw_State())
+    unsigned bitfield_17:15;
+};
+#endif
+
+
 /**
  *  Fetch voxel draw matrix.
  * 
@@ -228,9 +247,73 @@ IFACEMETHODIMP_(Coordinate) ShipLocomotionClass::Head_To_Coord()         // DONE
  */
 IFACEMETHODIMP_(Matrix3D) ShipLocomotionClass::Draw_Matrix(int *key)
 {
-    return LocomotionClass::Draw_Matrix(key);   // TODO
+    if (RampTransitionTimer.Expired()) {
+
+        if (WWMath::Fabs(Linked_To()->AngleRotatedSideways) < 0.005 && WWMath::Fabs(Linked_To()->AngleRotatedForwards) < 0.005) {
+
+            if (key && *key != -1) {
+                *key <<= 6; // * 64 (0x40)
+                *key += CurrentRamp;
+            }
+
+            Matrix3D draw_matrix = LocomotionClass::Draw_Matrix(key);
+            draw_matrix.Make_Identity();
+
+            //if () {
+            //} else {
+            //
+            //}
+            return draw_matrix;
+        }
+
+    } else {
+
+        // TODO possible duplication of case?
+
+        Matrix3D mat3d_a(true);
+        Matrix3D mat3d_b(true);
+
+        float voxel_scale_y = Linked_To()->Techno_Type_Class()->field_1F8;
+        float voxel_scale_x = Linked_To()->Techno_Type_Class()->field_200;
+
+        float v40 = WWMath::Cos(Linked_To()->AngleRotatedForwards);
+        float v46 = WWMath::Sin(Linked_To()->AngleRotatedForwards);
+        float v41 = WWMath::Cos(Linked_To()->AngleRotatedSideways);
+
+        float v47 = (WWMath::Fabs(WWMath::Sin(Linked_To()->AngleRotatedSideways)) * voxel_scale_y + WWMath::Fabs(v46) * voxel_scale_x);
+
+        float v8 = (voxel_scale_x - (v40 * voxel_scale_x));
+        float v45 = v8;
+
+        float v10 = (voxel_scale_y - (v41 * voxel_scale_y));
+        float v43 = v10;
+
+        if (Linked_To()->AngleRotatedForwards < 0.0f) {
+            v45 = -v8;
+        }
+        if (Linked_To()->AngleRotatedSideways > 0.0f) {
+            v43 = -v10;
+        }
+
+        mat3d_a.Translate_Z(v47);
+        mat3d_b.Translate_X(v45);
+        mat3d_b.Translate_Y(v43);
+
+        mat3d_b.Rotate_X(Linked_To()->AngleRotatedSideways);
+        mat3d_b.Rotate_Y(Linked_To()->AngleRotatedForwards);
+
+        if (key) {
+            *key = -1;
+        }
+
+        Matrix3D mat3d_c(true);
+
+        // TODO
+
+        return mat3d_a * mat3d_b * mat3d_c;
+
+    }
 }
-#endif
 
 
 /**
@@ -240,11 +323,9 @@ IFACEMETHODIMP_(Matrix3D) ShipLocomotionClass::Draw_Matrix(int *key)
  */
 IFACEMETHODIMP_(Matrix3D) ShipLocomotionClass::Shadow_Matrix(int *key)   // DONE
 {
-    if (RampTransitionTimer.Percent_Expired() != 1.0f) {
-        if (WWMath::Fabs(Linked_To()->AngleRotatedSideways) >= 0.005 || WWMath::Fabs(Linked_To()->AngleRotatedForwards) >= 0.005) {
-            if (key) {
-                *key = -1;
-            }
+    if (!RampTransitionTimer.Expired() || WWMath::Fabs(Linked_To()->AngleRotatedSideways) >= 0.005 || WWMath::Fabs(Linked_To()->AngleRotatedForwards) >= 0.005) {
+        if (key) {
+            *key = -1;
         }
     }
 
