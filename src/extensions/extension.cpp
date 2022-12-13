@@ -46,6 +46,7 @@
 #include "bullet.h"
 #include "bullettype.h"
 #include "campaign.h"
+#include "cell.h"
 #include "empulse.h"
 #include "factory.h"
 #include "foggedobject.h"
@@ -112,6 +113,7 @@
 #include "buildingtypeext.h"
 #include "bullettypeext.h"
 #include "campaignext.h"
+#include "cellext.h"
 #include "factoryext.h"
 #include "sideext.h"
 #include "houseext.h"
@@ -459,6 +461,51 @@ static bool Extension_Request_Pointer_Remap(const DynamicVectorClass<BASE_CLASS 
 }
 
 
+
+
+/**
+ *  Request remap of all the extension pointers from all the active abstract objects.
+ *
+ *  @author: CCHyper
+ */
+template<class BASE_CLASS, class EXT_CLASS>
+static bool Extension_Request_Pointer_Remap(const VectorClass<BASE_CLASS *> &list)
+{
+    if (!list.Length()) {
+        DEBUG_INFO("Requested remap of \"%s\" extension pointers, but the list is empty!\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str());
+        return true;
+    }
+
+    DEBUG_INFO("Requesting remap of \"%s\" extension pointers (Length %d)...\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str(), list.Length());
+
+    for (int index = 0; index < list.Length(); ++index) {
+
+        const BASE_CLASS *object = list[index];
+        if (object) {
+
+            if (!Extension_Get_Abstract_Pointer(object)) {
+                DEV_DEBUG_ERROR("Extension_Request_Pointer_Remap: \"%s\" extension pointer (index %d) for is null!\n", Extension::Utility::Get_TypeID_Name<BASE_CLASS>().c_str(), index);
+                continue; //return false;
+            }
+
+            Wstring extptr_name;
+            extptr_name += Extension::Utility::Get_TypeID_Name(object).c_str();
+            extptr_name += "::ExtPtr";
+
+            /**
+             *  Inform the swizzle manager that we need to remap the pointer.
+             */
+            uintptr_t **ext_ptr_addr = ABSTRACT_EXTENSION_POINTER_REMAP_MACRO(object);
+            VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(*ext_ptr_addr, extptr_name.Peek_Buffer());
+
+            EXT_DEBUG_INFO("  Requested remap of index %d extension pointer complete.\n", index);
+        }
+    }
+
+    return true;
+}
+
+
 /**
  *  Detaches the object from the list of active object.
  * 
@@ -496,7 +543,7 @@ AbstractClassExtension *Extension::Private::Make_Internal(const AbstractClass *a
         //case RTTI_BULLET: { extptr = Extension_Make<BulletClass, BulletClassExtension>(reinterpret_cast<const BulletClass *>(abstract)); break; } // Not yet implemented
         case RTTI_BULLETTYPE: { extptr = Extension_Make<BulletTypeClass, BulletTypeClassExtension>(reinterpret_cast<const BulletTypeClass *>(abstract)); break; }
         case RTTI_CAMPAIGN: { extptr = Extension_Make<CampaignClass, CampaignClassExtension>(reinterpret_cast<const CampaignClass *>(abstract)); break; }
-        //case RTTI_CELL: { extptr = Extension_Make<CellClass, CellClassExtension>(reinterpret_cast<const CellClass *>(abstract)); break; } // Not yet implemented
+        case RTTI_CELL: { extptr = Extension_Make<CellClass, CellClassExtension>(reinterpret_cast<const CellClass *>(abstract)); break; }
         case RTTI_FACTORY: { extptr = Extension_Make<FactoryClass, FactoryClassExtension>(reinterpret_cast<const FactoryClass *>(abstract)); break; }
         case RTTI_HOUSE: { extptr = Extension_Make<HouseClass, HouseClassExtension>(reinterpret_cast<const HouseClass *>(abstract)); break; }
         case RTTI_HOUSETYPE: { extptr = Extension_Make<HouseTypeClass, HouseTypeClassExtension>(reinterpret_cast<const HouseTypeClass *>(abstract)); break; }
@@ -576,7 +623,7 @@ bool Extension::Private::Destroy_Internal(const AbstractClass *abstract)
         //case RTTI_BULLET: { removed = Extension_Destroy<BulletClass, BulletClassExtension>(reinterpret_cast<const BulletClass *>(abstract)); break; } // Not yet implemented
         case RTTI_BULLETTYPE: { removed = Extension_Destroy<BulletTypeClass, BulletTypeClassExtension>(reinterpret_cast<const BulletTypeClass *>(abstract)); break; }
         case RTTI_CAMPAIGN: { removed = Extension_Destroy<CampaignClass, CampaignClassExtension>(reinterpret_cast<const CampaignClass *>(abstract)); break; }
-        //case RTTI_CELL: { removed = Extension_Destroy<CellClass, CellClassExtension>(reinterpret_cast<const CellClass *>(abstract)); break; } // Not yet implemented
+        case RTTI_CELL: { removed = Extension_Destroy<CellClass, CellClassExtension>(reinterpret_cast<const CellClass *>(abstract)); break; }
         case RTTI_FACTORY: { removed = Extension_Destroy<FactoryClass, FactoryClassExtension>(reinterpret_cast<const FactoryClass *>(abstract)); break; }
         case RTTI_HOUSE: { removed = Extension_Destroy<HouseClass, HouseClassExtension>(reinterpret_cast<const HouseClass *>(abstract)); break; }
         case RTTI_HOUSETYPE: { removed = Extension_Destroy<HouseTypeClass, HouseTypeClassExtension>(reinterpret_cast<const HouseTypeClass *>(abstract)); break; }
@@ -701,7 +748,7 @@ bool Extension::Save(IStream *pStm)
     //if (!Extension_Save<BulletClass, BulletClassExtension>(pStm, BulletExtensions)) { return false; }                 // Not yet implemented
     if (!Extension_Save<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
     //if (!Extension_Save<CampaignClass, CampaignClassExtension>(pStm, CampaignExtensions)) { return false; }           // Supported, but Campaign's are not saved to file.
-    //if (!Extension_Save<CellClass, CellClassExtension>(pStm, CellExtensions)) { return false; }                       // Not yet implemented
+    if (!Extension_Save<CellClass, CellClassExtension>(pStm, CellExtensions)) { return false; }
     if (!Extension_Save<FactoryClass, FactoryClassExtension>(pStm, FactoryExtensions)) { return false; }
     if (!Extension_Save<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
     if (!Extension_Save<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
@@ -798,7 +845,7 @@ bool Extension::Load(IStream *pStm)
     //if (!Extension_Load<BulletClass, BulletClassExtension>(pStm, BulletExtensions)) { return false; }                 // Not yet implemented
     if (!Extension_Load<BulletTypeClass, BulletTypeClassExtension>(pStm, BulletTypeExtensions)) { return false; }
     //if (!Extension_Load<CampaignClass, CampaignClassExtension>(pStm, CampaignExtensions)) { return false; }           // Supported, but Campaign's are not saved to file.
-    //if (!Extension_Load<CellClass, CellClassExtension>(pStm, CellExtensions)) { return false; }                       // Not yet implemented
+    if (!Extension_Load<CellClass, CellClassExtension>(pStm, CellExtensions)) { return false; }
     if (!Extension_Load<FactoryClass, FactoryClassExtension>(pStm, FactoryExtensions)) { return false; }
     if (!Extension_Load<HouseClass, HouseClassExtension>(pStm, HouseExtensions)) { return false; }
     if (!Extension_Load<HouseTypeClass, HouseTypeClassExtension>(pStm, HouseTypeExtensions)) { return false; }
@@ -899,7 +946,7 @@ bool Extension::Request_Pointer_Remap()
     //if (!Extension_Request_Pointer_Remap<BulletClass, BulletClassExtension>(Bullets)) { return false; }               // Not yet implemented
     if (!Extension_Request_Pointer_Remap<BulletTypeClass, BulletTypeClassExtension>(BulletTypes)) { return false; }
     //if (!Extension_Request_Pointer_Remap<CampaignClass, CampaignClassExtension>(Campaigns)) { return false; }         // Does not need to be processed for pointer remapping.
-    //if (!Extension_Request_Pointer_Remap<CellClass, CellClassExtension>()) { return false; }                          // Not yet implemented
+    if (!Extension_Request_Pointer_Remap<CellClass, CellClassExtension>(Map.Array)) { return false; }
     if (!Extension_Request_Pointer_Remap<FactoryClass, FactoryClassExtension>(Factories)) { return false; }
     if (!Extension_Request_Pointer_Remap<HouseClass, HouseClassExtension>(Houses)) { return false; }
     if (!Extension_Request_Pointer_Remap<HouseTypeClass, HouseTypeClassExtension>(HouseTypes)) { return false; }
@@ -978,7 +1025,7 @@ bool Extension::Register_Class_Factories()
     //REGISTER_CLASS(BulletClassExtension);                                     // Not yet implemented
     REGISTER_CLASS(BulletTypeClassExtension);
     REGISTER_CLASS(CampaignClassExtension);
-    //REGISTER_CLASS(CellClassExtension);                                       // Not yet implemented
+    REGISTER_CLASS(CellClassExtension);
     REGISTER_CLASS(FactoryClassExtension);
     REGISTER_CLASS(HouseClassExtension);
     REGISTER_CLASS(HouseTypeClassExtension);
@@ -1060,7 +1107,7 @@ void Extension::Free_Heaps()
     //BulletExtensions.Clear();                                                 // Not yet implemented
     BulletTypeExtensions.Clear();
     //CampaignExtensions.Clear();                                               // Campaign's do not need to be processed.
-    //CellExtensions.Clear();                                                   // Not yet implemented
+    CellExtensions.Clear();
     FactoryExtensions.Clear();
     HouseExtensions.Clear();
     HouseTypeExtensions.Clear();
@@ -1428,7 +1475,7 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
     std::fprintf(fp, "\n");
 
     std::fprintf(fp, "Map.Array.Length = %d\n", Map.Array.Length());
-    //std::fprintf(fp, "CellExtensions.Count = %d\n", CellExtensions.Count());                                          // Not yet implemented
+    std::fprintf(fp, "CellExtensions.Count = %d\n", CellExtensions.Count());
     std::fprintf(fp, "\n");
 
     /**
@@ -1832,7 +1879,7 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
     //Print_Heap_CRC_Lists(fp, BulletExtensions);                               // Not yet implemented
     Print_Heap_CRC_Lists(fp, BulletTypeExtensions);
     //Print_Heap_CRC_Lists(fp, CampaignExtensions);                             // Does not need to be processed as these have no impact on networking.
-    //Print_Heap_CRC_Lists(fp, CellExtensions);                                 // Not yet implemented
+    Print_Heap_CRC_Lists(fp, CellExtensions);
     Print_Heap_CRC_Lists(fp, FactoryExtensions);
     Print_Heap_CRC_Lists(fp, HouseExtensions);
     Print_Heap_CRC_Lists(fp, HouseTypeExtensions);
@@ -1909,7 +1956,7 @@ void Extension::Detach_This_From_All(TARGET target, bool all)
     //Extension_Detach_This_From_All(BulletExtensions, target, all);            // Not yet implemented
     Extension_Detach_This_From_All(BulletTypeExtensions, target, all);
     //Extension_Detach_This_From_All(CampaignExtensions, target, all);          // Does not need to be processed.
-    //Extension_Detach_This_From_All(CellExtensions, target, all);              // Not yet implemented
+    Extension_Detach_This_From_All(CellExtensions, target, all);
     Extension_Detach_This_From_All(FactoryExtensions, target, all);
     Extension_Detach_This_From_All(HouseExtensions, target, all);
     Extension_Detach_This_From_All(HouseTypeExtensions, target, all);
@@ -1998,7 +2045,7 @@ unsigned Extension::Get_Save_Version_Number()
     //version += sizeof(BulletClassExtension);                                  // Not yet implemented
     version += sizeof(BulletTypeClassExtension);
     version += sizeof(CampaignClassExtension);
-    //version += sizeof(CellClassExtension);                                    // Not yet implemented
+    version += sizeof(CellClassExtension);
     version += sizeof(FactoryClassExtension);
     version += sizeof(HouseClassExtension);
     version += sizeof(HouseTypeClassExtension);

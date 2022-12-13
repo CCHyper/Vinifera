@@ -37,6 +37,7 @@ DynamicVectorClass<BuildingClassExtension *> BuildingExtensions;
 DynamicVectorClass<BuildingTypeClassExtension *> BuildingTypeExtensions;
 DynamicVectorClass<BulletTypeClassExtension *> BulletTypeExtensions;
 DynamicVectorClass<CampaignClassExtension *> CampaignExtensions;
+DynamicVectorClass<CellClassExtension *> CellExtensions;
 DynamicVectorClass<FactoryClassExtension *> FactoryExtensions;
 DynamicVectorClass<SideClassExtension *> SideExtensions;
 DynamicVectorClass<HouseClassExtension *> HouseExtensions;

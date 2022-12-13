@@ -26,6 +26,7 @@
  *
  ******************************************************************************/
 #include "cellext_hooks.h"
+#include "cellext_init.h"
 #include "cellext_const.h"
 #include "tibsun_globals.h"
 #include "session.h"
@@ -215,6 +216,8 @@ passes_check:
  */
 void CellClassExtension_Hooks()
 {
+	CellClassExtension_Init();
+
 	Patch_Jump(0x0045882C, &_CellClass_Goodie_Check_Veterency_Trainable_BugFix_Patch);
 	Patch_Jump(0x00457EAB, &_CellClass_Goodie_Check_Crates_Disabled_Respawn_BugFix_Patch);
 	Patch_Jump(0x00454E60, &_CellClass_Draw_Shroud_Fog_Patch);
