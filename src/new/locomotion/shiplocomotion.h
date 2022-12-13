@@ -65,7 +65,7 @@ ShipLocomotionClass : public DriveLocomotionClass
         IFACEMETHOD_(Coordinate, Destination)();
         IFACEMETHOD_(Coordinate, Head_To_Coord)();
         //IFACEMETHOD_(Matrix3D, Draw_Matrix)(int *key);
-        //IFACEMETHOD_(Matrix3D, Shadow_Matrix)(int *key);
+        IFACEMETHOD_(Matrix3D, Shadow_Matrix)(int *key);
         IFACEMETHOD_(int, Z_Adjust)();
         IFACEMETHOD_(ZGradientType, Z_Gradient)();
         //IFACEMETHOD_(bool, Process)();
@@ -76,7 +76,7 @@ ShipLocomotionClass : public DriveLocomotionClass
         //IFACEMETHOD_(void, Force_Track)(int track, Coordinate coord);
         IFACEMETHOD_(LayerType, In_Which_Layer)();
         IFACEMETHOD_(void, Force_New_Slope)(TileRampType ramp);
-        //IFACEMETHOD_(bool, Is_Moving_Now)();
+        IFACEMETHOD_(bool, Is_Moving_Now)();
         IFACEMETHOD_(void, Mark_All_Occupation_Bits)(MarkType mark);
         IFACEMETHOD_(bool, Is_Moving_Here)(Coordinate to);
         //IFACEMETHOD_(bool, Will_Jump_Tracks)();

@@ -233,17 +233,23 @@ IFACEMETHODIMP_(Matrix3D) ShipLocomotionClass::Draw_Matrix(int *key)
 #endif
 
 
-#if 0
 /**
  *  Fetch shadow draw matrix.
  * 
  *  @author: CCHyper
  */
-IFACEMETHODIMP_(Matrix3D) ShipLocomotionClass::Shadow_Matrix(int *key)
+IFACEMETHODIMP_(Matrix3D) ShipLocomotionClass::Shadow_Matrix(int *key)   // DONE
 {
-    return LocomotionClass::Shadow_Matrix(key);   // TODO
+    if (RampTransitionTimer.Percent_Expired() != 1.0f) {
+        if (WWMath::Fabs(Linked_To()->AngleRotatedSideways) >= 0.005 || WWMath::Fabs(Linked_To()->AngleRotatedForwards) >= 0.005) {
+            if (key) {
+                *key = -1;
+            }
+        }
+    }
+
+    return LocomotionClass::Shadow_Matrix(key);
 }
-#endif
 
 
 /**
@@ -297,6 +303,9 @@ IFACEMETHODIMP_(void) ShipLocomotionClass::Move_To(Coordinate to)        // DONE
 
     DestinationCoord = to;
 
+    /**
+     *  
+     */
     if (Map[to].Bit2_16) {
         DestinationCoord.Z += BridgeCellHeight;
     }
@@ -356,7 +365,7 @@ IFACEMETHODIMP_(void) ShipLocomotionClass::Unlimbo()                     // DONE
     /**
      *  Set the objects ramp for redraw.
      */
-    Force_New_Slope(Linked_To()->Get_Cell_Ptr()->Ramp);
+    Force_New_Slope(TileRampType(Linked_To()->Get_Cell_Ptr()->Ramp));
 }
 
 
@@ -397,25 +406,18 @@ IFACEMETHODIMP_(void) ShipLocomotionClass::Force_New_Slope(TileRampType ramp)   
 }
 
 
-#if 0
 /**
  *  Is it actually moving across the ground this very second?
  * 
  *  @author: CCHyper
  */
-IFACEMETHODIMP_(bool) ShipLocomotionClass::Is_Moving_Now()
+IFACEMETHODIMP_(bool) ShipLocomotionClass::Is_Moving_Now()               // DONE
 {
     if (Linked_To()->PrimaryFacing.Is_Rotating()) {
         return true;
     }
-
-    if (Is_Moving()) {
-        return HeadToCoord && Apparent_Speed() > 0;
-    }
-
-    return false;   // TODO
+    return Is_Moving() && HeadToCoord && Linked_To()->Current_Speed() > 0;
 }
-#endif
 
 
 /**
@@ -436,12 +438,9 @@ IFACEMETHODIMP_(void) ShipLocomotionClass::Mark_All_Occupation_Bits(MarkType mar
  * 
  *  @author: CCHyper
  */
-IFACEMETHODIMP_(bool) ShipLocomotionClass::Is_Moving_Here(Coordinate to) // DONE
+IFACEMETHODIMP_(bool) ShipLocomotionClass::Is_Moving_Here(Coordinate to)
 {
-    if (Linked_To()->PrimaryFacing.Is_Rotating()) {
-        return true;
-    }
-    return Is_Moving() && HeadToCoord && Linked_To()->Current_Speed() > 0;
+    return false; // TODO
 }
 
 
@@ -465,7 +464,8 @@ IFACEMETHODIMP_(bool) ShipLocomotionClass::Will_Jump_Tracks()
  */
 IFACEMETHODIMP_(void) ShipLocomotionClass::Lock()                        // DONE
 {
-   IsLocked = true;
+   //IsLocked = true;
+   IsUnlocked = false;
 }
 
 
@@ -476,7 +476,8 @@ IFACEMETHODIMP_(void) ShipLocomotionClass::Lock()                        // DONE
  */
 IFACEMETHODIMP_(void) ShipLocomotionClass::Unlock()                      // DONE
 {
-    IsLocked = false;
+    //IsLocked = false;
+    IsUnlocked = true;
 }
 
 
@@ -1156,72 +1157,72 @@ ShipLocomotionClass::RawTrackType const ShipLocomotionClass::RawTracks[13] = {  
  *  be performed on the track data.
  */
 ShipLocomotionClass::TurnTrackType const ShipLocomotionClass::TrackControl[67] = {
-    {1,  0,  0, 0, DIR_N,   F_},                                                        // 0-0
-    {3,  7,  0, 0, DIR_NE,  F_D},                                                       // 0-1 (raw chart)
-    {4,  9,  0, 0, DIR_E,   F_D},                                                       // 0-2 (raw chart)
-    {0,  0,  0, 0, DIR_SE,  F_},                                                        // 0-3 !
-    {0,  0,  0, 0, DIR_S,   F_},                                                        // 0-4 !
-    {0,  0,  0, 0, DIR_SW,  F_},                                                        // 0-5 !
-    {4,  9,  0, 0, DIR_W,   (ShipLocomotionClass::TrackControlType)(F_X|F_D)},          // 0-6
-    {3,  7,  0, 0, DIR_NW,  (ShipLocomotionClass::TrackControlType)(F_X|F_D)},          // 0-7
-    {6,  8,  0, 0, DIR_N,   (ShipLocomotionClass::TrackControlType)(F_T|F_X|F_Y|F_D)},  // 1-0
-    {2,  0,  0, 0, DIR_NE,  F_},                                                        // 1-1 (raw chart)
-    {6,  8,  0, 0, DIR_E,   F_D},                                                       // 1-2 (raw chart)
-    {5,  10, 0, 0, DIR_SE,  F_D},                                                       // 1-3 (raw chart)
-    {0,  0,  0, 0, DIR_S,   F_},                                                        // 1-4 !
-    {0,  0,  0, 0, DIR_SW,  F_},                                                        // 1-5 !
-    {0,  0,  0, 0, DIR_W,   F_},                                                        // 1-6 !
-    {5,  10, 0, 0, DIR_NW,  (ShipLocomotionClass::TrackControlType)(F_T|F_X|F_Y|F_D)},  // 1-7
-    {4,  9,  0, 0, DIR_N,   (ShipLocomotionClass::TrackControlType)(F_T|F_X|F_Y|F_D)},  // 2-0
-    {3,  7,  0, 0, DIR_NE,  (ShipLocomotionClass::TrackControlType)(F_T|F_X|F_Y|F_D)},  // 2-1
-    {1,  0,  0, 0, DIR_E,   (ShipLocomotionClass::TrackControlType)(F_T|F_X)},          // 2-2
-    {3,  7,  0, 0, DIR_SE,  (ShipLocomotionClass::TrackControlType)(F_T|F_X|F_D)},      // 2-3
-    {4,  9,  0, 0, DIR_S,   (ShipLocomotionClass::TrackControlType)(F_T|F_X|F_D)},      // 2-4
-    {0,  0,  0, 0, DIR_SW,  F_},                                                        // 2-5 !
-    {0,  0,  0, 0, DIR_W,   F_},                                                        // 2-6 !
-    {0,  0,  0, 0, DIR_NW,  F_},                                                        // 2-7 !
-    {0,  0,  0, 0, DIR_N,   F_},                                                        // 3-0 !
-    {5,  10, 0, 0, DIR_NE,  (ShipLocomotionClass::TrackControlType)(F_Y|F_D)},          // 3-1
-    {6,  8,  0, 0, DIR_E,   (ShipLocomotionClass::TrackControlType)(F_Y|F_D)},          // 3-2
-    {2,  0,  0, 0, DIR_SE,  F_Y},                                                       // 3-3
-    {6,  8,  0, 0, DIR_S,   (ShipLocomotionClass::TrackControlType)(F_T|F_X|F_D)},      // 3-4
-    {5,  10, 0, 0, DIR_SW,  (ShipLocomotionClass::TrackControlType)(F_T|F_X|F_D)},      // 3-5
-    {0,  0,  0, 0, DIR_W,   F_},                                                        // 3-6 !
-    {0,  0,  0, 0, DIR_NW,  F_},                                                        // 3-7 !
-    {0,  0,  0, 0, DIR_N,   F_},                                                        // 4-0 !
-    {0,  0,  0, 0, DIR_NE,  F_},                                                        // 4-1 !
-    {4,  9,  0, 0, DIR_E,   (ShipLocomotionClass::TrackControlType)(F_Y|F_D)},          // 4-2
-    {3,  7,  0, 0, DIR_SE,  (ShipLocomotionClass::TrackControlType)(F_Y|F_D)},          // 4-3
-    {1,  0,  0, 0, DIR_S,   F_Y},                                                       // 4-4
-    {3,  7,  0, 0, DIR_SW,  (ShipLocomotionClass::TrackControlType)(F_X|F_Y|F_D)},      // 4-5
-    {4,  9,  0, 0, DIR_W,   (ShipLocomotionClass::TrackControlType)(F_X|F_Y|F_D)},      // 4-6
-    {0,  0,  0, 0, DIR_NW,  F_},                                                        // 4-7 !
-    {0,  0,  0, 0, DIR_N,   F_},                                                        // 5-0 !
-    {0,  0,  0, 0, DIR_NE,  F_},                                                        // 5-1 !
-    {0,  0,  0, 0, DIR_E,   F_},                                                        // 5-2 !
-    {5,  10, 0, 0, DIR_SE,  (ShipLocomotionClass::TrackControlType)(F_T|F_D)},          // 5-3
-    {6,  8,  0, 0, DIR_S,   (ShipLocomotionClass::TrackControlType)(F_T|F_D)},          // 5-4
-    {2,  0,  0, 0, DIR_SW,  F_T},                                                       // 5-5
-    {6,  8,  0, 0, DIR_W,   (ShipLocomotionClass::TrackControlType)(F_X|F_Y|F_D)},      // 5-6
-    {5,  10, 0, 0, DIR_NW,  (ShipLocomotionClass::TrackControlType)(F_X|F_Y|F_D)},      // 5-7
-    {4,  9,  0, 0, DIR_N,   (ShipLocomotionClass::TrackControlType)(F_T|F_Y|F_D)},      // 6-0
-    {0,  0,  0, 0, DIR_NE,  F_},                                                        // 6-1 !
-    {0,  0,  0, 0, DIR_E,   F_},                                                        // 6-2 !
-    {0,  0,  0, 0, DIR_SE,  F_},                                                        // 6-3 !
-    {4,  9,  0, 0, DIR_S,   (ShipLocomotionClass::TrackControlType)(F_T|F_D)},          // 6-4
-    {3,  7,  0, 0, DIR_SW,  (ShipLocomotionClass::TrackControlType)(F_T|F_D)},          // 6-5
-    {1,  0,  0, 0, DIR_W,   F_T},                                                       // 6-6
-    {3,  7,  0, 0, DIR_NW,  (ShipLocomotionClass::TrackControlType)(F_T|F_Y|F_D)},      // 6-7
-    {6,  8,  0, 0, DIR_N,   (ShipLocomotionClass::TrackControlType)(F_T|F_Y|F_D)},      // 7-0
-    {5,  10, 0, 0, DIR_NE,  (ShipLocomotionClass::TrackControlType)(F_T|F_Y|F_D)},      // 7-1
-    {0,  0,  0, 0, DIR_E,   F_},                                                        // 7-2 !
-    {0,  0,  0, 0, DIR_SE,  F_},                                                        // 7-3 !
-    {0,  0,  0, 0, DIR_S,   F_},                                                        // 7-4 !
-    {5,  10, 0, 0, DIR_SW,  (ShipLocomotionClass::TrackControlType)(F_X|F_D)},          // 7-5
-    {6,  8,  0, 0, DIR_W,   (ShipLocomotionClass::TrackControlType)(F_X|F_D)},          // 7-6
-    {2,  0,  0, 0, DIR_NW,  F_X},                                                       // 7-7
+    {1,  0,  0, 0, DIR_N,   F_},                                   // 0-0
+    {3,  7,  0, 0, DIR_NE,  F_D},                                  // 0-1 (raw chart)
+    {4,  9,  0, 0, DIR_E,   F_D},                                  // 0-2 (raw chart)
+    {0,  0,  0, 0, DIR_SE,  F_},                                   // 0-3 !
+    {0,  0,  0, 0, DIR_S,   F_},                                   // 0-4 !
+    {0,  0,  0, 0, DIR_SW,  F_},                                   // 0-5 !
+    {4,  9,  0, 0, DIR_W,   (TrackControlType)(F_X|F_D)},          // 0-6
+    {3,  7,  0, 0, DIR_NW,  (TrackControlType)(F_X|F_D)},          // 0-7
+    {6,  8,  0, 0, DIR_N,   (TrackControlType)(F_T|F_X|F_Y|F_D)},  // 1-0
+    {2,  0,  0, 0, DIR_NE,  F_},                                   // 1-1 (raw chart)
+    {6,  8,  0, 0, DIR_E,   F_D},                                  // 1-2 (raw chart)
+    {5,  10, 0, 0, DIR_SE,  F_D},                                  // 1-3 (raw chart)
+    {0,  0,  0, 0, DIR_S,   F_},                                   // 1-4 !
+    {0,  0,  0, 0, DIR_SW,  F_},                                   // 1-5 !
+    {0,  0,  0, 0, DIR_W,   F_},                                   // 1-6 !
+    {5,  10, 0, 0, DIR_NW,  (TrackControlType)(F_T|F_X|F_Y|F_D)},  // 1-7
+    {4,  9,  0, 0, DIR_N,   (TrackControlType)(F_T|F_X|F_Y|F_D)},  // 2-0
+    {3,  7,  0, 0, DIR_NE,  (TrackControlType)(F_T|F_X|F_Y|F_D)},  // 2-1
+    {1,  0,  0, 0, DIR_E,   (TrackControlType)(F_T|F_X)},          // 2-2
+    {3,  7,  0, 0, DIR_SE,  (TrackControlType)(F_T|F_X|F_D)},      // 2-3
+    {4,  9,  0, 0, DIR_S,   (TrackControlType)(F_T|F_X|F_D)},      // 2-4
+    {0,  0,  0, 0, DIR_SW,  F_},                                   // 2-5 !
+    {0,  0,  0, 0, DIR_W,   F_},                                   // 2-6 !
+    {0,  0,  0, 0, DIR_NW,  F_},                                   // 2-7 !
+    {0,  0,  0, 0, DIR_N,   F_},                                   // 3-0 !
+    {5,  10, 0, 0, DIR_NE,  (TrackControlType)(F_Y|F_D)},          // 3-1
+    {6,  8,  0, 0, DIR_E,   (TrackControlType)(F_Y|F_D)},          // 3-2
+    {2,  0,  0, 0, DIR_SE,  F_Y},                                  // 3-3
+    {6,  8,  0, 0, DIR_S,   (TrackControlType)(F_T|F_X|F_D)},      // 3-4
+    {5,  10, 0, 0, DIR_SW,  (TrackControlType)(F_T|F_X|F_D)},      // 3-5
+    {0,  0,  0, 0, DIR_W,   F_},                                   // 3-6 !
+    {0,  0,  0, 0, DIR_NW,  F_},                                   // 3-7 !
+    {0,  0,  0, 0, DIR_N,   F_},                                   // 4-0 !
+    {0,  0,  0, 0, DIR_NE,  F_},                                   // 4-1 !
+    {4,  9,  0, 0, DIR_E,   (TrackControlType)(F_Y|F_D)},          // 4-2
+    {3,  7,  0, 0, DIR_SE,  (TrackControlType)(F_Y|F_D)},          // 4-3
+    {1,  0,  0, 0, DIR_S,   F_Y},                                  // 4-4
+    {3,  7,  0, 0, DIR_SW,  (TrackControlType)(F_X|F_Y|F_D)},      // 4-5
+    {4,  9,  0, 0, DIR_W,   (TrackControlType)(F_X|F_Y|F_D)},      // 4-6
+    {0,  0,  0, 0, DIR_NW,  F_},                                   // 4-7 !
+    {0,  0,  0, 0, DIR_N,   F_},                                   // 5-0 !
+    {0,  0,  0, 0, DIR_NE,  F_},                                   // 5-1 !
+    {0,  0,  0, 0, DIR_E,   F_},                                   // 5-2 !
+    {5,  10, 0, 0, DIR_SE,  (TrackControlType)(F_T|F_D)},          // 5-3
+    {6,  8,  0, 0, DIR_S,   (TrackControlType)(F_T|F_D)},          // 5-4
+    {2,  0,  0, 0, DIR_SW,  F_T},                                  // 5-5
+    {6,  8,  0, 0, DIR_W,   (TrackControlType)(F_X|F_Y|F_D)},      // 5-6
+    {5,  10, 0, 0, DIR_NW,  (TrackControlType)(F_X|F_Y|F_D)},      // 5-7
+    {4,  9,  0, 0, DIR_N,   (TrackControlType)(F_T|F_Y|F_D)},      // 6-0
+    {0,  0,  0, 0, DIR_NE,  F_},                                   // 6-1 !
+    {0,  0,  0, 0, DIR_E,   F_},                                   // 6-2 !
+    {0,  0,  0, 0, DIR_SE,  F_},                                   // 6-3 !
+    {4,  9,  0, 0, DIR_S,   (TrackControlType)(F_T|F_D)},          // 6-4
+    {3,  7,  0, 0, DIR_SW,  (TrackControlType)(F_T|F_D)},          // 6-5
+    {1,  0,  0, 0, DIR_W,   F_T},                                  // 6-6
+    {3,  7,  0, 0, DIR_NW,  (TrackControlType)(F_T|F_Y|F_D)},      // 6-7
+    {6,  8,  0, 0, DIR_N,   (TrackControlType)(F_T|F_Y|F_D)},      // 7-0
+    {5,  10, 0, 0, DIR_NE,  (TrackControlType)(F_T|F_Y|F_D)},      // 7-1
+    {0,  0,  0, 0, DIR_E,   F_},                                   // 7-2 !
+    {0,  0,  0, 0, DIR_SE,  F_},                                   // 7-3 !
+    {0,  0,  0, 0, DIR_S,   F_},                                   // 7-4 !
+    {5,  10, 0, 0, DIR_SW,  (TrackControlType)(F_X|F_D)},          // 7-5
+    {6,  8,  0, 0, DIR_W,   (TrackControlType)(F_X|F_D)},          // 7-6
+    {2,  0,  0, 0, DIR_NW,  F_X},                                  // 7-7
 
-    {11, 11, 0, 0, DIR_SW, F_},                                                         // Backup harvester into refinery.
-    {12, 12, 0, 0, DIR_SW, F_},                                                         // Drive back into refinery.
-    {13, 13, 0, 0, DIR_SW, F_}                                                          // Drive out of weapons factory.
+    {11, 11, 0, 0, DIR_SW, F_},                                    // Backup harvester into refinery.
+    {12, 12, 0, 0, DIR_SW, F_},                                    // Drive back into refinery.
+    {13, 13, 0, 0, DIR_SW, F_}                                     // Drive out of weapons factory.
 };
