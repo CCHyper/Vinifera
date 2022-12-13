@@ -418,22 +418,17 @@ IFACEMETHODIMP_(bool) ShipLocomotionClass::Is_Moving_Now()
 #endif
 
 
-#if 0
 /**
  *  Lifts all occupation bits associated with the object off the map.
  * 
  *  @author: CCHyper
  */
-IFACEMETHODIMP_(void) ShipLocomotionClass::Mark_All_Occupation_Bits(int mark)
+IFACEMETHODIMP_(void) ShipLocomotionClass::Mark_All_Occupation_Bits(int mark) // NEEDS CONFIRMING
 {
-    Coordinate headto = Head_To_Coord();   // TODO
-    if (mark != 0) {
-        Linked_To()->Set_Occupy_Bit(headto);
-    } else {
-        Linked_To()->Set_Occupy_Bit(headto);
+    if (HeadToCoord) {
+        Mark_Track(HeadToCoord, MarkType(mark));
     }
 }
-#endif
 
 
 /**
