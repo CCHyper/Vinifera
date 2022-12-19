@@ -49,6 +49,7 @@
 #include "extension.h"
 #include "theatertype.h"
 #include "uicontrol.h"
+#include "mousetype.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <string>
@@ -668,6 +669,41 @@ int Vinifera_Pre_Init_Game(int argc, char *argv[])
 
     } else {
         DEV_DEBUG_WARNING("UI.INI not found!\n");
+    }
+
+    /**
+     *  Read the mouse controls and overrides.
+     */
+    MouseTypeHandler = new MouseTypeClass;
+
+#ifndef NDEBUG
+    /**
+     *  Write the default mouse control values to ini.
+     */
+    {
+        CCFileClass mouse_write_file("MOUSE.DBG");
+        CCINIClass mouse_write_ini;
+        mouse_write_file.Delete();
+        MouseTypeHandler->Write_Default_INI(mouse_write_ini);
+        mouse_write_ini.Save(mouse_write_file, false);
+        mouse_write_file.Close();
+    }
+#endif
+
+    CCFileClass mouse_file("MOUSE.INI");
+    CCINIClass mouse_ini;
+
+    if (mouse_file.Is_Available()) {
+
+        mouse_ini.Load(mouse_file, false);
+
+        if (!MouseTypeHandler->Read_INI(mouse_ini)) {
+            DEV_DEBUG_ERROR("Failed to read MOUSE.INI!\n");
+            return EXIT_FAILURE;
+        }
+
+    } else {
+        DEV_DEBUG_WARNING("MOUSE.INI not found!\n");
     }
 
 #if defined(TS_CLIENT)

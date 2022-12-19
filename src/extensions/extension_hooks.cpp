@@ -134,6 +134,7 @@
 #include "fetchres_hooks.h"
 
 #include "theatertype_hooks.h"
+#include "mousetype_hooks.h"
 
 #include "vinifera_globals.h"
 #include "tibsun_functions.h"
@@ -280,4 +281,5 @@ void Extension_Hooks()
      *  New classes and interfaces.
      */
     TheaterTypeClassExtension_Hooks();
+    MouseTypeClass_Hooks();
 }
