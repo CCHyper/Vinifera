@@ -135,6 +135,7 @@
 
 #include "theatertype_hooks.h"
 #include "mousetype_hooks.h"
+#include "actiontype_hooks.h"
 
 #include "vinifera_globals.h"
 #include "tibsun_functions.h"
@@ -282,4 +283,5 @@ void Extension_Hooks()
      */
     TheaterTypeClassExtension_Hooks();
     MouseTypeClass_Hooks();
+    ActionTypeClass_Hooks();
 }

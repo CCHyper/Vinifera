@@ -34,6 +34,7 @@
 
 class EBoltClass;
 class TheaterTypeClass;
+class ActionTypeClass;
 
 
 extern bool Vinifera_DeveloperMode;
@@ -95,6 +96,7 @@ extern MFCC *IsoGenericMix;
  */
 extern DynamicVectorClass<EBoltClass *> EBolts;
 extern DynamicVectorClass<TheaterTypeClass *> TheaterTypes;
+extern DynamicVectorClass<ActionTypeClass *> ActionTypes;
 
 
 /**

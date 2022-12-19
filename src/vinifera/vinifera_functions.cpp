@@ -50,6 +50,7 @@
 #include "theatertype.h"
 #include "uicontrol.h"
 #include "mousetype.h"
+#include "actiontype.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <string>
@@ -704,6 +705,24 @@ int Vinifera_Pre_Init_Game(int argc, char *argv[])
 
     } else {
         DEV_DEBUG_WARNING("MOUSE.INI not found!\n");
+    }
+
+    ActionTypeClass::One_Time();
+
+    CCFileClass action_file("ACTION.INI");
+    CCINIClass action_ini;
+
+    if (action_file.Is_Available()) {
+
+        action_ini.Load(action_file, false);
+
+        if (!ActionTypeClass::Read_INI(action_ini)) {
+            DEV_DEBUG_ERROR("Failed to read ACTION.INI!\n");
+            return EXIT_FAILURE;
+        }
+
+    } else {
+        DEV_DEBUG_WARNING("ACTION.INI not found!\n");
     }
 
 #if defined(TS_CLIENT)

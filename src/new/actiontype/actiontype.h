@@ -4,7 +4,7 @@
  *
  *  @project       Vinifera
  *
- *  @file          MOUSETYPE.H
+ *  @file          ACTIONTYPE.H
  *
  *  @author        CCHyper
  *
@@ -28,7 +28,7 @@
 #pragma once
 
 #include "always.h"
-#include "iomap.h"
+#include "tibsun_defines.h"
 #include "wstring.h"
 
 
@@ -36,39 +36,29 @@ class CCINIClass;
 class NoInitClass;
 
 
-class MouseTypeClass
+class ActionTypeClass
 {
     public:
-        MouseTypeClass();
-        MouseTypeClass(const NoInitClass &noinit);
-        ~MouseTypeClass();
+        ActionTypeClass(Wstring name);
+        ActionTypeClass(const NoInitClass &noinit);
+        ~ActionTypeClass();
 
-        bool Read_INI(CCINIClass &ini);
+        static void One_Time();
+        static bool Read_INI(CCINIClass &ini);
 
-#ifndef NDEBUG
-        bool Write_Default_INI(CCINIClass &ini);
-#endif
+        static ActionType From_Name(Wstring &name);
+        static Wstring Name_From(ActionType type);
+        static const ActionTypeClass *Find_Or_Make(Wstring &name);
+
+    private:
+        static Wstring Internal_Name(Wstring name);
 
     public:
-         /**
-          *  This type is used to control the frames and rates of the mouse
-          *  pointer. Some mouse pointers are actually looping animations.
-          */
-        typedef struct MouseStruct
-        {
-            int StartFrame;    // Starting frame number.
-            int FrameCount;    // Number of animation frames.
-            int FrameRate;     // Frame delay between changing frames.
-            int SmallFrame;    // Start frame number for small version (if any).
-            int X, Y;          // Hotspot X and Y offset.
-        } MouseStruct;
-
         /**
-         *  The control frames and rates for the various mouse pointers are stored
-         *  in this static array.
+         *  The ini name of this action.
          */
-        static MouseStruct MouseControl[MOUSE_COUNT];
-        static Wstring MouseTypeClass::MouseNames[MOUSE_COUNT];
-};
+        Wstring Name;
 
-extern MouseTypeClass *MouseTypeHandler;
+    public:
+        static Wstring ActionName[ACTION_COUNT];
+};

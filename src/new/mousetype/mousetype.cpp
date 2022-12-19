@@ -37,7 +37,7 @@ MouseTypeClass *MouseTypeHandler = nullptr;
 /**
  *  These are the ASCII names for the mouse control types.
  */
-const char *MouseTypeClass::MouseNames[MOUSE_COUNT] = {
+Wstring MouseTypeClass::MouseNames[MOUSE_COUNT] = {
     "Normal",               // MOUSE_NORMAL
 
     "ScrollN",              // MOUSE_N
@@ -249,26 +249,31 @@ bool MouseTypeClass::Read_INI(CCINIClass &ini)
         /**
          *  x
          */
-        if (!ini.Get_String(MOUSE, MouseNames[mouse], buffer, sizeof(buffer))) {
-            DEBUG_ERROR("Mouse: Unable to find definition for %s!\n", MouseNames[mouse]);
+        if (!ini.Get_String(MOUSE, MouseNames[mouse].Peek_Buffer(), buffer, sizeof(buffer))) {
+            DEBUG_ERROR("Mouse: Unable to find definition for mouse type \"%s\"!\n", MouseNames[mouse].Peek_Buffer());
             return false;
         }
 
         MouseStruct &mousectrl = MouseControl[mouse];
 
         tok = std::strtok(buffer, ",");
+        ASSERT_FATAL_PRINT(tok != nullptr, "Invalid StartFrame for MouseType \"%s\"!", MouseNames[mouse].Peek_Buffer());
         mousectrl.StartFrame = std::strtol(tok, nullptr, 10);
 
         tok = std::strtok(nullptr, ",");
+        ASSERT_FATAL_PRINT(tok != nullptr, "Invalid FrameCount for MouseType \"%s\"!", MouseNames[mouse].Peek_Buffer());
         mousectrl.FrameCount = std::strtol(tok, nullptr, 10);
 
         tok = std::strtok(nullptr, ",");
+        ASSERT_FATAL_PRINT(tok != nullptr, "Invalid FrameRate for MouseType \"%s\"!", MouseNames[mouse].Peek_Buffer());
         mousectrl.FrameRate = std::strtol(tok, nullptr, 10);
 
         tok = std::strtok(nullptr, ",");
+        ASSERT_FATAL_PRINT(tok != nullptr, "Invalid SmallFrame for MouseType \"%s\"!", MouseNames[mouse].Peek_Buffer());
         mousectrl.SmallFrame = std::strtol(tok, nullptr, 10);
 
         tok = std::strtok(nullptr, ",");
+        ASSERT_FATAL_PRINT(tok != nullptr, "Invalid HotSpotX for MouseType \"%s\"!", MouseNames[mouse].Peek_Buffer());
         if (!strcmpi(tok, "left")) {
             value = HOTSPOT_LEFT;
         } else if (!strcmpi(tok, "center")) {
@@ -281,6 +286,7 @@ bool MouseTypeClass::Read_INI(CCINIClass &ini)
         mousectrl.X = value;
 
         tok = std::strtok(nullptr, ",");
+        ASSERT_FATAL_PRINT(tok != nullptr, "Invalid HotSpotY for MouseType \"%s\"!", MouseNames[mouse].Peek_Buffer());
         if (!strcmpi(tok, "top")) {
             value = HOTSPOT_TOP;
         } else if (!strcmpi(tok, "middle")) {
@@ -328,7 +334,7 @@ bool MouseTypeClass::Write_Default_INI(CCINIClass &ini)
                 hotspot_x = "right";
                 break;
             default:
-                DEBUG_ERROR("Mouse: Invalid hotspot X for %s!\n", MouseNames[mouse]);
+                DEBUG_ERROR("Mouse: Invalid hotspot X for %s!\n", MouseNames[mouse].Peek_Buffer());
                 return false;
         };
 
@@ -343,7 +349,7 @@ bool MouseTypeClass::Write_Default_INI(CCINIClass &ini)
                 hotspot_y = "bottom";
                 break;
             default:
-                DEBUG_ERROR("Mouse: Invalid hotspot Y for %s!\n", MouseNames[mouse]);
+                DEBUG_ERROR("Mouse: Invalid hotspot Y for %s!\n", MouseNames[mouse].Peek_Buffer());
                 return false;
         };
 
@@ -355,7 +361,7 @@ bool MouseTypeClass::Write_Default_INI(CCINIClass &ini)
                                     hotspot_x,
                                     hotspot_y);
 
-        ini.Put_String(MOUSE, MouseNames[mouse], buffer);
+        ini.Put_String(MOUSE, MouseNames[mouse].Peek_Buffer(), buffer);
     }
 
     return true;
