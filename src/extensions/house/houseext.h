@@ -32,6 +32,9 @@
 #include "housetype.h"
 
 
+class TechnoTypeClass;
+
+
 class DECLSPEC_UUID(UUID_HOUSE_EXTENSION)
 HouseClassExtension final : public AbstractClassExtension
 {
@@ -62,6 +65,13 @@ HouseClassExtension final : public AbstractClassExtension
         virtual HouseClass *This() const override { return reinterpret_cast<HouseClass *>(AbstractClassExtension::This()); }
         virtual const HouseClass *This_Const() const override { return reinterpret_cast<const HouseClass *>(AbstractClassExtension::This_Const()); }
         virtual RTTIType What_Am_I() const override { return RTTI_HOUSE; }
+
+        float Get_Build_Time_Multiplier(const TechnoTypeClass *technotype) const;
+        float Get_Armor_Multiplier(const TechnoTypeClass *technotype) const;
+        float Get_Cost_Multiplier(const TechnoTypeClass *technotype) const;
+        float Get_Speed_Multiplier(const TechnoTypeClass *technotype) const;
+
+        void Reclaculate_Cost_Multipliers();
 
     public:
 };

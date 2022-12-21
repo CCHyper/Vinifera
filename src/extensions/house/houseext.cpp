@@ -27,6 +27,10 @@
  ******************************************************************************/
 #include "houseext.h"
 #include "house.h"
+#include "housetype.h"
+#include "housetypeext.h"
+#include "technotype.h"
+#include "buildingtype.h"
 #include "ccini.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -162,3 +166,130 @@ void HouseClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("HouseClassExtension::Compute_CRC - 0x%08X\n", (uintptr_t)(This()));
 }
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+float HouseClassExtension::Get_Build_Time_Multiplier(const TechnoTypeClass *technotype) const
+{
+    HouseTypeClassExtension *housetypeext = Extension::Fetch<HouseTypeClassExtension>(This()->Class);
+
+    switch (technotype->What_Am_I()) {
+        case RTTI_AIRCRAFTTYPE:
+            return housetypeext->BuildTimeAircraftMultiplier;
+        case RTTI_BUILDINGTYPE:
+        {
+            const BuildingTypeClass *buildingtype = reinterpret_cast<const BuildingTypeClass *>(technotype);
+            return buildingtype->IsBaseDefense ? housetypeext->BuildTimeDefensesMultiplier : housetypeext->BuildTimeBuildingsMultiplier;
+        }
+        case RTTI_INFANTRYTYPE:
+            return housetypeext->BuildTimeInfantryMultiplier;
+        case RTTI_UNITTYPE:
+            return housetypeext->BuildTimeUnitsMultiplier;
+    };
+
+    return 1.0f;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+float HouseClassExtension::Get_Armor_Multiplier(const TechnoTypeClass *technotype) const
+{
+    HouseTypeClassExtension *housetypeext = Extension::Fetch<HouseTypeClassExtension>(This()->Class);
+
+    switch (technotype->What_Am_I()) {
+        case RTTI_AIRCRAFTTYPE:
+            return housetypeext->ArmorAircraftMultiplier;
+        case RTTI_BUILDINGTYPE:
+        {
+            const BuildingTypeClass *buildingtype = reinterpret_cast<const BuildingTypeClass *>(technotype);
+            return buildingtype->IsBaseDefense ? housetypeext->ArmorDefensesMultiplier : housetypeext->ArmorBuildingsMultiplier;
+        }
+        case RTTI_INFANTRYTYPE:
+            return housetypeext->ArmorInfantryMultiplier;
+        case RTTI_UNITTYPE:
+            return housetypeext->ArmorUnitsMultiplier;
+    };
+
+    return 1.0f;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+float HouseClassExtension::Get_Cost_Multiplier(const TechnoTypeClass *technotype) const
+{
+    HouseTypeClassExtension *housetypeext = Extension::Fetch<HouseTypeClassExtension>(This()->Class);
+
+    switch (technotype->What_Am_I()) {
+        case RTTI_AIRCRAFTTYPE:
+            return housetypeext->CostAircraftMultiplier;
+        case RTTI_BUILDINGTYPE:
+        {
+            const BuildingTypeClass *buildingtype = reinterpret_cast<const BuildingTypeClass *>(technotype);
+            return buildingtype->IsBaseDefense ? housetypeext->CostDefensesMultiplier : housetypeext->CostBuildingsMultiplier;
+        }
+        case RTTI_INFANTRYTYPE:
+            return housetypeext->CostInfantryMultiplier;
+        case RTTI_UNITTYPE:
+            return housetypeext->CostUnitsMultiplier;
+    };
+
+    return 1.0f;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+float HouseClassExtension::Get_Speed_Multiplier(const TechnoTypeClass *technotype) const
+{
+    HouseTypeClassExtension *housetypeext = Extension::Fetch<HouseTypeClassExtension>(This()->Class);
+
+    switch (technotype->What_Am_I()) {
+        case RTTI_AIRCRAFTTYPE:
+            return housetypeext->SpeedAircraftMultiplier;
+        case RTTI_INFANTRYTYPE:
+            return housetypeext->SpeedInfantryMultiplier;
+        case RTTI_UNITTYPE:
+            return housetypeext->SpeedUnitsMultiplier;
+    };
+
+    return 1.0f;
+}
+
+
+#if 0
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+void HouseClassExtension::Reclaculate_Cost_Multipliers()
+{
+    CostInfantryMultiplier = 1.0f;
+    CostUnitsMultiplier = 1.0f;
+    CostAircraftMultiplier = 1.0f;
+    CostBuildingsMultiplier = 1.0f;
+    CostDefensesMultiplier = 1.0f;
+    for (result = 0; result < __FactoryPlants.ActiveCount; __CostDefensesMult = __FactoryPlants.Vector[result - 1]->Class->DefensesCostBonus * __CostDefensesMult) {
+        CostInfantryMultiplier = __FactoryPlants.Vector[result++]->Class->InfantryCostBonus * CostInfantryMultiplier;
+        CostUnitsMultiplier = __FactoryPlants.Vector[result - 1]->Class->UnitsCostBonus * CostUnitsMultiplier;
+        CostAircraftMultiplier = __FactoryPlants.Vector[result - 1]->Class->AircraftCostBonus * CostAircraftMultiplier;
+        CostBuildingsMultiplier = __FactoryPlants.Vector[result - 1]->Class->BuildingsCostBonus * CostBuildingsMultiplier;
+    }
+    return result;
+}
+#endif

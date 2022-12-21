@@ -39,6 +39,12 @@
 #include "hooker_macros.h"
 
 
+DECLARE_PATCH()
+{
+
+}
+
+
 /**
  *  #issue-593
  * 

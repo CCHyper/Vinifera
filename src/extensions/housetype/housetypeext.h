@@ -62,4 +62,37 @@ HouseTypeClassExtension final : public AbstractTypeClassExtension
         virtual bool Read_INI(CCINIClass &ini) override;
 
     public:
+        /**
+         *  x
+         */
+        float BuildTimeAircraftMultiplier;
+        float BuildTimeUnitsMultiplier;
+        float BuildTimeInfantryMultiplier;
+        float BuildTimeBuildingsMultiplier;
+        float BuildTimeDefensesMultiplier;
+
+        /**
+         *  x
+         */
+        float ArmorAircraftMultiplier;
+        float ArmorUnitsMultiplier;
+        float ArmorInfantryMultiplier;
+        float ArmorBuildingsMultiplier;
+        float ArmorDefensesMultiplier;
+
+        /**
+         *  x
+         */
+        float CostAircraftMultiplier;
+        float CostUnitsMultiplier;
+        float CostInfantryMultiplier;
+        float CostBuildingsMultiplier;
+        float CostDefensesMultiplier;
+
+        /**
+         *  x
+         */
+        float SpeedAircraftMultiplier;
+        float SpeedUnitsMultiplier;
+        float SpeedInfantryMultiplier;
 };
