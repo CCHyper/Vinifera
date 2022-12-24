@@ -65,7 +65,8 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(const TechnoTypeClass *this_p
     VoiceDeploy(),
     VoiceHarvest(),
     IdleRate(0),
-    CameoImageSurface(nullptr)
+    CameoImageSurface(nullptr),
+    WakeAnim(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TechnoTypeClassExtension::TechnoTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
@@ -112,6 +113,7 @@ HRESULT TechnoTypeClassExtension::Load(IStream *pStm)
     }
 
     VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(UnloadingClass, "UnloadingClass");
+    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(WakeAnim, "WakeAnim");
 
     /**
      *  We need to reload the "Cameo" key because TechnoTypeClass does
@@ -259,6 +261,7 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     VoiceEnter = ini.Get_VocType_List(ini_name, "VoiceEnter", VoiceEnter);
     VoiceDeploy = ini.Get_VocType_List(ini_name, "VoiceDeploy", VoiceDeploy);
     VoiceHarvest = ini.Get_VocType_List(ini_name, "VoiceHarvest", VoiceHarvest);
+    WakeAnim = ini.Get_Anim(ini_name, "WakeAnim", WakeAnim);
 
     IdleRate = ini.Get_Int(ini_name, "IdleRate", IdleRate);
     IdleRate = ArtINI.Get_Int(graphic_name, "IdleRate", IdleRate);
