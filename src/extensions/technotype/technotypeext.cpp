@@ -67,7 +67,8 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(const TechnoTypeClass *this_p
     VoiceHarvest(),
     IdleRate(0),
     CameoImageSurface(nullptr),
-    WakeAnim(nullptr)
+    WakeAnim(nullptr),
+    WakeAnimRate(10)                    // Default DriveLocomotion value.
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TechnoTypeClassExtension::TechnoTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
@@ -212,6 +213,7 @@ void TechnoTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
     crc(ShakePixelXLo);
     crc(SoylentValue);
     crc(IsLegalTargetComputer);
+    crc(WakeAnimRate);
 }
 
 
@@ -265,6 +267,7 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     VoiceDeploy = ini.Get_VocTypes(ini_name, "VoiceDeploy", VoiceDeploy);
     VoiceHarvest = ini.Get_VocTypes(ini_name, "VoiceHarvest", VoiceHarvest);
     WakeAnim = ini.Get_Anim(ini_name, "WakeAnim", WakeAnim);
+    WakeAnimRate = ArtINI.Get_Int(graphic_name, "WakeAnimRate", WakeAnimRate);
 
     IdleRate = ini.Get_Int(ini_name, "IdleRate", IdleRate);
     IdleRate = ArtINI.Get_Int(graphic_name, "IdleRate", IdleRate);
