@@ -98,6 +98,8 @@
 //#include "alphashapeext_hooks.h"
 //#include "veinholemonsterext_hooks.h"
 
+#include "drivelocomotionext_hooks.h"
+
 #include "rulesext_hooks.h"
 #include "scenarioext_hooks.h"
 #include "sessionext_hooks.h"
@@ -231,6 +233,11 @@ void Extension_Hooks()
     //FoggedObjectClassExtension_Hooks();                   // Not yet implemented
     //AlphaShapeClassExtension_Hooks();                     // Not yet implemented
     //VeinholeMonsterClassExtension_Hooks();                // Not yet implemented
+
+    /**
+     *  Locomotors.
+     */
+    DriveLocomotionClassExtension_Hooks();
 
     /**
      *  All global class extensions here.

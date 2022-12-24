@@ -158,4 +158,9 @@ class TechnoTypeClassExtension : public ObjectTypeClassExtension
          *  Pointer to the cameo image surface.
          */
         BSurface *CameoImageSurface;
+
+        /**
+         *  The wake graphic to show as the object moves across water.
+         */
+        const AnimTypeClass *WakeAnim;
 };
