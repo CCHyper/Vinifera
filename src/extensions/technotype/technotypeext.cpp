@@ -67,7 +67,8 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(const TechnoTypeClass *this_p
     IdleRate(0),
     CameoImageSurface(nullptr),
     WakeAnim(nullptr),
-    WakeAnimRate(10)                    // Default DriveLocomotion value.
+    WakeAnimRate(10),                   // Default DriveLocomotion value.
+    IdleWakeAnim(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TechnoTypeClassExtension::TechnoTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
@@ -115,6 +116,7 @@ HRESULT TechnoTypeClassExtension::Load(IStream *pStm)
 
     VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(UnloadingClass, "UnloadingClass");
     VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(WakeAnim, "WakeAnim");
+    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(IdleWakeAnim, "IdleWakeAnim");
 
     /**
      *  We need to reload the "Cameo" key because TechnoTypeClass does
@@ -266,6 +268,7 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
 
     WakeAnim = ArtINI.Get_Anim(graphic_name, "WakeAnim", WakeAnim);
     WakeAnimRate = ArtINI.Get_Int(graphic_name, "WakeAnimRate", WakeAnimRate);
+    IdleWakeAnim = ArtINI.Get_Anim(graphic_name, "IdleWakeAnim", IdleWakeAnim);
 
     IdleRate = ini.Get_Int(ini_name, "IdleRate", IdleRate);
     IdleRate = ArtINI.Get_Int(graphic_name, "IdleRate", IdleRate);

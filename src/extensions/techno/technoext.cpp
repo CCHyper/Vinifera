@@ -46,7 +46,8 @@
  */
 TechnoClassExtension::TechnoClassExtension(const TechnoClass *this_ptr) :
     ObjectClassExtension(this_ptr),
-    ElectricBolt(nullptr)
+    ElectricBolt(nullptr),
+    IdleWakeAnim(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TechnoClassExtension::TechnoClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
@@ -74,6 +75,9 @@ TechnoClassExtension::~TechnoClassExtension()
     //EXT_DEBUG_TRACE("TechnoClassExtension::~TechnoClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     ElectricBolt = nullptr;
+
+    delete IdleWakeAnim;
+    IdleWakeAnim = nullptr;
 }
 
 
@@ -92,6 +96,8 @@ HRESULT TechnoClassExtension::Load(IStream *pStm)
     }
 
     ElectricBolt = nullptr;
+
+    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(IdleWakeAnim, "IdleWakeAnim");
     
     return hr;
 }

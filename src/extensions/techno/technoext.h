@@ -31,6 +31,7 @@
 
 
 class EBoltClass;
+class AnimClass;
 
 
 class TechnoClassExtension : public ObjectClassExtension
@@ -67,4 +68,9 @@ class TechnoClassExtension : public ObjectClassExtension
          *  The current electric bolt instance fired by this object.
          */
         EBoltClass *ElectricBolt;
+
+        /**
+         *  The idle wake animation attached to this object.
+         */
+        AnimClass *IdleWakeAnim;
 };
