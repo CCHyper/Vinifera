@@ -63,5 +63,7 @@ HouseClassExtension final : public AbstractClassExtension
         virtual const HouseClass *This_Const() const override { return reinterpret_cast<const HouseClass *>(AbstractClassExtension::This_Const()); }
         virtual RTTIType What_Am_I() const override { return RTTI_HOUSE; }
 
+        ProdFailType Abandon_Production_Queue(RTTIType type, int id);
+
     public:
 };

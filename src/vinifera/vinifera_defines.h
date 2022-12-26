@@ -127,3 +127,31 @@
 #define UUID_FOGGEDOBJECT_EXTENSION         "7D9C5263-465F-42CE-AD81-5C057B52226F"
 #define UUID_ALPHASHAPE_EXTENSION           "4C8171D5-E7A7-43D1-80F3-0C285CF6B352"
 #define UUID_VEINHOLEMONSTER_EXTENSION      "4AD76F43-090A-44BF-BB1A-5BFDE52BC842"
+
+
+/**
+ *  Extension of the EventType enum.
+ */
+typedef enum NewEventType
+{
+    /**
+     *  This offsets the new TAction enum so they are correctly numbered.
+     */
+    NEW_EVENT_PAD = EVENT_LATENCYFUDGE, // The last EventType
+
+    /**
+     *  Add new EventTypes from here, do not reorder these!
+     */
+
+     NEW_EVENT_ABANDON_ALL,                      // Abandon all factory queues.
+
+    /**
+     *  The new total EventType count.
+     */
+    NEW_TACTION_COUNT
+
+} NewEventType;
+DEFINE_ENUMERATION_OPERATORS(NewEventType);
+
+#define EVENT_ABANDON_ALL   EventType(NEW_EVENT_ABANDON_ALL)
+

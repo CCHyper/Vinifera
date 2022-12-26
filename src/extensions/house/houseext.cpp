@@ -27,6 +27,10 @@
  ******************************************************************************/
 #include "houseext.h"
 #include "house.h"
+#include "iomap.h"
+#include "factory.h"
+#include "technotype.h"
+#include "tibsun_functions.h"
 #include "ccini.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -161,4 +165,76 @@ void HouseClassExtension::Detach(TARGET target, bool all)
 void HouseClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("HouseClassExtension::Compute_CRC - 0x%08X\n", (uintptr_t)(This()));
+}
+
+
+/**
+ *  Abandons the production of all the queued item type specified.
+ *
+ *  @author: CCHyper
+ */
+ProdFailType HouseClassExtension::Abandon_Production_Queue(RTTIType type, int id)
+{
+    //EXT_DEBUG_TRACE("HouseClassExtension::Abandon_Production - 0x%08X\n", (uintptr_t)(This()));
+
+    FactoryClass *fptr = This()->Fetch_Factory(type);
+
+    /**
+     *  If there is no factory to abandon, then return with a failure code.
+     */
+    if (fptr == nullptr) {
+        return PROD_CANT;
+    }
+
+    const TechnoTypeClass *technotype = Fetch_Techno_Type(type, id);
+
+    /**
+     *  Abandon all queued of this type.
+     */
+    bool removed = fptr->Remove_From_Queue(*technotype);
+    if (removed) {
+        while (fptr->Remove_From_Queue(*technotype));
+    }
+
+    /**
+     *  Tell the sidebar that it needs to be redrawn because of this.
+     */
+    if (removed) {
+        //Map.Redraw_Strip(0);      // We don't need to redraw the building strip.
+        Map.Redraw_Strip(1);
+    }
+
+    if (PlayerPtr == This()) {
+        Map.Abandon_Production(type, fptr);
+
+        if (type == RTTI_BUILDINGTYPE || type == RTTI_BUILDING) {
+            Map.PendingObjectPtr = nullptr;
+            Map.PendingObject = nullptr;
+            Map.PendingHouse = HOUSE_NONE;
+            Map.Set_Cursor_Shape(nullptr);
+        }
+    }
+
+    /**
+     *  Abandon production of the object.
+     */
+    fptr->Abandon();
+
+#if 0
+    /**
+     *  Resume the queue if there is items left to produce.
+     */
+    if (fptr->Queued_Object_Count() > 0) {
+        fptr->Resume_Queue();
+        return PROD_OK;
+    }
+#endif
+
+    /**
+     *  Clear the production factory.
+     */
+    This()->Set_Factory(type, nullptr);
+    delete fptr;
+
+    return PROD_OK;
 }
