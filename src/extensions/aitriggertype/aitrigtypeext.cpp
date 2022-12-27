@@ -29,6 +29,11 @@
 #include "aitrigtype.h"
 #include "ccini.h"
 #include "wwcrc.h"
+#include "side.h"
+#include "house.h"
+#include "housetype.h"
+#include "technotype.h"
+#include "tibsun_globals.h"
 #include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -175,4 +180,97 @@ bool AITriggerTypeClassExtension::Read_INI(CCINIClass &ini)
     //EXT_DEBUG_TRACE("AITriggerTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     return true;
+}
+
+
+/**
+ *  Check to see if the Civilian house owns this the object.
+ *
+ *  @author: CCHyper
+ */
+bool AITriggerTypeClassExtension::Check_Civilian_Owns(HouseClass *house, HouseClass *enemy)
+{
+    //EXT_DEBUG_TRACE("AITriggerTypeClassExtension::Check_Civilian_Owns - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    if (Houses.Count() <= 0) {
+        return false;
+    }
+
+    HouseClass *hptr = nullptr;
+
+    /**
+     *  Fetch the first house that has it's side set to "Civilian" (usually the "Neutral" HouseType).
+     */
+    for (int index = 0; index < Houses.Count(); ++index) {
+        if (Houses[index]->Class->Side != SideClass::From_Name("Civilian")) {
+            hptr = Houses[index];
+            break;
+        }
+    }
+
+    if (!hptr) {
+        return false;
+    }
+
+    TechnoTypeClass *condition_object = This()->ConditionObject;
+    int quantity = 0;
+
+    /**
+     *  Fetch the quantity of the condition object this house has.
+     */
+    if (condition_object) {
+
+        int heap_id = condition_object->Get_Heap_ID();
+
+        switch (condition_object->What_Am_I()) {
+            case RTTI_AIRCRAFTTYPE:
+                quantity = hptr->ActiveAQuantity.Count_Of(AircraftType(heap_id));
+                break;
+            case RTTI_BUILDINGTYPE:
+                quantity = hptr->ActiveBQuantity.Count_Of(BuildingType(heap_id));
+                break;
+            case RTTI_INFANTRYTYPE:
+                quantity = hptr->ActiveIQuantity.Count_Of(InfantryType(heap_id));
+                break;
+            case RTTI_UNITTYPE:
+                quantity = hptr->ActiveUQuantity.Count_Of(UnitType(heap_id));
+                break;
+            default:
+                break;
+        };
+
+    }
+
+    bool result = false;
+
+    AITriggerComparatorType comparator = This()->Data.Parameters.Comparator;
+    int number = This()->Data.Parameters.Number;
+
+    /**
+     *  Compare the quantity of the condition object to the query amount.
+     */
+    switch (comparator) {
+        case COMPARATOR_LESS:
+            result = quantity < number;
+            break;
+        case COMPARATOR_LESS_OR_EQUAL:
+            result = quantity <= number;
+            break;
+        case COMPARATOR_EQUAL:
+            result = quantity == number;
+            break;
+        case COMPARATOR_GREATER_OR_EQUAL:
+            result = quantity >= number;
+            break;
+        case COMPARATOR_GREATER:
+            result = quantity > number;
+            break;
+        case COMPARATOR_NOT_EQUAL:
+            result = quantity != number;
+            break;
+        default:
+            break;
+    };
+
+    return result;
 }

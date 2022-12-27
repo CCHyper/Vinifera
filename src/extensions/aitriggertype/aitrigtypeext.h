@@ -61,5 +61,7 @@ AITriggerTypeClassExtension final : public AbstractTypeClassExtension
 
         virtual bool Read_INI(CCINIClass &ini) override;
 
+        bool Check_Civilian_Owns(HouseClass *house, HouseClass *enemy);
+
     public:
 };
