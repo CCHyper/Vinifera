@@ -36,6 +36,7 @@
 class AbstractClass;
 class AbstractClassExtension;
 
+class AITriggerTypeClassExtension;
 class AircraftClassExtension;
 class AircraftTypeClassExtension;
 class AnimClassExtension;
@@ -108,26 +109,27 @@ extern DynamicVectorClass<BuildingClassExtension *> BuildingExtensions;
 extern DynamicVectorClass<BuildingTypeClassExtension *> BuildingTypeExtensions;
 extern DynamicVectorClass<BulletTypeClassExtension *> BulletTypeExtensions;
 extern DynamicVectorClass<CampaignClassExtension *> CampaignExtensions;
-extern DynamicVectorClass<SideClassExtension *> SideExtensions;
 extern DynamicVectorClass<HouseClassExtension *> HouseExtensions;
 extern DynamicVectorClass<HouseTypeClassExtension *> HouseTypeExtensions;
 extern DynamicVectorClass<InfantryClassExtension *> InfantryExtensions;
 extern DynamicVectorClass<InfantryTypeClassExtension *> InfantryTypeExtensions;
 extern DynamicVectorClass<IsometricTileTypeClassExtension *> IsometricTileTypeExtensions;
 extern DynamicVectorClass<OverlayTypeClassExtension *> OverlayTypeExtensions;
-extern DynamicVectorClass<ParticleSystemTypeClassExtension *> ParticleSystemTypeExtensions;
 extern DynamicVectorClass<ParticleTypeClassExtension *> ParticleTypeExtensions;
+extern DynamicVectorClass<ParticleSystemTypeClassExtension *> ParticleSystemTypeExtensions;
+extern DynamicVectorClass<SideClassExtension *> SideExtensions;
 extern DynamicVectorClass<SmudgeTypeClassExtension *> SmudgeTypeExtensions;
-extern DynamicVectorClass<SuperClassExtension *> SuperExtensions;
 extern DynamicVectorClass<SuperWeaponTypeClassExtension *> SuperWeaponTypeExtensions;
 extern DynamicVectorClass<TerrainClassExtension *> TerrainExtensions;
 extern DynamicVectorClass<TerrainTypeClassExtension *> TerrainTypeExtensions;
-extern DynamicVectorClass<TiberiumClassExtension *> TiberiumExtensions;
 extern DynamicVectorClass<UnitTypeClassExtension *> UnitTypeExtensions;
 extern DynamicVectorClass<VoxelAnimTypeClassExtension *> VoxelAnimTypeExtensions;
-extern DynamicVectorClass<WarheadTypeClassExtension *> WarheadTypeExtensions;
 extern DynamicVectorClass<WaveClassExtension *> WaveExtensions;
+extern DynamicVectorClass<TiberiumClassExtension *> TiberiumExtensions;
 extern DynamicVectorClass<WeaponTypeClassExtension *> WeaponTypeExtensions;
+extern DynamicVectorClass<WarheadTypeClassExtension *> WarheadTypeExtensions;
+extern DynamicVectorClass<SuperClassExtension *> SuperExtensions;
+extern DynamicVectorClass<AITriggerTypeClassExtension *> AITriggerTypeExtensions;
 
 /**
  *  Abstract derived classes, but only a single instance is required.

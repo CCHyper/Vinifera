@@ -104,6 +104,7 @@
 #include "layer.h"
 #include "logic.h"
 
+#include "aitrigtypeext.h"
 #include "aircraftext.h"
 #include "aircrafttypeext.h"
 #include "animext.h"
@@ -538,7 +539,7 @@ AbstractClassExtension *Extension::Private::Make_Internal(const AbstractClass *a
         //case RTTI_EMPULSE: { extptr = Extension_Make<EMPulseClass, EMPulseClassExtension>(reinterpret_cast<const EMPulseClass *>(abstract)); break; } // Not yet implemented
         case RTTI_SUPERWEAPON: { extptr = Extension_Make<SuperClass, SuperClassExtension>(reinterpret_cast<const SuperClass *>(abstract)); break; }
         //case RTTI_AITRIGGER: { extptr = Extension_Make<AITriggerClass, AITriggerClassExtension>(reinterpret_cast<const AITriggerClass *>(abstract)); break; } // Not yet implemented
-        //case RTTI_AITRIGGERTYPE: { extptr = Extension_Make<AITriggerTypeClass, AITriggerTypeClassExtension>(reinterpret_cast<const AITriggerTypeClass *>(abstract)); break; } // Not yet implemented
+        case RTTI_AITRIGGERTYPE: { extptr = Extension_Make<AITriggerTypeClass, AITriggerTypeClassExtension>(reinterpret_cast<const AITriggerTypeClass *>(abstract)); break; }
         //case RTTI_NEURON: { extptr = Extension_Make<NeuronClass, NeuronClassExtension>(reinterpret_cast<const NeuronClass *>(abstract)); break; } // Not yet implemented
         //case RTTI_FOGGEDOBJECT: { extptr = Extension_Make<FoggedObjectClass, FoggedObjectClassExtension>(reinterpret_cast<const FoggedObjectClass *>(abstract)); break; } // Not yet implemented
         //case RTTI_ALPHASHAPE: { extptr = Extension_Make<AlphaShapeClass, AlphaShapeClassExtension>(reinterpret_cast<const AlphaShapeClass *>(abstract)); break; } // Not yet implemented
@@ -618,7 +619,7 @@ bool Extension::Private::Destroy_Internal(const AbstractClass *abstract)
         //case RTTI_EMPULSE: { removed = Extension_Destroy<EMPulseClass, EMPulseClassExtension>(reinterpret_cast<const EMPulseClass *>(abstract)); break; } // Not yet implemented
         case RTTI_SUPERWEAPON: { removed = Extension_Destroy<SuperClass, SuperClassExtension>(reinterpret_cast<const SuperClass *>(abstract)); break; }
         //case RTTI_AITRIGGER: { removed = Extension_Destroy<AITriggerClass, AITriggerClassExtension>(reinterpret_cast<const AITriggerClass *>(abstract)); break; } // Not yet implemented
-        //case RTTI_AITRIGGERTYPE: { removed = Extension_Destroy<AITriggerTypeClass, AITriggerTypeClassExtension>(reinterpret_cast<const AITriggerTypeClass *>(abstract)); break; } // Not yet implemented
+        case RTTI_AITRIGGERTYPE: { removed = Extension_Destroy<AITriggerTypeClass, AITriggerTypeClassExtension>(reinterpret_cast<const AITriggerTypeClass *>(abstract)); break; }
         //case RTTI_NEURON: { removed = Extension_Destroy<NeuronClass, NeuronClassExtension>(reinterpret_cast<const NeuronClass *>(abstract)); break; } // Not yet implemented
         //case RTTI_FOGGEDOBJECT: { removed = Extension_Destroy<FoggedObjectClass, FoggedObjectClassExtension>(reinterpret_cast<const FoggedObjectClass *>(abstract)); break; } // Not yet implemented
         //case RTTI_ALPHASHAPE: { removed = Extension_Destroy<AlphaShapeClass, AlphaShapeClassExtension>(reinterpret_cast<const AlphaShapeClass *>(abstract)); break; } // Not yet implemented
@@ -743,7 +744,7 @@ bool Extension::Save(IStream *pStm)
     //if (!Extension_Save<EMPulseClass, EMPulseClassExtension>(pStm, EMPulseExtensions)) { return false; }              // Not yet implemented
     if (!Extension_Save<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
     //if (!Extension_Save<AITriggerClass, AITriggerClassExtension>(pStm, AITriggerExtensions)) { return false; }        // Not yet implemented
-    //if (!Extension_Save<AITriggerTypeClass, AITriggerTypeClassExtension>(pStm, AITriggerExtensions)) { return false; } // Not yet implemented
+    if (!Extension_Save<AITriggerTypeClass, AITriggerTypeClassExtension>(pStm, AITriggerTypeExtensions)) { return false; } // Not yet implemented
     //if (!Extension_Save<NeuronClass, NeuronClassExtension>(pStm, NeuronExtensions)) { return false; }                 // Not yet implemented
     //if (!Extension_Save<FoggedObjectClass, FoggedObjectClassExtension>(pStm, FoggedObjectExtensions)) { return false; } // Not yet implemented
     //if (!Extension_Save<AlphaShapeClass, AlphaShapeClassExtension>(pStm, AlphaShapeExtensions)) { return false; }     // Not yet implemented
@@ -840,7 +841,7 @@ bool Extension::Load(IStream *pStm)
     //if (!Extension_Load<EMPulseClass, EMPulseClassExtension>(pStm, EMPulseExtensions)) { return false; }              // Not yet implemented
     if (!Extension_Load<SuperClass, SuperClassExtension>(pStm, SuperExtensions)) { return false; }
     //if (!Extension_Load<AITriggerClass, AITriggerClassExtension>(pStm, AITriggerExtensions)) { return false; }        // Not yet implemented
-    //if (!Extension_Load<AITriggerTypeClass, AITriggerTypeClassExtension>(pStm, AITriggerExtensions)) { return false; } // Not yet implemented
+    if (!Extension_Load<AITriggerTypeClass, AITriggerTypeClassExtension>(pStm, AITriggerTypeExtensions)) { return false; }
     //if (!Extension_Load<NeuronClass, NeuronClassExtension>(pStm, NeuronExtensions)) { return false; }                 // Not yet implemented
     //if (!Extension_Load<FoggedObjectClass, FoggedObjectClassExtension>(pStm, FoggedObjectExtensions)) { return false; } // Not yet implemented
     //if (!Extension_Load<AlphaShapeClass, AlphaShapeClassExtension>(pStm, AlphaShapeExtensions)) { return false; }     // Not yet implemented
@@ -941,7 +942,7 @@ bool Extension::Request_Pointer_Remap()
     //if (!Extension_Request_Pointer_Remap<EMPulseClass, EMPulseClassExtension>(EMPulses)) { return false; }            // Not yet implemented
     if (!Extension_Request_Pointer_Remap<SuperClass, SuperClassExtension>(Supers)) { return false; }
     //if (!Extension_Request_Pointer_Remap<AITriggerClass, AITriggerClassExtension>(AITriggers)) { return false; }      // Not yet implemented
-    //if (!Extension_Request_Pointer_Remap<AITriggerTypeClass, AITriggerTypeExtension>(AITriggerTypes)) { return false; } // Not yet implemented
+    if (!Extension_Request_Pointer_Remap<AITriggerTypeClass, AITriggerTypeClassExtension>(AITriggerTypes)) { return false; }
     //if (!Extension_Request_Pointer_Remap<NeuronClass, NeuronClassExtension>(Neurons)) { return false; }               // Not yet implemented
     //if (!Extension_Request_Pointer_Remap<FoggedObjectClass, FoggedObjectClassExtension>(FoggedObjects)) { return false; } // Not yet implemented
     //if (!Extension_Request_Pointer_Remap<AlphaShapeClass, AlphaShapeClassExtension>(AlphaShapes)) { return false; }   // Not yet implemented
@@ -1021,7 +1022,7 @@ bool Extension::Register_Class_Factories()
     //REGISTER_CLASS(TacticalExtension);                                        // Tactical extension is now a global class and no longer uses COM, so we don't need to register it.
     REGISTER_CLASS(SuperClassExtension);
     //REGISTER_CLASS(AITriggerClassExtension);                                  // Not yet implemented
-    //REGISTER_CLASS(AITriggerTypeClassExtension);                              // Not yet implemented
+    REGISTER_CLASS(AITriggerTypeClassExtension);
     //REGISTER_CLASS(NeuronClassExtension);                                     // Not yet implemented
     //REGISTER_CLASS(FoggedObjectClassExtension);                               // Not yet implemented
     //REGISTER_CLASS(AlphaShapeClassExtension);                                 // Not yet implemented
@@ -1103,7 +1104,7 @@ void Extension::Free_Heaps()
     //delete TacticalMapExtension;                                              // Does not need to be processed here, class has been promoted to a global.
     SuperExtensions.Clear();
     //AITriggerExtensions.Clear();                                              // Not yet implemented
-    //AITriggerTypeExtensions.Clear();                                          // Not yet implemented
+    AITriggerTypeExtensions.Clear();
     //NeuronExtensions.Clear();                                                 // Not yet implemented
     //FoggedObjectExtensions.Clear();                                           // Not yet implemented
     //AlphaShapeExtensions.Clear();                                             // Not yet implemented
@@ -1417,7 +1418,7 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
     //std::fprintf(fp, "EMPulseExtensions.Count = %d\n", EMPulseExtensions.Count());                                    // Not yet implemented
     std::fprintf(fp, "SuperExtensions.Count = %d\n", SuperExtensions.Count());
     //std::fprintf(fp, "AITriggerExtensions.Count = %d\n", AITriggerExtensions.Count());                                // Not yet implemented
-    //std::fprintf(fp, "AITriggerTypeExtensions.Count = %d\n", AITriggerTypeExtensions.Count());                        // Not yet implemented
+    std::fprintf(fp, "AITriggerTypeExtensions.Count = %d\n", AITriggerTypeExtensions.Count());
     //std::fprintf(fp, "NeuronExtensions.Count = %d\n", NeuronExtensions.Count());                                      // Not yet implemented
     //std::fprintf(fp, "FoggedObjectExtensions.Count = %d\n", FoggedObjectExtensions.Count());                          // Not yet implemented
     //std::fprintf(fp, "AlphaShapeExtensions.Count = %d\n", AlphaShapeExtensions.Count());                              // Not yet implemented
@@ -1874,7 +1875,7 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
     //Print_Heap_CRC_Lists(fp, EMPulseExtensions);                              // Not yet implemented
     Print_Heap_CRC_Lists(fp, SuperExtensions);
     //Print_Heap_CRC_Lists(fp, AITriggerExtensions);                            // Not yet implemented
-    //Print_Heap_CRC_Lists(fp, AITriggerTypeExtensions);                        // Not yet implemented
+    Print_Heap_CRC_Lists(fp, AITriggerTypeExtensions);
     //Print_Heap_CRC_Lists(fp, NeuronExtensions);                               // Not yet implemented
     //Print_Heap_CRC_Lists(fp, FoggedObjectExtensions);                         // Not yet implemented
     //Print_Heap_CRC_Lists(fp, AlphaShapeExtensions);                           // Not yet implemented
@@ -1951,7 +1952,7 @@ void Extension::Detach_This_From_All(TARGET target, bool all)
     //Extension_Detach_This_From_All(EMPulseExtensions, target, all);           // Not yet implemented
     Extension_Detach_This_From_All(SuperExtensions, target, all);
     //Extension_Detach_This_From_All(AITriggerExtensions, target, all);         // Not yet implemented
-    //Extension_Detach_This_From_All(AITriggerTypeExtensions, target, all);     // Not yet implemented
+    Extension_Detach_This_From_All(AITriggerTypeExtensions, target, all);
     //Extension_Detach_This_From_All(NeuronExtensions, target, all);            // Not yet implemented
     //Extension_Detach_This_From_All(FoggedObjectExtensions, target, all);      // Not yet implemented
     //Extension_Detach_This_From_All(AlphaShapeExtensions, target, all);        // Not yet implemented
@@ -2040,7 +2041,7 @@ unsigned Extension::Get_Save_Version_Number()
     //version += sizeof(EMPulseClassExtension);                                 // Not yet implemented
     version += sizeof(SuperClassExtension);
     //version += sizeof(AITriggerClassExtension);                               // Not yet implemented
-    //version += sizeof(AITriggerTypeClassExtension);                           // Not yet implemented
+    version += sizeof(AITriggerTypeClassExtension);
     //version += sizeof(NeuronClassExtension);                                  // Not yet implemented
     //version += sizeof(FoggedObjectClassExtension);                            // Not yet implemented
     //version += sizeof(AlphaShapeClassExtension);                              // Not yet implemented
