@@ -54,6 +54,32 @@
 
 /**
  *  #issue-635
+ *
+ *  Switch to the Paradrop animation sequence when this infantry is falling (para-dropped).
+ *
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_InfantryClass_Paradrop_Do_Paradrop_Patch)
+{
+    GET_REGISTER_STATIC(InfantryClass *, this_ptr, esi);
+
+    /**
+     *  Assign the paradrop graphic sequence. This is forced, overriding
+     *  any current sequence.
+     */
+    this_ptr->Do_Action(DO_PARADROP, true);
+
+    /**
+     *  Stolen bytes/code.
+     */
+    _asm { mov al, 1 }
+    _asm { pop esi }
+    _asm { retn 4 }
+}
+
+
+/**
+ *  #issue-635
  * 
  *  Fixes a bug where EngineerDamage was not used to calculate the engineer damage.
  * 
@@ -552,4 +578,12 @@ void InfantryClassExtension_Hooks()
      *  to make sure the mouse shows the correct visual cursor.
      */
     Patch_Byte(0x004D7124+1, ACTION_CAPTURE);
+
+    /**
+     *  #issue-948
+     *
+     *
+     */
+    Patch_Jump(0x004D91AC, 0x004D91BE);
+    Patch_Jump(0x004D91BE, &_InfantryClass_Paradrop_Do_Paradrop_Patch);
 }

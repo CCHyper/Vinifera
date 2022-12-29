@@ -213,17 +213,37 @@ void InfantryTypeClassExtension::Read_Sequence_INI()
          *  Create a new instance of do info if one has not been allocated already.
          */
         if (This()->DoControls == nullptr) {
-            This()->DoControls = new DoInfoStruct [DO_COUNT];
+            This()->DoControls = new DoInfoStruct [NEW_DO_COUNT];
             ASSERT_FATAL(This()->DoControls != nullptr);
         }
 
         /**
          *  Iterate over all the DoType's, reading the animation control for each.
          */
-        for (DoType do_type = DO_FIRST; do_type < DO_COUNT; ++do_type) {
+        for (DoType do_type = DO_FIRST; do_type < NEW_DO_COUNT; ++do_type) {
 
             DoInfoStruct &do_info = This()->DoControls[do_type];
-            const char *do_name = SequenceName[do_type];
+            const char *do_name = nullptr;
+
+            /**
+             *  Support for the new DoTypes. Each of the new animation types must
+             *  be initialised to a fallback value set before reading them from the
+             *  ini database. This is because they are implemented with the expectation
+             *  that they are defined correctly.
+             */
+            switch (do_type) {
+                case DO_PARADROP:
+                    This()->DoControls[DO_PARADROP] = This()->DoControls[DO_STAND_READY];
+                    do_name = "Paradrop";
+                    break;
+
+                /**
+                 *  All original DoTypes.
+                 */
+                default:
+                    do_name = SequenceName[do_type];
+                    break;
+            };
 
             char buffer[64];
             if (ArtINI.Get_String(sequence_buf, do_name, buffer, sizeof(buffer)) > 0) {

@@ -127,3 +127,31 @@
 #define UUID_FOGGEDOBJECT_EXTENSION         "7D9C5263-465F-42CE-AD81-5C057B52226F"
 #define UUID_ALPHASHAPE_EXTENSION           "4C8171D5-E7A7-43D1-80F3-0C285CF6B352"
 #define UUID_VEINHOLEMONSTER_EXTENSION      "4AD76F43-090A-44BF-BB1A-5BFDE52BC842"
+
+
+/**
+ *  Extension of the DoType enum.
+ */
+typedef enum DoTypeExt
+{
+    /**
+     *  This offsets the new enum so they are correctly numbered.
+     */
+    NEW_DO_PADDING = DO_STRUGGLE, // The last enum value.
+
+    /**
+     *  Add new enum values here.
+     */
+    NEW_DO_PARADROP,
+
+    /**
+     *  The new enum total count.
+     */
+    NEW_DO_COUNT
+
+} DoTypeExt;
+
+/**
+ *  The new DoType enum casted so it is accepted by the original game functions.
+ */
+#define DO_PARADROP         DoType(NEW_DO_PARADROP)
