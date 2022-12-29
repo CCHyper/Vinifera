@@ -33,6 +33,9 @@
 #include "debughandler.h"
 #include "asserthandler.h"
 
+#include "hooker.h"
+#include "hooker_macros.h"
+
 
 /**
  *  Main function for patching the hooks.
@@ -43,4 +46,11 @@ void InfantryTypeClassExtension_Hooks()
      *  Initialises the extended class.
      */
     InfantryTypeClassExtension_Init();
+
+    /**
+     *  Removes the call to Read_Sequence_INI() in InfantryTypeClass::Read_INI() as
+     *  it is now called by InfantryTypeClassExtension::Read_INI().
+     */
+    Patch_Byte_Range(0x004DAC22, 0x90, 2);
+    Patch_Byte_Range(0x004DAC2A, 0x90, 5);
 }

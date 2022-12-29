@@ -27,6 +27,7 @@
  ******************************************************************************/
 #include "infantrytypeext.h"
 #include "infantrytype.h"
+#include "tibsun_globals.h"
 #include "ccini.h"
 #include "wwcrc.h"
 #include "extension.h"
@@ -187,6 +188,137 @@ bool InfantryTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IsMechanic = ini.Get_Bool(ini_name, "Mechanic", IsMechanic);
     IsOmniHealer = ini.Get_Bool(ini_name, "OmniHealer", IsOmniHealer);
-    
+
+    Read_Sequence_INI();
+
     return true;
+}
+
+
+/**
+ *  Read the animation sequence from the ini database.
+ *
+ *  @author: CCHyper
+ */
+void InfantryTypeClassExtension::Read_Sequence_INI()
+{
+    //EXT_DEBUG_TRACE("InfantryTypeClassExtension::Read_Sequence_INI - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    char sequence_buf[64];
+    const char *graphic_name = Graphic_Name();
+
+    if (ArtINI.Get_String(graphic_name, "Sequence", sequence_buf, sizeof(sequence_buf)) > 0) {
+        
+        /**
+         *  Create a new instance of do info if one has not been allocated already.
+         */
+        if (This()->DoControls == nullptr) {
+            This()->DoControls = new DoInfoStruct [DO_COUNT];
+            ASSERT_FATAL(This()->DoControls != nullptr);
+        }
+
+        /**
+         *  Iterate over all the DoType's, reading the animation control for each.
+         */
+        for (DoType do_type = DO_FIRST; do_type < DO_COUNT; ++do_type) {
+
+            DoInfoStruct &do_info = This()->DoControls[do_type];
+            const char *do_name = SequenceName[do_type];
+
+            char buffer[64];
+            if (ArtINI.Get_String(sequence_buf, do_name, buffer, sizeof(buffer)) > 0) {
+
+                /**
+                 *  Read the animation controls for this DoType.
+                 */
+
+                char facing_buf[3] = { '\0' };
+#if 0
+                // Original code, but "finish_buf" contains garbage memory if "Finish" is not defined.
+                std::sscanf(buffer, "%d,%d,%d,%s", &do_info.Frame, &do_info.Count, &do_info.Jump, &facing_buf);
+#else
+                char *tok = nullptr;
+
+                /**
+                 *  The starting frame number of this animation.
+                 */
+                tok = std::strtok(buffer, ",");
+                ASSERT(tok != nullptr);
+                do_info.Frame = std::strtoul(tok, nullptr, 10);
+
+                /**
+                 *  The number of frames of this animation. If this number
+                 *  is zero then no animation is present.
+                 */
+                tok = std::strtok(nullptr, ",");
+                ASSERT(tok != nullptr);
+                do_info.Count = std::strtoul(tok, nullptr, 10);
+
+                /**
+                 *  The multiplier by the infantry facing to reach the facing
+                 *  specific animation start.
+                 */
+                tok = std::strtok(nullptr, ",");
+                ASSERT(tok != nullptr);
+                int jump = std::strtoul(tok, nullptr, 10);
+
+                /**
+                 *  If the Jump number is zero, then there is no facing specific modifier.
+                 */
+                if (jump > 0) {
+
+                    do_info.Jump = std::strtoul(tok, nullptr, 10);
+
+                    /**
+                     *  Fetch the facing modifier.
+                     */
+                    tok = std::strtok(nullptr, ",");
+                    //ASSERT(tok != nullptr);           // Facing modifier is optional.
+                    if (tok) {
+                        std::strncpy(facing_buf, tok, std::strlen(tok));
+                    }
+
+                }
+#endif
+
+                /**
+                 *  Fetch the facing modifier from the string representation.
+                 * 
+                 *  NOTE: Added string length check to make sure buffer is a valid string.
+                 */
+                if (std::strlen(facing_buf) > 0) {
+                    if (!std::strcmp("N", facing_buf)) {
+                        do_info.Finish = FACING_N;
+
+                    } else if (!std::strcmp("NE", facing_buf)) {
+                        do_info.Finish = FACING_NE;
+
+                    } else if (!std::strcmp("E", facing_buf)) {
+                        do_info.Finish = FACING_E;
+
+                    } else if (!std::strcmp("SE", facing_buf)) {
+                        do_info.Finish = FACING_S;
+
+                    } else if (!std::strcmp("S", facing_buf)) {
+                        do_info.Finish = FACING_S;
+
+                    } else if (!std::strcmp("SW", facing_buf)) {
+                        do_info.Finish = FACING_SW;
+
+                    } else if (!std::strcmp("W", facing_buf)) {
+                        do_info.Finish = FACING_W;
+
+                    } else if (!std::strcmp("NW", facing_buf)) {
+                        do_info.Finish = FACING_NE;
+
+                    }
+                }
+
+            }
+
+        }
+
+    } else {
+        DEBUG_WARNING("InfantryType \"%s\" does not have a valid Sequence!\n", Name());
+    }
 }

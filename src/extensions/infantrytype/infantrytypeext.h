@@ -62,6 +62,9 @@ InfantryTypeClassExtension final : public TechnoTypeClassExtension
         virtual bool Read_INI(CCINIClass &ini) override;
 
     public:
+        void Read_Sequence_INI();
+
+    public:
         /**
          *  If this infantry has a weapon with negative damage, does it target
          *  units and aircraft rather than other infantry (e.g., like a medic?)?
