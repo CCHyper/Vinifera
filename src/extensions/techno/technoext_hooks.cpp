@@ -56,6 +56,30 @@
 
 
 /**
+ *  #issue-635
+ *
+ *  x
+ *
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_TechnoClass_AI_Animation_Timer_System_Patch)
+{
+    GET_REGISTER_STATIC(TechnoClass *, this_ptr, esi);
+    static TechnoClassExtension *techno_ext;
+
+    techno_ext = Extension::Fetch<TechnoClassExtension>(this_ptr);
+
+    /**
+     *  Update the animation timer system, setting the has changed flag if
+     *  the animation timer has changed to the next stage.
+     */
+    techno_ext->IsStageChanged = this_ptr->StageClass::Graphic_Logic();
+
+    JMP(0x0062ECE3);
+}
+
+
+/**
  *  #issue-594
  * 
  *  Implements IsCanRetaliate for TechnoTypes.
@@ -703,4 +727,5 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x00630390, &_TechnoClass_Fire_At_Suicide_Patch);
     Patch_Jump(0x00631223, &_TechnoClass_Fire_At_Electric_Bolt_Patch);
     Patch_Jump(0x00636F09, &_TechnoClass_Is_Allowed_To_Retaliate_Can_Retaliate_Patch);
+    Patch_Jump(0x0062ECA2, &_TechnoClass_AI_Animation_Timer_System_Patch);
 }

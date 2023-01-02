@@ -28,6 +28,7 @@
 #include "infantrytypeext.h"
 #include "infantrytype.h"
 #include "tibsun_globals.h"
+#include "voc.h"
 #include "ccini.h"
 #include "wwcrc.h"
 #include "extension.h"
@@ -46,6 +47,15 @@ InfantryTypeClassExtension::InfantryTypeClassExtension(const InfantryTypeClass *
     IsOmniHealer(false)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("InfantryTypeClassExtension::InfantryTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    /**
+     *  Create a new instance of do info.
+     * 
+     *  Moved from Read_INI().
+     */
+    //delete This()->DoControls;
+    This()->DoControls = (::DoInfoStruct *)new InfantryTypeClassExtension::DoInfoStruct[NEW_DO_COUNT];
+    ASSERT_FATAL(This()->DoControls != nullptr);
 
     InfantryTypeExtensions.Add(this);
 }
@@ -208,24 +218,18 @@ void InfantryTypeClassExtension::Read_Sequence_INI()
     const char *graphic_name = Graphic_Name();
 
     if (ArtINI.Get_String(graphic_name, "Sequence", sequence_buf, sizeof(sequence_buf)) > 0) {
-        
-        /**
-         *  Create a new instance of do info if one has not been allocated already.
-         */
-        if (This()->DoControls == nullptr) {
-            This()->DoControls = new DoInfoStruct [NEW_DO_COUNT];
-            ASSERT_FATAL(This()->DoControls != nullptr);
-        }
 
         /**
          *  Iterate over all the DoType's, reading the animation control for each.
          */
         for (DoType do_type = DO_FIRST; do_type < NEW_DO_COUNT; ++do_type) {
 
-            DoInfoStruct &do_info = This()->DoControls[do_type];
+            InfantryTypeClassExtension::DoInfoStruct &do_info = const_cast<InfantryTypeClassExtension::DoInfoStruct &>(Do_Controls(do_type));
             const char *do_name = nullptr;
 
             /**
+             *  #issue-635
+             * 
              *  Support for the new DoTypes. Each of the new animation types must
              *  be initialised to a fallback value set before reading them from the
              *  ini database. This is because they are implemented with the expectation
@@ -245,7 +249,10 @@ void InfantryTypeClassExtension::Read_Sequence_INI()
                     break;
             };
 
+            char entry[64];
             char buffer[64];
+            char *tok = nullptr;
+
             if (ArtINI.Get_String(sequence_buf, do_name, buffer, sizeof(buffer)) > 0) {
 
                 /**
@@ -257,7 +264,6 @@ void InfantryTypeClassExtension::Read_Sequence_INI()
                 // Original code, but "finish_buf" contains garbage memory if "Finish" is not defined.
                 std::sscanf(buffer, "%d,%d,%d,%s", &do_info.Frame, &do_info.Count, &do_info.Jump, &facing_buf);
 #else
-                char *tok = nullptr;
 
                 /**
                  *  The starting frame number of this animation.
@@ -335,6 +341,61 @@ void InfantryTypeClassExtension::Read_Sequence_INI()
                 }
 
             }
+
+            /**
+             *  #issue-635
+             *
+             *  x
+             */
+            std::snprintf(entry, sizeof(entry), "%sSounds", do_name);
+            if (ArtINI.Get_String(sequence_buf, entry, buffer, sizeof(buffer)) > 0) {
+                
+                /**
+                 *  The frame number the sound should play on.
+                 */
+                tok = std::strtok(buffer, ",:");
+                ASSERT(tok != nullptr);
+
+                int sound_index = 0;
+
+                while (tok && sound_index < DO_SOUND_COUNT) {
+
+                    /**
+                     *  x
+                     */
+                    int frame = std::strtoul(tok, nullptr, 10);
+                    ASSERT(frame > 0);
+
+                    /**
+                     *  x
+                     */
+                    tok = std::strtok(nullptr, ",:");
+                    ASSERT(tok != nullptr);
+                    VocType sound = VocClass::From_Name(tok);
+
+                    /**
+                     *  x
+                     */
+                    if (frame > 0 && sound != VOC_NONE) {
+                        do_info.Sounds[sound_index].Frame = std::clamp<unsigned>(frame, 0, do_info.Count);
+                        do_info.Sounds[sound_index].Sound = sound;
+                    }
+
+                    /**
+                     *  Fetch the next sound entry.
+                     */
+                    tok = std::strtok(nullptr, ",:");
+
+                    ++sound_index;
+                }
+
+            }
+
+#ifndef NDEBUG
+            for (int i = 0; i < DO_SOUND_COUNT; ++i) {
+                DEV_DEBUG_INFO("[%d] %s Frame %d Sound %d\n", i, do_name, do_info.Sounds[0].Frame, do_info.Sounds[0].Sound);
+            }
+#endif
 
         }
 

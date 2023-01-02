@@ -46,6 +46,7 @@
  */
 TechnoClassExtension::TechnoClassExtension(const TechnoClass *this_ptr) :
     ObjectClassExtension(this_ptr),
+    IsStageChanged(false),
     ElectricBolt(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TechnoClassExtension::TechnoClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
@@ -141,6 +142,8 @@ void TechnoClassExtension::Compute_CRC(WWCRCEngine &crc) const
     //EXT_DEBUG_TRACE("TechnoClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     ObjectClassExtension::Compute_CRC(crc);
+
+    crc(IsStageChanged);
 }
 
 

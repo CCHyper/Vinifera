@@ -65,6 +65,47 @@ InfantryTypeClassExtension final : public TechnoTypeClassExtension
         void Read_Sequence_INI();
 
     public:
+        enum { DO_SOUND_COUNT = 2 };
+
+        /**
+         *  x
+         */
+        typedef struct DoInfoSoundStruct
+        {
+            DoInfoSoundStruct() : Frame(-1), Sound(VOC_NONE) {}
+
+            int Frame;          // The frame which this sound is played.
+            VocType Sound;      // The sound type to play.
+        } DoInfoSoundStruct;
+
+        typedef struct DoInfoStruct
+        {
+            DoInfoStruct() : Frame(0), Count(0), Jump(0), Finish(FACING_NONE) {}
+
+            int Frame;              // Starting frame of the animation.
+            unsigned int Count;     // Number of frames of animation.
+            unsigned int Jump;      // Frames to jump between facings.
+            FacingType Finish;      // Direction to face when finished.
+
+            /**
+             *  Control for the sounds to play.
+             */
+            DoInfoSoundStruct Sounds[DO_SOUND_COUNT];
+        } DoInfoStruct;
+
+        /**
+         *  Returns the DoControls for the requested type, casted to the new DoInfo struct.
+         * 
+         *  #WARNING: Do not directly access DoControls from the original class, use this
+         *            function in all new code as the original system has been replaced!
+         */
+        const InfantryTypeClassExtension::DoInfoStruct &Do_Controls(DoType doing) const
+        {
+            const InfantryTypeClassExtension::DoInfoStruct *doinfo = reinterpret_cast<const InfantryTypeClassExtension::DoInfoStruct *>(This_Const()->DoControls);
+            return doinfo[doing];
+        }
+
+    public:
         /**
          *  If this infantry has a weapon with negative damage, does it target
          *  units and aircraft rather than other infantry (e.g., like a medic?)?

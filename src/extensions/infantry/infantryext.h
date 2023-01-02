@@ -63,5 +63,7 @@ InfantryClassExtension final : public FootClassExtension
         virtual const InfantryClass *This_Const() const override { return reinterpret_cast<const InfantryClass *>(FootClassExtension::This_Const()); }
         virtual RTTIType What_Am_I() const override { return RTTI_INFANTRY; }
 
+        void Doing_Sound_AI();
+
     public:
 };

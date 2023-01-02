@@ -27,6 +27,10 @@
  ******************************************************************************/
 #include "infantryext.h"
 #include "infantry.h"
+#include "infantrytype.h"
+#include "infantrytypeext.h"
+#include "vinifera_defines.h"
+#include "voc.h"
 #include "wwcrc.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -161,4 +165,58 @@ void InfantryClassExtension::Detach(TARGET target, bool all)
 void InfantryClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("InfantryClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+void InfantryClassExtension::Doing_Sound_AI()
+{
+    //EXT_DEBUG_TRACE("InfantryClassExtension::Doing_Sound_AI - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    InfantryTypeClassExtension *inftypeext = Extension::Fetch<InfantryTypeClassExtension>(This()->Class);
+
+    /**
+     *  Has the stage animation timer just changed (did we switch to a new DoType)?
+     */
+    if (IsStageChanged) {
+
+        const InfantryTypeClassExtension::DoInfoStruct &do_info = inftypeext->Do_Controls(This()->Doing);
+
+        /**
+         *  x
+         */
+        for (int index = 0; index < InfantryTypeClassExtension::DO_SOUND_COUNT; ++index) {
+
+            /**
+             *  x
+             */
+            if (do_info.Sounds[index].Frame == -1) continue;
+            if (do_info.Sounds[index].Sound == VOC_NONE) continue;
+
+            DEV_DEBUG_INFO("%s  Frame:%d Sound:%s.\n", SequenceName[This()->Doing], do_info.Sounds[index].Frame, VocClass::INI_Name_From(do_info.Sounds[index].Sound));
+
+            /**
+             *  x
+             */
+            //int frame_count = std::max<unsigned>(1, do_info.Count);
+            if (This()->Fetch_Stage() % do_info.Count == do_info.Sounds[index].Frame) {
+
+#ifndef NDEBUG
+                DEV_DEBUG_INFO("Playing sound \"%s\" for DoType \"%s\".\n", VocClass::INI_Name_From(do_info.Sounds[index].Sound), SequenceName[This()->Doing]);
+#endif
+
+                /**
+                 *  x
+                 */
+                Play_Sound_Effect(do_info.Sounds[index].Sound, This()->Coord);
+            }
+
+        }
+
+    }
+
 }

@@ -57,6 +57,38 @@
 
 
 /**
+ *  #issue-635
+ *
+ *  x
+ *
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_BuildingClass_Animation_AI_Animation_Timer_System_Patch)
+{
+    GET_REGISTER_STATIC(BuildingClass *, this_ptr, esi);
+    static BuildingClassExtension *building_ext;
+    static bool stagechanged;
+
+    building_ext = Extension::Fetch<BuildingClassExtension>(this_ptr);
+
+    /**
+     *  Update the animation timer system, setting the has changed flag if
+     *  the animation timer has changed to the next stage.
+     */
+    building_ext->IsStageChanged = this_ptr->StageClass::Graphic_Logic();
+
+    /**
+     *  Set "bl" register (bool stagechanged).
+     */
+    stagechanged = building_ext->IsStageChanged;
+    _asm { xor ebx, ebx }
+    _asm { mov bl, stagechanged }
+
+    JMP(0x00435A9E);
+}
+
+
+/**
  *  #issue-26
  * 
  *  Adds functionality for the produce cash per-frame logic.
@@ -481,4 +513,5 @@ void BuildingClassExtension_Hooks()
     Patch_Jump(0x00429A96, &_BuildingClass_AI_ProduceCash_Patch);
     Patch_Jump(0x0042F67D, &_BuildingClass_Captured_ProduceCash_Patch);
     Patch_Jump(0x0042E179, &_BuildingClass_Grand_Opening_ProduceCash_Patch);
+    Patch_Jump(0x00435A58, &_BuildingClass_Animation_AI_Animation_Timer_System_Patch);
 }

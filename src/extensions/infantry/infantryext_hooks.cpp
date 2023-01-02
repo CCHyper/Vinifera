@@ -28,6 +28,7 @@
 #include "infantryext_hooks.h"
 #include "infantryext_init.h"
 #include "infantry.h"
+#include "infantryext.h"
 #include "infantrytype.h"
 #include "infantrytypeext.h"
 #include "technotype.h"
@@ -55,6 +56,36 @@
 /**
  *  #issue-635
  *
+ *  x
+ *
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_InfantryClass_Doing_AI_Sounds_Patch)
+{
+    GET_REGISTER_STATIC(InfantryClass *, this_ptr, esi);
+    static InfantryClassExtension *infantryext;
+    
+    infantryext = Extension::Fetch<InfantryClassExtension>(this_ptr);
+
+    /**
+     *  x
+     */
+    infantryext->Doing_Sound_AI();
+
+    /**
+     *  Stolen bytes/code.
+     */
+    _asm { pop edi }
+    _asm { pop esi }
+    _asm { pop ebx }
+    _asm { add esp, 0x10 }
+    _asm { ret }
+}
+
+
+/**
+ *  #issue-635
+ *
  *  Switch to the Paradrop animation sequence when this infantry is falling (para-dropped).
  *
  *  @author: CCHyper
@@ -74,7 +105,7 @@ DECLARE_PATCH(_InfantryClass_Paradrop_Do_Paradrop_Patch)
      */
     _asm { mov al, 1 }
     _asm { pop esi }
-    _asm { retn 4 }
+    _asm { ret 4 }
 }
 
 
@@ -584,6 +615,12 @@ void InfantryClassExtension_Hooks()
      *
      *
      */
-    Patch_Jump(0x004D91AC, 0x004D91BE);
+    Patch_Jump(0x004D91AC, 0x004D91BE); // Fixup the return of the InfantryClass::Paradrop() function.
     Patch_Jump(0x004D91BE, &_InfantryClass_Paradrop_Do_Paradrop_Patch);
+
+    Patch_Jump(0x004D8B22, 0x004D8CA1); // Fixup the return of the InfantryClass::Doing_AI() function.
+    Patch_Jump(0x004D8BB6, 0x004D8CA1); // Fixup the return of the InfantryClass::Doing_AI() function.
+    Patch_Jump(0x004D8C65, 0x004D8CA1); // Fixup the return of the InfantryClass::Doing_AI() function.
+    Patch_Jump(0x004D8C7C, 0x004D8CA1); // Fixup the return of the InfantryClass::Doing_AI() function.
+    Patch_Jump(0x004D8CA1, &_InfantryClass_Doing_AI_Sounds_Patch);
 }

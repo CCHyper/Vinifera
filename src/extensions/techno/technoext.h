@@ -64,6 +64,12 @@ class TechnoClassExtension : public ObjectClassExtension
 
     public:
         /**
+         *  This is a internal flag for if the Stage animation timer has just changed.
+         */
+        bool IsStageChanged;
+
+    public:
+        /**
          *  The current electric bolt instance fired by this object.
          */
         EBoltClass *ElectricBolt;
