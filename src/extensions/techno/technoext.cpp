@@ -47,6 +47,7 @@
  */
 TechnoClassExtension::TechnoClassExtension(const TechnoClass *this_ptr) :
     RadioClassExtension(this_ptr),
+    IsMouseOver(false),
     ElectricBolt(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TechnoClassExtension::TechnoClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
@@ -142,6 +143,8 @@ void TechnoClassExtension::Compute_CRC(WWCRCEngine &crc) const
     //EXT_DEBUG_TRACE("TechnoClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     RadioClassExtension::Compute_CRC(crc);
+
+    crc(IsMouseOver);
 }
 
 
@@ -376,6 +379,17 @@ bool TechnoClassExtension::Can_Passive_Acquire() const
      *  IsCanPassiveAcquire defaults to true to copy original behaviour, so all units can passive acquire unless told otherwise.
      */
     return Techno_Type_Class_Ext()->IsCanPassiveAcquire;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+bool TechnoClassExtension::Can_Show_Health_Bar() const
+{
+    return Techno_Type_Class()->IsSelectable && IsMouseOver;
 }
 
 

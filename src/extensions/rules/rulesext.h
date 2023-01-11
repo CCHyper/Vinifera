@@ -93,6 +93,11 @@ class RulesClassExtension final : public GlobalExtensionClass<RulesClass>
         bool IsShowSuperWeaponTimers;
 
         /**
+         *  x
+         */
+        bool IsShowHealthBarsOnMouseOver;
+
+        /**
          *  Defines the strength of ice. Higher values make ice less likely
          *  to break from a shot.
          */

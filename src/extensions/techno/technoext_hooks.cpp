@@ -54,13 +54,102 @@
 #include "hooker_macros.h"
 
 
- /**
-  *  #issue-977
-  *
-  *  Adds check for IsLegalTargetComputer when evaluating a target for attacking.
-  *
-  *  @author: CCHyper
-  */
+/**
+ *  #issue-x
+ *
+ *  x
+ *
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_TechnoClass_Draw_Overlays_IsMouseOver_Patch)
+{
+    GET_REGISTER_STATIC(TechnoClass *, this_ptr, ebx);
+    GET_STACK_STATIC(Point2D *, point, esp, 0x90);
+    GET_STACK_STATIC(Rect *, rect, esp, 0x94);
+    static TechnoClassExtension *this_ext;
+    static bool can_player_see;
+
+    /**
+     *  Stolen bytes/code.
+     * 
+     *  Can the player "see" this cell (does it have sense array(s) over this cell)?
+     */
+    _asm { mov al, [esp+0x6C] }
+    _asm { mov [can_player_see], al }
+    if (can_player_see) {
+        goto continue_selection_checks;
+    }
+
+    /**
+     *  x
+     */
+    if (RuleExtension->IsShowHealthBarsOnMouseOver) {
+
+        this_ext = Extension::Fetch<TechnoClassExtension>(this_ptr);
+        if (!this_ptr->IsSelected && this_ext->Can_Show_Health_Bar()) {
+            goto draw_health_bar;
+        }
+
+    }
+
+draw_talk_bubble:
+    JMP(0x0062BE24);
+
+continue_selection_checks:
+    JMP(0x0062B27F);
+
+    /**
+     *  x
+     */
+draw_health_bar:
+    this_ptr->entry_330(*point, *rect, true);
+    goto draw_talk_bubble;
+}
+
+
+/**
+ *  #issue-x
+ *
+ *  x
+ *
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_TechnoClass_AI_IsMouseOver_Reset_Patch)
+{
+    GET_REGISTER_STATIC(TechnoClass *, this_ptr, esi);
+    static TechnoClassExtension *this_ext;
+
+    this_ext = Extension::Fetch<TechnoClassExtension>(this_ptr);
+
+    /**
+     *  Reset the mouse over object tracking flag.
+     */
+    if (this_ext->IsMouseOver) {
+        this_ext->IsMouseOver = false;
+    }
+
+    /**
+     *  Stolen bytes/code.
+     */
+    if (!this_ptr->entry_234()) {
+        goto skipped_rocking_ai;
+    }
+
+rocking_ai:
+    JMP(0x0062E76B);
+
+skipped_rocking_ai:
+    JMP(0x0062E780);
+}
+
+
+/**
+ *  #issue-977
+ *
+ *  Adds check for IsLegalTargetComputer when evaluating a target for attacking.
+ *
+ *  @author: CCHyper
+ */
 DECLARE_PATCH(_TechnoClass_Evaluate_Object_Is_Legal_Target_Patch)
 {
     GET_REGISTER_STATIC(TechnoClass *, this_ptr, edi);
@@ -756,4 +845,6 @@ void TechnoClassExtension_Hooks()
     Patch_Jump(0x00631223, &_TechnoClass_Fire_At_Electric_Bolt_Patch);
     Patch_Jump(0x00636F09, &_TechnoClass_Is_Allowed_To_Retaliate_Can_Retaliate_Patch);
     Patch_Jump(0x0062D4CA, &_TechnoClass_Evaluate_Object_Is_Legal_Target_Patch);
+    Patch_Jump(0x0062E75F, &_TechnoClass_AI_IsMouseOver_Reset_Patch);
+    Patch_Jump(0x0062B273, &_TechnoClass_Draw_Overlays_IsMouseOver_Patch);
 }
