@@ -83,6 +83,12 @@ char *EXEName = "@TARGET_EXE@";
 char *DLLName = "@PROJECT_DLL@";
 
 /**
+ *  Additional target DLL files to inject.
+ */
+char *CnCNetDLLName = "@CNCNET_DLL@";
+char *PatchesDLLName = "@PATCHES_DLL@";
+
+/**
  *  The target DLL debug database file.
  */
 char *PDBName = "@PROJECT_NAME@.pdb";
@@ -194,7 +200,7 @@ bool Inject_Dll(const char *dllname, HANDLE hProcess)
  *  Based on code snippet from:
  *  https://opcode0x90.wordpress.com/2011/01/15/injecting-dll-into-process-on-load/
  */
-bool Inject_Loader(const char *path, const char *dllname, char *args)
+bool Inject_Loader(const char *path, const char *dllname, char *args, const char *additional_dll_list = nullptr, int additional_dll_list_count = 0)
 {
     DWORD oldProtect;
     DWORD oldProtect2;
@@ -269,11 +275,21 @@ bool Inject_Loader(const char *path, const char *dllname, char *args)
             }
 
 			/**
-			 *  Inject DLL payload into remote process.
+			 *  Inject additional DLL payloads into the remote process.
+			 */
+            for (int i = 0; i < additional_dll_list_count; ++i) {
+                if (!Inject_Dll(additional_dll_list[i], ProcessInformation.hProcess)) {
+                    MessageBoxA(NULL, "Failed to inject DLL!", "Error!", MB_OK|MB_ICONEXCLAMATION);
+                    throw "Failed to inject DLL!";
+                }
+            }
+            
+			/**
+			 *  Inject the main DLL payload into the remote process.
 			 */
             if (!Inject_Dll(dllname, ProcessInformation.hProcess)) {
-				MessageBoxA(NULL, "Failed to load DLL!", "Error!", MB_OK|MB_ICONEXCLAMATION);
-                throw "Failed to load DLL!";
+				MessageBoxA(NULL, "Failed to inject DLL!", "Error!", MB_OK|MB_ICONEXCLAMATION);
+                throw "Failed to inject DLL!";
             }
 			
 #ifndef NDEBUG
@@ -513,8 +529,31 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 		MessageBoxA(NULL, buff, "Error!", MB_OK|MB_ICONEXCLAMATION);
         return EXIT_FAILURE;
     }
+    
+	/**
+	 *  Check the additional DLLs exist before we attempt injection.
+     *
+     *  These are done before the main DLL as this have lower priority.
+	 */
+    if (File_Exists(CnCNetDLLName)) {
+        if (!Inject_DLL(EXEName, CnCNetDLLName, Make_Args(lpCmdLine))) {
+#ifndef NDEBUG
+            OutputDebugStringA("Injection failed!");
+#endif
+        }
+    }
+    if (File_Exists(PatchesDLLName)) {
+        if (!Inject_DLL(EXEName, PatchesDLLName, Make_Args(lpCmdLine))) {
+#ifndef NDEBUG
+            OutputDebugStringA("Injection failed!");
+#endif
+        }
+    }
 
-	if (!Inject_Loader(EXEName, DLLName, Make_Args(lpCmdLine))) {
+    /**
+     *  Finally, inject the 
+     */
+	if (!Inject_Loader(EXEName, DLLName, Make_Args(lpCmdLine), additional_dll_list, additional_dll_count)) {
 		MessageBoxA(NULL, "Injection failed!", "Error!", MB_OK|MB_ICONEXCLAMATION);
 		
 		/**
