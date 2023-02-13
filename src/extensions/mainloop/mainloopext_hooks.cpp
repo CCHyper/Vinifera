@@ -32,6 +32,7 @@
 #include "iomap.h"
 #include "tactical.h"
 #include "house.h"
+#include "scenarioext.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -158,6 +159,19 @@ static bool Main_Loop_Intercept()
          *  The games main loop function.
          */
         ret = Main_Loop();
+
+        /**
+         *  x
+         */
+        if (Frame == 1) {
+            if (!ScenExtension->Lua_Scenario_Start()) {
+                DEBUG_ERROR("Lua_Scenario_Start() returned false!\n");
+            }
+        }
+
+        if (!ScenExtension->Lua_Frame_Tick(Frame)) {
+            DEBUG_ERROR("Lua_Frame_Tick() returned false!\n");
+        }
 
         After_Main_Loop();
 

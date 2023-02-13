@@ -81,3 +81,5 @@ bool Vinifera_SkipToInternet = false;
 bool Vinifera_ExitAfterSkip = false;
 
 DynamicVectorClass<ExceptionInfoDatabaseStruct> ExceptionInfoDatabase;
+
+LuaScriptClass *LuaScript = nullptr;

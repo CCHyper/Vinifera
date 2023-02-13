@@ -152,6 +152,7 @@ if(NOT ${OPTION_CUSTOM_DEBUGGER_TARGET_NAME} STREQUAL " ")
 endif()
 
 option(OPTION_CHECK_TARGET_BINARIES "This option controls if the launcher should check target binaries before injection." ON)
+option(OPTION_ENABLE_LUA "todo." ON)
 
 
 ################################################################################
@@ -304,6 +305,32 @@ endif()
 
 
 ################################################################################
+# Fetch the latest Lua library code
+################################################################################
+if(OPTION_ENABLE_LUA)
+	message(STATUS "Fetching Lua library...")
+
+    include(FetchContent)
+    FetchContent_Declare(
+        Lua
+        GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+        GIT_REPOSITORY https://github.com/Vinifera-Developers/lua.git
+        GIT_TAG        origin/master
+    )
+	
+	FetchContent_MakeAvailable(Lua)
+
+    #FetchContent_GetProperties(Lua)
+    #if(NOT Lua_POPULATED)
+    #    FetchContent_Populate(Lua)
+	#	message(STATUS ${Lua_SOURCE_DIR})
+	#	message(STATUS ${Lua_BINARY_DIR})
+    #    add_subdirectory(${Lua_SOURCE_DIR} ${Lua_BINARY_DIR} EXCLUDE_FROM_ALL)
+    #endif()
+endif()
+
+
+################################################################################
 # Embed some git version information in the binary.
 ################################################################################
 message(STATUS "Fetching git repository information.")
@@ -432,8 +459,10 @@ endif()
 # Set input and output paths.
 set(PDB_COPY_SOURCE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/_deps/tspp-src/pdb/)
 set(EDB_COPY_SOURCE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/_deps/tspp-src/edb/)
+set(LUA_COPY_SOURCE_PATH ${CMAKE_SOURCE_DIR}/lua_scripts/)
 set(PDB_COPY_DESTINATION_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/)
 set(EDB_COPY_DESTINATION_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/)
+set(LUA_COPY_DESTINATION_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/)
 
 # Create post build script to copy the Target Fake PDB to the build output directory.
 include(WindowsCopyFiles)
@@ -489,6 +518,26 @@ if(NOT ${OPTION_CUSTOM_DEBUGGER_DIRECTORY_PATH} STREQUAL " ")
 		${COPY_DESTINATION_PATH}
 		"${TARGET_EDB}"
 	)
+    
+    if(OPTION_ENABLE_LUA)
+         # Create post build script to copy the required LUA scripts to the build output directory.
+        include(WindowsCopyFiles)
+        PostBuild_WindowsCopyFiles(${PROJECT_NAME}
+            ${LUA_COPY_SOURCE_PATH}
+            ${LUA_COPY_DESTINATION_PATH}
+            "common.lua"
+        )
+        PostBuild_WindowsCopyFiles(${PROJECT_NAME}
+            ${LUA_COPY_SOURCE_PATH}
+            ${LUA_COPY_DESTINATION_PATH}
+            "debug.lua"
+        )
+        PostBuild_WindowsCopyFiles(${PROJECT_NAME}
+            ${LUA_COPY_SOURCE_PATH}
+            ${LUA_COPY_DESTINATION_PATH}
+            "utility.lua"
+        )
+    endif()
 endif()
 
 
@@ -523,6 +572,13 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC "$<$<CONFIG:RelWithDebInfo>:PR
 message(STATUS "Build: Preview")
 else()
 message(STATUS "Build: Unofficial")
+endif()
+
+
+if(OPTION_ENABLE_LUA)
+target_compile_definitions(${PROJECT_NAME} PUBLIC "$<$<CONFIG:RelWithDebInfo>:LUA_ENABLED>")
+target_compile_definitions(${PROJECT_NAME} PUBLIC "$<$<CONFIG:Debug>:LUA_ENABLED>")
+message(STATUS "Build: LUA script support enabled")
 endif()
 
 
@@ -606,6 +662,12 @@ target_compile_options(${PROJECT_NAME} PUBLIC /MP2)
 # Link to the TS++ static library.
 target_link_libraries(${PROJECT_NAME} TSpp)
 add_dependencies(${PROJECT_NAME} TSpp)
+
+# Link to the Lua library.
+if(OPTION_ENABLE_LUA)
+    target_link_libraries(${PROJECT_NAME} lua_static)
+    add_dependencies(${PROJECT_NAME} lua_static)
+endif()
 
 # Ensure the launcher is built with the main project.
 add_dependencies(${PROJECT_NAME} Launch${PROJECT_NAME})

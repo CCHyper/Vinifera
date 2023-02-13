@@ -32,6 +32,9 @@
 #include "scenario.h"
 
 
+class LuaScriptClass;
+
+
 class ScenarioClassExtension final : public GlobalExtensionClass<ScenarioClass>
 {
     public:
@@ -58,6 +61,27 @@ class ScenarioClassExtension final : public GlobalExtensionClass<ScenarioClass>
         static void Assign_Houses();
         static void Create_Units(bool official);
 
+        /**
+         *  x
+         */
+        LuaScriptClass *Get_Lua_Script() const { return LuaScript; }
+
+        bool Lua_Scenario_Start();
+        bool Lua_Frame_Tick(long frame);
+
+    private:
+        static bool Lua_Register_Functions(LuaScriptClass *lua_script);
+
     public:
 
+    private:
+        /**
+         *  The Lua script file associated with this scenario file.
+         */
+        LuaScriptClass *LuaScript;
+
+        /**
+         *  x
+         */
+        bool IsSeenScenarioStart;
 };

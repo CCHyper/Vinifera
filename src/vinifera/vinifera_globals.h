@@ -34,6 +34,7 @@
 
 class EBoltClass;
 class TheaterTypeClass;
+class LuaScriptClass;
 
 
 extern bool Vinifera_DeveloperMode;
@@ -134,3 +135,9 @@ struct ExceptionInfoDatabaseStruct
 };
 
 extern DynamicVectorClass<ExceptionInfoDatabaseStruct> ExceptionInfoDatabase;
+
+
+/**
+ *  
+ */
+extern LuaScriptClass *LuaScript;

@@ -29,6 +29,7 @@
 #include "tibsun_globals.h"
 #include "tibsun_defines.h"
 #include "ccini.h"
+#include "luascript.h"
 #include "unit.h"
 #include "building.h"
 #include "unittype.h"
@@ -54,7 +55,9 @@
  *  @author: CCHyper
  */
 ScenarioClassExtension::ScenarioClassExtension(const ScenarioClass *this_ptr) :
-    GlobalExtensionClass(this_ptr)
+    GlobalExtensionClass(this_ptr),
+    LuaScript(nullptr),
+    IsSeenScenarioStart(false)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("ScenarioClassExtension::ScenarioClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 
@@ -85,6 +88,17 @@ ScenarioClassExtension::ScenarioClassExtension(const NoInitClass &noinit) :
 ScenarioClassExtension::~ScenarioClassExtension()
 {
     //EXT_DEBUG_TRACE("ScenarioClassExtension::~ScenarioClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
+
+#if defined(LUA_ENABLED)
+    /**
+     *  x
+     */
+    if (LuaScript) {
+        LuaScript->Deinitialize();
+        delete LuaScript;
+        LuaScript = nullptr;
+    }
+#endif
 }
 
 
@@ -170,6 +184,19 @@ void ScenarioClassExtension::Init_Clear()
 {
     //EXT_DEBUG_TRACE("ScenarioClassExtension::Init_Clear - 0x%08X\n", (uintptr_t)(This()));
 
+#if defined(LUA_ENABLED)
+    /**
+     *  x
+     */
+    if (LuaScript) {
+        LuaScript->Deinitialize();
+        delete LuaScript;
+        LuaScript = nullptr;
+    }
+
+    IsSeenScenarioStart = false;
+#endif
+    
     {
         /**
          *  Clear the any previously loaded tutorial messages in preperation for
@@ -195,6 +222,56 @@ void ScenarioClassExtension::Init_Clear()
 bool ScenarioClassExtension::Read_INI(CCINIClass &ini)
 {
     //EXT_DEBUG_TRACE("ScenarioClassExtension::Read_INI - 0x%08X\n", (uintptr_t)(This()));
+
+
+#if defined(LUA_ENABLED)
+
+#ifdef NDEBUG
+    if (NewINIFormat == 5) {
+#endif
+
+        if (!LuaScript) {
+
+            /**
+             *  Remove scenario file extension.
+             */
+            std::string scenname = This()->ScenarioName;
+            size_t lastindex = scenname.find_last_of(".");
+            std::string rawname = scenname.substr(0, lastindex);
+
+            /**
+             *  x
+             */
+            Wstring luafname = rawname.c_str();
+            luafname += ".LUA";
+            luafname.To_Upper();
+
+            /**
+             *  x
+             */
+            if (CCFileClass(luafname.Peek_Buffer()).Is_Available()) {
+
+                /**
+                 *  We found the associated scenario lua script, now initalise the system.
+                 */
+                LuaScript = new LuaScriptClass();
+                ASSERT(LuaScript != nullptr);
+
+                DEBUG_INFO("About to call LuaScript->Initalize(%s)...\n", luafname.Peek_Buffer());
+
+                if (!LuaScript->Initalize(luafname, Lua_Register_Functions)) {
+                    return false;
+                }
+
+            }
+
+        }
+
+#ifdef NDEBUG
+    }
+#endif
+
+#endif
 
     /**
      *  #issue-123
@@ -264,6 +341,44 @@ bool ScenarioClassExtension::Read_Tutorial_INI(CCINIClass &ini, bool log)
         }
 
     }
+
+    return true;
+}
+
+
+
+
+bool ScenarioClassExtension::Lua_Scenario_Start()
+{
+    if (IsSeenScenarioStart) {
+        return true;
+    }
+
+    if (!LuaScript->Call_Function("Scenario_Start")) {
+        return false;
+    }
+
+    IsSeenScenarioStart = true;
+
+    return true;
+}
+
+
+bool ScenarioClassExtension::Lua_Frame_Tick(long frame)
+{
+    int retval;
+
+    if (!LuaScript->Call_Function("Frame_Tick", &retval)) {
+        return false;
+    }
+
+    return retval > 0 ? true : false;
+}
+
+
+bool ScenarioClassExtension::Lua_Register_Functions(LuaScriptClass *lua_script)
+{
+    DEBUG_INFO("Lua: Registering scenario functions...\n");
 
     return true;
 }
