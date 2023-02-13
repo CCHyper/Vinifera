@@ -33,6 +33,7 @@
 #include "weapontype.h"
 #include "animtype.h"
 #include "theatertype.h"
+#include "foundationtype.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -58,6 +59,9 @@ static class CCINIClassExt final : public CCINIClass
 
         TheaterType _Get_TheaterType(const char *section, const char *entry, const TheaterType defvalue);
         bool _Put_TheaterType(const char *section, const char *entry, TheaterType value);
+
+        BSizeType _Get_BSizeType(const char *section, const char *entry, const BSizeType defvalue);
+        bool _Put_BSizeType(const char *section, const char *entry, BSizeType value);
 };
 
 
@@ -165,6 +169,34 @@ bool CCINIClassExt::_Put_TheaterType(const char *section, const char *entry, The
 
 
 /**
+ *  Reimplementation of CCINIClass::Get_BSizeType to support FoundationTypeClass.
+ *  
+ *  @author: CCHyper
+ */
+BSizeType CCINIClassExt::_Get_BSizeType(const char *section, const char *entry, const BSizeType defvalue)
+{
+    char buffer[2048];
+
+    if (CCINIClass::Get_String(section, entry, "", buffer, sizeof(buffer))) {
+        return FoundationTypeClass::From_Name(buffer);
+    }
+
+    return defvalue;
+}
+
+
+/**
+ *  Reimplementation of CCINIClass::Put_BSizeType to support FoundationTypeClass.
+ *  
+ *  @author: CCHyper
+ */
+bool CCINIClassExt::_Put_BSizeType(const char *section, const char *entry, BSizeType value)
+{
+    return CCINIClass::Put_String(section, entry, FoundationTypeClass::Name_From(value));
+}
+
+
+/**
  *  Fetch a list of AnimTypes.
  * 
  *  @author: CCHyper
@@ -258,4 +290,7 @@ void CCINIClassExtension_Hooks()
 
     Patch_Jump(0x0044B310, &CCINIClassExt::_Get_TheaterType);
     Patch_Jump(0x0044B360, &CCINIClassExt::_Put_TheaterType);
+
+    Patch_Jump(0x0044AAE0, &CCINIClassExt::_Get_BSizeType);
+    Patch_Jump(0x0044AB50, &CCINIClassExt::_Put_BSizeType);
 }

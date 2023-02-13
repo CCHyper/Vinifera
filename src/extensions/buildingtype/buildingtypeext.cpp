@@ -30,6 +30,7 @@
 #include "tibsun_defines.h"
 #include "ccini.h"
 #include "wwcrc.h"
+#include "foundationtype.h"
 #include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -117,6 +118,12 @@ HRESULT BuildingTypeClassExtension::Load(IStream *pStm)
     }
 
     new (this) BuildingTypeClassExtension(NoInitClass());
+
+    /**
+     *  Reassign the occupy and exit lists using the new foundation container class.
+     */
+    This()->OccupyList = FoundationTypeClass::As_Reference(This()->Size).Occupy_List();
+    This()->ExitList = FoundationTypeClass::As_Reference(This()->Size).Exit_List();
     
     return hr;
 }
@@ -204,6 +211,13 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IsEligibleForAllyBuilding = ini.Get_Bool(ini_name, "EligibleForAllyBuilding",
                                                     This()->IsConstructionYard ? true : IsEligibleForAllyBuilding);
+
+    /**
+     *  Reassign the occupy and exit lists using the new foundation container class.
+     */
+    //This()->Size = ini.Get_BSizeType(ini_name, "Foundation", This()->Size);
+    This()->OccupyList = FoundationTypeClass::As_Reference(This()->Size).Occupy_List();
+    This()->ExitList = FoundationTypeClass::As_Reference(This()->Size).Exit_List();
     
     return true;
 }

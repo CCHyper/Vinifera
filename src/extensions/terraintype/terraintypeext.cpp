@@ -29,6 +29,7 @@
 #include "terraintype.h"
 #include "ccini.h"
 #include "wwcrc.h"
+#include "foundationtype.h"
 #include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -113,6 +114,11 @@ HRESULT TerrainTypeClassExtension::Load(IStream *pStm)
     }
 
     new (this) TerrainTypeClassExtension(NoInitClass());
+
+    /**
+     *  Reassign the occupy and exit lists using the new foundation container class.
+     */
+    This()->Occupy = FoundationTypeClass::As_Reference(This()->Size).Occupy_List();
     
     return hr;
 }
@@ -194,6 +200,12 @@ bool TerrainTypeClassExtension::Read_INI(CCINIClass &ini)
     LightRedTint = ini.Get_Double(ini_name, "LightRedTint", (LightRedTint / 1000)) * 1000.0 + 0.1;
     LightGreenTint = ini.Get_Double(ini_name, "LightGreenTint", (LightGreenTint / 1000)) * 1000.0 + 0.1;
     LightBlueTint = ini.Get_Double(ini_name, "LightBlueTint", (LightBlueTint / 1000)) * 1000.0 + 0.1;
+
+    /**
+     *  Reassign the occupy and exit lists using the new foundation container class.
+     */
+    //This()->Size = ini.Get_BSizeType(ini_name, "Foundation", This()->Size);
+    This()->Occupy = FoundationTypeClass::As_Reference(This()->Size).Occupy_List();
     
     return true;
 }

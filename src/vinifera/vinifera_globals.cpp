@@ -68,6 +68,7 @@ DynamicVectorClass<MFCC *> ViniferaMoviesMixes;
 
 DynamicVectorClass<EBoltClass *> EBolts;
 DynamicVectorClass<TheaterTypeClass *> TheaterTypes;
+DynamicVectorClass<FoundationTypeClass *> FoundationTypes;
 
 MFCC *GenericMix = nullptr;
 MFCC *IsoGenericMix = nullptr;

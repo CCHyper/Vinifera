@@ -48,6 +48,7 @@
 #include "testlocomotion.h"
 #include "extension.h"
 #include "theatertype.h"
+#include "foundationtype.h"
 #include "uicontrol.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -620,6 +621,7 @@ bool Vinifera_Shutdown()
      */
     EBoltClass::Clear_All();
     TheaterTypes.Clear();
+    FoundationTypes.Clear();
 
     /**
      *  Cleanup global extension instances.
@@ -707,6 +709,8 @@ int Vinifera_Post_Init_Game(int argc, char *argv[])
     } else {
         DEV_DEBUG_WARNING("THEATERS.INI not found!\n");
     }
+
+    FoundationTypeClass::One_Time();
 
     return EXIT_SUCCESS;
 }

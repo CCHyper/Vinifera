@@ -59,6 +59,8 @@
 #include "particlesystypeext.h"
 #include "voxelanimtypeext.h"
 
+#include "foundationtype.h"
+
 #include "extension.h"
 #include "extension_globals.h"
 
@@ -275,6 +277,8 @@ void RulesClassExtension::Process(CCINIClass &ini)
     General(ini);
     MPlayer(ini);
     AudioVisual(ini);
+
+    Foundations(ini);
 
     /**
      *  Process the objects (extension classes).
@@ -513,6 +517,26 @@ bool RulesClassExtension::Weapons(CCINIClass &ini)
     }
 
     return counter > 0;
+}
+
+
+/**
+ *  Fetch all the foundation characteristic values.
+ * 
+ *  @author: CCHyper
+ */
+bool RulesClassExtension::Foundations(CCINIClass &ini)
+{
+    //EXT_DEBUG_TRACE("RulesClassExtension::Foundations - 0x%08X\n", (uintptr_t)(This()));
+
+    // Foundations are artwork related, and therefor should only be
+    // loaded from ART.INI
+    CCINIClass &_ini = ArtINI; // ini
+
+    /**
+     *  x
+     */
+    return FoundationTypeClass::Read_Foundation_INI(_ini);
 }
 
 
