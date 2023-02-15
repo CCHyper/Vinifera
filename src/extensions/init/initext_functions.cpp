@@ -31,6 +31,8 @@
 #include "vinifera_util.h"
 #include "tibsun_globals.h"
 #include "tibsun_functions.h"
+#include "options.h"
+#include "optionsext.h"
 #include "language.h"
 #include "addon.h"
 #include "cd.h"
@@ -171,15 +173,15 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
     /**
      *  Create our main window.
      */
-    if (Debug_Windowed) {
+    if (OptionsExtension->IsWindowed) {
 
         DEBUG_INFO("Create_Main_Window() - Creating desktop window (%d x %d).\n", width, height);
 
         hWnd = CreateWindowEx(
-            WS_EX_LEFT|WS_EX_TOPMOST,
+            WS_EX_LEFT | WS_EX_TOPMOST,
             "Vinifera",
             Vinifera_Get_Window_Title(dwPid),
-            WS_SYSMENU|WS_MINIMIZEBOX|WS_CLIPCHILDREN|WS_CAPTION,
+            WS_SYSMENU | WS_MINIMIZEBOX | WS_CLIPCHILDREN | WS_CAPTION,
             0, 0, 0, 0,
             nullptr,
             nullptr,
@@ -195,7 +197,7 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
 
         /**
          *  #BUGFIX:
-         * 
+         *
          *  Fetch the desktop size, calculate the screen center position the window and move it.
          */
         RECT workarea;
@@ -203,11 +205,28 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
 
         int x_pos = (display_width - width) / 2;
         int y_pos = (((display_height - height) / 2) - (display_height - workarea.bottom));
-        
+
         DEBUG_INFO("Create_Main_Window() - Moving window (%d,%d,%d,%d).\n",
             x_pos, y_pos, (rect.right - rect.left), (rect.bottom - rect.top));
 
         MoveWindow(hWnd, x_pos, y_pos, (rect.right - rect.left), (rect.bottom - rect.top), TRUE);
+
+    } else if (OptionsExtension->IsBorderlessWindow) {
+
+        DEBUG_INFO("Create_Main_Window() - Creating desktop window (%d x %d).\n", width, height);
+
+        hWnd = CreateWindowEx(
+            WS_EX_LEFT/*|WS_EX_TOPMOST*/,   // Removed: Causes focus issues when debugging with MSVC.
+            "Vinifera",
+            Vinifera_Get_Window_Title(dwPid),
+            WS_POPUP,
+            0, 0, 0, 0,
+            nullptr,
+            nullptr,
+            (HINSTANCE)hInstance,
+            nullptr);
+
+        SetRect(&rect, 0, 0, display_width, display_height);
 
     } else {
 

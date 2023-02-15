@@ -42,7 +42,12 @@
  *  @author: CCHyper
  */
 OptionsClassExtension::OptionsClassExtension(const OptionsClass *this_ptr) :
-    GlobalExtensionClass(this_ptr)
+    GlobalExtensionClass(this_ptr),
+    IsWindowed(false),
+    WindowWidth(-1),
+    WindowHeight(-1),
+    IsBorderlessWindow(false),
+    IsClipCursorToWindow(false)
 {
     //EXT_DEBUG_TRACE("OptionsClassExtension::OptionsClassExtension - 0x%08X\n", (uintptr_t)(This()));
 }
@@ -166,7 +171,29 @@ void OptionsClassExtension::Load_Init_Settings()
 {
     //EXT_DEBUG_TRACE("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(This()));
     
-    RawFileClass file("SUN.INI");
+    static char const * const VIDEO = "Video";
+
+    //RawFileClass file("SUN.INI");
+    //CCINIClass ini;
+
+    //ini.Load(file, false);
+
+    IsWindowed = ConfigINI.Get_Bool("Video", "Windowed", IsWindowed);
+    WindowWidth = ConfigINI.Get_Int("Video", "WindowWidth", This()->ScreenWidth);
+    WindowHeight = ConfigINI.Get_Int("Video", "WindowHeight", This()->ScreenHeight);
+
+    ASSERT_FATAL(WindowWidth >= This()->ScreenWidth);
+    ASSERT_FATAL(WindowHeight >= This()->ScreenHeight);
+
+    IsBorderlessWindow = ConfigINI.Get_Bool("Video", "BorderlessWindow", IsBorderlessWindow);
+    IsClipCursorToWindow = ConfigINI.Get_Bool("Video", "ClipCursorToWindow", IsClipCursorToWindow);
+
+
+
+    // TEMP: Force all new renderers to be created as a window.
+    OptionsExtension->IsWindowed = true;
+    OptionsExtension->IsBorderlessWindow = false;
+    Debug_Windowed = OptionsExtension->IsWindowed;
 }
 
 
@@ -179,7 +206,18 @@ void OptionsClassExtension::Save_Settings()
 {
     //EXT_DEBUG_TRACE("OptionsClassExtension::Save_Settings - 0x%08X\n", (uintptr_t)(This()));
     
+    static char const * const VIDEO = "Video";
+
     RawFileClass file("SUN.INI");
+    INIClass ini;
+
+    ConfigINI.Put_Bool("Video", "Windowed", IsWindowed);
+    ConfigINI.Put_Int("Video", "WindowWidth", WindowWidth);
+    ConfigINI.Put_Int("Video", "WindowHeight", WindowHeight);
+    ConfigINI.Put_Bool("Video", "BorderlessWindow", IsBorderlessWindow);
+    ConfigINI.Put_Bool("Video", "ClipCursorToWindow", IsClipCursorToWindow);
+
+    ini.Save(file);
 }
 
 
