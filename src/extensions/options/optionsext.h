@@ -64,4 +64,10 @@ class OptionsClassExtension final : public GlobalExtensionClass<OptionsClass>
         void Set();
 
     public:
+        bool IsWindowed;
+        int WindowWidth;
+        int WindowHeight;
+        bool IsBorderlessWindow;
+        bool IsClipCursorToWindow;
+        int RefreshRate;
 };
