@@ -70,4 +70,5 @@ class OptionsClassExtension final : public GlobalExtensionClass<OptionsClass>
         bool IsBorderlessWindow;
         bool IsClipCursorToWindow;
         int RefreshRate;
+        int ScalingMode;
 };

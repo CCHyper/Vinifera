@@ -4,13 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          D3DSURFACE.H
+ *  @file          VIRTUALSURFACE.H
  *
  *  @author        CCHyper
  *
- *  @contributors  tomsons26
- *
- *  @brief         Direct3D surface class.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -30,16 +28,26 @@
 #pragma once
 
 #include "always.h"
-#include "xsurface.h"
-#include <d3d9.h>
+#include "bsurface.h"
+#include <ddraw.h>
 
 
-class D3DSurface : public XSurface
+/**
+ *  A buffered clone of DSurface that implements the minimum required, without
+ *  using DirectDraw. It has the exact same interface to ensure the game calls
+ *  expected functions without crashing.
+ */
+class VirtualSurface : public BSurface
 {
     public:
-        D3DSurface(int width, int height, D3DFORMAT format = D3DFMT_R5G6B5);
-        virtual ~D3DSurface();
+        VirtualSurface();
+        VirtualSurface(int width, int height, bool system_mem = false);
+        VirtualSurface(LPDIRECTDRAWSURFACE surface);
+        virtual ~VirtualSurface();
 
+        /**
+         *  Surface
+         */
         virtual bool Copy_From(Rect &toarea, Rect &torect, Surface &fromsurface, Rect &fromarea, Rect &fromrect, bool trans_blit = false, bool a7 = true) override;
         virtual bool Copy_From(Rect &torect, Surface &fromsurface, Rect &fromrect, bool trans_blit = false, bool a5 = true) override;
         virtual bool Copy_From(Surface &fromsurface, bool trans_blit = false, bool a3 = true) override;
@@ -49,32 +57,24 @@ class D3DSurface : public XSurface
         virtual bool Draw_Line_entry_34(Rect &area, Point2D &start, Point2D &end, unsigned color, int a5, int a6, bool z_only = false) override;
         virtual bool Draw_Line_entry_38(Rect &area, Point2D &start, Point2D &end, int a4, int a5, int a6, bool a7 = false) override;
         virtual bool Draw_Line_entry_3C(Rect &area, Point2D &start, Point2D &end, RGBClass &color, int a5, int a6, bool a7, bool a8, bool a9, bool a10, float a11) override;
-        virtual bool Draw_Ellipse(Point2D point, int radius_x, int radius_y, Rect clip, unsigned color) override;
-        virtual bool Put_Pixel(Point2D &point, unsigned color) override;
+        virtual int entry_48(Point2D &start, Point2D &end, unsigned color, bool pattern[], int offset, bool a6) override;
+        virtual bool entry_4C(Point2D &start, Point2D &end, unsigned color, bool a4 = false) override;
         virtual void *Lock(int x = 0, int y = 0) override;
         virtual bool Unlock() override;
         virtual bool Can_Lock(int x = 0, int y = 0) const override;
-        virtual int Get_Bytes_Per_Pixel() const override { return BytesPerPixel; }
+        virtual int Get_Bytes_Per_Pixel() const override;
         virtual int Get_Pitch() const override;
-        virtual bool entry_80() const override { return true; }
+        virtual bool entry_80() const override;
 
+        /**
+         *  DSurface
+         */
         virtual bool Draw_Line_entry_90(Rect &area, Point2D &start, Point2D &end, RGBClass &a4, RGBClass &a5, float &a6, float &a7);
-
-        /**
-         *  Is the surface ready to immediately accept blitting?
-         */
-        virtual bool Can_Blit() const { return true; }
-
-        /**
-         *  Is the surface ready to immediately flip?
-         */
-        virtual bool Can_Flip() const { return true; }
-
+        virtual bool Can_Blit() const;
+        
         HDC Get_DC();
-        bool Release_DC(HDC hDC);
+        BOOL Release_DC(HDC hdc);
+        bool Restore_Check();
 
-        LPDIRECT3DSURFACE9 Get_Video_Surface_Ptr() const { return VideoSurfacePtr; }
-
-    private:
-        LPDIRECT3DSURFACE9 VideoSurfacePtr;
+    public:
 };

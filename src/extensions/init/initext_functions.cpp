@@ -146,7 +146,7 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
     wc.hInstance      = (HINSTANCE)hInstance;
     wc.hIcon          = hIcon;
     wc.hCursor        = hCursor;
-    wc.hbrBackground  = nullptr;
+    wc.hbrBackground  = (HBRUSH)GetStockObject(RGB(0,0,0));
     wc.lpszMenuName   = nullptr;
     wc.lpszClassName  = "Vinifera";
     wc.hIconSm        = (hSmIcon ? hSmIcon : hIcon);
@@ -173,7 +173,24 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
     /**
      *  Create our main window.
      */
-    if (OptionsExtension->IsWindowed) {
+    if (OptionsExtension->IsBorderlessWindow) {
+
+        DEBUG_INFO("Create_Main_Window() - Creating borderless desktop window (%d x %d).\n", width, height);
+
+        hWnd = CreateWindowEx(
+            WS_EX_LEFT/*|WS_EX_TOPMOST*/,   // Removed: Causes focus issues when debugging with MSVC.
+            "Vinifera",
+            Vinifera_Get_Window_Title(dwPid),
+            WS_POPUP,
+            0, 0, 0, 0,
+            nullptr,
+            nullptr,
+            (HINSTANCE)hInstance,
+            nullptr);
+
+        SetRect(&rect, 0, 0, display_width, display_height);
+
+    } else if (OptionsExtension->IsWindowed) {
 
         DEBUG_INFO("Create_Main_Window() - Creating desktop window (%d x %d).\n", width, height);
 
@@ -211,22 +228,6 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
 
         MoveWindow(hWnd, x_pos, y_pos, (rect.right - rect.left), (rect.bottom - rect.top), TRUE);
 
-    } else if (OptionsExtension->IsBorderlessWindow) {
-
-        DEBUG_INFO("Create_Main_Window() - Creating desktop window (%d x %d).\n", width, height);
-
-        hWnd = CreateWindowEx(
-            WS_EX_LEFT/*|WS_EX_TOPMOST*/,   // Removed: Causes focus issues when debugging with MSVC.
-            "Vinifera",
-            Vinifera_Get_Window_Title(dwPid),
-            WS_POPUP,
-            0, 0, 0, 0,
-            nullptr,
-            nullptr,
-            (HINSTANCE)hInstance,
-            nullptr);
-
-        SetRect(&rect, 0, 0, display_width, display_height);
 
     } else {
 

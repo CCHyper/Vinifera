@@ -47,7 +47,8 @@ OptionsClassExtension::OptionsClassExtension(const OptionsClass *this_ptr) :
     WindowWidth(-1),
     WindowHeight(-1),
     IsBorderlessWindow(false),
-    IsClipCursorToWindow(false)
+    IsClipCursorToWindow(false),
+    ScalingMode(1) // Nearest.
 {
     //EXT_DEBUG_TRACE("OptionsClassExtension::OptionsClassExtension - 0x%08X\n", (uintptr_t)(This()));
 }
@@ -178,15 +179,25 @@ void OptionsClassExtension::Load_Init_Settings()
 
     //ini.Load(file, false);
 
-    IsWindowed = ConfigINI.Get_Bool("Video", "Windowed", IsWindowed);
-    WindowWidth = ConfigINI.Get_Int("Video", "WindowWidth", This()->ScreenWidth);
-    WindowHeight = ConfigINI.Get_Int("Video", "WindowHeight", This()->ScreenHeight);
+    IsWindowed = ConfigINI.Get_Bool(VIDEO, "Windowed", IsWindowed);
+    WindowWidth = ConfigINI.Get_Int(VIDEO, "WindowWidth", This()->ScreenWidth);
+    WindowHeight = ConfigINI.Get_Int(VIDEO, "WindowHeight", This()->ScreenHeight);
 
     ASSERT_FATAL(WindowWidth >= This()->ScreenWidth);
     ASSERT_FATAL(WindowHeight >= This()->ScreenHeight);
 
-    IsBorderlessWindow = ConfigINI.Get_Bool("Video", "BorderlessWindow", IsBorderlessWindow);
-    IsClipCursorToWindow = ConfigINI.Get_Bool("Video", "ClipCursorToWindow", IsClipCursorToWindow);
+    IsBorderlessWindow = ConfigINI.Get_Bool(VIDEO, "BorderlessWindow", IsBorderlessWindow);
+    IsClipCursorToWindow = ConfigINI.Get_Bool(VIDEO, "ClipCursorToWindow", IsClipCursorToWindow);
+
+    Wstring buff;
+    ConfigINI.Get_String(VIDEO, "ScalingMode", buff);
+
+    if (buff == "nearest") {
+        ScalingMode = 1;
+
+    } else if (buff == "linear") {
+        ScalingMode = 2;
+    }
 }
 
 

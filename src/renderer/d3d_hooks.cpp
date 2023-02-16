@@ -28,7 +28,7 @@
 #include "d3d_hooks.h"
 #include "tibsun_functions.h"
 #include "tibsun_globals.h"
-#include "d3dsurface.h"
+#include "virtualsurface.h"
 #include "options.h"
 #include "optionsext.h"
 #include "movie.h"
@@ -40,17 +40,20 @@
 #include "hooker.h"
 #include "hooker_macros.h"
 
-
+#include <d3d9.h>
 #pragma comment (lib, "d3d9.lib")
 
 
 LPDIRECT3D9 Direct3D = nullptr;
 LPDIRECT3DDEVICE9 Direct3DDevice = nullptr;
+LPDIRECT3DSURFACE9 Direct3DPrimarySurface = nullptr;
+LPDIRECT3DSURFACE9 Direct3DBackSurface = nullptr;
 
 
-// Cast DSurface pointer to D3DSurface.
-#define D3D_SURFACE_ASSIGN(surface, ptr) surface = reinterpret_cast<DSurface *>(ptr)
-#define D3D_SURFACE_CAST(surface) reinterpret_cast<D3DSurface *>(surface)
+
+// Cast DSurface pointer to VirtualSurface.
+#define VIRTUAL_SURFACE_ASSIGN(surface, ptr) surface = reinterpret_cast<DSurface *>(ptr)
+#define VIRTUAL_SURFACE_CAST(surface) reinterpret_cast<VirtualSurface *>(surface)
 
 
 
@@ -59,6 +62,233 @@ void __cdecl D3D_Write_Surface_Data_To_File(const char *filename, XSurface *surf
 #if 1 // #ifndef NDEBUG
     Write_PNG_File(&RawFileClass(filename), *surface, &GamePalette);
 #endif
+}
+
+
+
+bool D3D_Create_Primary(XSurface *primary_surface)
+{
+    HRESULT res;
+
+    // Create primary surface.
+    res = Direct3DDevice->CreateOffscreenPlainSurface(
+        primary_surface->Get_Width(),
+        primary_surface->Get_Height(),
+        D3DFMT_R5G6B5,
+        D3DPOOL_DEFAULT,
+        &Direct3DPrimarySurface,
+        nullptr);
+
+    if (FAILED(res)) {
+        DEBUG_ERROR("Direct3D - Failed to create primary surface! Error code %x!", res);
+        return false;
+    }
+
+    // Create back surface.
+#if 0
+    res = Direct3DDevice->CreateOffscreenPlainSurface(
+        primary_surface->Get_Width(),
+        primary_surface->Get_Height(),
+        D3DFMT_R5G6B5,
+        D3DPOOL_DEFAULT,
+        &Direct3DBackSurface,
+        nullptr);
+    if (FAILED(res)) {
+        DEBUG_ERROR("Direct3D - Failed to create back buffer surface! Error code %x!", res);
+        return false;
+    }
+#else
+    res = Direct3DDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &Direct3DBackSurface);
+    if (FAILED(res)) {
+        DEBUG_ERROR("Direct3D - Failed to get back buffer surface! Error code %x!", res);
+        return false;
+    }
+#endif
+
+    Direct3DDevice->SetRenderTarget(0, Direct3DPrimarySurface);
+
+    return true;
+}
+
+bool D3D_Clear_Screen(bool present = false)
+{
+    Direct3DDevice->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+
+    if (present) {
+        Direct3DDevice->Present(nullptr, nullptr, nullptr, nullptr);
+    }
+
+    return true;
+}
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+bool D3D_Lock_Surface(LPDIRECT3DSURFACE9 surface, D3DLOCKED_RECT& lock_rect, bool discard, bool readonly)
+{
+    ASSERT(surface != nullptr);
+
+    lock_rect.Pitch = 0;
+    lock_rect.pBits = nullptr;
+
+    DWORD flags = (discard ? D3DLOCK_DISCARD : 0);
+    if (readonly) {
+        flags |= D3DLOCK_READONLY;
+    }
+    else {
+        flags |= D3DLOCK_NOSYSLOCK;
+    }
+
+    HRESULT res = surface->LockRect(&lock_rect, nullptr, flags);
+
+    if (FAILED(res)) {
+        DEBUG_ERROR("Direct3D - Failed to lock back surface! Error code %x!", res);
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+bool D3D_Unlock_Surface(LPDIRECT3DSURFACE9 surface)
+{
+    ASSERT(surface != nullptr);
+
+    HRESULT res = surface->UnlockRect();
+
+    if (FAILED(res)) {
+        DEBUG_ERROR("Direct3D - Failed to unlock back surface! Error code %x!", res);
+        return false;
+    }
+
+    return true;
+}
+
+bool D3D_Flip(XSurface *surface)
+{
+    D3D_Clear_Screen();
+
+    D3DLOCKED_RECT lock_rect;
+
+    if (!D3D_Lock_Surface(Direct3DPrimarySurface, lock_rect, false, false)) {
+        DEBUG_ERROR("Direct3D - Failed to lock destination surface!\n");
+        return false;
+    }
+
+    //unsigned short *dstptr = reinterpret_cast<unsigned short *>(VIRTUAL_SURFACE_CAST(PrimarySurface)->Lock());
+    //if (!dstptr) {
+    //    DEBUG_ERROR("Direct3D - Failed to lock game surface!\n");
+    //    return false;
+    //}
+
+    unsigned short *srcptr = reinterpret_cast<unsigned short *>(surface->Lock());
+    if (!srcptr) {
+        DEBUG_ERROR("Direct3D - Failed to lock game surface!\n");
+        D3D_Unlock_Surface(Direct3DPrimarySurface);
+        return false;
+    }
+
+    std::memcpy(lock_rect.pBits, srcptr, surface->Get_Width() * surface->Get_Height() * surface->Get_Bytes_Per_Pixel());
+    //std::memcpy(dstptr, srcptr, surface->Get_Width() * surface->Get_Height() * surface->Get_Bytes_Per_Pixel());
+
+    //D3D_Write_Surface_Data_To_File("SRC.PNG", surface);
+    //D3D_Write_Surface_Data_To_File("DST.PNG", VIRTUAL_SURFACE_CAST(PrimarySurface));
+
+    if (!surface->Unlock()) {
+        DEBUG_ERROR("Direct3D - Failed to unlock game surface!\n");
+        VIRTUAL_SURFACE_CAST(PrimarySurface)->Unlock();
+        return false;
+    }
+    //if (!VIRTUAL_SURFACE_CAST(PrimarySurface)->Unlock()) {
+    //    DEBUG_ERROR("Direct3D - Failed to unlock destination surface!\n");
+    //    return false;
+    //}
+    if (!D3D_Unlock_Surface(Direct3DPrimarySurface)) {
+        DEBUG_ERROR("Direct3D - Failed to unlock destination surface!\n");
+        return false;
+    }
+
+    RECT src_rect;
+    src_rect.left = 0;
+    src_rect.top = 0;
+    src_rect.right = surface->Get_Width();
+    src_rect.bottom = surface->Get_Height();
+
+    RECT dest_rect;
+    dest_rect.left = 0;
+    dest_rect.top = 0;
+    dest_rect.right = surface->Get_Width();
+    dest_rect.bottom = surface->Get_Height();
+
+    //LPDIRECT3DSURFACE9 backsurfaceptr;
+    //
+    //HRESULT res = Direct3DDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backsurfaceptr);
+    //if (FAILED(res)) {
+    //    DEBUG_ERROR("Direct3D - Failed to get back buffer surface! Error code %x!\n", res);
+    //    return false;
+    //}
+
+    //D3DTEXF_NONE = 0,      // filtering disabled (valid for mip filter only)
+    //D3DTEXF_POINT = 1,     // nearest
+    //D3DTEXF_LINEAR = 2,    // linear interpolation
+
+    D3DTEXTUREFILTERTYPE d3dtft = (D3DTEXTUREFILTERTYPE)OptionsExtension->ScalingMode;
+    Direct3DDevice->StretchRect(Direct3DPrimarySurface, &src_rect, Direct3DBackSurface, &dest_rect, d3dtft);
+
+    // Present the backbuffer contents to the display.
+    Direct3DDevice->Present(&src_rect, &dest_rect, nullptr, nullptr);
+
+    return true;
+}
+
+HDC D3D_Primary_Get_DC()
+{
+    HDC hDC;
+
+    HRESULT res = Direct3DPrimarySurface->GetDC(&hDC);
+    if (FAILED(res)) {
+        DEBUG_ERROR("Direct3D - Failed to get DC! Error code %x!\n", res);
+        return nullptr;
+    }
+
+    return hDC;
+}
+
+bool D3D_Primary_Release_DC(HDC hDC)
+{
+    HRESULT res = Direct3DPrimarySurface->ReleaseDC(hDC);
+    if (FAILED(res)) {
+        DEBUG_ERROR("Direct3D - Failed to release DC! Error code %x!\n", res);
+        return false;
+    }
+
+    return true;
+}
+
+void D3D_Flip_Primary()
+{
+    D3D_Flip(PrimarySurface);
+}
+
+void D3D_Flip_Hidden()
+{
+    D3D_Flip(HiddenSurface);
+}
+
+void D3D_Focus_Loss()
+{
+    Focus_Loss();
+}
+
+static void D3D_Focus_Restore()
+{
+    Focus_Restore();
 }
 
 
@@ -100,32 +330,32 @@ static bool Allocate_Surfaces_Intercept(Rect *common_rect, Rect *composite_rect,
      *  Create new instances of the surfaces using the Virtual interface.
      */
     if (common_rect->Width > 0 && common_rect->Height > 0) {
-        D3D_SURFACE_ASSIGN(AlternateSurface, new D3DSurface(common_rect->Width, common_rect->Height));
-        D3D_SURFACE_CAST(AlternateSurface)->Clear();
+        VIRTUAL_SURFACE_ASSIGN(AlternateSurface, new VirtualSurface(common_rect->Width, common_rect->Height));
+        VIRTUAL_SURFACE_CAST(AlternateSurface)->Clear();
         DEBUG_INFO("AlternateSurface created (%dx%d)\n", common_rect->Width, common_rect->Height);
     }
 
     if (common_rect->Width > 0 && common_rect->Height > 0) {
-        D3D_SURFACE_ASSIGN(HiddenSurface, new D3DSurface(common_rect->Width, common_rect->Height));
-        D3D_SURFACE_CAST(HiddenSurface)->Clear();
+        VIRTUAL_SURFACE_ASSIGN(HiddenSurface, new VirtualSurface(common_rect->Width, common_rect->Height));
+        VIRTUAL_SURFACE_CAST(HiddenSurface)->Clear();
         DEBUG_INFO("HiddenSurface created (%dx%d)\n", common_rect->Width, common_rect->Height);
     }
 
     if (composite_rect->Width > 0 && composite_rect->Height > 0) {
-        D3D_SURFACE_ASSIGN(CompositeSurface, new D3DSurface(composite_rect->Width, composite_rect->Height));
-        D3D_SURFACE_CAST(CompositeSurface)->Clear();
+        VIRTUAL_SURFACE_ASSIGN(CompositeSurface, new VirtualSurface(composite_rect->Width, composite_rect->Height));
+        VIRTUAL_SURFACE_CAST(CompositeSurface)->Clear();
         DEBUG_INFO("CompositeSurface created (%dx%d)\n", composite_rect->Width, composite_rect->Height);
     }
 
     if (tile_rect->Width > 0 && tile_rect->Height > 0) {
-        D3D_SURFACE_ASSIGN(TileSurface, new D3DSurface(tile_rect->Width, tile_rect->Height));
-        D3D_SURFACE_CAST(TileSurface)->Clear();
+        VIRTUAL_SURFACE_ASSIGN(TileSurface, new VirtualSurface(tile_rect->Width, tile_rect->Height));
+        VIRTUAL_SURFACE_CAST(TileSurface)->Clear();
         DEBUG_INFO("TileSurface created (%dx%d)\n", tile_rect->Width, tile_rect->Height);
     }
 
     if (sidebar_rect->Width > 0 && sidebar_rect->Height > 0) {
-        D3D_SURFACE_ASSIGN(SidebarSurface, new D3DSurface(sidebar_rect->Width, sidebar_rect->Height));
-        D3D_SURFACE_CAST(SidebarSurface)->Clear();
+        VIRTUAL_SURFACE_ASSIGN(SidebarSurface, new VirtualSurface(sidebar_rect->Width, sidebar_rect->Height));
+        VIRTUAL_SURFACE_CAST(SidebarSurface)->Clear();
         DEBUG_INFO("SidebarSurface created (%dx%d)\n", sidebar_rect->Width, sidebar_rect->Height);
     }
 
@@ -144,7 +374,7 @@ static XSurface *Create_Primary_Intercept(XSurface **backbuffer_surface)
     /**
      *  Create a virtual surface keep the game happy.
      */
-    D3DSurface *primary_surface = new D3DSurface(Options.ScreenWidth, Options.ScreenHeight, D3DFMT_R5G6B5);
+    VirtualSurface *primary_surface = new VirtualSurface(Options.ScreenWidth, Options.ScreenHeight);
     ASSERT(primary_surface != nullptr);
 
     if (!primary_surface) {
@@ -171,6 +401,15 @@ static XSurface *Create_Primary_Intercept(XSurface **backbuffer_surface)
     DSurface::ColorGrey = DSurface::RGB_To_Pixel(127, 127, 127);
     DSurface::ColorMidGrey = DSurface::RGB_To_Pixel(63, 63, 63);
     DSurface::ColorDarkGrey = DSurface::RGB_To_Pixel(31, 31, 31);
+
+    /**
+     *  Create the primary Direct3D surface.
+     */
+    if (!D3D_Create_Primary(primary_surface)) {
+        return false;
+    }
+
+    Direct3DDevice->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
 
     // Hack! Window seems to be out of focus at this point...
     // The window needs this initially otherwise we need to alt-tab to gain focus.
@@ -211,7 +450,7 @@ static bool Set_Video_Mode_Intercept(HWND hWnd, int width, int height, int bits_
 
     HRESULT res = Direct3D->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, behaviour_flags, &d3dpp, &Direct3DDevice);
     if (FAILED(res)) {
-        DEBUG_ERROR("DirectX9 - Failed to create Direct3D device! Error code %x!\n", res);
+        DEBUG_ERROR("Direct3D - Failed to create Direct3D device! Error code %x!\n", res);
         return false;
     }
 
@@ -251,173 +490,6 @@ static bool Prep_Renderer_Intercept(HWND hWnd)
 
 
 
-bool D3D_Clear_Screen(bool present)
-{
-    Direct3DDevice->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-
-    if (present) {
-        Direct3DDevice->Present(nullptr, nullptr, nullptr, nullptr);
-    }
-
-    return true;
-}
-
-
-
-/**
- *  x
- *
- *  @author: CCHyper
- */
-bool D3D_Lock_Surface(LPDIRECT3DSURFACE9 surface, D3DLOCKED_RECT& lock_rect, bool discard, bool readonly)
-{
-    ASSERT(surface != nullptr);
-
-    lock_rect.Pitch = 0;
-    lock_rect.pBits = nullptr;
-
-    DWORD flags = (discard ? D3DLOCK_DISCARD : 0);
-    if (readonly) {
-        flags |= D3DLOCK_READONLY;
-    }
-    else {
-        flags |= D3DLOCK_NOSYSLOCK;
-    }
-
-    HRESULT res = surface->LockRect(&lock_rect, nullptr, flags);
-
-    if (FAILED(res)) {
-        DEBUG_ERROR("DirectX9 - Failed to lock back surface! Error code %x!", res);
-        return false;
-    }
-
-    return true;
-}
-
-
-/**
- *  x
- *
- *  @author: CCHyper
- */
-bool D3D_Unlock_Surface(LPDIRECT3DSURFACE9 surface)
-{
-    ASSERT(surface != nullptr);
-
-    HRESULT res = surface->UnlockRect();
-
-    if (FAILED(res)) {
-        DEBUG_ERROR("DirectX9 - Failed to unlock back surface! Error code %x!", res);
-        return false;
-    }
-
-    return true;
-}
-
-bool D3D_Flip(XSurface *surface)
-{
-    Direct3DDevice->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0, 0, 255), 1.0f, 0);
-
-    D3DLOCKED_RECT lock_rect;
-
-    if (!D3D_Lock_Surface(D3D_SURFACE_CAST(PrimarySurface)->Get_Video_Surface_Ptr(), lock_rect, false, false)) {
-        DEBUG_ERROR("DirectX9 - Failed to lock destination surface!\n");
-        return false;
-    }
-
-    //unsigned short *dstptr = reinterpret_cast<unsigned short *>(D3D_SURFACE_CAST(PrimarySurface)->Lock());
-    //if (!dstptr) {
-    //    DEBUG_ERROR("DirectX9 - Failed to lock game surface!\n");
-    //    return false;
-    //}
-
-    unsigned short *srcptr = reinterpret_cast<unsigned short *>(surface->Lock());
-    if (!srcptr) {
-        DEBUG_ERROR("DirectX9 - Failed to lock game surface!\n");
-        D3D_SURFACE_CAST(PrimarySurface)->Unlock();
-        return false;
-    }
-
-    std::memcpy(lock_rect.pBits, srcptr, surface->Get_Width() * surface->Get_Height() * surface->Get_Bytes_Per_Pixel());
-    //std::memcpy(dstptr, srcptr, surface->Get_Width() * surface->Get_Height() * surface->Get_Bytes_Per_Pixel());
-
-    D3D_Write_Surface_Data_To_File("SRC.PNG", surface);
-    D3D_Write_Surface_Data_To_File("DST.PNG", D3D_SURFACE_CAST(PrimarySurface));
-
-    if (!surface->Unlock()) {
-        DEBUG_ERROR("DirectX9 - Failed to unlock game surface!\n");
-        D3D_SURFACE_CAST(PrimarySurface)->Unlock();
-        return false;
-    }
-    //if (!D3D_SURFACE_CAST(PrimarySurface)->Unlock()) {
-    //    DEBUG_ERROR("DirectX9 - Failed to unlock destination surface!\n");
-    //    return false;
-    //}
-    if (!D3D_Unlock_Surface(D3D_SURFACE_CAST(PrimarySurface)->Get_Video_Surface_Ptr())) {
-        DEBUG_ERROR("DirectX9 - Failed to unlock destination surface!\n");
-        return false;
-    }
-
-    RECT src_rect;
-    src_rect.left = 0;
-    src_rect.top = 0;
-    src_rect.right = surface->Get_Width();
-    src_rect.bottom = surface->Get_Height();
-
-    RECT dest_rect;
-    dest_rect.left = 0;
-    dest_rect.top = 0;
-    dest_rect.right = surface->Get_Width();
-    dest_rect.bottom = surface->Get_Height();
-
-    LPDIRECT3DSURFACE9 backsurfaceptr;
-
-    HRESULT res = Direct3DDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backsurfaceptr);
-    if (FAILED(res)) {
-        DEBUG_ERROR("DirectX9 - Failed to get back buffer surface! Error code %x!\n", res);
-        return false;
-    }
-
-    D3DTEXTUREFILTERTYPE d3dtft = D3DTEXF_NONE;
-    Direct3DDevice->StretchRect(D3D_SURFACE_CAST(PrimarySurface)->Get_Video_Surface_Ptr(), &src_rect, backsurfaceptr, &dest_rect, d3dtft);
-
-    // Present the backbuffer contents to the display.
-    Direct3DDevice->Present(&src_rect, &dest_rect, nullptr, nullptr);
-
-    return true;
-}
-
-HDC D3D_Primary_Get_DC()
-{
-    return D3D_SURFACE_CAST(PrimarySurface)->Get_DC();
-}
-
-bool D3D_Primary_Release_DC(HDC hDC)
-{
-    return D3D_SURFACE_CAST(PrimarySurface)->Release_DC(hDC);
-}
-
-void D3D_Flip_Primary()
-{
-    D3D_Flip(PrimarySurface);
-}
-
-void D3D_Flip_Hidden()
-{
-    D3D_Flip(HiddenSurface);
-}
-
-void D3D_Focus_Loss()
-{
-    Focus_Loss();
-}
-
-static void D3D_Focus_Restore()
-{
-    Focus_Restore();
-}
-
-
 
 
 
@@ -427,22 +499,22 @@ static void D3D_Focus_Restore()
  */
 static XSurface *D3D_Placement_Surface_Constructor_Patch(XSurface *surface, int dummy, int width, int height, bool sys_mem)
 {
-    return new (surface) D3DSurface(width, height);
+    return new (surface) VirtualSurface(width, height);
 }
 
 static XSurface * __cdecl D3D_Create_Surface(int width, int height)
 {
-    return new D3DSurface(width, height);
+    return new VirtualSurface(width, height);
 }
 
 static XSurface * __cdecl D3D_Create_Surface(int width, int height, bool sys_mem)
 {
-    return new D3DSurface(width, height);
+    return new VirtualSurface(width, height);
 }
 
 static XSurface * __cdecl D3D_Placement_Create_Surface(XSurface *surface, int width, int height, bool sys_mem)
 {
-    return new (surface) D3DSurface(width, height);
+    return new (surface) VirtualSurface(width, height);
 }
 
 static XSurface * __cdecl D3D_Placement_Destory_Surface(XSurface *surface)
@@ -573,6 +645,6 @@ void D3D_Hooks()
     Patch_Call(0x0050AF41, &Create_Primary_Intercept);
     Patch_Call(0x0060141E, &Create_Primary_Intercept);
 
-    Patch_Jump(0x0048B2E0, &D3DSurface::Get_DC);
-    Patch_Jump(0x0048B320, &D3DSurface::Release_DC);
+    Patch_Jump(0x0048B2E0, &VirtualSurface::Get_DC);
+    Patch_Jump(0x0048B320, &VirtualSurface::Release_DC);
 }
