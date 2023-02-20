@@ -32,6 +32,7 @@
 #include "iomap.h"
 #include "tactical.h"
 #include "house.h"
+#include "optionsext.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -158,6 +159,11 @@ static bool Main_Loop_Intercept()
          *  The games main loop function.
          */
         ret = Main_Loop();
+
+        if (OptionsExtension->DebugBreakAtFrame > 0 && OptionsExtension->DebugBreakAtFrame == Frame) {
+            DEV_DEBUG_INFO("Main_Loop() - Breaking on frame %d.\n", Frame);
+            DebugBreak();
+        }
 
         After_Main_Loop();
 

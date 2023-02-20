@@ -64,4 +64,8 @@ class OptionsClassExtension final : public GlobalExtensionClass<OptionsClass>
         void Set();
 
     public:
+        /**
+         *  x
+         */
+        int DebugBreakAtFrame;
 };

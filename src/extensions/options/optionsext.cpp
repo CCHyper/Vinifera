@@ -42,7 +42,8 @@
  *  @author: CCHyper
  */
 OptionsClassExtension::OptionsClassExtension(const OptionsClass *this_ptr) :
-    GlobalExtensionClass(this_ptr)
+    GlobalExtensionClass(this_ptr),
+    DebugBreakAtFrame(-1)
 {
     //EXT_DEBUG_TRACE("OptionsClassExtension::OptionsClassExtension - 0x%08X\n", (uintptr_t)(This()));
 }
@@ -165,8 +166,8 @@ void OptionsClassExtension::Load_Settings()
 void OptionsClassExtension::Load_Init_Settings()
 {
     //EXT_DEBUG_TRACE("OptionsClassExtension::Load_Settings - 0x%08X\n", (uintptr_t)(This()));
-    
-    RawFileClass file("SUN.INI");
+
+    ConfigINI.Get_Int("Debug", "BreakAtFrame", DebugBreakAtFrame);
 }
 
 
