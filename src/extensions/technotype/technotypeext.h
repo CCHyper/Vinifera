@@ -95,6 +95,11 @@ class TechnoTypeClassExtension : public ObjectTypeClassExtension
         bool IsCanRetaliate;
 
         /**
+         *  x
+         */
+        bool IsDistributedFire;
+
+        /**
          *  These values are used to shake the screen when the object is destroyed.
          */
         unsigned ShakePixelYHi;
