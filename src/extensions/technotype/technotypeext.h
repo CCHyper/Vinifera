@@ -95,6 +95,11 @@ class TechnoTypeClassExtension : public ObjectTypeClassExtension
         bool IsCanRetaliate;
 
         /**
+         *  Can this object fire (and reload it's ammo reserve) while moving?
+         */
+        bool IsMobileFire;
+
+        /**
          *  These values are used to shake the screen when the object is destroyed.
          */
         unsigned ShakePixelYHi;
