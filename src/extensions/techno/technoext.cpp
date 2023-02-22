@@ -32,6 +32,7 @@
 #include "house.h"
 #include "voc.h"
 #include "ebolt.h"
+#include "foot.h"
 #include "tibsun_inline.h"
 #include "wwcrc.h"
 #include "extension.h"
@@ -311,4 +312,59 @@ bool TechnoClassExtension::Can_Passive_Acquire() const
 const TechnoTypeClass *TechnoClassExtension::Techno_Type_Class() const
 {
     return reinterpret_cast<TechnoClass *>(This())->Techno_Type_Class();
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+void TechnoClassExtension::Update_Distributed_Fire()
+{
+    /**
+     *  x
+     */
+    if (This()->Is_Foot()) {
+        return;
+    }
+
+    if (CurrentTargets.Count() > 0) {
+
+        for (int index = AttackedTargets.Count()-1; index >= 0; ++index) {
+
+        }
+
+        int v34 = 0;
+        DynamicVectorClass<TARGET> vec;
+
+        if (AttackedTargets.Count() > 0) {
+
+            for (int index = 0; index < CurrentTargets.Count(); ++index) {
+
+            }
+
+        }
+
+        if (v34 > 0) {
+
+            TARGET targ = nullptr;
+
+            for (int index = 0; index < v34; ++index) {
+
+            }
+
+            reinterpret_cast<FootClass*>(This())->Assign_Target(targ);
+
+        } else {
+
+            TARGET targ = nullptr;
+
+            reinterpret_cast<FootClass*>(This())->Assign_Target(targ);
+
+        }
+
+    } else {
+        AttackedTargets.Clear();
+    }
 }

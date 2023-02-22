@@ -50,14 +50,12 @@ class TechnoClassExtension : public ObjectClassExtension
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
-        /**
-         *  Extended class functions.
-         */
         void Response_Capture();
         void Response_Enter();
         void Response_Deploy();
         void Response_Harvest();
         bool Can_Passive_Acquire() const;
+        void Update_Distributed_Fire();
 
     private:
         const TechnoTypeClass *Techno_Type_Class() const;
@@ -67,4 +65,19 @@ class TechnoClassExtension : public ObjectClassExtension
          *  The current electric bolt instance fired by this object.
          */
         EBoltClass *ElectricBolt;
+
+        /**
+         *  x
+         */
+        DynamicVectorClass<TARGET> CurrentTargetThreatValues;
+
+        /**
+         *  x
+         */
+        DynamicVectorClass<TARGET> CurrentTargets;
+
+        /**
+         *  x
+         */
+        DynamicVectorClass<TARGET> AttackedTargets;
 };
