@@ -97,7 +97,12 @@ class TechnoTypeClassExtension : public ObjectTypeClassExtension
         /**
          *  x
          */
-        bool IsDistributedFire;
+        bool IsDeployFire;
+
+        /**
+         *  x
+         */
+        WeaponSlotType DeployFireWeaponIndex;
 
         /**
          *  These values are used to shake the screen when the object is destroyed.

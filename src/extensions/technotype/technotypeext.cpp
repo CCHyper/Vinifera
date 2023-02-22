@@ -65,7 +65,9 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(const TechnoTypeClass *this_p
     VoiceDeploy(),
     VoiceHarvest(),
     IdleRate(0),
-    CameoImageSurface(nullptr)
+    CameoImageSurface(nullptr),
+    IsDeployFire(false),
+    DeployFireWeaponIndex(WEAPON_SLOT_NONE)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TechnoTypeClassExtension::TechnoTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
@@ -208,6 +210,8 @@ void TechnoTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
     crc(ShakePixelXHi);
     crc(ShakePixelXLo);
     crc(SoylentValue);
+    crc(IsDeployFire);
+    crc((int)DeployFireWeaponIndex);
 }
 
 
@@ -270,6 +274,9 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     if (imagesurface) {
         CameoImageSurface = imagesurface;
     }
+
+    IsDeployFire = ini.Get_Bool(ini_name, "DeployFire", IsDeployFire);
+    DeployFireWeaponIndex = (WeaponSlotType)ini.Get_Bool(ini_name, "DeployFireWeapon", (int)DeployFireWeaponIndex);
 
     return true;
 }
