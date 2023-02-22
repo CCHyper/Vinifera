@@ -95,6 +95,11 @@ class TechnoTypeClassExtension : public ObjectTypeClassExtension
         bool IsCanRetaliate;
 
         /**
+         *  Can this object fire while it is performing other actions (e.g moving)?
+         */
+        bool IsOpportunityFire;
+
+        /**
          *  These values are used to shake the screen when the object is destroyed.
          */
         unsigned ShakePixelYHi;
