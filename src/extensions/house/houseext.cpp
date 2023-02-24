@@ -185,9 +185,9 @@ void HouseClassExtension::AI_Super_Weapon_Handler()
         return;
     }
 
-    for (int index = 0; index < Supers.Count(); ++index) {
+    for (int index = 0; index < This()->SuperWeapon.Count(); ++index) {
 
-        SuperClass *super = Supers[index];
+        SuperClass *super = This()->SuperWeapon[index];
         if (!super || !super->IsReady) {
             continue;
         }
@@ -217,12 +217,28 @@ void HouseClassExtension::AI_Super_Weapon_Handler()
                 break;
 
             case SPECIAL_DROP_PODS:
-                This()->Super_Weapon_Drop_Pods(super);
+                Super_Weapon_Drop_Pods(super);
                 break;
 
             default:
                 break;
         };
 
+    }
+}
+
+
+/**
+ *  Handles the super weapon charge and discharge logic for computer controlled houses.
+ *
+ *  @author: CCHyper
+ */
+void HouseClassExtension::Super_Weapon_Drop_Pods(SuperClass *super)
+{
+    if (This()->Enemy != HOUSE_NONE) {
+
+        if () {
+            super->Discharged(This()->Is_Player());
+        }
     }
 }

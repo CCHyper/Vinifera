@@ -27,8 +27,10 @@
  ******************************************************************************/
 #include "supertypeext.h"
 #include "supertype.h"
+#include "technotype.h"
 #include "vinifera_util.h"
 #include "bsurface.h"
+#include "wstring.h"
 #include "ccini.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -44,7 +46,9 @@ SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension(const SuperWeaponTy
     AbstractTypeClassExtension(this_ptr),
     SidebarImage(),
     IsShowTimer(false),
-    CameoImageSurface(nullptr)
+    CameoImageSurface(nullptr),
+    AITargetingMode(TARGETING_NONE),
+    AITargetTypes()
 {
     //if (this_ptr) EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::SuperWeaponTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
@@ -122,6 +126,8 @@ HRESULT SuperWeaponTypeClassExtension::Load(IStream *pStm)
     if (imagesurface) {
         CameoImageSurface = imagesurface;
     }
+
+    //AITargetTypes
     
     return hr;
 }
@@ -145,6 +151,8 @@ HRESULT SuperWeaponTypeClassExtension::Save(IStream *pStm, BOOL fClearDirty)
     if (FAILED(hr)) {
         return hr;
     }
+
+    //AITargetTypes
 
     return hr;
 }
@@ -182,6 +190,9 @@ void SuperWeaponTypeClassExtension::Detach(TARGET target, bool all)
 void SuperWeaponTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("SuperWeaponTypeClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    //crc(AITargetingMode);
+    //crc(AITargetTypes.Count());
 }
 
 
@@ -198,9 +209,34 @@ bool SuperWeaponTypeClassExtension::Read_INI(CCINIClass &ini)
         return false;
     }
 
+    char buffer[32];
+
     const char *ini_name = Name();
 
     IsShowTimer = ini.Get_Bool(ini_name, "ShowTimer", IsShowTimer);
+
+    if (ini.Get_String(ini_name, "AITargeting", buffer, sizeof(buffer)) > 0) {
+        
+        static const char * const _SuperWeaponTargetingNames[TARGETING_COUNT] = {
+            "HOME_BASE",
+            "HOME_BUILDING",
+            "HOME_UNIT",
+            "ENEMY_BASE",
+            "ENEMY_BUILDING",
+            "ENEMY_UNIT",
+            "ENEMY_ION_CANNON",
+        };
+
+        for (int index = 0; index < TARGETING_COUNT; ++index) {
+            if (Wstring(buffer) == Wstring(_SuperWeaponTargetingNames[index])) {
+                AITargetingMode = (SuperWeaponTargetingType)index;
+                break;
+            }
+        }
+
+    }
+
+    AITargetTypes = ini.Get_TechnoTypes(ini_name, "AITargetTypes", AITargetTypes);
 
     /**
      *  Fetch the cameo image surface if it exists.

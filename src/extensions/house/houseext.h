@@ -65,5 +65,12 @@ HouseClassExtension final : public AbstractClassExtension
 
         void AI_Super_Weapon_Handler();
 
+    private:
+        void Super_Weapon_Ion_Cannon(SuperClass *super);
+        void Super_Weapon_Hunter_Seeker(SuperClass *super);
+        void Super_Weapon_Multi_Missile(SuperClass *super);
+        void Super_Weapon_Chem_Missile(SuperClass *super);
+        void Super_Weapon_Drop_Pods(SuperClass *super);
+
     public:
 };

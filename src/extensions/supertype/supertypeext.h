@@ -29,9 +29,32 @@
 
 #include "abstracttypeext.h"
 #include "supertype.h"
+#include "typelist.h"
 
 
+class SuperWeaponTypeClass;
+class TechnoTypeClass;
 class BSurface;
+
+
+typedef enum SuperWeaponTargetingType
+{
+    TARGETING_HOME_BASE,
+    TARGETING_HOME_BUILDING,
+    TARGETING_HOME_UNIT,
+
+    TARGETING_ENEMY_BASE,
+    TARGETING_ENEMY_BUILDING,
+    TARGETING_ENEMY_UNIT,
+
+    TARGETING_ENEMY_ION_CANNON,
+
+    TARGETING_DISCHARGE,
+
+    TARGETING_COUNT,
+    TARGETING_NONE = -1
+
+} SuperWeaponTargetingType;
 
 
 class DECLSPEC_UUID(UUID_SUPERWEAPONTYPE_EXTENSION)
@@ -81,4 +104,14 @@ SuperWeaponTypeClassExtension final : public AbstractTypeClassExtension
          *  Pointer to the cameo image surface.
          */
         BSurface *CameoImageSurface;
+
+        /**
+         *  x
+         */
+        SuperWeaponTargetingType AITargetingMode;
+       
+        /**
+         *  x
+         */
+        TypeList<TechnoTypeClass *> AITargetTypes;
 };
