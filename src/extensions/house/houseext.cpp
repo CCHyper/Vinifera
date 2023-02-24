@@ -27,6 +27,10 @@
  ******************************************************************************/
 #include "houseext.h"
 #include "house.h"
+#include "super.h"
+#include "supertype.h"
+#include "tibsun_globals.h"
+#include "session.h"
 #include "ccini.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -161,4 +165,64 @@ void HouseClassExtension::Detach(TARGET target, bool all)
 void HouseClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("HouseClassExtension::Compute_CRC - 0x%08X\n", (uintptr_t)(This()));
+}
+
+
+/**
+ *  Handles the super weapon charge and discharge logic for computer controlled houses.
+ * 
+ *  @author: CCHyper
+ */
+void HouseClassExtension::AI_Super_Weapon_Handler()
+{
+    bool human = This()->IsHuman;
+
+    if (Session.Type == GAME_NORMAL) {
+        human = human || This()->IsPlayerControl;
+    }
+
+    if (human) {
+        return;
+    }
+
+    for (int index = 0; index < Supers.Count(); ++index) {
+
+        SuperClass *super = Supers[index];
+        if (!super || !super->IsReady) {
+            continue;
+        }
+
+        switch (super->Class->ActsLike) {
+
+            case SPECIAL_MULTI_MISSILE:
+                This()->Super_Weapon_Multi_Missile(super);
+                break;
+
+            //case SPECIAL_EM_PULSE:
+            //    break;
+
+            //case SPECIAL_FIRESTORM:
+            //    break;
+
+            case SPECIAL_ION_CANNON:
+                This()->Super_Weapon_Ion_Cannon(super);
+                break;
+
+            case SPECIAL_HUNTER_SEEKER:
+                This()->Super_Weapon_Hunter_Seeker(super);
+                break;
+
+            case SPECIAL_CHEM_MISSILE:
+                This()->Super_Weapon_Chem_Missile(super);
+                break;
+
+            case SPECIAL_DROP_PODS:
+                This()->Super_Weapon_Drop_Pods(super);
+                break;
+
+            default:
+                break;
+        };
+
+    }
 }

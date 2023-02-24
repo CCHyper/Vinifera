@@ -30,15 +30,44 @@
 #include "vinifera_globals.h"
 #include "tibsun_globals.h"
 #include "house.h"
+#include "houseext.h"
 #include "housetype.h"
 #include "technotype.h"
 #include "super.h"
+#include "session.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  A fake class for implementing new member functions which allow
+ *  access to the "this" pointer of the intended class.
+ * 
+ *  @note: This must not contain a constructor or destructor!
+ *  @note: All functions must be prefixed with "_" to prevent accidental virtualization.
+ */
+class HouseClassExt final : public HouseClass
+{
+    public:
+        void _AI_Super_Weapon_Handler();
+};
+
+
+/**
+ *  Reimplementation of HouseClass::AI_Super_Weapon_Handler.
+ * 
+ *  @author: CCHyper
+ */
+void HouseClassExt::_AI_Super_Weapon_Handler()
+{
+    HouseClassExtension *houseext = Extension::Fetch<HouseClassExtension>(this);
+    houseext->AI_Super_Weapon_Handler();
+}
 
 
 /**
@@ -166,4 +195,5 @@ void HouseClassExtension_Hooks()
 
     Patch_Jump(0x004BBD26, &_HouseClass_Can_Build_BuildCheat_Patch);
     Patch_Jump(0x004BD30B, &_HouseClass_Super_Weapon_Handler_InstantRecharge_Patch);
+    Patch_Call(0x004C0816, &HouseClassExt::_AI_Super_Weapon_Handler);
 }
