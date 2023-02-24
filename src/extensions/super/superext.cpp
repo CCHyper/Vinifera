@@ -27,6 +27,12 @@
  ******************************************************************************/
 #include "superext.h"
 #include "super.h"
+#include "tibsun_inline.h"
+#include "tibsun_globals.h"
+#include "rules.h"
+#include "infantry.h"
+#include "infantrytype.h"
+#include "iomap.h"
 #include "wwcrc.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -41,7 +47,8 @@
 SuperClassExtension::SuperClassExtension(const SuperClass *this_ptr) :
     AbstractClassExtension(this_ptr),
     FlashTimeEnd(0),
-    TimerFlashState(false)
+    TimerFlashState(false),
+    DropPodTypes()
 {
     //if (this_ptr) EXT_DEBUG_TRACE("SuperClassExtension::SuperClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
@@ -163,4 +170,66 @@ void SuperClassExtension::Detach(TARGET target, bool all)
 void SuperClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("SuperClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    crc(DropPodTypes.Count());
+}
+
+
+/**
+ *  x
+ *  
+ *  @author: CCHyper
+ */
+void SuperClassExtension::Place_Drop_Pods(Cell &cell)
+{
+    //EXT_DEBUG_TRACE("SuperClassExtension::Place_Drop_Pods - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    int count = Random_Pick(Rule->DropPodInfantryMinimum, Rule->DropPodInfantryMaximum);
+
+    const InfantryTypeClass *infantry_one = InfantryTypeClass::As_Pointer("E1");
+    const InfantryTypeClass *infantry_two = InfantryTypeClass::As_Pointer("E2");
+
+    Cell place_cell = cell;
+
+    int v4 = 3 * count;
+
+    if (count > 0) {
+
+        for (int i = count; count > 0; --count) {
+
+            InfantryTypeClass *inftype = const_cast<InfantryTypeClass *>(Percent_Chance(50) ? infantry_two : infantry_one);
+
+            InfantryClass *inf = reinterpret_cast<InfantryClass *>(inftype->Create_One_Of(This()->House));
+            ASSERT(inf != nullptr);
+
+            Cell cell = Map.Nearby_Location(place_cell, SPEED_FOOT, -1, MZONE_INFANTRY);
+            CellClass *cellptr = &Map[cell];
+
+            if (inf->Can_Enter_Cell(cellptr)) {
+
+                inf->Veterancy.Set_Elite(true);
+                inf->Piggyback_DropPod_Locomotor();
+
+
+                if (inf->IsInLimbo) {
+                    inf->Look();
+                    inf->Assign_Mission(MISSION_GUARD_AREA);
+                    inf->Commence();
+                }
+
+
+
+                if (inf->IsInLimbo) {
+                    inf->entry_E4();
+                }
+
+                place_cell = Adjacent_Cell(place_cell, dir);
+
+            } else {
+                inf->entry_E4();
+            }
+
+        }
+
+    }
 }

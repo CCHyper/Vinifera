@@ -30,9 +30,11 @@
 #include "abstracttypeext.h"
 #include "super.h"
 #include "supertype.h"
+#include "typelist.h"
 
 
 class HouseClass;
+class TechnoTypeClass;
 
 
 class DECLSPEC_UUID(UUID_SUPERWEAPON_EXTENSION)
@@ -66,6 +68,8 @@ SuperClassExtension final : public AbstractClassExtension
         virtual const SuperClass *This_Const() const override { return reinterpret_cast<const SuperClass *>(AbstractClassExtension::This_Const()); }
         virtual RTTIType What_Am_I() const override { return RTTI_SUPERWEAPON; }
 
+        void Place_Drop_Pods(Cell &cell);
+
     public:
         /**
          *  The time at which the flash mode should return to normal.
@@ -76,4 +80,9 @@ SuperClassExtension final : public AbstractClassExtension
          *  The current flash state of the timer printed on the tactical view.
          */
         bool TimerFlashState;
+
+        /**
+         *  x
+         */
+        TypeList<TechnoTypeClass *> DropPodTypes;
 };

@@ -28,12 +28,39 @@
 #include "superext_hooks.h"
 #include "superext_init.h"
 #include "superext.h"
+#include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  A fake class for implementing new member functions which allow
+ *  access to the "this" pointer of the intended class.
+ * 
+ *  @note: This must not contain a constructor or destructor!
+ *  @note: All functions must be prefixed with "_" to prevent accidental virtualization.
+ */
+class SuperClassExt final : public SuperClass
+{
+    public:
+        void _Place_Drop_Pods(Cell &cell);
+};
+
+
+/**
+ *  Reimplementation of SuperClass::Place_Drop_Pods.
+ * 
+ *  @author: CCHyper
+ */
+void SuperClassExt::_Place_Drop_Pods(Cell &cell)
+{
+    SuperClassExtension *superext = Extension::Fetch<SuperClassExtension>(this);
+    superext->Place_Drop_Pods(cell);
+}
 
 
 /**
@@ -45,4 +72,6 @@ void SuperClassExtension_Hooks()
      *  Initialises the extended class.
      */
     SuperClassExtension_Init();
+
+    Patch_Call(0x0060BFA0, &SuperClassExt::_Place_Drop_Pods);
 }
