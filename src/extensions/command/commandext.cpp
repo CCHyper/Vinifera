@@ -3323,3 +3323,331 @@ bool DumpNetworkCRCCommandClass::Process()
 
     return true;
 }
+
+
+
+
+const char * SaveFullMapPreviewCommandClass::Get_Name() const
+{
+    return "MapPreviews";
+}
+
+const char * SaveFullMapPreviewCommandClass::Get_UI_Name() const
+{
+    return "Map Previews";
+}
+
+const char * SaveFullMapPreviewCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char * SaveFullMapPreviewCommandClass::Get_Description() const
+{
+    return "Saves a snapshot preview of the whole map.";
+}
+
+#include "tibsun_globals.h"
+#include "tibsun_functions.h"
+#include "dsurface.h"
+#include "abuffer.h"
+#include "zbuffer.h"
+#include "iomap.h"
+
+Rect &TacticalRect2 = Make_Global<Rect>(0x0080CED8);
+
+static bool Write_Surface_To_PNG(XSurface &surface, const char *filename)
+{
+    RawFileClass map_preview_file(filename);
+    return Write_PNG_File(&map_preview_file, surface, &GamePalette);
+}
+
+static bool Write_Map_Preview(Rect &preview_rect, bool draw_game_objects = false, bool draw_map_bounds = false)
+{
+    char filename_buffer[128];
+    char fullpath_buffer[PATH_MAX];
+
+    /**
+     *  Fetch and remove the file extension from the scenario name.
+     */
+    std::string scenname = strupr(Scen->ScenarioName);
+    size_t lastindex = scenname.find_last_of(".");
+    std::string rawname = scenname.substr(0, lastindex);
+
+    /**
+     *  Generate a unique filename with the current timestamp.
+     */
+    int day = 0;
+    int month = 0;
+    int year = 0;
+    int hour = 0;
+    int min = 0;
+    int sec = 0;
+    Get_Full_Time(day, month, year, hour, min, sec);
+    std::snprintf(filename_buffer, sizeof(filename_buffer), "%s_%02u-%02u-%04u_%02u-%02u-%02u.PNG", rawname.c_str(), day, month, year, hour, min, sec);
+
+    std::snprintf(fullpath_buffer, sizeof(fullpath_buffer), "%s\\%s", Vinifera_ScreenshotDirectory, filename_buffer);
+
+    /**
+     *  We don't want the mouse to appear in previews!
+     */
+    DEV_DEBUG_INFO("WWMouse->Hide_Mouse()\n");
+    WWMouse->Hide_Mouse();
+
+
+    bool debug_map = Debug_Map;
+    bool debug_unshroud = Debug_Unshroud;
+    //Debug_Map = true;
+    Debug_Unshroud = true;
+
+
+
+
+    /**
+     *  Backup various rects and surfaces.
+     */
+    //Rect tilesurface_rect = TileSurface->Get_Rect();
+    //Rect sidebarsurface_rect = SidebarSurface->Get_Rect();
+    //Rect primarysurface_rect = PrimarySurface->Get_Rect();
+    //Rect hiddensurface_rect = HiddenSurface->Get_Rect();
+    //Rect altsurface_rect = AlternateSurface->Get_Rect();
+    //Rect tempsurface_rect = TempSurface->Get_Rect();
+    //Rect compsurface_rect = CompositeSurface->Get_Rect();
+
+    DSurface *old_tile_surface = TileSurface;
+    DSurface *old_temp_surface = TempSurface;
+    DSurface *old_comp_surface = CompositeSurface;
+    ABuffer *old_abuffer = AlphaBuffer;
+    ZBuffer *old_zbuffer = DepthBuffer;
+
+    Rect tactical_rect = TacticalRect;
+    Rect screen_rect = ScreenRect;
+    Rect sidebar_rect_ = SidebarRect;
+    Rect unk_rect = TacticalRect2;
+
+
+    /**
+     *  x
+     */
+    DEV_DEBUG_INFO("Creating temporary surfaces...\n");
+    DSurface *tmp_tile_surface = new DSurface(preview_rect.Width, preview_rect.Height);
+    DSurface *tmp_temp_surface = new DSurface(preview_rect.Width, preview_rect.Height);
+    DSurface *tmp_comp_surface = new DSurface(preview_rect.Width, preview_rect.Height);
+    ABuffer *tmp_abuffer = new ABuffer(preview_rect);
+    ZBuffer *tmp_zbuffer = new ZBuffer(preview_rect);
+
+    TileSurface = tmp_tile_surface;
+    CompositeSurface = tmp_comp_surface;
+    TempSurface = tmp_comp_surface;
+    AlphaBuffer = tmp_abuffer;
+    DepthBuffer = tmp_zbuffer;
+
+    TacticalRect = preview_rect;
+    ScreenRect = preview_rect;
+    SidebarRect = Rect(0, 0, 0, 0);
+    //TacticalRect2 = preview_rect;
+
+
+    /**
+     *  Backup and store the current 
+     */
+    DEV_DEBUG_INFO("Setting tactical position to the top left...\n");
+
+
+    /**
+     *  x
+     */
+    // save the current position.
+    Point2D tact_pos = TacticalMap->Get_Tactical_Position();
+    Cell tact_cell = TacticalMap->Click_Cell_Calc(tact_pos);
+
+
+    /**
+     *  x
+     */
+    // get top left cell within this map rect.
+    Map.Horizontal_Iterator_Reset();
+    CellClass *tl_cell = Map.Horizontal_Iterator_Next_Cell();
+    if (!tl_cell) {
+        return false;
+    }
+
+    Coordinate tl_cell_coord = Cell_Coord(tl_cell->Pos);
+
+    /**
+     *  Now set the tactical position to top left cell on the map.
+     */
+    DEV_DEBUG_INFO("Settings tactical position to cell %d,%d.\n", tl_cell->Pos.X, tl_cell->Pos.Y);
+    TacticalMap->Set_Tactical_Position(tl_cell_coord);
+
+
+
+    /**
+     *  x
+     */
+    DEV_DEBUG_INFO("Setting tactical dimensions to %d,%d,%d,%d...\n", preview_rect.X, preview_rect.Y, preview_rect.Width, preview_rect.Height);
+    TacticalMap->Set_Tactical_Dimensions(preview_rect);
+
+
+
+    /**
+     *  x
+     */
+    int key_colour = DSurface::RGB_To_Pixel(255, 0, 255);
+
+#if 0 // #ifndef NDEBUG
+    DEV_DEBUG_INFO("TacticalMap->Render(RENDERPASS_FIRST)\n");
+    TempSurface->Fill(key_colour);
+    Map.Flag_To_Redraw(2);
+    TacticalMap->Render(*TempSurface, true, RENDERPASS_FIRST);
+    Write_Surface_To_PNG(*TempSurface, "TACTICAL_FIRST.PNG");
+
+    DEV_DEBUG_INFO("TacticalMap->Render(RENDERPASS_SECOND)\n");
+    TempSurface->Fill(key_colour);
+    Map.Flag_To_Redraw(2);
+    TacticalMap->Render(*TempSurface, true, RENDERPASS_SECOND);
+    Write_Surface_To_PNG(*TempSurface, "TACTICAL_SECOND.PNG");
+
+    DEV_DEBUG_INFO("TacticalMap->Render(RENDERPASS_THIRD)\n");
+    TempSurface->Fill(key_colour);
+    Map.Flag_To_Redraw(2);
+    TacticalMap->Render(*TempSurface, true, RENDERPASS_THIRD);
+    Write_Surface_To_PNG(*TempSurface, "TACTICAL_THIRD.PNG");
+
+    DEV_DEBUG_INFO("TacticalMap->Render(RENDERPASS_ALL)\n");
+    TempSurface->Fill(key_colour);
+    Map.Flag_To_Redraw(2);
+    TacticalMap->Render(*TempSurface, true, RENDERPASS_ALL);
+    Write_Surface_To_PNG(*TempSurface, "TACTICAL_ALL.PNG");
+#endif
+
+    DEBUG_INFO("About to write preview to file...\n");
+
+    RenderPassEnum mode = RENDERPASS_SECOND;
+    if (draw_game_objects) {
+        mode = RENDERPASS_ALL;
+    }
+
+    TempSurface->Fill(key_colour);
+    Map.Flag_To_Redraw(2);
+    TacticalMap->Render(*TempSurface, true, mode);
+    Write_Surface_To_PNG(*TempSurface, fullpath_buffer);
+
+
+
+    // cleanup
+    DEV_DEBUG_INFO("Cleaning up temporary memory...\n");
+    delete tmp_tile_surface;
+    delete tmp_temp_surface;
+    delete tmp_comp_surface;
+    delete tmp_abuffer;
+    delete tmp_zbuffer;
+
+
+    // restore originals
+    TacticalRect = tactical_rect;
+    ScreenRect = screen_rect;
+    SidebarRect = sidebar_rect_;
+    TacticalRect2 = unk_rect;
+
+    TileSurface = old_tile_surface;
+    TempSurface = old_temp_surface;
+    CompositeSurface = old_comp_surface;
+    AlphaBuffer = old_abuffer;
+    DepthBuffer = old_zbuffer;
+
+
+
+    Debug_Map = debug_map;
+    Debug_Unshroud = debug_unshroud;
+
+
+
+    /**
+     *  x
+     */
+    DEV_DEBUG_INFO("Restoring tactical dimensions to %d,%d,%d,%d.\n", TacticalRect.X, TacticalRect.Y, TacticalRect.Width, TacticalRect.Height);
+    TacticalMap->Set_Tactical_Dimensions(TacticalRect);
+
+    DEV_DEBUG_INFO("Restoring tactical position to cell %d,%d.\n", tact_cell.X, tact_cell.Y);
+    TacticalMap->Set_Tactical_Position(Cell_Coord(tact_cell));
+
+    DEBUG_INFO("Full map preview \"%s\" written sucessfully.\n", filename_buffer);
+
+    /**
+     *  Now show the mouse again.
+     */
+    DEV_DEBUG_INFO("WWMouse->Show_Mouse()\n");
+    WWMouse->Show_Mouse();
+
+    return true;
+}
+
+#include "tacticalext.h"
+
+bool SaveFullMapPreviewCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    /**
+     *  x
+     */
+    Scen->UserInputLocked = true;
+    TacticalMapExtension->IsGeneratingMapPreview = true;
+
+    Rect map_rect;
+
+    /**
+     *  Write a preview of the playable map area.
+     */
+    DEBUG_INFO("About to write preview from LocalSize...\n");
+    Write_Map_Preview(
+        Rect(0, // Map.MapLocalSize.X * CELL_PIXEL_W,
+             0, // Map.MapLocalSize.Y * CELL_PIXEL_H,
+             (Map.MapLocalSize.Width * CELL_PIXEL_W),
+             (Map.MapLocalSize.Height * CELL_PIXEL_H) + (CELL_PIXEL_H * 4) + (CELL_PIXEL_H / 2)
+             )
+    );
+
+
+    /**
+     *  x
+     */
+    Sleep(2000);
+
+    /**
+     *  Write a preview of the whole map.
+     */
+    Debug_Map = true;
+    HWND main_window = MainWindow;
+    MainWindow = nullptr; // hax: shroud doesn't draw if no window
+
+    // looks like Debug_Map enables some sort of padding, this is the values
+    // it pads by, so add these to the other side to giev the full map?
+    // EDIT: Nope, offsets the map again...
+    int editor_padding_x = CELL_PIXEL_W * 15 + (CELL_PIXEL_W / 2);
+    int editor_padding_y = CELL_PIXEL_H * 13 + (CELL_PIXEL_H / 2);
+
+    DEBUG_INFO("About to write preview from Size...\n");
+    Write_Map_Preview(
+        Rect(0, // Map.MapSize.X * CELL_PIXEL_W,
+             0, // Map.MapSize.Y * CELL_PIXEL_H,
+             (Map.MapSize.Width * CELL_PIXEL_W) * 2 /* + editor_padding_x*/,
+             (Map.MapSize.Height * CELL_PIXEL_H) * 2 /*+ editor_padding_y*/
+             )
+    );
+
+    MainWindow = main_window;
+    Debug_Map = false;
+
+
+    /**
+     *  x
+     */
+    TacticalMapExtension->IsGeneratingMapPreview = false;
+    Scen->UserInputLocked = false;
+
+    return true;
+}

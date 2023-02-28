@@ -278,62 +278,66 @@ DECLARE_PATCH(_Tactical_Render_Overlay_Patch)
 {
     GET_REGISTER_STATIC(Tactical *, this_ptr, ebp);
 
-    /**
-     *  If the developer mode is active, draw the developer overlay.
-     */
-    if (Vinifera_DeveloperMode) {
+    if (!TacticalMapExtension->IsGeneratingMapPreview) {
 
-        TacticalMapExtension->Draw_Debug_Overlay();
+        /**
+         *  If the developer mode is active, draw the developer overlay.
+         */
+        if (Vinifera_DeveloperMode) {
 
-        if (Vinifera_Developer_FrameStep) {
-            TacticalMapExtension->Draw_FrameStep_Overlay();
+            TacticalMapExtension->Draw_Debug_Overlay();
+
+            if (Vinifera_Developer_FrameStep) {
+                TacticalMapExtension->Draw_FrameStep_Overlay();
+            }
         }
-    }
 
 #ifndef NDEBUG
-    /**
-     *  Various developer only debugging.
-     */
-    //Tactical_Debug_Draw_Facings();
+        /**
+         *  Various developer only debugging.
+         */
+        //Tactical_Debug_Draw_Facings();
 #endif
 
 #ifndef RELEASE
-    /**
-     *  Draw the version number on screen for non-release builds.
-     * 
-     *  @note: This must be last in the draw order!
-     */
-    Vinifera_Draw_Version_Text(CompositeSurface);
+        /**
+         *  Draw the version number on screen for non-release builds.
+         * 
+         *  @note: This must be last in the draw order!
+         */
+        Vinifera_Draw_Version_Text(CompositeSurface);
 #endif
 
-    /**
-     *  Has custom screen text been set?
-     */
-    if (TacticalMapExtension->IsInfoTextSet) {
+        /**
+         *  Has custom screen text been set?
+         */
+        if (TacticalMapExtension->IsInfoTextSet) {
 
-        /**
-         *  Draw it to the screen.
-         */
-        TacticalMapExtension->Draw_Information_Text();
-        
-        /**
-         *  Play the one time notification sound if defined.
-         */
-        if (TacticalMapExtension->InfoTextNotifySound != VOC_NONE) {
-            Sound_Effect(TacticalMapExtension->InfoTextNotifySound, TacticalMapExtension->InfoTextNotifySoundVolume);
-            TacticalMapExtension->InfoTextNotifySound = VOC_NONE;
+            /**
+             *  Draw it to the screen.
+             */
+            TacticalMapExtension->Draw_Information_Text();
+            
+            /**
+             *  Play the one time notification sound if defined.
+             */
+            if (TacticalMapExtension->InfoTextNotifySound != VOC_NONE) {
+                Sound_Effect(TacticalMapExtension->InfoTextNotifySound, TacticalMapExtension->InfoTextNotifySoundVolume);
+                TacticalMapExtension->InfoTextNotifySound = VOC_NONE;
+            }
+            
+            /**
+             *  If the screen timer has expired, disable drawing.
+             */
+            if (TacticalMapExtension->InfoTextTimer.Expired()) {
+                TacticalMapExtension->InfoTextTimer.Stop();
+                TacticalMapExtension->IsInfoTextSet = false;
+                std::memset(TacticalMapExtension->InfoTextBuffer, 0, sizeof(TacticalMapExtension->InfoTextBuffer));
+                TacticalMapExtension->InfoTextNotifySound = VOC_NONE;
+                TacticalMapExtension->InfoTextPosition = TOP_LEFT;
+            }       
         }
-        
-        /**
-         *  If the screen timer has expired, disable drawing.
-         */
-        if (TacticalMapExtension->InfoTextTimer.Expired()) {
-            TacticalMapExtension->InfoTextTimer.Stop();
-            TacticalMapExtension->IsInfoTextSet = false;
-            std::memset(TacticalMapExtension->InfoTextBuffer, 0, sizeof(TacticalMapExtension->InfoTextBuffer));
-            TacticalMapExtension->InfoTextNotifySound = VOC_NONE;
-            TacticalMapExtension->InfoTextPosition = TOP_LEFT;
-        }       
+
     }
 
     /**

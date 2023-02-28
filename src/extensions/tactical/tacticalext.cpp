@@ -62,6 +62,7 @@
  */
 TacticalExtension::TacticalExtension(const Tactical *this_ptr) :
     GlobalExtensionClass(this_ptr),
+    IsGeneratingMapPreview(false),
     IsInfoTextSet(false),
     InfoTextBuffer(),
     InfoTextPosition(BOTTOM_LEFT),

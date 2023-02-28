@@ -50,15 +50,10 @@ bool Write_PNG_File(FileClass *name, Surface &pic, const PaletteClass *palette, 
     /**
      *  Copy graphic data from the surface to the buffer.
      */
-    unsigned short *buffer = (unsigned short *)std::malloc(pic_height * (pic_width * sizeof(unsigned short)));
-    if (!buffer) {
+    unsigned short *bufferptr = (unsigned short *)pic.Lock();
+    if (!bufferptr) {
         return false;
     }
-
-    std::memcpy(buffer, (unsigned short *)pic.Lock(), pic_height * (pic_width * sizeof(unsigned short)));
-    pic.Unlock();
-
-    unsigned short *bufferptr = buffer;
 
     /**
      *  Convert the pixel data from 16bit to 24bit.
@@ -99,7 +94,8 @@ bool Write_PNG_File(FileClass *name, Surface &pic, const PaletteClass *palette, 
      */
     std::free(png);
     std::free(image);
-    std::free(buffer);
+
+    pic.Unlock();
 
     /**
      *  Handle any errors.

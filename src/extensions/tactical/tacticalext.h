@@ -87,6 +87,11 @@ class TacticalExtension final : public GlobalExtensionClass<Tactical>
 
     public:
         /**
+         *  x
+         */
+        bool IsGeneratingMapPreview;
+
+        /**
          *  Has information text been set?
          */
         bool IsInfoTextSet;
