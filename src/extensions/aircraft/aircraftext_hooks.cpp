@@ -29,6 +29,7 @@
 #include "aircraftext_init.h"
 #include "aircraft.h"
 #include "aircrafttype.h"
+#include "aircraftext.h"
 #include "object.h"
 #include "target.h"
 #include "unit.h"
@@ -44,6 +45,77 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  A fake class for implementing new member functions which allow
+ *  access to the "this" pointer of the intended class.
+ * 
+ *  @note: This must not contain a constructor or destructor!
+ *  @note: All functions must be prefixed with "_" to prevent accidental virtualization.
+ */
+class AircraftClassExt final : public AircraftClass
+{
+    public:
+        int _Mission_Retreat();
+        int _Paradrop_Cargo();
+};
+
+
+/**
+ *  Reimplementation of AircraftClass::Mission_Retreat.
+ * 
+ *  @author: CCHyper
+ */
+int AircraftClassExt::_Mission_Retreat()
+{
+    AircraftClassExtension *aircraftext = Extension::Fetch<AircraftClassExtension>(this);
+    return aircraftext->Mission_Retreat();
+}
+
+
+/**
+ *  Reimplementation of AircraftClass::Paradrop_Cargo.
+ *
+ *  @author: CCHyper
+ */
+int AircraftClassExt::_Paradrop_Cargo()
+{
+    AircraftClassExtension *aircraftext = Extension::Fetch<AircraftClassExtension>(this);
+    return aircraftext->Paradrop_Cargo();
+}
+
+
+DECLARE_PATCH(_AircraftClass_Enter_Idle_Mode_Approach_Missions)
+{
+    GET_REGISTER_STATIC(AircraftClass *, this_ptr, esi);
+
+    /**
+     *  If the aircraft is current approaching the target, do not enter idle mode.
+     */
+    if (this_ptr->Mission == MISSION_PARADROP_APPROACH
+     || this_ptr->Mission == MISSION_PARADROP_OVERFLY
+     || this_ptr->Mission == MISSION_SPYPLANE_APPROACH
+     || this_ptr->Mission == MISSION_SPYPLANE_OVERFLY) {
+        goto return_false;
+    }
+
+    /**
+     *  x
+     */
+    if (this_ptr->MissionQueue == MISSION_PARADROP_APPROACH || this_ptr->MissionQueue == MISSION_SPYPLANE_APPROACH) {
+        this_ptr->Commence();
+        goto return_false;
+    }
+
+continue_function:
+    _asm { mov eax, [esp+0x18] }
+    _asm { mov ecx, [esp+0x14] }
+    JMP_REG(eax, 0x0040B351);
+
+return_false:
+    JMP_REG(ebx, 0x0040B340);
+}
 
 
 /**
@@ -263,4 +335,8 @@ void AircraftClassExtension_Hooks()
     Patch_Jump(0x0040B819, &_AircraftClass_What_Action_Is_Totable_Patch);
     Patch_Jump(0x0040A413, &_AircraftClass_Mission_Move_LAND_Is_Moving_Check_Patch);
     Patch_Jump(0x0040988C, &_AircraftClass_Mission_Unload_Transport_Detach_Sound_Patch);
+    Patch_Jump(0x0040B349, &_AircraftClass_Enter_Idle_Mode_Approach_Missions);
+
+    Change_Virtual_Address(0x006CAFD0, Get_Func_Address(&AircraftClassExt::_Mission_Retreat));
+    Patch_Call(0x00409B88, &AircraftClassExt::_Paradrop_Cargo);
 }

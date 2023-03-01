@@ -28,6 +28,8 @@
 #pragma once
 
 #include "missionext.h"
+#include "tibsun_functions.h"
+#include "debughandler.h"
 #include "asserthandler.h"
 
 
@@ -230,6 +232,56 @@ void MissionClassExtension::AI()
             case MISSION_MISSILE:
                 This()->Timer = This()->Mission_Missile();
                 break;
+
+            /**
+             *
+             *  New missions.
+             *
+             */
+
+            /**
+             *  Paradrop Approach
+             */
+            case MISSION_PARADROP_APPROACH:
+                This()->Timer = Mission_Paradrop_Approach();
+                break;
+
+            /**
+             *  Paradrop Overfly
+             */
+            case MISSION_PARADROP_OVERFLY:
+                This()->Timer = Mission_Paradrop_Overfly();
+                break;
+
+            /**
+             *  Spyplane Approach
+             */
+            case MISSION_SPYPLANE_APPROACH:
+                This()->Timer = Mission_Spyplane_Approach();
+                break;
+
+            /**
+             *  Spyplane Overfly
+             */
+            case MISSION_SPYPLANE_OVERFLY:
+                This()->Timer = Mission_Spyplane_Overfly();
+                break;
         }
+
     }
 }
+
+
+/**
+ *  These are the stub routines that handle the mission logic. They do nothing at this
+ *  level. Derived classes will override these routine as necessary.
+ * 
+ *  @return: Returns with the number of game frames to delay before calling this mission
+ *           handler again.
+ * 
+ *  @author: CCHyper
+ */
+int MissionClassExtension::Mission_Paradrop_Approach() { return TICKS_PER_SECOND * 30; }
+int MissionClassExtension::Mission_Paradrop_Overfly() { return TICKS_PER_SECOND * 30; }
+int MissionClassExtension::Mission_Spyplane_Approach() { return TICKS_PER_SECOND * 30; }
+int MissionClassExtension::Mission_Spyplane_Overfly() { return TICKS_PER_SECOND * 30; }

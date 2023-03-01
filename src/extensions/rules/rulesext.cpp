@@ -38,6 +38,7 @@
 #include "noinit.h"
 #include "swizzle.h"
 #include "addon.h"
+#include "tibsun_inline.h"
 #include "vinifera_saveload.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -73,7 +74,10 @@ RulesClassExtension::RulesClassExtension(const RulesClass *this_ptr) :
     IsMPAutoDeployMCV(false),
     IsMPPrePlacedConYards(false),
     IsBuildOffAlly(true),
-    IsShowSuperWeaponTimers(true)
+    IsShowSuperWeaponTimers(true),
+    ParadropRadius(Cell_To_Lepton(4)),
+    SpyPlaneCameraFrames(16),
+    SpyPlaneCameraSound(VOC_NONE)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("RulesClassExtension::RulesClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 
@@ -423,6 +427,10 @@ bool RulesClassExtension::General(CCINIClass &ini)
      *  @author: CCHyper
      */
     This()->EngineerDamage = ini.Get_Float(GENERAL, "EngineerDamage", This()->EngineerDamage);
+
+    ParadropRadius = ini.Get_Int(GENERAL, "ParadropRadius", ParadropRadius);
+    SpyPlaneCameraFrames = ini.Get_Int(GENERAL, "SpyPlaneCameraFrames", SpyPlaneCameraFrames);
+    SpyPlaneCameraSound = ini.Get_VocType(GENERAL, "SpyPlaneCamera", SpyPlaneCameraSound);
 
     return true;
 }

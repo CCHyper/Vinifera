@@ -30,9 +30,11 @@
 #include "technotype.h"
 #include "technotypeext.h"
 #include "house.h"
+#include "housetype.h"
 #include "voc.h"
 #include "ebolt.h"
 #include "tibsun_inline.h"
+#include "iomap.h"
 #include "wwcrc.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -311,4 +313,58 @@ bool TechnoClassExtension::Can_Passive_Acquire() const
 const TechnoTypeClass *TechnoClassExtension::Techno_Type_Class() const
 {
     return reinterpret_cast<TechnoClass *>(This())->Techno_Type_Class();
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+void TechnoClassExtension::Look(bool incremental, bool a2, bool all, HouseClass *house)
+{
+    //EXT_DEBUG_TRACE("TechnoClassExtension::Look - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    if (This()->IsLocked) {
+
+        if (!This()->House->Class->IsMultiplayPassive) {
+
+            if (true){ //?????) {
+
+                //????? = false;
+
+                if (LastSightRange > 0) {
+
+                    if (!all || (house = This()->House) == false) {
+
+                        // TODO, YR has a version that takes Cell...
+                        Map.Sight_From(LastSightCoords, LastSightRange, This()->House, incremental, a2);
+
+                    } else {
+
+                        // TODO, YR has a version that takes Cell...
+                        Map.Sight_From(LastSightCoords, LastSightRange, house, incremental, a2);
+
+                    }
+
+                }
+
+            } else if (all) {
+
+                if (LastSightRange > 0) {
+
+                    if (house != nullptr) {
+
+                        // TODO, YR has a version that takes Cell...
+                        Map.Sight_From(LastSightCoords, LastSightRange, house, incremental, a2);
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
 }

@@ -66,9 +66,16 @@ class TechnoClassExtension : public MissionClassExtension
     private:
         const TechnoTypeClass *Techno_Type_Class() const;
 
+    protected:
+        virtual void Look(bool incremental = false, bool a2 = false, bool all = false, HouseClass *house = nullptr);
+
     public:
         /**
          *  The current electric bolt instance fired by this object.
          */
         EBoltClass *ElectricBolt;
+
+        Coordinate LastSightCoords;
+        LEPTON LastSightRange; // LEPTON maybe?
+        int LastSightHeight;
 };

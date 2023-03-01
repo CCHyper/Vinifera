@@ -395,6 +395,9 @@ void Init_Vinifera_Commands()
 
         cmdptr = new DumpNetworkCRCCommandClass;
         Commands.Add(cmdptr);
+
+        cmdptr = new SpawnReinforcementsCommandClass;
+        Commands.Add(cmdptr);
     }
 
 #ifndef NDEBUG
