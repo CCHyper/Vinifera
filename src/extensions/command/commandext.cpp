@@ -61,6 +61,9 @@
 #include "scenarioini.h"
 #include "scenario.h"
 #include "vox.h"
+#include "reinf.h"
+#include "teamtype.h"
+#include "taskforce.h"
 #include "language.h"
 #include "wwcrc.h"
 #include "filepcx.h"
@@ -3320,6 +3323,242 @@ bool DumpNetworkCRCCommandClass::Process()
     Extension::Print_CRCs(fp, nullptr);
 
     std::fclose(fp);
+
+    return true;
+}
+
+
+/**
+ *  Toggles the instant recharge cheat for the AI player super weapons.
+ *
+ *  @author: CCHyper
+ */
+const char *SpawnReinforcementsCommandClass::Get_Name() const
+{
+    return "SpawnReinforcements";
+}
+
+const char *SpawnReinforcementsCommandClass::Get_UI_Name() const
+{
+    return "Spawn Reinforcements";
+}
+
+const char *SpawnReinforcementsCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *SpawnReinforcementsCommandClass::Get_Description() const
+{
+    return "SpawnReinforcementsCommandClass";
+}
+
+
+
+
+int New_Create_Air_Reinforcement(HouseClass *house, AircraftType air, int number, MissionType mission, TARGET tarcom, TARGET navcom, InfantryType passenger = INFANTRY_NONE, int passenger_count = 0)
+{
+    ASSERT(house != 0);
+    ASSERT((unsigned)air < AircraftTypes.Count());
+    ASSERT(number != 0);
+    ASSERT((unsigned)mission < MISSION_COUNT);
+
+    /*
+    ** Get a pointer to the class of the object that we are going to create.
+    */
+    TechnoTypeClass const * type = (TechnoTypeClass *)&AircraftTypeClass::As_Reference(air);
+
+#if 0
+    /*
+    ** Abort the airstrike if Tanya is the passenger and she's dead.
+    */
+    if (passenger == INFANTRY_TANYA && IsTanyaDead) {
+        number = 0;
+    }
+#endif
+
+    /*
+    ** Loop through the number of objects we are supposed to create and
+    **     create and place them on the map.
+    */
+    int sub;
+    for (sub = 0; sub < number; sub++) {
+
+        /*
+        ** Create one of the required objects.  If this fails we could have
+        ** a real problem.
+        */
+        ScenarioInit++;
+        TechnoClass * obj = (TechnoClass *)type->Create_One_Of(house);
+        ScenarioInit--;
+        if (!obj) return(sub);
+
+        /*
+        ** Flying objects always have the IsALoaner bit set.
+        */
+        obj->IsALoaner = true;
+
+        /*
+        ** Find a cell for the object to come in on.  This is stolen from the
+        ** the code that handles a SOURCE_AIR in the normal logic.
+        */
+        SourceType source = house->Control.Edge;
+        switch (source) {
+            case SOURCE_NORTH:
+            case SOURCE_EAST:
+            case SOURCE_SOUTH:
+            case SOURCE_WEST:
+                break;
+
+            default:
+                source = SOURCE_NORTH;
+                break;
+        }
+        Cell newcell = Map.Calculated_Cell(source, Cell(0,0), Cell(0,0), SPEED_WINGED);
+
+        /*
+        ** If we succeeded in placing the obj onto the map then
+        ** now we need to give it a mission and destination.
+        */
+        obj->Assign_Mission(mission);
+
+        /*
+        ** If a navcom was specified then set it.
+        */
+        if (navcom != nullptr) {
+            obj->Assign_Destination(navcom);
+        }
+
+        /*
+        ** If a tarcom was specified then set it.
+        */
+        if (tarcom != nullptr) {
+            obj->Assign_Target(tarcom);
+        }
+
+        /*
+        ** Try and place the object onto the map.
+        */
+        ScenarioInit++;
+        bool placed = obj->Unlimbo(Cell_Coord(newcell));
+        ScenarioInit--;
+        if (placed) {
+
+            /*
+            **    Assign generic passenger value here. This value is used to determine
+            **    if this aircraft should drop parachute reinforcements.
+            */
+            if (obj->What_Am_I() == RTTI_AIRCRAFT && passenger != INFANTRY_NONE && passenger_count > 0) {
+                AircraftClass * aircraft = (AircraftClass *)obj;
+                //if (passenger != INFANTRY_NONE) {
+                    aircraft->Passenger = true;
+                //}
+//                if (Passenger == INFANTRY_TANYA) {
+//                    aircraft->Ammo = 1;
+                    //aircraft->AttacksRemaining = 1;
+//                }
+                InfantryTypeClass const * inftype = &InfantryTypeClass::As_Reference(passenger);
+                if (inftype != nullptr) {
+                    for (int i = 0; i < passenger_count; ++i) {
+                        InfantryClass *inf = (InfantryClass *)inftype->Create_One_Of(house);
+                        if (inf) {
+                            inf->Limbo();
+                            aircraft->Cargo.Attach(inf);
+                        }
+                    }
+                }
+            }
+
+            /*
+            ** Start the object into action.
+            */
+            obj->Commence();
+        } else {
+            delete obj;
+            sub--;
+            return(sub);
+        }
+    }
+    return(sub);
+}
+
+
+
+
+
+bool SpawnReinforcementsCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    //if (!Scen->Is_Valid_Waypoint(WAYPOINT_HOME)) {
+    //    return false;
+    //}
+
+
+    Cell base_center_cell = Coord_Cell(PlayerPtr->Center);
+
+
+    Cell mouse_cell = Get_Cell_Under_Mouse();
+    //CellClass *cellptr = &Map[mouse_cell];
+
+
+    // reassign as required.
+    Cell use_this_cell = mouse_cell;
+
+
+    TeamTypeClass * ttype = (TeamTypeClass *)TeamTypeClass::Find_Or_Make("@PINF");
+    if (ttype != nullptr) {
+        //strcpy(ttype->IniName, "@PINF");
+        //ttype->IsTransient = true;
+        ttype->IsPrebuilt = false;
+        ttype->IsReinforcable = false;
+        //ttype->Origin = WAYPT_SPECIAL;
+        //ttype->MissionCount = 1;
+        //ttype->MissionList[0].Mission = TMISSION_ATT_WAYPT;
+        //ttype->MissionList[0].Data.Value = WAYPT_SPECIAL;
+        //ttype->ClassCount = 2;
+        //ttype->Members[0].Quantity = AircraftTypeClass::As_Reference("ORCATRAN").Max_Passengers();
+        //ttype->Members[0].Class = &InfantryTypeClass::As_Reference("E1");
+        //ttype->Members[1].Quantity = 1;
+        //ttype->Members[1].Class = &AircraftTypeClass::As_Reference("ORCATRAN");
+
+        TaskForceClass* tftype = (TaskForceClass*)TaskForceClass::Find_Or_Make("@PINF-TF");
+        if (tftype != nullptr) {
+            tftype->ClassCount = 2;
+            tftype->Members[0].Quantity = AircraftTypeClass::As_Reference("ORCATRAN").Max_Passengers();
+            tftype->Members[0].Class = &InfantryTypeClass::As_Reference("E1");
+            tftype->Members[1].Quantity = 1;
+            tftype->Members[1].Class = &AircraftTypeClass::As_Reference("ORCATRAN");
+        }
+
+        ttype->TaskForce = tftype;
+    }
+
+    if (ttype != nullptr) {
+        ttype->House = PlayerPtr;
+        Scen->Waypoint[WAYPOINT_SPECIAL] = Map.Nearby_Location(use_this_cell, SPEED_FOOT);
+        Do_Reinforcements(ttype);
+    }
+
+
+
+
+
+
+    TARGET tarcom = nullptr;
+    //if (!tarcom) {
+    //    return false;
+    //}
+
+    //Cell cell = Map.Nearby_Location(Coord_Cell(PlayerPtr->Center), SPEED_WINGED, -1, MZONE_FLYER);
+    TARGET navcom = &Map[use_this_cell];
+    if (!navcom) {
+        return false;
+    }
+
+    New_Create_Air_Reinforcement(PlayerPtr, AircraftTypeClass::From_Name("ORCATRAN"), 1, MISSION_HUNT, tarcom, navcom, InfantryTypeClass::From_Name("E1"), 5);
 
     return true;
 }
