@@ -71,4 +71,8 @@ class TechnoClassExtension : public MissionClassExtension
          *  The current electric bolt instance fired by this object.
          */
         EBoltClass *ElectricBolt;
+
+        Coordinate LastSightCoords;
+        LEPTON LastSightRange; // LEPTON maybe?
+        int LastSightHeight;
 };

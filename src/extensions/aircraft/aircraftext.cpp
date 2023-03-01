@@ -27,6 +27,12 @@
  ******************************************************************************/
 #include "aircraftext.h"
 #include "aircraft.h"
+#include "target.h"
+#include "house.h"
+#include "weapontype.h"
+#include "iomap.h"
+#include "rulesext.h"
+#include "voc.h"
 #include "wwcrc.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -161,4 +167,87 @@ void AircraftClassExtension::Detach(TARGET target, bool all)
 void AircraftClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("AircraftClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+int AircraftClassExtension::Mission_Spyplane_Approach()
+{
+    //EXT_DEBUG_TRACE("AircraftClassExtension::Mission_Spyplane_Approach - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    LEPTON tarcom_distance = This()->Distance(This()->TarCom);
+    TARGET tarcom = This()->TarCom;
+
+    if (Target_Legal(tarcom)) {
+
+        if (Target_Legal(This()->NavCom)) {
+
+            if (tarcom_distance <= This()->Get_Weapon()->Weapon->Range) {
+                //This()->__Reveal_Limbo(0,0,0,0); // new YR function?
+                //This()->OnUnlimbo_sub_70AF50_deactivate(0,0,0,0,This()->Get_Weapon()->Weapon->Attack); // new YR function?
+                //Map.visibility_567DA0(&This()->Coord, 0, (LastSightRange + 3), 0); // new YR function?
+                Sound_Effect(RuleExtension->SpyPlaneCameraSound, This()->Coord);
+            }
+
+        } else {
+
+            This()->Assign_Destination(tarcom);
+
+        }
+
+    } else {
+
+        This()->Assign_Destination(nullptr);
+        This()->Assign_Mission(MISSION_RETREAT);
+
+    }
+
+    if (tarcom_distance <= 768) { // TODO macro calculation.
+
+        This()->Assign_Mission(MISSION_SPYPLANE_OVERFLY);
+
+        This()->IsLocked = true;
+
+        SourceType source = This()->House->Control.Edge;
+        Cell cell = Map.Calculated_Cell(source, Cell(-1,-1), Cell(-1,-1), SPEED_WINGED, true);
+        if (cell) {
+            This()->Assign_Destination(&Map[cell]);
+        }
+
+    }
+
+    return RuleExtension->SpyPlaneCameraFrames;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+int AircraftClassExtension::Mission_Spyplane_Overfly()
+{
+    //EXT_DEBUG_TRACE("AircraftClassExtension::Mission_Spyplane_Overfly - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    LEPTON tarcom_distance = This()->Distance(This()->TarCom);
+
+    if (tarcom_distance <= This()->Get_Weapon()->Weapon->Range) {
+        //This()->__Reveal_Limbo(0,0,0,0); // new YR function?
+        //This()->OnUnlimbo_sub_70AF50_deactivate(0,0,0,0,This()->Get_Weapon()->Weapon->Attack); // new YR function?
+        //Map.visibility_567DA0(&This()->Coord, 0, (LastSightRange + 3), 0); // new YR function?
+    }
+
+    if (!Target_Legal(This()->NavCom)) {
+        SourceType source = This()->House->Control.Edge;
+        Cell cell = Map.Calculated_Cell(source, Cell(-1,-1), Cell(-1,-1), SPEED_WINGED, true);
+        if (cell) {
+            This()->Assign_Destination(&Map[cell]);
+        }
+    }
+
+    return 3;
 }

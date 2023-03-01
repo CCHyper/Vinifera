@@ -53,5 +53,9 @@ class MissionClassExtension : public ObjectClassExtension
 
         void AI();
 
+    protected:
+        virtual int Mission_Spyplane_Approach();
+        virtual int Mission_Spyplane_Overfly();
+
     public:
 };
