@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          TECHNOEXT.H
+ *  @file          MISSIONEXT.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended TechnoClass class.
+ *  @brief         Extended MissionClassExtension class.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,14 +27,11 @@
  ******************************************************************************/
 #pragma once
 
-#include "missionext.h"
-#include "techno.h"
+#include "objectext.h"
+#include "mission.h"
 
 
-class EBoltClass;
-
-
-class TechnoClassExtension : public MissionClassExtension
+class MissionClassExtension : public ObjectClassExtension
 {
     public:
         /**
@@ -44,31 +41,15 @@ class TechnoClassExtension : public MissionClassExtension
         IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
 
     public:
-        TechnoClassExtension(const TechnoClass *this_ptr);
-        TechnoClassExtension(const NoInitClass &noinit);
-        virtual ~TechnoClassExtension();
+        MissionClassExtension(const MissionClass *this_ptr);
+        MissionClassExtension(const NoInitClass &noinit);
+        virtual ~MissionClassExtension();
 
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
-        virtual TechnoClass *This() const override { return reinterpret_cast<TechnoClass *>(MissionClassExtension::This()); }
-        virtual const TechnoClass *This_Const() const override { return reinterpret_cast<const TechnoClass *>(MissionClassExtension::This_Const()); }
-
-        /**
-         *  Extended class functions.
-         */
-        void Response_Capture();
-        void Response_Enter();
-        void Response_Deploy();
-        void Response_Harvest();
-        bool Can_Passive_Acquire() const;
-
-    private:
-        const TechnoTypeClass *Techno_Type_Class() const;
+        virtual MissionClass *This() const override { return reinterpret_cast<MissionClass *>(ObjectClassExtension::This()); }
+        virtual const MissionClass *This_Const() const override { return reinterpret_cast<const MissionClass *>(ObjectClassExtension::This_Const()); }
 
     public:
-        /**
-         *  The current electric bolt instance fired by this object.
-         */
-        EBoltClass *ElectricBolt;
 };
