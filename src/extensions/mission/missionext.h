@@ -51,5 +51,7 @@ class MissionClassExtension : public ObjectClassExtension
         virtual MissionClass *This() const override { return reinterpret_cast<MissionClass *>(ObjectClassExtension::This()); }
         virtual const MissionClass *This_Const() const override { return reinterpret_cast<const MissionClass *>(ObjectClassExtension::This_Const()); }
 
+        void AI();
+
     public:
 };

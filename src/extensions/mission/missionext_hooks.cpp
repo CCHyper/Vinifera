@@ -27,6 +27,7 @@
  ******************************************************************************/
 #include "missionext_hooks.h"
 #include "mission.h"
+#include "missionext.h"
 #include "extension.h"
 #include "fatal.h"
 #include "asserthandler.h"
@@ -37,8 +38,39 @@
 
 
 /**
+ *  A fake class for implementing new member functions which allow
+ *  access to the "this" pointer of the intended class.
+ * 
+ *  @note: This must not contain a constructor or destructor.
+ * 
+ *  @note: All functions must not be virtual and must also be prefixed
+ *         with "_" to prevent accidental virtualization.
+ */
+class MissionClassExt final : public MissionClass
+{
+    public:
+        void _AI();
+};
+
+
+/**
+ *  Reimplementation of MissionClass::AI.
+ *
+ *  @author: CCHyper
+ */
+void MissionClassExt::_AI()
+{
+    MissionClassExtension *missionext = Extension::Fetch<MissionClassExtension>(this);
+    missionext->MissionClassExtension::AI(); // Specificy the namespace to ensure we call the correct function in the hierarchy.
+}
+
+
+/**
  *  Main function for patching the hooks.
  */
 void MissionClassExtension_Hooks()
 {
+    Patch_Call(0x0062E9D1, &MissionClassExt::_AI);
+    Change_Virtual_Address(0x006D44B0, Get_Func_Address(&MissionClassExt::_AI)); // Of MissionClass.
+    Change_Virtual_Address(0x006D5BE0, Get_Func_Address(&MissionClassExt::_AI)); // Of RadioClass.
 }

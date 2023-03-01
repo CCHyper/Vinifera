@@ -28,6 +28,7 @@
 #pragma once
 
 #include "missionext.h"
+#include "asserthandler.h"
 
 
 /**
@@ -124,4 +125,111 @@ void MissionClassExtension::Compute_CRC(WWCRCEngine &crc) const
     //EXT_DEBUG_TRACE("MissionClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     ObjectClassExtension::Compute_CRC(crc);
+}
+
+
+/**
+ *  Processes order script.
+ *
+ *  @author: CCHyper
+ */
+void MissionClassExtension::AI()
+{
+    //EXT_DEBUG_TRACE("MissionClassExtension::AI - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    //ASSERT(This()->IsActive);
+
+    This()->ObjectClass::AI();
+
+    if (!This()->IsActive) {
+        return;
+    }
+
+    /**
+     *  This is the script AI equivalent processing.
+     */
+    if (This()->Timer == 0 && This()->Strength > 0) {
+        switch (This()->Mission) {
+            default:
+                This()->Timer = This()->Mission_Sleep();
+                break;
+
+            case MISSION_HARMLESS:
+            case MISSION_SLEEP:
+                This()->Timer = This()->Mission_Sleep();
+                break;
+
+            case MISSION_STICKY:
+            case MISSION_GUARD:
+                This()->Timer = This()->Mission_Guard();
+                break;
+
+            case MISSION_ENTER:
+                This()->Timer = This()->Mission_Enter();
+                break;
+
+            case MISSION_CONSTRUCTION:
+                This()->Timer = This()->Mission_Construction();
+                break;
+
+            case MISSION_DECONSTRUCTION:
+                This()->Timer = This()->Mission_Deconstruction();
+                break;
+
+            case MISSION_CAPTURE:
+            case MISSION_SABOTAGE:
+                This()->Timer = This()->Mission_Capture();
+                break;
+
+            case MISSION_QMOVE:
+            case MISSION_MOVE:
+                This()->Timer = This()->Mission_Move();
+                break;
+
+            case MISSION_ATTACK:
+                This()->Timer = This()->Mission_Attack();
+                break;
+
+            case MISSION_RETREAT:
+                This()->Timer = This()->Mission_Retreat();
+                break;
+
+            case MISSION_HARVEST:
+                This()->Timer = This()->Mission_Harvest();
+                break;
+
+            case MISSION_GUARD_AREA:
+                This()->Timer = This()->Mission_Guard_Area();
+                break;
+
+            case MISSION_RETURN:
+                This()->Timer = This()->Mission_Return();
+                break;
+
+            case MISSION_STOP:
+                This()->Timer = This()->Mission_Stop();
+                break;
+
+            case MISSION_AMBUSH:
+                This()->Timer = This()->Mission_Ambush();
+                break;
+
+            case MISSION_HUNT:
+            case MISSION_RESCUE:
+                This()->Timer = This()->Mission_Hunt();
+                break;
+
+            case MISSION_UNLOAD:
+                This()->Timer = This()->Mission_Unload();
+                break;
+
+            case MISSION_REPAIR:
+                This()->Timer = This()->Mission_Repair();
+                break;
+
+            case MISSION_MISSILE:
+                This()->Timer = This()->Mission_Missile();
+                break;
+        }
+    }
 }
