@@ -29,6 +29,7 @@
 #include "aircraftext_init.h"
 #include "aircraft.h"
 #include "aircrafttype.h"
+#include "aircraftext.h"
 #include "object.h"
 #include "target.h"
 #include "unit.h"
@@ -44,6 +45,32 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  A fake class for implementing new member functions which allow
+ *  access to the "this" pointer of the intended class.
+ * 
+ *  @note: This must not contain a constructor or destructor!
+ *  @note: All functions must be prefixed with "_" to prevent accidental virtualization.
+ */
+class AircraftClassExt final : public AircraftClass
+{
+    public:
+        int _Mission_Retreat();
+};
+
+
+/**
+ *  Reimplementation of AircraftClass::Mission_Retreat.
+ * 
+ *  @author: CCHyper
+ */
+int AircraftClassExt::_Mission_Retreat()
+{
+    AircraftClassExtension *aircraftext = Extension::Fetch<AircraftClassExtension>(this);
+    return aircraftext->Mission_Retreat();
+}
 
 
 /**
@@ -263,4 +290,6 @@ void AircraftClassExtension_Hooks()
     Patch_Jump(0x0040B819, &_AircraftClass_What_Action_Is_Totable_Patch);
     Patch_Jump(0x0040A413, &_AircraftClass_Mission_Move_LAND_Is_Moving_Check_Patch);
     Patch_Jump(0x0040988C, &_AircraftClass_Mission_Unload_Transport_Detach_Sound_Patch);
+
+    Change_Virtual_Address(0x006CAFD0, Get_Func_Address(&AircraftClassExt::_Mission_Retreat));
 }

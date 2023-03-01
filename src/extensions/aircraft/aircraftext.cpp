@@ -27,6 +27,12 @@
  ******************************************************************************/
 #include "aircraftext.h"
 #include "aircraft.h"
+#include "target.h"
+#include "house.h"
+#include "weapontype.h"
+#include "iomap.h"
+#include "rulesext.h"
+#include "voc.h"
 #include "wwcrc.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -39,7 +45,8 @@
  *  @author: CCHyper
  */
 AircraftClassExtension::AircraftClassExtension(const AircraftClass *this_ptr) :
-    FootClassExtension(this_ptr)
+    FootClassExtension(this_ptr),
+    ParadropsRemaining(5)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("AircraftClassExtension::AircraftClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
@@ -161,4 +168,126 @@ void AircraftClassExtension::Detach(TARGET target, bool all)
 void AircraftClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("AircraftClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    crc(ParadropsRemaining);
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+int AircraftClassExtension::Mission_Retreat()
+{
+    //EXT_DEBUG_TRACE("AircraftClassExtension::Mission_Retreat - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    if (Target_Legal(This()->NavCom)) {
+
+        if (This()->NavCom == This()->Get_Cell_Ptr()) {
+            This()->Assign_Destination(TARGET_NULL);
+        }
+
+    } else {
+
+        /**
+         *  Head back to towards the map edge. When the edge is
+         *  reached, the aircraft should be automatically eliminated.
+         */
+        SourceType source = This()->House->Control.Edge;
+        Cell cell = Map.Calculated_Cell(source, Cell(0,0), Cell(0,0), SPEED_WINGED);
+        if (cell) {
+            This()->Assign_Destination(&Map[cell]);
+        }
+
+    }
+
+    return 3;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+int AircraftClassExtension::Mission_Paradrop_Approach()
+{
+    //EXT_DEBUG_TRACE("AircraftClassExtension::Mission_Paradrop_Approach - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    LEPTON tarcom_distance = This()->Distance(This()->TarCom);
+    TARGET tarcom = This()->TarCom;
+
+    if (Target_Legal(tarcom)) {
+
+        if (Target_Legal(This()->NavCom)) {
+
+            if (tarcom_distance <= RuleExtension->ParadropRadius) {
+                This()->Assign_Mission(MISSION_PARADROP_OVERFLY);
+                --ParadropsRemaining;
+            }
+
+        } else {
+
+            This()->Assign_Destination(tarcom);
+
+        }
+
+    } else {
+
+        This()->Assign_Destination(TARGET_NULL);
+        This()->Assign_Mission(MISSION_RETREAT);
+
+    }
+
+    return 3;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+int AircraftClassExtension::Mission_Paradrop_Overfly()
+{
+    //EXT_DEBUG_TRACE("AircraftClassExtension::Mission_Paradrop_Overfly - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    LEPTON tarcom_distance = This()->Distance(This()->TarCom);
+
+    This()->IsLocked = true;
+
+    if (!Target_Legal(This()->TarCom) || !This()->Cargo.Is_Something_Attached()) {
+
+        This()->IsLocked = false;
+
+        This()->Assign_Target(TARGET_NULL);
+        This()->Assign_Destination(TARGET_NULL);
+        This()->Assign_Mission(MISSION_RETREAT);
+
+    } else if (tarcom_distance > RuleExtension->ParadropRadius) {
+
+        This()->IsLocked = false;
+
+        if (ParadropsRemaining > 0) {
+
+            This()->Assign_Mission(MISSION_PARADROP_APPROACH);
+
+        } else {
+
+            This()->Assign_Target(TARGET_NULL);
+            This()->Assign_Destination(TARGET_NULL);
+            This()->Assign_Mission(MISSION_RETREAT);
+
+        }
+
+    } else {
+
+        if (Map.In_Radar(This()->Coord)) {
+            This()->Paradrop_Cargo();
+        }
+
+    }
+
+    return 5;
 }
