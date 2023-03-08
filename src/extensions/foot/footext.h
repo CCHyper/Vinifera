@@ -51,5 +51,7 @@ class FootClassExtension : public TechnoClassExtension
         virtual FootClass *This() const override { return reinterpret_cast<FootClass *>(TechnoClassExtension::This()); }
         virtual const FootClass *This_Const() const override { return reinterpret_cast<const FootClass *>(TechnoClassExtension::This_Const()); }
 
+        virtual int Mission_Timed_Hunt() override;
+
     public:
 };

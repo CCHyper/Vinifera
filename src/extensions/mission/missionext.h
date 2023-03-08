@@ -53,5 +53,7 @@ class MissionClassExtension : public ObjectClassExtension
 
         void AI();
 
+        virtual int Mission_Timed_Hunt();
+
     public:
 };

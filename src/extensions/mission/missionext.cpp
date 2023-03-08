@@ -28,6 +28,8 @@
 #pragma once
 
 #include "missionext.h"
+#include "tibsun_functions.h"
+#include "debughandler.h"
 #include "asserthandler.h"
 
 
@@ -230,6 +232,33 @@ void MissionClassExtension::AI()
             case MISSION_MISSILE:
                 This()->Timer = This()->Mission_Missile();
                 break;
+
+            /**
+             *
+             *  New missions.
+             *
+             */
+
+            /**
+             *  Timed Hunt
+             */
+            case MISSION_TIMED_HUNT:
+                This()->Timer = Mission_Timed_Hunt();
+                break;
+
         }
+
     }
 }
+
+
+/**
+ *  These are the stub routines that handle the mission logic. They do nothing at this
+ *  level. Derived classes will override these routine as necessary.
+ * 
+ *  @return: Returns with the number of game frames to delay before calling this mission
+ *           handler again.
+ * 
+ *  @author: CCHyper
+ */
+int MissionClassExtension::Mission_Timed_Hunt() { return TICKS_PER_SECOND * 30; }

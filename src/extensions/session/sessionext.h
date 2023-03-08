@@ -71,6 +71,12 @@ class SessionClassExtension final : public GlobalExtensionClass<SessionClass>
              */
             bool IsBuildOffAlly;
 
+            /**
+             *  If this flag is set, computer AI will blitz the humans all at once;
+             *  otherwise, the computer units trickle gradually out.
+             */
+            bool MPlayerBlitz;
+
         } ExtGameOptionsType;
 
         ExtGameOptionsType ExtOptions;

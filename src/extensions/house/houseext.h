@@ -30,6 +30,7 @@
 #include "abstractext.h"
 #include "house.h"
 #include "housetype.h"
+#include "ttimer.h"
 
 
 class DECLSPEC_UUID(UUID_HOUSE_EXTENSION)
@@ -64,4 +65,9 @@ HouseClassExtension final : public AbstractClassExtension
         virtual RTTIType What_Am_I() const override { return RTTI_HOUSE; }
 
     public:
+        /**
+         *  This timer is for multiplayer mode; for a computer-controlled house,
+         *  it determines how long until this player "blitzes" the hapless humans.
+         */
+        CDTimerClass<FrameTimerClass> BlitzTime;
 };
