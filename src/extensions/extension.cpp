@@ -1751,11 +1751,13 @@ void Extension::Print_CRCs(FILE *fp, EventClass *ev)
      *  Event queues.
      */
     std::fprintf(fp, "-------------------- DoList Events -------------------\n");
-    Print_Event_List(fp, DoList);
+    //Print_Event_List(fp, DoList);
+    Print_Event_List(fp, ViniferaDoList);
     std::fprintf(fp, "\n");
 
     std::fprintf(fp, "-------------------- OutList Events -------------------\n");
-    Print_Event_List(fp, OutList);
+    //Print_Event_List(fp, OutList);
+    Print_Event_List(fp, ViniferaOutList);
     std::fprintf(fp, "\n");
 
     /**

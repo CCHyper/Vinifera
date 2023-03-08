@@ -81,3 +81,6 @@ bool Vinifera_SkipToInternet = false;
 bool Vinifera_ExitAfterSkip = false;
 
 DynamicVectorClass<ExceptionInfoDatabaseStruct> ExceptionInfoDatabase;
+
+QueueClass<EventClass, VINIFERA_MAX_EVENTS> ViniferaOutList;
+QueueClass<EventClass, (VINIFERA_MAX_EVENTS * 64)> ViniferaDoList;
