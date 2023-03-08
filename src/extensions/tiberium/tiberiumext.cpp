@@ -28,6 +28,8 @@
 #include "tiberiumext.h"
 #include "tiberium.h"
 #include "ccini.h"
+#include "swizzle.h"
+#include "vinifera_saveload.h"
 #include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -39,7 +41,8 @@
  *  @author: CCHyper
  */
 TiberiumClassExtension::TiberiumClassExtension(const TiberiumClass *this_ptr) :
-    AbstractTypeClassExtension(this_ptr)
+    AbstractTypeClassExtension(this_ptr),
+    Warhead(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TiberiumClassExtension::TiberiumClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
@@ -106,6 +109,8 @@ HRESULT TiberiumClassExtension::Load(IStream *pStm)
     }
 
     new (this) TiberiumClassExtension(NoInitClass());
+
+    VINIFERA_SWIZZLE_REQUEST_POINTER_REMAP(Warhead, "Warhead");
     
     return hr;
 }
@@ -182,6 +187,8 @@ bool TiberiumClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
+
+    Warhead = ini.Get_Warhead(ini_name, "Warhead", Warhead);
     
     return true;
 }

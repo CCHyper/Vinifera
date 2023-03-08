@@ -37,6 +37,8 @@
 #include "tagtype.h"
 #include "house.h"
 #include "housetype.h"
+#include "tiberium.h"
+#include "tiberiumext.h"
 #include "target.h"
 #include "voc.h"
 #include "tibsun_globals.h"
@@ -50,6 +52,69 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+ /**
+  *  #issue-899
+  *
+  *  Allow Tiberiums to use custom warheads when applying damage to infantry on tiberium covered cells.
+  *
+  *  @author: CCHyper
+  */
+static ResultType Infantry_Per_Cell_Process_Apply_Tiberium_Damage(InfantryClass *this_ptr, CellClass *cell_ptr, TiberiumType tiberium)
+{
+    TiberiumClass *tiberium_ptr = Tiberiums[tiberium];
+    ASSERT(tiberium_ptr != nullptr);
+
+    const WarheadTypeClass *warhead = Rule->C4Warhead;
+
+    /**
+     *  Calculate the damage to apply based off the "power" of the tiberium on the cell.
+     */
+    int damage = std::max(1, tiberium_ptr->Power / 10);
+
+    /**
+     *  Use the custom warhead for this tiberium to apply the damage, if it has one defined.
+     */
+    TiberiumClassExtension *tiberiumext = Extension::Fetch<TiberiumClassExtension>(tiberium_ptr);
+    if (tiberiumext->Warhead) {
+        warhead = tiberiumext->Warhead;
+    }
+
+    /**
+     *  Apply the damage to this infantry unit.
+     */
+    return this_ptr->Take_Damage(damage, 0, warhead, nullptr, true);
+}
+
+static Coordinate &Infantry_Get_Center_Coord(InfantryClass*this_ptr) { return this_ptr->Get_Coord(); }
+
+DECLARE_PATCH(_InfantryClass_Per_Cell_Process_Tiberium_Damage_Warhead_Patch)
+{
+    GET_REGISTER_STATIC(InfantryClass *, this_ptr, esi);
+    GET_REGISTER_STATIC(CellClass *, cell, ecx);
+    GET_REGISTER_STATIC(TiberiumType, tiberium, eax);
+    GET_STACK_STATIC(Coordinate *, coord, esp, 0x1C);
+    static Coordinate *tmpcoord;
+    static ResultType result;
+
+    /**
+     *  x
+     */
+    result = Infantry_Per_Cell_Process_Apply_Tiberium_Damage(this_ptr, cell, tiberium);
+
+    /**
+     *  Stolen bytes/code.
+     */
+    tmpcoord = &Infantry_Get_Center_Coord(this_ptr);
+    coord->X = tmpcoord->X;
+    coord->Y = tmpcoord->Y;
+    coord->Z = tmpcoord->Z;
+
+    _asm { mov eax, result }
+
+    JMP_REG(ecx, 0x004D3FD4);
+}
 
 
 /**
@@ -543,6 +608,7 @@ void InfantryClassExtension_Hooks()
     Patch_Jump(0x004D87E9, &_InfantryClass_Firing_AI_Mechanic_Patch);
     Patch_Jump(0x004D3A7B, &_InfantryClass_Per_Cell_Process_Transport_Attach_Sound_Patch);
     Patch_Jump(0x004D35F9, &_InfantryClass_Per_Cell_Process_Engineer_Capture_Damage_Patch);
+    Patch_Jump(0x004D3F5D, &_InfantryClass_Per_Cell_Process_Tiberium_Damage_Warhead_Patch);
 
     /**
      *  ACTION_DAMAGE no longer a case in DisplayClass::Left_Mouse_Up to show the

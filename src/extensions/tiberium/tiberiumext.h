@@ -62,4 +62,8 @@ TiberiumClassExtension final : public AbstractTypeClassExtension
         virtual bool Read_INI(CCINIClass &ini) override;
 
     public:
+        /**
+         *  x
+         */
+        const WarheadTypeClass *Warhead;
 };
