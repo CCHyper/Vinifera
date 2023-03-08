@@ -207,6 +207,12 @@ void RulesClassExtension::Process(CCINIClass &ini)
      */
 
     This()->Colors(ini);
+
+    /**
+     *  x
+     */
+    AIGenerals(ini);
+
     This()->Houses(ini);
     This()->Sides(ini);
     This()->Overlays(ini);
@@ -469,6 +475,21 @@ bool RulesClassExtension::MPlayer(CCINIClass &ini)
     IsBuildOffAlly = ini.Get_Bool(MPLAYER, "BuildOffAlly", IsBuildOffAlly);
 
     return true;
+}
+
+
+/**
+ *  Process the AI personality generals.
+ *  
+ *  @author: CCHyper
+ */
+bool RulesClassExtension::AIGenerals(CCINIClass &ini)
+{
+    static char const * const AIGENERALS = "AIGenerals";
+
+    if (!ini.Is_Present(AIGENERALS)) {
+        return false;
+    }
 }
 
 
