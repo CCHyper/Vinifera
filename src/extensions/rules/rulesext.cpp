@@ -520,7 +520,95 @@ bool RulesClassExtension::Weapons(CCINIClass &ini)
  */
 void RulesClassExtension::Check()
 {
+    //EXT_DEBUG_TRACE("RulesClassExtension::Check - 0x%08X\n", (uintptr_t)(This()));
+
     ASSERT_PRINT(This()->CreditTicks.Count() == 2, "CreditTicks must contain 2 valid entries!");
+}
+
+
+/**
+ *  Performs checks on each of the game object types to see if they have valid images.
+ *  
+ *  @author: CCHyper
+ */
+void RulesClassExtension::Check_Object_Images()
+{
+    //EXT_DEBUG_TRACE("RulesClassExtension::Check_Object_Images - 0x%08X\n", (uintptr_t)(This()));
+
+    for (int index = 0; index < AnimTypes.Count(); ++index) {
+        const AnimTypeClass *type = AnimTypes[index];
+        if (std::strlen(type->GraphicName) > 0 && type->Image == nullptr && !type->IsDemandLoad) { DEBUG_WARNING("AnimType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Get_Heap_ID()); }
+    }
+    
+    for (int index = 0; index < BuildingTypes.Count(); ++index) {
+        const BuildingTypeClass *type = BuildingTypes[index];
+        if (std::strlen(type->GraphicName) > 0 && type->Image == nullptr && !type->IsDemandLoad) { DEBUG_WARNING("BuildingType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Get_Heap_ID()); }
+        if (std::strlen(type->BuildupFilename) > 0 && type->BuildupData == nullptr && !type->IsDemandLoadBuildup) { DEBUG_WARNING("BuildingType \"%s\" (%d) has an invalid buildup image!\n", type->Name(), type->Get_Heap_ID()); }
+    }
+    
+    for (int index = 0; index < AircraftTypes.Count(); ++index) {
+        const AircraftTypeClass *type = AircraftTypes[index];
+        if (!type->IsVoxel && std::strlen(type->GraphicName) > 0 && type->Image == nullptr) { DEBUG_WARNING("AircraftType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Get_Heap_ID()); }
+        if (type->IsVoxel && type->BodyVoxel == nullptr) { DEBUG_WARNING("AircraftType \"%s\" (%d) has an invalid voxel image!\n", type->Name(), type->Get_Heap_ID()); }
+        if (type->IsVoxel && type->IsTurretEquipped && type->TurretVoxel == nullptr) { DEBUG_WARNING("AircraftType \"%s\" (%d) has an invalid turret voxel image!\n", type->Name(), type->Get_Heap_ID()); }
+    }
+    
+    for (int index = 0; index < UnitTypes.Count(); ++index) {
+        const UnitTypeClass *type = UnitTypes[index];
+        if (!type->IsVoxel && std::strlen(type->GraphicName) > 0 && type->Image == nullptr) { DEBUG_WARNING("UnitType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Get_Heap_ID()); }
+        if (type->IsVoxel && type->BodyVoxel == nullptr) { DEBUG_WARNING("UnitType \"%s\" (%d) has an invalid voxel image!\n", type->Name(), type->Get_Heap_ID()); }
+        if (type->IsVoxel && type->IsTurretEquipped && type->TurretVoxel == nullptr) { DEBUG_WARNING("UnitType \"%s\" (%d) has an invalid turret voxel image!\n", type->Name(), type->Get_Heap_ID()); }
+    }
+    
+    for (int index = 0; index < InfantryTypes.Count(); ++index) {
+        const InfantryTypeClass *type = InfantryTypes[index];
+        if (std::strlen(type->GraphicName) > 0 && type->Image == nullptr) { DEBUG_WARNING("InfantryType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Get_Heap_ID()); }
+    }
+    
+    for (int index = 0; index < WeaponTypes.Count(); ++index) {
+        const WeaponTypeClass *type = WeaponTypes[index];
+        //if (std::strlen(type->GraphicName) > 0 && type->Image == nullptr) { DEBUG_WARNING("WeaponType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Get_Heap_ID()); }
+    }
+    
+    for (int index = 0; index < BulletTypes.Count(); ++index) {
+        const BulletTypeClass *type = BulletTypes[index];
+        if (std::strlen(type->GraphicName) > 0 && type->Image == nullptr) { DEBUG_WARNING("BulletType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Get_Heap_ID()); }
+    }
+    
+    for (int index = 0; index < WarheadTypes.Count(); ++index) {
+        const WarheadTypeClass *type = WarheadTypes[index];
+        //if (std::strlen(type->GraphicName) > 0 && type->Image == nullptr) { DEBUG_WARNING("WarheadType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Get_Heap_ID()); }
+    }
+    
+    for (int index = 0; index < TerrainTypes.Count(); ++index) {
+        const TerrainTypeClass *type = TerrainTypes[index];
+        if (std::strlen(type->GraphicName) > 0 && type->Image == nullptr) { DEBUG_WARNING("TerrainType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Get_Heap_ID()); }
+    }
+    
+    for (int index = 0; index < SmudgeTypes.Count(); ++index) {
+        const SmudgeTypeClass *type = SmudgeTypes[index];
+        if (std::strlen(type->GraphicName) > 0 && type->Image == nullptr) { DEBUG_WARNING("SmudgeType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Get_Heap_ID()); }
+    }
+    
+    for (int index = 0; index < OverlayTypes.Count(); ++index) {
+        const OverlayTypeClass *type = OverlayTypes[index];
+        if (std::strlen(type->GraphicName) > 0 && type->Image == nullptr) { DEBUG_WARNING("OverlayType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Get_Heap_ID()); }
+    }
+    
+    for (int index = 0; index < ParticleTypes.Count(); ++index) {
+        const ParticleTypeClass *type = ParticleTypes[index];
+        if (std::strlen(type->GraphicName) > 0 && type->Image == nullptr) { DEBUG_WARNING("ParticleType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Fetch_ID()); }
+    }
+    
+    for (int index = 0; index < ParticleSystemTypes.Count(); ++index) {
+        const ParticleSystemTypeClass *type = ParticleSystemTypes[index];
+        if (std::strlen(type->GraphicName) > 0 && type->Image == nullptr) { DEBUG_WARNING("ParticleSystemType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Fetch_ID()); }
+    }
+    
+    for (int index = 0; index < VoxelAnimTypes.Count(); ++index) {
+        const VoxelAnimTypeClass *type = VoxelAnimTypes[index];
+        if (std::strlen(type->GraphicName) > 0 && type->Image == nullptr) { DEBUG_WARNING("VoxelAnimType \"%s\" (%d) has an invalid image!\n", type->Name(), type->Fetch_ID()); }
+    }
 }
 
 

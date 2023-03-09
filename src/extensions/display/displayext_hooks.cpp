@@ -39,6 +39,7 @@
 #include "housetype.h"
 #include "session.h"
 #include "sessionext.h"
+#include "rulesext.h"
 #include "wwmouse.h"
 #include "extension.h"
 #include "fatal.h"
@@ -47,6 +48,24 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_DisplayClass_Read_INI_Init_Check_Null_Image_Patch)
+{
+    RuleExtension->Check_Object_Images();
+
+    /**
+     *  Stolen bytes/code.
+     */
+    Session.Loading_Callback(65);
+
+    JMP(0x00479E26);
+}
 
 
 /**
@@ -251,6 +270,7 @@ void DisplayClassExtension_Hooks()
     Patch_Jump(0x0047AFA6, &_DisplayClass_Help_Text_GetCursorPosition_Patch);
     Patch_Jump(0x00478974, &_DisplayClass_Mouse_Left_Release_PlaceAnywhere_BugFix_Patch);
     Patch_Jump(0x004762E4, &_DisplayClass_Passes_Proximity_Passes_Check_Patch);
+    Patch_Jump(0x00479E1A, &_DisplayClass_Read_INI_Init_Check_Null_Image_Patch);
 
     /**
      *  #issue-76
