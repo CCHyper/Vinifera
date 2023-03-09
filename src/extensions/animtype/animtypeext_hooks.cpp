@@ -38,6 +38,47 @@
 #include "hooker_macros.h"
 
 
+
+/**
+ *  A fake class for implementing new member functions which allow
+ *  access to the "this" pointer of the intended class.
+ * 
+ *  @note: This must not contain a constructor or destructor!
+ *  @note: All functions must be prefixed with "_" to prevent accidental virtualization.
+ */
+class AnimTypeClassExt final : public AnimTypeClass
+{
+    public:
+        void _Free_Image();
+};
+
+
+/**
+ *  Reimplementation of AnimTypeClass::Free_Image.
+ *
+ *  @author: CCHyper
+ */
+void AnimTypeClassExt::_Free_Image()
+{
+    if (IsDemandLoad && Image) {
+
+        if (IsFreeAfterPlaying) {
+            DEV_DEBUG_WARNING("Anim: Freeing loaded image for %s\n", Name());
+
+            /**
+             *  x
+             */
+             //delete Image;
+
+            Image = nullptr;
+        }
+    }
+}
+
+DECLARE_PATCH(_AnimTypeClass_DTOR_Free_Image_Patch) { GET_REGISTER_STATIC(AnimTypeClass *, this_ptr, esi); this_ptr->Free_Image(); JMP(0x004187F2); }
+DECLARE_PATCH(_AnimTypeClass_SDDTOR_Free_Image_Patch) { GET_REGISTER_STATIC(AnimTypeClass *, this_ptr, esi); this_ptr->Free_Image(); JMP(0x00419C22); }
+
+
 /**
  *  Patches in an assertion check for image data.
  * 
@@ -70,4 +111,8 @@ void AnimTypeClassExtension_Hooks()
     AnimTypeClassExtension_Init();
 
     //Patch_Jump(0x00419B37, &_AnimTypeClass_Get_Image_Data_Assertion_Patch);
+
+    Patch_Jump(0x00419B40, &AnimTypeClassExt::_Free_Image);
+    Patch_Jump(0x004187DB, &_AnimTypeClass_DTOR_Free_Image_Patch);
+    Patch_Jump(0x00419C0B, &_AnimTypeClass_SDDTOR_Free_Image_Patch);
 }
