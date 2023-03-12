@@ -87,4 +87,10 @@ BuildingClassExtension final : public TechnoClassExtension
          *  Has the cash budget been depleted (stops producing cash)?
          */
         bool IsBudgetDepleted;
+
+        /**
+         *  Used by radar facilities to know if they're being jammed by a
+         *  mobile radar jammer.
+         */
+        bool IsJammed;
 };

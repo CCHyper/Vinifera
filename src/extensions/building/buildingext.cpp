@@ -47,7 +47,8 @@ BuildingClassExtension::BuildingClassExtension(const BuildingClass *this_ptr) :
     ProduceCashTimer(),
     CurrentProduceCashBudget(-1),
     IsCaptureOneTimeCashGiven(false),
-    IsBudgetDepleted(false)
+    IsBudgetDepleted(false),
+    IsJammed(false)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("BuildingClassExtension::BuildingClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
@@ -170,12 +171,8 @@ void BuildingClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("BuildingClassExtension::Compute_CRC - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
-    /**
-     *  #issue-26
-     * 
-     *  Members for the Produce Cash logic.
-     */
     crc(ProduceCashTimer());
+    crc(IsJammed);
 }
 
 /**

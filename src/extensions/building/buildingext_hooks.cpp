@@ -56,6 +56,25 @@
 #include "hooker_macros.h"
 
 
+DECLARE_PATCH(_BuildingClass_Mission_Attack_SAM_IsJammed_Patch)
+{
+    GET_REGISTER_STATIC(BuildingClass *, this_ptr, esi);
+    static BuildingClassExtension *buildingext;
+
+    buildingext = Extension::Fetch<BuildingClassExtension>(this_ptr);
+
+    if ((this_ptr->Class->IsPowered && this_ptr->House->Power_Fraction() < 1) || buildingext->IsJammed) {
+        goto return_1;
+    }
+
+continue_checks:
+    JMP(0x004314C7);
+
+return_1:
+    JMP(0x00431766);
+}
+
+
 /**
  *  #issue-26
  * 
