@@ -59,6 +59,9 @@
 #include "particlesystypeext.h"
 #include "voxelanimtypeext.h"
 
+#include "aihouse.h"
+#include "tclassfactory.h"
+
 #include "extension.h"
 #include "extension_globals.h"
 
@@ -485,11 +488,53 @@ bool RulesClassExtension::MPlayer(CCINIClass &ini)
  */
 bool RulesClassExtension::AIGenerals(CCINIClass &ini)
 {
+    //static bool _one_time = false;
     static char const * const AIGENERALS = "AIGenerals";
 
     if (!ini.Is_Present(AIGENERALS)) {
         return false;
     }
+
+    // Primative check to make sure they are not reallocated.
+    //if (_one_time) {
+    //    return 1;
+    //}
+
+    int counter = ini.Entry_Count(AIGENERALS);
+#if 0
+    for (int index = 0; index < counter; ++index) {
+        const char *entry = ini.Get_Entry(AIGENERALS, index);
+
+        /**
+         *  Get a clsid entry.
+         */
+        CLSID uuid = ini.Get_UUID(AIGENERALS, entry, CLSID());
+
+        if (__uuidof(AIHouse) == uuid) {
+            REGISTER_CLASS(AIHouse);
+
+        } else if (__uuidof(AIMeade) == uuid) {
+            REGISTER_CLASS(AIMeade);
+
+        } else if (__uuidof(AIJackson) == uuid) {
+            REGISTER_CLASS(AIJackson);
+
+        } else if (__uuidof(AIGrant) == uuid) {
+            REGISTER_CLASS(AIGrant);
+
+        } else if (__uuidof(AIHooker) == uuid) {
+            REGISTER_CLASS(AIHooker);
+
+        }
+
+    }
+
+    if (counter > 0) {
+        _one_time = true;
+    }
+#endif
+
+    return counter > 0;
 }
 
 

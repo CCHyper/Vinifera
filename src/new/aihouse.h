@@ -47,7 +47,7 @@
 /**
  *  Brain dead general - No behavior defined.
  */
-class __declspec(uuid("F706E6E0-86DA-11D1-B706-00A024DDAFD1"))
+class DECLSPEC_UUID("F706E6E0-86DA-11D1-B706-00A024DDAFD1")
 AIHouse : public IAIHouse, /*public IPersistStream,*/ public IDescription
 {
     public:
@@ -67,8 +67,8 @@ AIHouse : public IAIHouse, /*public IPersistStream,*/ public IDescription
         IFACEMETHOD_(ULONG, AddRef)();
         IFACEMETHOD_(ULONG, Release)();
 
-        IFACEMETHOD_(LONG, Link_House)(IHouse *house) PURE;
-        IFACEMETHOD_(LONG, AI)(long *framedelay) PURE;
+        IFACEMETHOD_(LONG, Link_House)(IHouse *house) { return S_OK; }
+        IFACEMETHOD_(LONG, AI)(long* framedelay);
 
         IFACEMETHOD_(BSTR, Short_Name)() { return L"Brain dead general"; }
         IFACEMETHOD_(BSTR, Description)() { return L"No behavior defined"; }
@@ -82,8 +82,7 @@ AIHouse : public IAIHouse, /*public IPersistStream,*/ public IDescription
 /**
  *  General Meade - Strong defense, weak attack.
  */
-// General Meade - Strong defense, weak attack.
-class __declspec(uuid("9E0F6120-87C1-11D1-B707-00A024DDAFD1"))
+class DECLSPEC_UUID("9E0F6120-87C1-11D1-B707-00A024DDAFD1")
 AIMeade : public IAIHouse, /*public IPersistStream,*/ public IDescription
 {
     public:
@@ -91,14 +90,14 @@ AIMeade : public IAIHouse, /*public IPersistStream,*/ public IDescription
         IFACEMETHOD_(ULONG, AddRef)();
         IFACEMETHOD_(ULONG, Release)();
 
-        IFACEMETHOD_(LONG, Link_House)(IHouse *house) PURE;
-        IFACEMETHOD_(LONG, AI)(long *framedelay) PURE;
+        IFACEMETHOD_(LONG, Link_House)(IHouse *house) { House = house; return S_OK; }
+        IFACEMETHOD_(LONG, AI)(long *framedelay);
 
         IFACEMETHOD_(BSTR, Short_Name)() { return L"General Meade"; }
         IFACEMETHOD_(BSTR, Description)() { return L"Strong defense, weak attack"; }
 
     public:
-        AIMeade() {}
+        AIMeade() : House(nullptr) {}
         virtual ~AIMeade() {}
 
     private:
@@ -109,7 +108,7 @@ AIMeade : public IAIHouse, /*public IPersistStream,*/ public IDescription
 /**
  *  General Jackson - Strong defense, strong attack.
  */
-class __declspec(uuid("C6004D80-87D1-11D1-B707-00A024DDAFD1"))
+class DECLSPEC_UUID("C6004D80-87D1-11D1-B707-00A024DDAFD1")
 AIJackson : public IAIHouse, /*public IPersistStream,*/ public IDescription
 {
     public:
@@ -117,14 +116,14 @@ AIJackson : public IAIHouse, /*public IPersistStream,*/ public IDescription
         IFACEMETHOD_(ULONG, AddRef)();
         IFACEMETHOD_(ULONG, Release)();
 
-        IFACEMETHOD_(LONG, Link_House)(IHouse *house) PURE;
-        IFACEMETHOD_(LONG, AI)(long *framedelay) PURE;
+        IFACEMETHOD_(LONG, Link_House)(IHouse *house) { House = house; return S_OK; }
+        IFACEMETHOD_(LONG, AI)(long *framedelay);
 
         IFACEMETHOD_(BSTR, Short_Name)() { return L"General Jackson"; }
         IFACEMETHOD_(BSTR, Description)() { return L"Strong defense, strong attack"; }
 
     public:
-        AIJackson() {}
+        AIJackson() : House(nullptr) {}
         virtual ~AIJackson() {}
 
     private:
@@ -135,7 +134,7 @@ AIJackson : public IAIHouse, /*public IPersistStream,*/ public IDescription
 /**
  *  General Grant - Weak defense, frequent attack.
  */
-class __declspec(uuid("FBE6D4A0-87D1-11D1-B707-00A024DDAFD1"))
+class DECLSPEC_UUID("FBE6D4A0-87D1-11D1-B707-00A024DDAFD1")
 AIGrant : public IAIHouse, /*public IPersistStream,*/ public IDescription
 {
     public:
@@ -143,14 +142,14 @@ AIGrant : public IAIHouse, /*public IPersistStream,*/ public IDescription
         IFACEMETHOD_(ULONG, AddRef)();
         IFACEMETHOD_(ULONG, Release)();
 
-        IFACEMETHOD_(LONG, Link_House)(IHouse *house) PURE;
-        IFACEMETHOD_(LONG, AI)(long *framedelay) PURE;
+        IFACEMETHOD_(LONG, Link_House)(IHouse *house) { House = house; return S_OK; }
+        IFACEMETHOD_(LONG, AI)(long *framedelay);
 
         IFACEMETHOD_(BSTR, Short_Name)() { return L"General Grant"; }
         IFACEMETHOD_(BSTR, Description)() { return L"Weak defense, frequent attack"; }
 
     public:
-        AIGrant() {}
+        AIGrant() : House(nullptr) {}
         virtual ~AIGrant() {}
 
     private:
@@ -161,7 +160,7 @@ AIGrant : public IAIHouse, /*public IPersistStream,*/ public IDescription
 /**
  *  General Hooker - Unpredictable.
  */
-class __declspec(uuid("FBE6D4A1-87D1-11D1-B707-00A024DDAFD1"))
+class DECLSPEC_UUID("FBE6D4A1-87D1-11D1-B707-00A024DDAFD1")
 AIHooker : public IAIHouse, /*public IPersistStream,*/ public IDescription
 {
     public:
@@ -169,14 +168,14 @@ AIHooker : public IAIHouse, /*public IPersistStream,*/ public IDescription
         IFACEMETHOD_(ULONG, AddRef)();
         IFACEMETHOD_(ULONG, Release)();
 
-        IFACEMETHOD_(LONG, Link_House)(IHouse *house) PURE;
-        IFACEMETHOD_(LONG, AI)(long *framedelay) PURE;
+        IFACEMETHOD_(LONG, Link_House)(IHouse *house) { House = house; return S_OK; }
+        IFACEMETHOD_(LONG, AI)(long *framedelay);
 
         IFACEMETHOD_(BSTR, Short_Name)() { return L"General Hooker"; }
         IFACEMETHOD_(BSTR, Description)() { return L"Unpredictable"; }
 
     public:
-        AIHooker() {}
+        AIHooker() : House(nullptr) {}
         virtual ~AIHooker() {}
 
     private:

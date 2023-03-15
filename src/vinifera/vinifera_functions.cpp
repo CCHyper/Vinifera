@@ -49,6 +49,7 @@
 #include "extension.h"
 #include "theatertype.h"
 #include "uicontrol.h"
+#include "aihouse.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <string>
@@ -742,6 +743,13 @@ bool Vinifera_Register_Com_Objects()
 
     //DEBUG_INFO("  TestLocomotionClass\n");
     REGISTER_CLASS(TestLocomotionClass);
+
+    //DEBUG_INFO("  IAIHouse\n");
+    REGISTER_CLASS(AIHouse);
+    REGISTER_CLASS(AIMeade);
+    REGISTER_CLASS(AIJackson);
+    REGISTER_CLASS(AIGrant);
+    REGISTER_CLASS(AIHooker);
     
     //DEBUG_INFO("  Extension classes\n");
     Extension::Register_Class_Factories();

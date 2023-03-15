@@ -30,15 +30,47 @@
 #include "vinifera_globals.h"
 #include "tibsun_globals.h"
 #include "house.h"
+#include "houseext.h"
 #include "housetype.h"
 #include "technotype.h"
 #include "super.h"
 #include "fatal.h"
+#include "extension.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+extern HouseClass *House_This;
+DECLARE_PATCH(_HouseClass_AI_AIGeneral_Patch)
+{
+    GET_REGISTER_STATIC(HouseClass *, this_ptr, esi);
+    static HouseClassExtension *houseext;
+
+    /**
+     *  x
+     */
+    if (this_ptr->AIGeneral) {
+
+        houseext = Extension::Fetch<HouseClassExtension>(this_ptr);
+
+        /**
+         *  x
+         */
+        House_This = this_ptr;
+        this_ptr->AIGeneral->AI(&houseext->FrameDelayAI);
+        House_This = nullptr;
+    }
+
+    JMP(0x004BC666);
+}
 
 
 /**
@@ -166,4 +198,5 @@ void HouseClassExtension_Hooks()
 
     Patch_Jump(0x004BBD26, &_HouseClass_Can_Build_BuildCheat_Patch);
     Patch_Jump(0x004BD30B, &_HouseClass_Super_Weapon_Handler_InstantRecharge_Patch);
+    Patch_Jump(0x004BC649, &_HouseClass_AI_AIGeneral_Patch);
 }

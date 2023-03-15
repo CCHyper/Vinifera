@@ -28,6 +28,7 @@
 #include "houseext.h"
 #include "house.h"
 #include "ccini.h"
+#include "aihouse.h"
 #include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -39,7 +40,8 @@
  *  @author: CCHyper
  */
 HouseClassExtension::HouseClassExtension(const HouseClass *this_ptr) :
-    AbstractClassExtension(this_ptr)
+    AbstractClassExtension(this_ptr),
+    FrameDelayAI(50)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("HouseClassExtension::HouseClassExtension - 0x%08X\n", (uintptr_t)(This()));
 
@@ -161,4 +163,68 @@ void HouseClassExtension::Detach(TARGET target, bool all)
 void HouseClassExtension::Compute_CRC(WWCRCEngine &crc) const
 {
     //EXT_DEBUG_TRACE("HouseClassExtension::Compute_CRC - 0x%08X\n", (uintptr_t)(This()));
+
+    crc(FrameDelayAI);
+;}
+
+
+void HouseClassExtension::Read_INI(CCINIClass &ini)
+{
+    //EXT_DEBUG_TRACE("HouseClassExtension::Read_INI - 0x%08X\n", (uintptr_t)(This()));
+
+    const char *ini_name = Name();
+
+    if (!ini.Is_Present(ini_name)) {
+        return;
+    }
+
+    // clear existing general (if there is one).
+    delete This()->AIGeneral;
+    This()->AIGeneral = nullptr;
+
+    // fetch the desired "AI".
+    IAIHouse *house_ai = nullptr;
+    //CLSID uuid = ini.Get_UUID(ini_name, "AI", __uuidof(*This()->AIGeneral));
+    CLSID uuid = ini.Get_UUID(ini_name, "AI", __uuidof(AIMeade));
+
+    if (uuid != __uuidof(IAIHouse)) {
+
+        // create the ai house that matches.
+        if (__uuidof(AIHouse) == uuid) {
+            house_ai = new AIHouse;
+            ASSERT(house_ai != nullptr);
+
+        } else if (__uuidof(AIMeade) == uuid) {
+            house_ai = new AIMeade;
+            ASSERT(house_ai != nullptr);
+
+        } else if (__uuidof(AIJackson) == uuid) {
+            house_ai = new AIJackson;
+            ASSERT(house_ai != nullptr);
+
+        } else if (__uuidof(AIGrant) == uuid) {
+            house_ai = new AIGrant;
+            ASSERT(house_ai != nullptr);
+
+        } else if (__uuidof(AIHooker) == uuid) {
+            house_ai = new AIHooker;
+            ASSERT(house_ai != nullptr);
+
+        }
+
+        /**
+         *  x
+         */
+        IHouse *lpPS = nullptr;
+        HRESULT hr = This()->QueryInterface(__uuidof(IHouse), (LPVOID*)&lpPS);
+        if (FAILED(hr)) {
+            DEBUG_ERROR("HouseClass does not support IHouse!\n");
+            return;
+        }
+
+        house_ai->Link_House(lpPS);
+
+        // assign to this house.
+        This()->AIGeneral = house_ai;
+    }
 }

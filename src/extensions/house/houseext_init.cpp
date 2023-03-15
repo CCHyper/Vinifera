@@ -104,6 +104,20 @@ original_code:
 }
 
 
+DECLARE_PATCH(_HouseClass_Read_INI_Patch)
+{
+    GET_REGISTER_STATIC(HouseClass *, this_ptr, esi);
+    GET_REGISTER_STATIC(CCINIClass *, ini, ebx);
+    static HouseClassExtension *houseext;
+
+    houseext = Extension::Fetch<HouseClassExtension>(this_ptr);
+
+    houseext->Read_INI(*ini);
+
+    JMP(0x004C312C);
+}
+
+
 /**
  *  Main function for patching the hooks.
  */
@@ -111,4 +125,5 @@ void HouseClassExtension_Init()
 {
     Patch_Jump(0x004BAEBE, &_HouseClass_Constructor_Patch);
     Patch_Jump(0x004BB9B7, &_HouseClass_Destructor_Patch);
+    Patch_Jump(0x004C3126, &_HouseClass_Read_INI_Patch);
 }
