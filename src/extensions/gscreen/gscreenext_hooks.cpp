@@ -28,6 +28,7 @@
 #include "gscreenext_hooks.h"
 #include "gscreen.h"
 #include "tibsun_globals.h"
+#include "rulesext.h"
 #include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
@@ -75,21 +76,53 @@ void GScreenClassExt::_AI(KeyNumType &input, Point2D &xy)
 
     /**
      *  Adjust the screen offset based on the desired adjustment.
+     * 
+     *  #issue-xxx
+     * 
+     *  Adds support for "ping-pong" style screen shakes (back ported from RA2).
      */
-    if (ScreenX >= 0) {
-        if (ScreenX > 0) {
-            ScreenX = ScreenX - 1;
-        }
-    } else {
-        ScreenX = ScreenX + 1;
-    }
+    if (RuleExtension->IsScreenShakePingPong) {
 
-    if (ScreenY >= 0) {
-        if (ScreenY > 0) {
-            ScreenY = ScreenY - 1;
+        /**
+         *  "Ping-pong" RA2 style.
+         */
+        if (ScreenX >= 0) {
+            if (ScreenX > 0) {
+                ScreenX = 1 - ScreenX;
+            }
+        } else {
+            ScreenX = -1 - ScreenX;
         }
+
+        if (ScreenY >= 0) {
+            if (ScreenY > 0) {
+                ScreenY = 1 - ScreenY;
+            }
+        } else {
+            ScreenY = -1 - ScreenY;
+        }
+
     } else {
-        ScreenY = ScreenY + 1;
+
+        /**
+         *  Original TibSun style.
+         */
+        if (ScreenX >= 0) {
+            if (ScreenX > 0) {
+                ScreenX = ScreenX - 1;
+            }
+        } else {
+            ScreenX = ScreenX + 1;
+        }
+
+        if (ScreenY >= 0) {
+            if (ScreenY > 0) {
+                ScreenY = ScreenY - 1;
+            }
+        } else {
+            ScreenY = ScreenY + 1;
+        }
+
     }
 
     /**
