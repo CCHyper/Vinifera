@@ -27,6 +27,7 @@
  ******************************************************************************/
 #include "gscreenext_hooks.h"
 #include "gscreen.h"
+#include "tibsun_globals.h"
 #include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
@@ -57,6 +58,24 @@ class GScreenClassExt final : public GScreenClass
  */
 void GScreenClassExt::_AI(KeyNumType &input, Point2D &xy)
 {
+    static long _last_frame = -1;
+
+    /**
+     *  #issue-xxx
+     * 
+     *  Are we still processing the same frame in which we just adjusted?
+     *  This gate is required for TibSun as the GScreen input handler is
+     *  not tied to the game engine tick, and as a result the screen will
+     *  update (shake in this context) at the same rate for the lowest
+     *  gamespeed as it would at the highest game speed.
+     */
+    if (_last_frame == Frame) {
+        return;
+    }
+
+    /**
+     *  Adjust the screen offset based on the desired adjustment.
+     */
     if (ScreenX >= 0) {
         if (ScreenX > 0) {
             ScreenX = ScreenX - 1;
@@ -72,6 +91,11 @@ void GScreenClassExt::_AI(KeyNumType &input, Point2D &xy)
     } else {
         ScreenY = ScreenY + 1;
     }
+
+    /**
+     *  Store the frame in which we just shifted.
+     */
+    _last_frame = Frame;
 }
 
 
