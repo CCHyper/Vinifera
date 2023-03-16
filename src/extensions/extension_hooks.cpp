@@ -109,6 +109,8 @@
 #include "displayext_hooks.h"
 #include "sidebarext_hooks.h"
 
+#include "ionblastext_hooks.h"
+
 #include "initext_hooks.h"
 #include "mainloopext_hooks.h"
 #include "newmenuext_hooks.h"
@@ -245,6 +247,8 @@ void Extension_Hooks()
     GScreenClassExtension_Hooks();
     DisplayClassExtension_Hooks();
     SidebarClassExtension_Hooks();
+
+    IonBlastClassExtension_Hooks();
 
     /**
      *  Various modules and functions.

@@ -95,4 +95,12 @@ class RulesClassExtension final : public GlobalExtensionClass<RulesClass>
          *  x
          */
         bool IsScreenShakePingPong;
+
+        /**
+         *  These values are used to shake the screen when the ion cannon impacts the ground.
+         */
+        unsigned int IonCannonShakePixelYHi;
+        unsigned int IonCannonShakePixelYLo;
+        unsigned int IonCannonShakePixelXHi;
+        unsigned int IonCannonShakePixelXLo;
 };
