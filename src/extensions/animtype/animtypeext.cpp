@@ -27,8 +27,12 @@
  ******************************************************************************/
 #include "animtypeext.h"
 #include "animtype.h"
-#include "ccini.h"
 #include "tibsun_defines.h"
+#include "tibsun_globals.h"
+#include "ccini.h"
+#include "ccfile.h"
+#include "palette.h"
+#include "convert.h"
 #include "wwcrc.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -47,9 +51,12 @@ AnimTypeClassExtension::AnimTypeClassExtension(const AnimTypeClass *this_ptr) :
     ZAdjust(0),
     AttachLayer(LAYER_NONE),
     ParticleToSpawn(PARTICLE_NONE),
-    NumberOfParticles(0)
+    NumberOfParticles(0),
+    PaletteName()
 {
     //if (this_ptr) EXT_DEBUG_TRACE("AnimTypeClassExtension::AnimTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    PaletteName[0] = '\0';
 
     AnimTypeExtensions.Add(this);
 }
@@ -188,6 +195,8 @@ bool AnimTypeClassExtension::Read_INI(CCINIClass &ini)
         return false;
     }
 
+    char buffer[128];
+
     const char *ini_name = This()->Name();
 
     if (!ini.Is_Present(ini_name)) {
@@ -233,6 +242,10 @@ bool AnimTypeClassExtension::Read_INI(CCINIClass &ini)
     AttachLayer = ini.Get_LayerType(ini_name, "Layer", AttachLayer);
     ParticleToSpawn = ini.Get_ParticleType(ini_name, "SpawnsParticle", ParticleToSpawn);
     NumberOfParticles = ini.Get_Int(ini_name, "NumParticles", NumberOfParticles);
-    
+
+    if (ini.Get_String(ini_name, "Palette", buffer, sizeof(buffer)) > 0) {
+        std::strncpy(PaletteName, buffer, sizeof(PaletteName));
+    }
+
     return true;
 }

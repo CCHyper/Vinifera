@@ -94,4 +94,9 @@ AnimTypeClassExtension final : public ObjectTypeClassExtension
          *  The number of the particle to spawn.
          */
         unsigned NumberOfParticles;
+
+        /**
+         *  x
+         */
+        char PaletteName[32];
 };
