@@ -191,6 +191,7 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
     }
 
     const char *ini_name = Name();
+    const char *graphic_name = Graphic_Name();
 
     GateUpSound = ini.Get_VocType(ini_name, "GateUpSound", GateUpSound);
     GateDownSound = ini.Get_VocType(ini_name, "GateDownSound", GateDownSound);
@@ -204,6 +205,55 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IsEligibleForAllyBuilding = ini.Get_Bool(ini_name, "EligibleForAllyBuilding",
                                                     This()->IsConstructionYard ? true : IsEligibleForAllyBuilding);
+
+    /**
+     *  The following lines are reloading various animation keys as they are
+     *  incorrect loaded with "IniName" instead of "GraphicName". As a result
+     *  if the building uses Image= with a string that does not match its actual
+     *  name (i.e. PROC, the Refinery), then these keys are not loaded from
+     *  the section specified on Image=.
+     */
+    This()->field_580[BANIM_SPECIAL_ONE].Location.X = ini.Get_Int(graphic_name, "SpecialAnimX", This()->field_580[BANIM_SPECIAL_ONE].Location.X);
+    This()->field_580[BANIM_SPECIAL_ONE].Location.Y = ini.Get_Int(graphic_name, "SpecialAnimY", This()->field_580[BANIM_SPECIAL_ONE].Location.Y);
+    This()->field_580[BANIM_SPECIAL_ONE].ZAdjust = ini.Get_Int(graphic_name, "SpecialAnimZAdjust", This()->field_580[BANIM_SPECIAL_ONE].ZAdjust);
+    This()->field_580[BANIM_SPECIAL_ONE].YSort = ini.Get_Int(graphic_name, "SpecialAnimYSort", This()->field_580[BANIM_SPECIAL_ONE].YSort);
+    This()->field_580[BANIM_SPECIAL_ONE].Powered = ini.Get_Bool(graphic_name, "SpecialAnimPowered", This()->field_580[BANIM_SPECIAL_ONE].Powered);
+    This()->field_580[BANIM_SPECIAL_ONE].PoweredLight = ini.Get_Bool(graphic_name, "SpecialAnimPoweredLight", This()->field_580[BANIM_SPECIAL_ONE].PoweredLight);
+
+    This()->field_580[BANIM_SPECIAL_TWO].Location.X = ini.Get_Int(graphic_name, "SpecialAnimTwoX", This()->field_580[BANIM_SPECIAL_TWO].Location.X);
+    This()->field_580[BANIM_SPECIAL_TWO].Location.Y = ini.Get_Int(graphic_name, "SpecialAnimTwoY", This()->field_580[BANIM_SPECIAL_TWO].Location.Y);
+    This()->field_580[BANIM_SPECIAL_TWO].ZAdjust = ini.Get_Int(graphic_name, "SpecialAnimTwoZAdjust", This()->field_580[BANIM_SPECIAL_TWO].ZAdjust);
+    This()->field_580[BANIM_SPECIAL_TWO].YSort = ini.Get_Int(graphic_name, "SpecialAnimTwoYSort", This()->field_580[BANIM_SPECIAL_TWO].YSort);
+    This()->field_580[BANIM_SPECIAL_TWO].Powered = ini.Get_Bool(graphic_name, "SpecialAnimTwoPowered", This()->field_580[BANIM_SPECIAL_TWO].Powered);
+    This()->field_580[BANIM_SPECIAL_TWO].PoweredLight = ini.Get_Bool(graphic_name, "SpecialAnimTwoPoweredLight", This()->field_580[BANIM_SPECIAL_TWO].PoweredLight);
+
+    This()->field_580[BANIM_SPECIAL_THREE].Location.X = ini.Get_Int(graphic_name, "SpecialAnimThreeX", This()->field_580[BANIM_SPECIAL_THREE].Location.X);
+    This()->field_580[BANIM_SPECIAL_THREE].Location.Y = ini.Get_Int(graphic_name, "SpecialAnimThreeY", This()->field_580[BANIM_SPECIAL_THREE].Location.Y);
+    This()->field_580[BANIM_SPECIAL_THREE].ZAdjust = ini.Get_Int(graphic_name, "SpecialAnimThreeZAdjust", This()->field_580[BANIM_SPECIAL_THREE].ZAdjust);
+    This()->field_580[BANIM_SPECIAL_THREE].YSort = ini.Get_Int(graphic_name, "SpecialAnimThreeYSort", This()->field_580[BANIM_SPECIAL_THREE].YSort);
+    This()->field_580[BANIM_SPECIAL_THREE].Powered = ini.Get_Bool(graphic_name, "SpecialAnimThreePowered", This()->field_580[BANIM_SPECIAL_THREE].Powered);
+    This()->field_580[BANIM_SPECIAL_THREE].PoweredLight = ini.Get_Bool(graphic_name, "SpecialAnimThreePoweredLight", This()->field_580[BANIM_SPECIAL_THREE].PoweredLight);
+
+    This()->field_580[BANIM_PRODUCTION].Location.X = ini.Get_Int(graphic_name, "ProductionAnimX", This()->field_580[BANIM_PRODUCTION].Location.X);
+    This()->field_580[BANIM_PRODUCTION].Location.Y = ini.Get_Int(graphic_name, "ProductionAnimY", This()->field_580[BANIM_PRODUCTION].Location.Y);
+    This()->field_580[BANIM_PRODUCTION].ZAdjust = ini.Get_Int(graphic_name, "ProductionAnimZAdjust", This()->field_580[BANIM_PRODUCTION].ZAdjust);
+    This()->field_580[BANIM_PRODUCTION].YSort = ini.Get_Int(graphic_name, "ProductionAnimYSort", This()->field_580[BANIM_PRODUCTION].YSort);
+    This()->field_580[BANIM_PRODUCTION].Powered = ini.Get_Bool(graphic_name, "ProductionAnimPowered", This()->field_580[BANIM_PRODUCTION].Powered);
+    This()->field_580[BANIM_PRODUCTION].PoweredLight = ini.Get_Bool(graphic_name, "ProductionAnimPoweredLight", This()->field_580[BANIM_PRODUCTION].PoweredLight);
+
+    This()->field_580[BANIM_PRE_PRODUCTION].Location.X = ini.Get_Int(graphic_name, "PreProductionAnimX", This()->field_580[BANIM_PRE_PRODUCTION].Location.X);
+    This()->field_580[BANIM_PRE_PRODUCTION].Location.Y = ini.Get_Int(graphic_name, "PreProductionAnimY", This()->field_580[BANIM_PRE_PRODUCTION].Location.Y);
+    This()->field_580[BANIM_PRE_PRODUCTION].ZAdjust = ini.Get_Int(graphic_name, "PreProductionAnimZAdjust", This()->field_580[BANIM_PRE_PRODUCTION].ZAdjust);
+    This()->field_580[BANIM_PRE_PRODUCTION].YSort = ini.Get_Int(graphic_name, "PreProductionAnimYSort", This()->field_580[BANIM_PRE_PRODUCTION].YSort);
+    This()->field_580[BANIM_PRE_PRODUCTION].Powered = ini.Get_Bool(graphic_name, "PreProductionAnimPowered", This()->field_580[BANIM_PRE_PRODUCTION].Powered);
+    This()->field_580[BANIM_PRE_PRODUCTION].PoweredLight = ini.Get_Bool(graphic_name, "PreProductionAnimPoweredLight", This()->field_580[BANIM_PRE_PRODUCTION].PoweredLight);
+
+    This()->field_580[BANIM_TURRET].Location.X = ini.Get_Int(graphic_name, "TurretAnimX", This()->field_580[BANIM_TURRET].Location.X);
+    This()->field_580[BANIM_TURRET].Location.Y = ini.Get_Int(graphic_name, "TurretAnimY", This()->field_580[BANIM_TURRET].Location.Y);
+    This()->field_580[BANIM_TURRET].ZAdjust = ini.Get_Int(graphic_name, "TurretAnimZAdjust", This()->field_580[BANIM_TURRET].ZAdjust);
+    This()->field_580[BANIM_TURRET].YSort = ini.Get_Int(graphic_name, "TurretAnimYSort", This()->field_580[BANIM_TURRET].YSort);
+    This()->field_580[BANIM_TURRET].Powered = ini.Get_Bool(graphic_name, "TurretAnimPowered", This()->field_580[BANIM_TURRET].Powered);
+    This()->field_580[BANIM_TURRET].PoweredLight = ini.Get_Bool(graphic_name, "TurretPoweredLight", This()->field_580[BANIM_TURRET].PoweredLight);
     
     return true;
 }
