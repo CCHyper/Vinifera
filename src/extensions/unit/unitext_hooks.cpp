@@ -36,6 +36,8 @@
 #include "unit.h"
 #include "unittype.h"
 #include "unittypeext.h"
+#include "building.h"
+#include "buildingext.h"
 #include "target.h"
 #include "rules.h"
 #include "iomap.h"
@@ -47,6 +49,31 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+
+/**
+ *  #issue-510
+ * 
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_UnitClass_Mission_Unload_Refinery_Smoke_Particles_Patch)
+{
+    GET_REGISTER_STATIC(BuildingClass *, cell_building, ebx);
+    static BuildingClassExtension *buildingext;
+
+    buildingext = Extension::Fetch<BuildingClassExtension>(cell_building);
+
+    buildingext->Spawn_Refinery_Smoke_Particles();
+
+    /**
+     *  Stolen bytes/code.
+     */
+    _asm { lea ebp, [esi+0x168] } // this->Storage
+
+    JMP(0x0065499E);
+}
 
 
 #if 0
@@ -701,4 +728,5 @@ void UnitClassExtension_Hooks()
     Patch_Jump(0x0065665D, &_UnitClass_What_Action_ACTION_HARVEST_Block_On_Bridge_Patch); // IsToVeinHarvest
     //Patch_Jump(0x0065054F, &_UnitClass_Enter_Idle_Mode_Block_Harvesting_On_Bridge_Patch); // Removed, keeping code for reference.
     //Patch_Jump(0x00654AB0, &_UnitClass_Mission_Harvest_Block_Harvesting_On_Bridge_Patch); // Removed, keeping code for reference.
+    Patch_Jump(0x00654998, &_UnitClass_Mission_Unload_Refinery_Smoke_Particles_Patch);
 }

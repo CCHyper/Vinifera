@@ -29,6 +29,10 @@
 
 #include "technotypeext.h"
 #include "buildingtype.h"
+#include "tpoint.h"
+
+
+class ParticleSystemTypeClass;
 
 
 class DECLSPEC_UUID(UUID_BUILDINGTYPE_EXTENSION)
@@ -106,4 +110,25 @@ BuildingTypeClassExtension final : public TechnoTypeClassExtension
          *  Is this building eligible for proximity checks by players who are its owner's allies?
          */
         bool IsEligibleForAllyBuilding;
+
+        /**
+         *  x
+         */
+        const ParticleSystemTypeClass *RefinerySmokeParticleSystemOne;
+        const ParticleSystemTypeClass *RefinerySmokeParticleSystemTwo;
+        const ParticleSystemTypeClass *RefinerySmokeParticleSystemThree;
+        const ParticleSystemTypeClass *RefinerySmokeParticleSystemFour;
+
+        /**
+         *  x
+         */
+        TPoint3D<int> RefinerySmokeOffsetOne;
+        TPoint3D<int> RefinerySmokeOffsetTwo;
+        TPoint3D<int> RefinerySmokeOffsetThree;
+        TPoint3D<int> RefinerySmokeOffsetFour;
+
+        /**
+         *  x
+         */
+        int RefinerySmokeFrames;
 };

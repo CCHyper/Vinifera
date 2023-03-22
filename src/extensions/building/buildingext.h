@@ -66,6 +66,7 @@ BuildingClassExtension final : public TechnoClassExtension
         virtual RTTIType What_Am_I() const override { return RTTI_BUILDING; }
 
         void Produce_Cash_AI();
+        void Spawn_Refinery_Smoke_Particles();
 
     public:
         /**

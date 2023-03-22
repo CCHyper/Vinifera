@@ -31,6 +31,7 @@
 #include "buildingtypeext.h"
 #include "house.h"
 #include "housetype.h"
+#include "particlesys.h"
 #include "wwcrc.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -178,6 +179,7 @@ void BuildingClassExtension::Compute_CRC(WWCRCEngine &crc) const
     crc(ProduceCashTimer());
 }
 
+
 /**
  *  #issue-26
  * 
@@ -288,6 +290,70 @@ void BuildingClassExtension::Produce_Cash_AI()
 
         }
 
+    }
+
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+void BuildingClassExtension::Spawn_Refinery_Smoke_Particles()
+{
+    //EXT_DEBUG_TRACE("BuildingClassExtension::Spawn_Refinery_Smoke_Particles - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
+
+    ParticleSystemClass *particle = nullptr;
+
+    BuildingTypeClassExtension *classext = Extension::Fetch<BuildingTypeClassExtension>(This()->Class);
+
+    if (classext->RefinerySmokeParticleSystemOne) {
+        if (classext->RefinerySmokeOffsetOne.Is_Valid()) {
+            Coordinate coord = This()->Coord;
+            coord.X += classext->RefinerySmokeOffsetOne.X;
+            coord.Y += classext->RefinerySmokeOffsetOne.Y;
+            coord.Z += classext->RefinerySmokeOffsetOne.Z;
+            particle = new ParticleSystemClass(classext->RefinerySmokeParticleSystemOne, coord);
+            ASSERT(particle != nullptr);
+            particle->Lifetime = classext->RefinerySmokeFrames;
+        }
+    }
+
+    if (classext->RefinerySmokeParticleSystemTwo) {
+        if (classext->RefinerySmokeOffsetTwo.Is_Valid()) {
+            Coordinate coord = This()->Coord;
+            coord.X += classext->RefinerySmokeOffsetTwo.X;
+            coord.Y += classext->RefinerySmokeOffsetTwo.Y;
+            coord.Z += classext->RefinerySmokeOffsetTwo.Z;
+            particle = new ParticleSystemClass(classext->RefinerySmokeParticleSystemTwo, coord);
+            ASSERT(particle != nullptr);
+            particle->Lifetime = classext->RefinerySmokeFrames;
+        }
+    }
+
+    if (classext->RefinerySmokeParticleSystemThree) {
+        if (classext->RefinerySmokeOffsetThree.Is_Valid()) {
+            Coordinate coord = This()->Coord;
+            coord.X += classext->RefinerySmokeOffsetThree.X;
+            coord.Y += classext->RefinerySmokeOffsetThree.Y;
+            coord.Z += classext->RefinerySmokeOffsetThree.Z;
+            particle = new ParticleSystemClass(classext->RefinerySmokeParticleSystemThree, coord);
+            ASSERT(particle != nullptr);
+            particle->Lifetime = classext->RefinerySmokeFrames;
+        }
+    }
+
+    if (classext->RefinerySmokeParticleSystemFour) {
+        if (classext->RefinerySmokeOffsetFour.Is_Valid()) {
+            Coordinate coord = This()->Coord;
+            coord.X += classext->RefinerySmokeOffsetFour.X;
+            coord.Y += classext->RefinerySmokeOffsetFour.Y;
+            coord.Z += classext->RefinerySmokeOffsetFour.Z;
+            particle = new ParticleSystemClass(classext->RefinerySmokeParticleSystemFour, coord);
+            ASSERT(particle != nullptr);
+            particle->Lifetime = classext->RefinerySmokeFrames;
+        }
     }
 
 }

@@ -50,7 +50,16 @@ BuildingTypeClassExtension::BuildingTypeClassExtension(const BuildingTypeClass *
     ProduceCashBudget(0),
     IsStartupCashOneTime(false),
     IsResetBudgetOnCapture(false),
-    IsEligibleForAllyBuilding(false)
+    IsEligibleForAllyBuilding(false),
+    RefinerySmokeParticleSystemOne(nullptr),
+    RefinerySmokeParticleSystemTwo(nullptr),
+    RefinerySmokeParticleSystemThree(nullptr),
+    RefinerySmokeParticleSystemFour(nullptr),
+    RefinerySmokeOffsetOne(0,0,0),
+    RefinerySmokeOffsetTwo(0,0,0),
+    RefinerySmokeOffsetThree(0,0,0),
+    RefinerySmokeOffsetFour(0,0,0),
+    RefinerySmokeFrames(25)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("BuildingTypeClassExtension::BuildingTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
@@ -204,6 +213,18 @@ bool BuildingTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IsEligibleForAllyBuilding = ini.Get_Bool(ini_name, "EligibleForAllyBuilding",
                                                     This()->IsConstructionYard ? true : IsEligibleForAllyBuilding);
+
+    RefinerySmokeParticleSystemOne = ini.Get_ParticleSystem(ini_name, "RefinerySmokeParticleSystemOne", RefinerySmokeParticleSystemOne);
+    RefinerySmokeParticleSystemTwo = ini.Get_ParticleSystem(ini_name, "RefinerySmokeParticleSystemTwo", RefinerySmokeParticleSystemTwo);
+    RefinerySmokeParticleSystemThree = ini.Get_ParticleSystem(ini_name, "RefinerySmokeParticleSystemThree", RefinerySmokeParticleSystemThree);
+    RefinerySmokeParticleSystemFour = ini.Get_ParticleSystem(ini_name, "RefinerySmokeParticleSystemFour", RefinerySmokeParticleSystemFour);
+
+    RefinerySmokeOffsetOne = ini.Get_Point(ini_name, "RefinerySmokeOffsetOne", RefinerySmokeOffsetOne);
+    RefinerySmokeOffsetTwo = ini.Get_Point(ini_name, "RefinerySmokeOffsetTwo", RefinerySmokeOffsetTwo);
+    RefinerySmokeOffsetThree = ini.Get_Point(ini_name, "RefinerySmokeOffsetThree", RefinerySmokeOffsetThree);
+    RefinerySmokeOffsetFour = ini.Get_Point(ini_name, "RefinerySmokeOffsetFour", RefinerySmokeOffsetFour);
+
+    RefinerySmokeFrames = ini.Get_Int(ini_name, "RefinerySmokeFrames", RefinerySmokeFrames);
     
     return true;
 }
