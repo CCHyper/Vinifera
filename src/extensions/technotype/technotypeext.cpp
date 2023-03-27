@@ -32,6 +32,7 @@
 #include "swizzle.h"
 #include "bsurface.h"
 #include "tibsun_globals.h"
+#include "rules.h"
 #include "vinifera_util.h"
 #include "spritecollection.h"
 #include "vinifera_saveload.h"
@@ -65,7 +66,16 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(const TechnoTypeClass *this_p
     VoiceDeploy(),
     VoiceHarvest(),
     IdleRate(0),
-    CameoImageSurface(nullptr)
+    CameoImageSurface(nullptr),
+    IsJumpJet(false),
+    JumpjetTurnRate(Rule->JumpjetTurnRate),
+    JumpjetSpeed(Rule->JumpjetSpeed),
+    JumpjetClimb(Rule->JumpjetClimb),
+    JumpjetCruiseHeight(Rule->JumpjetCruiseHeight),
+    JumpjetAcceleration(Rule->JumpjetAcceleration),
+    JumpjetWobblesPerSecond(Rule->JumpjetWobblesPerSecond),
+    JumpjetWobbleDeviation(Rule->JumpjetWobbleDeviation),
+    JumpjetCloakDetectionRadius(Rule->JumpjetCloakDetectionRadius)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TechnoTypeClassExtension::TechnoTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
@@ -208,6 +218,7 @@ void TechnoTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
     crc(ShakePixelXHi);
     crc(ShakePixelXLo);
     crc(SoylentValue);
+    crc(IsJumpJet);
 }
 
 
@@ -262,6 +273,20 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IdleRate = ini.Get_Int(ini_name, "IdleRate", IdleRate);
     IdleRate = ArtINI.Get_Int(graphic_name, "IdleRate", IdleRate);
+
+    /**
+     *  IsJumpJet is now moved to TechnoType, but this will handle the original InfantryType cases too.
+     */
+    IsJumpJet = ini.Get_Bool(ini_name, "JumpJet", IsJumpJet);
+
+    JumpjetTurnRate = ini.Get_Int(ini_name, "JumpjetTurnRate", JumpjetTurnRate);
+    JumpjetSpeed = ini.Get_Int(ini_name, "JumpjetSpeed", JumpjetSpeed);
+    JumpjetClimb = ini.Get_Int(ini_name, "JumpjetClimb", JumpjetClimb);
+    JumpjetCruiseHeight = ini.Get_Int(ini_name, "JumpjetHeight", JumpjetCruiseHeight);
+    JumpjetAcceleration = ini.Get_Int(ini_name, "JumpjetAccel", JumpjetAcceleration);
+    JumpjetWobblesPerSecond = ini.Get_Int(ini_name, "JumpjetWobbles", JumpjetWobblesPerSecond);
+    JumpjetWobbleDeviation = ini.Get_Int(ini_name, "JumpjetDeviation", JumpjetWobbleDeviation);
+    JumpjetCloakDetectionRadius = ini.Get_Int(ini_name, "JumpjetCloakDetectionRadius", JumpjetCloakDetectionRadius);
 
     /**
      *  Fetch the cameo image surface if it exists.

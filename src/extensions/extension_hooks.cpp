@@ -130,6 +130,8 @@
 #include "multiscoreext_hooks.h"
 #include "multimissionext_hooks.h"
 
+#include "jumpjetlocomotionext_hooks.h"
+
 #include "skirmishdlg_hooks.h"
 
 #include "filepcx_hooks.h"
@@ -268,6 +270,11 @@ void Extension_Hooks()
     MapSeedClassExtension_Hooks();
     MultiScoreExtension_Hooks();
     MultiMissionExtension_Hooks();
+
+    /**
+     *  Locomotors
+     */
+    JumpjetLocomotionClassExtension_Hooks();
 
     /**
      *  Dialogs and associated code.

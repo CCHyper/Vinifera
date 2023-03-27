@@ -148,6 +148,23 @@ class TechnoTypeClassExtension : public ObjectTypeClassExtension
         unsigned IdleRate;
 
         /**
+         *
+         */
+        bool IsJumpJet;
+
+        /**
+         *  Jumpjet overrides.
+         */
+        int JumpjetTurnRate;
+        int JumpjetSpeed;
+        double JumpjetClimb;
+        int JumpjetCruiseHeight;
+        double JumpjetAcceleration;
+        double JumpjetWobblesPerSecond;
+        int JumpjetWobbleDeviation;
+        int JumpjetCloakDetectionRadius;
+
+        /**
          *  Pointer to the cameo image surface.
          */
         BSurface *CameoImageSurface;
