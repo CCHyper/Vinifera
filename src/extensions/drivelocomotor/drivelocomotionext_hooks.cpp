@@ -48,10 +48,9 @@
  * 
  *  @author: CCHyper
  */
-static void DriveLocomotionClass_Process_Create_WakeAnim(DriveLocomotionClass *this_ptr)
+static void DriveLocomotionClass_Process_Create_WakeAnim(TechnoClass *linked_to)
 {
-    FootClass *linked_foot = this_ptr->Linked_To();
-    TechnoTypeClassExtension *technotype_ext = Extension::Fetch<TechnoTypeClassExtension>(linked_foot->Techno_Type_Class());
+    TechnoTypeClassExtension *technotype_ext = Extension::Fetch<TechnoTypeClassExtension>(linked_to->Techno_Type_Class());
 
     /**
      *  #issue-944
@@ -60,7 +59,7 @@ static void DriveLocomotionClass_Process_Create_WakeAnim(DriveLocomotionClass *t
      */
     if (!(Frame % technotype_ext->WakeAnimRate)) {
 
-        if (!linked_foot->IsOnBridge && linked_foot->Get_Cell_Ptr()->Land_Type() == LAND_WATER) {
+        if (!linked_to->IsOnBridge && linked_to->Get_Cell_Ptr()->Land_Type() == LAND_WATER) {
 
             /**
              *  #issue-944
@@ -75,7 +74,7 @@ static void DriveLocomotionClass_Process_Create_WakeAnim(DriveLocomotionClass *t
              *  Create the wake animation at the current objects coordinate.
              */
             if (wake_anim) {
-                AnimClass *animptr = new AnimClass(wake_anim, linked_foot->Get_Coord());
+                AnimClass *animptr = new AnimClass(wake_anim, linked_to->Get_Coord());
                 ASSERT(animptr != nullptr);
             }
         }
@@ -92,9 +91,13 @@ static void DriveLocomotionClass_Process_Create_WakeAnim(DriveLocomotionClass *t
  */
 DECLARE_PATCH(_DriveLocomotionClass_Process_WakeAnim_Patch)
 {
-    GET_REGISTER_STATIC(DriveLocomotionClass *, this_ptr, esi);
+    //GET_REGISTER_STATIC(DriveLocomotionClass *, this_ptr, esi);
+    static TechnoClass * linked_to;
 
-    DriveLocomotionClass_Process_Create_WakeAnim(this_ptr);
+    _asm { mov eax, [esi+4] }
+    _asm { mov [linked_to], eax }
+
+    DriveLocomotionClass_Process_Create_WakeAnim(linked_to);
 
     JMP(0x0047E05D);
 }
