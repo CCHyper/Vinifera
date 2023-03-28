@@ -42,6 +42,25 @@
 #include "hooker_macros.h"
 
 
+#include "iomap.h"
+static void TerrainClass_AI_Spawn_Tiberium(TerrainClass *this_ptr)
+{
+    if (this_ptr->Class->IsSpawnsTiberium) {
+        Map[this_ptr->Get_Coord()].Spread_Tiberium(true);
+    }
+}
+
+DECLARE_PATCH(_TerrainClass_AI_Spawn_Tiberium)
+{
+    GET_REGISTER_STATIC(TerrainClass *, this_ptr, esi);
+    TerrainClass_AI_Spawn_Tiberium(this_ptr);
+    JMP(0x0064010F);
+}
+
+
+
+
+
 /**
  *  Create a light source instances for terrain object.
  * 
@@ -190,4 +209,18 @@ void TerrainClassExtension_Hooks()
 
     Patch_Jump(0x006409C3, &_TerrainClass_Unlimbo_LightSource_Patch);
     Patch_Jump(0x0063F4D9, &_TerrainClass_Take_Damage_LightSource_Patch);
+
+
+
+
+
+    // Remove SpawnsTiberium check in TerrainClass::AI
+    Patch_Jump(0x006400A0, 0x006400AA);
+
+    Patch_Byte_Range(0x006400E0, 0x90, 2); // remove "push 1"
+    Patch_Byte_Range(0x006400EB, 0x90, 5); // remove "lea eax, [esp+1Ch+var_C], push eax"
+    
+    //Patch_Jump(0x006400F3, 0x0064010F);
+    Patch_Jump(0x006400F3, &_TerrainClass_AI_Spawn_Tiberium);
+
 }

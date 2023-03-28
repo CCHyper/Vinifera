@@ -234,7 +234,7 @@ void TacticalExtension::Draw_Debug_Overlay()
      *  Fill the background area.
      */
     Rect fill_rect;
-    fill_rect.X = 160; // Width of Options tab, so we draw from there.
+    fill_rect.X = TacticalRect.Width-(160*3); // Width of Tactical, minus timer tab, so we draw from there.
     fill_rect.Y = 0;
     fill_rect.Width = text_rect.Width+(padding+1);
     fill_rect.Height = 16; // Tab bar height
@@ -528,23 +528,25 @@ void TacticalExtension::Render_Post()
     /**
      *  Draw any overlay text.
      */
+    Draw_Mission_Timer();
     Draw_Super_Timers();
 }
 
 
 /**
- *  Prints a single super weapon timer to the tactical screen.
+ *  Prints a timer to the tactical screen.
  * 
  *  @authors: CCHyper
  */
-void TacticalExtension::Super_Draw_Timer(int row_index, ColorScheme *color, int time, const char *name, unsigned long *flash_time, bool *flash_state)
+void TacticalExtension::Draw_Timer(int row_index, ColorScheme *color, int time, const char *name, unsigned long *flash_time = nullptr, bool *flash_state = nullptr)
 {
-    static WWFontClass *_font = nullptr;
+    static WWFontClass *font = nullptr;
 
-    TextPrintType style = TPF_8POINT|TPF_RIGHT|TPF_NOSHADOW|TPF_METAL12|TPF_SOLIDBLACK_BG;
+    TextPrintType style = TPF_RIGHT|TPF_METAL12|TPF_DROPSHADOW;
+    //style |= UIControls. ? TPF_METAL12 : TPF_8POINT;
 
-    if (!_font) {
-        _font = Font_Ptr(style);
+    if (!font) {
+        font = Font_Ptr(style);
     }
 
     char fullbuff[128];
@@ -586,21 +588,21 @@ void TacticalExtension::Super_Draw_Timer(int row_index, ColorScheme *color, int 
     }
 
     Rect name_rect;
-    _font->String_Pixel_Rect(namebuff, &name_rect);
+    font->String_Pixel_Rect(namebuff, &name_rect);
 
     Rect timer_rect;
-    _font->String_Pixel_Rect(timerbuff, &timer_rect);
+    font->String_Pixel_Rect(timerbuff, &timer_rect);
 
-    int font_width = _font->Get_Font_Width();
-    int font_height = _font->Get_Font_Height();
+    int font_width = font->Get_Font_Width();
+    int font_height = font->Get_Font_Height();
 
-    int y_pos = TacticalRect.Height - (row_index * (font_height + 2)) + 3;
+    int y_pos = TacticalRect.Height - (row_index * (font_height + 2)) + 1;
 
     Point2D timer_point;
     timer_point.X = TacticalRect.Width - 4;
     timer_point.Y = y_pos;
 
-    int x_offset = hours ? 56 : 38; // timer_rect.Width
+    int x_offset = hours ? 74 : 56; // timer_rect.Width
 
     Point2D name_point;
     name_point.X = TacticalRect.Width - x_offset - 3;
@@ -608,7 +610,7 @@ void TacticalExtension::Super_Draw_Timer(int row_index, ColorScheme *color, int 
 
     Rect fill_rect;
     fill_rect.X = TacticalRect.Width - (x_offset + name_rect.Width) - 4;
-    fill_rect.Y = y_pos-1;
+    fill_rect.Y = y_pos-2;
     fill_rect.Width = x_offset + name_rect.Width + 2;
     fill_rect.Height = timer_rect.Height + 2;
 
@@ -620,6 +622,77 @@ void TacticalExtension::Super_Draw_Timer(int row_index, ColorScheme *color, int 
 
     Fancy_Text_Print(namebuff, CompositeSurface, &CompositeSurface->Get_Rect(), 
         &name_point, color, COLOR_TBLACK, style);
+}
+
+
+/**
+ *  Draws the mission timer to the tactical screen.
+ *
+ *  @authors: CCHyper
+ */
+void TacticalExtension::Draw_Mission_Timer()
+{
+    //EXT_DEBUG_TRACE("TacticalExtension::Draw_Mission_Timer - 0x%08X\n", (uintptr_t)(This()));
+
+    /**
+     *  Non-release builds print the version information to the tactical view
+     *  so we need to adjust the timers to print above this text.
+     */
+#ifdef RELEASE
+    int row_index = 0;
+#else
+    int row_index = 3;
+#endif
+
+    if (!Scen->MissionTimer.Expired()) {
+        Draw_Timer(
+            row_index++,
+            ColorSchemes[PlayerPtr->RemapColor],
+            Scen->MissionTimer.Value() / TICKS_PER_SECOND,
+            "Test Timer String:"
+        );
+    }
+
+    /**
+     *  Iterate over all active super weapons and print their recharge timers.
+     */
+    for (int i = 0; i < Supers.Count(); ++i) {
+
+        SuperClass *super = Supers[i];
+        SuperClassExtension *superext = Extension::Fetch<SuperClassExtension>(super);
+        SuperWeaponTypeClassExtension *supertypeext = Extension::Fetch<SuperWeaponTypeClassExtension>(super->Class);
+
+        /**
+         *  Should we show the recharge timer for this super?
+         */
+        if (!supertypeext->IsShowTimer) {
+            continue;
+        }
+
+        if (super->House->Class->IsMultiplayPassive) {
+            continue;
+        }
+
+        /**
+         *  Skip supers that are disabled.
+         */
+        if (!super->IsPresent) {
+            continue;
+        }
+
+        if (super->Control.Value() != super->Class->RechargeTime) {
+
+            Draw_Timer(
+                row_index++,
+                ColorSchemes[super->House->RemapColor],
+                super->Control.Value() / TICKS_PER_SECOND,
+                super->Class->FullName,
+                &superext->FlashTimeEnd,
+                &superext->TimerFlashState
+            );
+        }
+
+    }
 }
 
 
@@ -694,7 +767,7 @@ void TacticalExtension::Draw_Super_Timers()
 
         if (super->Control.Value() != super->Class->RechargeTime) {
 
-            Super_Draw_Timer(
+            Draw_Timer(
                 row_index++,
                 ColorSchemes[super->House->RemapColor],
                 super->Control.Value() / TICKS_PER_SECOND,

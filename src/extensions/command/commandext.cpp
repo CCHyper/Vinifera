@@ -1032,9 +1032,9 @@ const char *AIInstantBuildCommandClass::Get_Description() const
 
 bool AIInstantBuildCommandClass::Process()
 {
-    if (!Session.Singleplayer_Game()) {
-        return false;
-    }
+    //if (!Session.Singleplayer_Game()) {
+    //    return false;
+    //}
 
     Vinifera_Developer_AIInstantBuild = !Vinifera_Developer_AIInstantBuild;
 

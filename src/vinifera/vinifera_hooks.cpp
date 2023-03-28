@@ -395,6 +395,16 @@ DECLARE_PATCH(_Select_Game_Clear_Globals_Patch)
      */
     Map.Set_Default_Mouse(MOUSE_NORMAL);
 
+
+
+
+
+    // force fog of war
+    Session.Options.FogOfWar = true;
+    Special.FogOfWar = true;
+    Scen->SpecialFlags.FogOfWar = true;
+
+
     JMP(0x004E1F30);
 }
 

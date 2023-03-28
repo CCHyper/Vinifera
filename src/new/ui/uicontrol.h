@@ -29,6 +29,8 @@
 
 #include "always.h"
 #include "tpoint.h"
+#include "typelist.h"
+#include "tibsun_defines.h"
 
 
 struct IStream;
@@ -65,6 +67,98 @@ class UIControlsClass
          *  Transparency of the text background.
          */
         unsigned TextLabelBackgroundTransparency;
+
+        /**
+         *  Should the tactical rubber band box be drawn with a drop shadow?
+         */
+        bool IsBandBoxDropShadow;
+
+        /**
+         *
+         */
+        bool IsBandBoxThick;
+
+        /**
+         *
+         */
+        RGBStruct BandBoxColor;
+
+        /**
+         *
+         */
+        RGBStruct BandBoxDropShadowColor;
+
+        /**
+         *  Transparency of the tactical rubber band.
+         */
+        unsigned BandBoxTintTransparency;
+
+        /**
+         *
+         */
+        TypeList<RGBStruct> BandBoxTintColors;
+
+        /**
+         *
+         */
+        bool IsMovementLineDashed;
+
+        /**
+         *
+         */
+        bool IsMovementLineDropShadow;
+
+        /**
+         *
+         */
+        bool IsMovementLineThick;
+
+        /**
+         *
+         */
+        RGBStruct MovementLineColor;
+
+        /**
+         *
+         */
+        RGBStruct MovementLineDropShadowColor;
+
+        /**
+         *
+         */
+        bool IsTargetLineDashed;
+        bool IsTargetLineDropShadow;
+        bool IsTargetLineThick;
+        RGBStruct TargetLineColor;
+        RGBStruct TargetLineDropShadowColor;
+
+        /**
+         *
+         */
+        bool IsTargetLaserDashed;
+        bool IsTargetLaserDropShadow;
+        bool IsTargetLaserThick;
+        RGBStruct TargetLaserColor;
+        RGBStruct TargetLaserDropShadowColor;
+
+        /**
+         *
+         */
+        unsigned TargetLaserTime;
+
+        /**
+         *
+         */
+        bool IsShowNavComQueueLines;
+
+        /**
+         *
+         */
+        bool IsNavComQueueLineDashed;
+        bool IsNavComQueueLineDropShadow;
+        bool IsNavComQueueLineThick;
+        RGBStruct NavComQueueLineColor;
+        RGBStruct NavComQueueLineDropShadowColor;
 };
 
 extern UIControlsClass *UIControls;

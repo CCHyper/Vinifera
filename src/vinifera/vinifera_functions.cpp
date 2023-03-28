@@ -154,6 +154,9 @@ static bool Vinifera_Load_Exception_Database(const char *filename)
     while (true) {
 
         char *tok = nullptr;
+
+        std::memset(line_buffer, 0, sizeof(line_buffer));
+        std::memset(&einfo, 0, sizeof(ExceptionInfoDatabaseStruct));
            
         /**
          *  Read the line into the buffer.
@@ -207,8 +210,12 @@ static bool Vinifera_Load_Exception_Database(const char *filename)
 
         tok = std::strtok(nullptr, ",");
         ASSERT(tok != nullptr);
+        einfo.ContinueAddress = std::strtoul(tok+2, nullptr, 16);
+
+        tok = std::strtok(nullptr, ",");
+        ASSERT(tok != nullptr);
         einfo.Ignore = std::strtoul(tok, nullptr, 10) ? true : false;
-        
+
         tok = std::strtok(nullptr, ",");
         ASSERT(tok != nullptr);
         std::strncpy(einfo.Description, tok, std::strlen(tok));
@@ -225,9 +232,9 @@ static bool Vinifera_Load_Exception_Database(const char *filename)
     DEV_DEBUG_INFO("Exception database dump...\n");
     for (int i = 0; i < ExceptionInfoDatabase.Count(); ++i) {
         ExceptionInfoDatabaseStruct &e = ExceptionInfoDatabase[i];
-        DEV_DEBUG_INFO("  0x%08X %s %s \"%.32s...\"\n",
+        DEV_DEBUG_INFO("  0x%08X %s 0x%08X %s \"%.32s...\"\n",
                        e.Address, e.CanContinue ? "true " : "false",
-                       e.Ignore ? "true " : "false",
+                       e.ContinueAddress, e.Ignore ? "true " : "false",
                        e.Description);
     }
 #endif
@@ -591,11 +598,11 @@ bool Vinifera_Startup()
         MessageBox(MainWindow, "Invalid or corrupt exception database, please reinstall Vinifera.", "Vinifera", MB_OK);
         return false;
     }
-    if (!Vinifera_Load_Exception_Database(dbfile.File_Name())) {
-        DEBUG_ERROR("Failed to load the exception database!\n");
-        MessageBox(MainWindow, "Failed to load the exception database, please reinstall Vinifera.", "Vinifera", MB_OK);
-        return false;
-    }
+    //if (!Vinifera_Load_Exception_Database(dbfile.File_Name())) {
+    //    DEBUG_ERROR("Failed to load the exception database!\n");
+    //    MessageBox(MainWindow, "Failed to load the exception database, please reinstall Vinifera.", "Vinifera", MB_OK);
+    //    return false;
+    //}
 
 #if !defined(TS_CLIENT)
     /**

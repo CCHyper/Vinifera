@@ -219,4 +219,16 @@ void CellClassExtension_Hooks()
 	Patch_Jump(0x00457EAB, &_CellClass_Goodie_Check_Crates_Disabled_Respawn_BugFix_Patch);
 	Patch_Jump(0x00454E60, &_CellClass_Draw_Shroud_Fog_Patch);
 	Patch_Jump(0x00455130, &_CellClass_Draw_Fog_Patch);
+
+
+
+
+
+    //Patch_Byte(0x00456395+1, 0x00); // disable shroud, only fog
+    //Patch_Byte(0x00456393, 0x74); // jnz to jz
+    //Patch_Byte_Range(0x00456390, 0x90, 5);
+
+	//// remove shroud grow in logic ai
+	//Patch_Jump(0x00506D0B, 0x00506D8E);
+	//Patch_Jump(0x00507221, 0x0050729C);
 }

@@ -120,6 +120,7 @@ struct ExceptionInfoDatabaseStruct
     ExceptionInfoDatabaseStruct() :
         Address(0x00000000),
         CanContinue(false),
+        ContinueAddress(0x00000000),
         Ignore(false),
         Description()
     {
@@ -131,6 +132,7 @@ struct ExceptionInfoDatabaseStruct
 
     uint32_t Address;
     bool CanContinue;
+    uint32_t ContinueAddress;
     bool Ignore;
     char Description[1024];
 };
