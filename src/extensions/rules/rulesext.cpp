@@ -38,6 +38,7 @@
 #include "noinit.h"
 #include "swizzle.h"
 #include "addon.h"
+#include "prerequisitetype.h"
 #include "vinifera_saveload.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -278,6 +279,7 @@ void RulesClassExtension::Process(CCINIClass &ini)
     General(ini);
     MPlayer(ini);
     AudioVisual(ini);
+    Prerequisite(ini);
 
     /**
      *  Process the objects (extension classes).
@@ -509,6 +511,47 @@ bool RulesClassExtension::Weapons(CCINIClass &ini)
                 DEV_DEBUG_INFO("Rules: Found WeaponType \"%s\".\n", buf);
             } else {
                 DEV_DEBUG_WARNING("Rules: Error processing WeaponType \"%s\"!\n", buf);
+            }
+
+        }
+
+    }
+
+    return counter > 0;
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+bool RulesClassExtension::Prerequisite(CCINIClass &ini)
+{
+    //EXT_DEBUG_TRACE("RulesClassExtension::Prerequisite - 0x%08X\n", (uintptr_t)(This()));
+
+    static const char * const PREREQUISITE = "PrerequisiteGroupTypes";
+
+    char buf[128];
+    PrerequisiteGroupTypeClass *pgroup;
+
+    int counter = ini.Entry_Count(PREREQUISITE);
+    for (int index = 0; index < counter; ++index) {
+        const char *entry = ini.Get_Entry(PREREQUISITE, index);
+
+        /**
+         *  Get a prerequisite group entry.
+         */
+        if (ini.Get_String(PREREQUISITE, entry, buf, sizeof(buf))) {
+
+            /**
+             *  Find or create a prerequisite group of the name specified.
+             */
+            pgroup = PrerequisiteGroupTypeClass::Find_Or_Make(buf);
+            if (pgroup) {
+                DEV_DEBUG_INFO("Rules: Found PrerequisiteGroupType \"%s\".\n", buf);
+            } else {
+                DEV_DEBUG_WARNING("Rules: Error processing PrerequisiteGroupType \"%s\"!\n", buf);
             }
 
         }
