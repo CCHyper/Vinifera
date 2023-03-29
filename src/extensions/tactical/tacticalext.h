@@ -75,6 +75,7 @@ class TacticalExtension final : public GlobalExtensionClass<Tactical>
 
         void Draw_Information_Text();
         void Draw_Super_Timers();
+        void Draw_Selection_Icons();
 
         void Render_Post();
 

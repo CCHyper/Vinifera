@@ -73,7 +73,8 @@ RulesClassExtension::RulesClassExtension(const RulesClass *this_ptr) :
     IsMPAutoDeployMCV(false),
     IsMPPrePlacedConYards(false),
     IsBuildOffAlly(true),
-    IsShowSuperWeaponTimers(true)
+    IsShowSuperWeaponTimers(true),
+    SelectedObjectsIconScale(1.0f)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("RulesClassExtension::RulesClassExtension - 0x%08X\n", (uintptr_t)(ThisPtr));
 
@@ -450,6 +451,7 @@ bool RulesClassExtension::AudioVisual(CCINIClass &ini)
     }
 
     IsShowSuperWeaponTimers = ini.Get_Bool(AUDIOVISUAL, "ShowSuperWeaponTimers", IsShowSuperWeaponTimers);
+    SelectedObjectsIconScale = ini.Get_Float(AUDIOVISUAL, "SelectedObjectsIconScale", SelectedObjectsIconScale);
 
     return true;
 }

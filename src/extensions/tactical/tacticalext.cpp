@@ -30,6 +30,7 @@
 #include "wwcrc.h"
 #include "vinifera_globals.h"
 #include "tibsun_globals.h"
+#include "tibsun_functions.h"
 #include "colorscheme.h"
 #include "rgb.h"
 #include "wwfont.h"
@@ -48,11 +49,14 @@
 #include "supertypeext.h"
 #include "rules.h"
 #include "rulesext.h"
+#include "drawshape.h"
 #include "swizzle.h"
 #include "vinifera_saveload.h"
 #include "extension.h"
 #include "asserthandler.h"
 #include "debughandler.h"
+#include <vector>
+#include <map>
 
 
 /**
@@ -508,8 +512,9 @@ void TacticalExtension::Render_Post()
     //DEV_DEBUG_INFO("After EBoltClass::Draw_All\n");
 
     /**
-     *  Draw any overlay text.
+     *  Draw any overlay graphics/text.
      */
+    Draw_Selection_Icons();
     Draw_Super_Timers();
 }
 
@@ -686,5 +691,163 @@ void TacticalExtension::Draw_Super_Timers()
             );
         }
 
+    }
+}
+
+
+/**
+ *  x
+ *
+ *  @authors: CCHyper, OmniBlade
+ */
+#include "technotypeext.h"
+#include "bsurface.h"
+void TacticalExtension::Draw_Selection_Icons()
+{
+    //EXT_DEBUG_TRACE("TacticalExtension::Draw_Selection_Icons - 0x%08X\n", (uintptr_t)(This()));
+
+    if (!CurrentObjects.Count()) {
+        return;
+    }
+
+    //typedef struct IconDrawStruct
+    //{
+    //    TechnoClass *Object;
+    //
+    //    bool operator == (const IconDrawStruct &that) const { return RTTI == that.RTTI && Object == that.Object; }
+    //    bool operator != (const IconDrawStruct &that) const { return RTTI != that.RTTI && Object != that.Object; }
+    //} IconDrawStruct;
+
+    typedef struct IconDrawStruct
+    {
+        TechnoClass *Object;
+        
+        bool operator == (const IconDrawStruct &that) const { return Object == that.Object; }
+        bool operator != (const IconDrawStruct &that) const { return Object != that.Object; }
+    };
+
+    //IndexClass<RTTIType, unsigned> icon_draw_index;
+
+    //std::map<RTTIType, unsigned> icon_draw_count;
+    //std::map<RTTIType, unsigned> type_map;
+
+    std::vector<IconDrawStruct> icon_draw_index;
+
+    ColorScheme *white_color = ColorScheme::As_Pointer("White", 1);
+
+    /**
+     *  x
+     */
+    for (int index = 0; index < CurrentObjects.Count(); ++index) {
+
+        ObjectClass *object = CurrentObjects[index];
+
+        if (object->What_Am_I() != RTTI_UNIT
+         && object->What_Am_I() != RTTI_INFANTRY
+         && object->What_Am_I() != RTTI_AIRCRAFT) {
+             continue;
+        }
+
+        if (!PlayerPtr->Is_Ally(object)) {
+            continue;
+        }
+
+        TechnoClass *techno = object->As_Techno();
+
+        IconDrawStruct icon { techno, (RTTIType)techno->What_Am_I(), techno->Get_Heap_ID() };
+
+        if (!icon_draw_list.Is_Present(icon)) {
+            DEBUG_INFO("Added %d %d\n", (RTTIType)techno->What_Am_I(), techno->Get_Heap_ID());
+            icon_draw_list.Add(icon);
+        }
+
+        //++count_map[(RTTIType)object->What_Am_I()];
+
+        //IconDrawStruct data { (RTTIType)CurrentObjects[index]->What_Am_I(), (TechnoClass *)object };
+        //if (!icon_draw_list.Is_Present(data)) {
+        //
+        //    //icon_draw_index.Add_Index((RTTIType)CurrentObjects[index]->What_Am_I(), 1);
+        //    ++count_map[(RTTIType)CurrentObjects[index]->What_Am_I()];
+        //
+        //    icon_draw_list.Add(techno);
+        //}
+    }
+
+    int icon_padding = 1;
+
+    /**
+     *  x
+     */
+    for (int index = 0; index < icon_draw_list.Count(); ++index) {
+
+        //IconDrawStruct &object = icon_draw_list[index];
+        //int object_count = count_map[object.RTTI];
+        //if (!object_count) {
+        //    continue;
+        //}
+        int object_count = 1;
+
+        ObjectClass *object = CurrentObjects[index];
+
+        const TechnoTypeClass *ttype = object->Techno_Type_Class();
+        const TechnoTypeClassExtension *ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+        if (ttype == nullptr) {
+            continue;
+        }
+
+        BSurface *icon_surface = ttypeext->CameoImageScaledSurface ? ttypeext->CameoImageScaledSurface : ttypeext->CameoImageSurface;
+        if (icon_surface == nullptr) {
+            continue;
+        }
+
+        int icon_width = icon_surface->Get_Width();
+        int icon_height = icon_surface->Get_Height();
+
+        /**
+         *  Calcaulate the positions for the background and icon.
+         */
+        Rect background_rect;
+        background_rect.X = TacticalRect.X;
+        background_rect.Y = TacticalRect.Y + (TacticalRect.Height - icon_height) - (icon_padding * 2);
+        background_rect.Width = icon_width + (icon_padding * 2);
+        background_rect.Height = icon_height + (icon_padding * 2);
+
+        Point2D icon_pos;
+        icon_pos.X = icon_padding;
+        icon_pos.Y = TacticalRect.Height - icon_height - icon_padding;
+
+        Point2D counter_pos;
+        counter_pos.X = icon_pos.X + icon_width - 2;
+        counter_pos.Y = icon_pos.Y + 1;
+
+        /**
+         *  Adjust the positions based on the column.
+         */
+        background_rect.X += index == 0 ? 0 : ((background_rect.Width/* - 1*/) * index); // We minus one as we want the left border to overlap.
+        icon_pos.X += index == 0 ? 0 : background_rect.X;
+        counter_pos.X += index == 0 ? 0 : background_rect.X;
+
+        //RGBClass object_color = ColorSchemes[PlayerPtr->RemapColor]->field_308;
+        RGBClass object_color = object->Owning_House()->RemapColorRGB;
+
+        /**
+         *  Draw the background frame.
+         */
+        CompositeSurface->Fill_Rect(background_rect,
+            DSurface::RGB_To_Pixel(object_color.Red/2, object_color.Green/2, object_color.Blue/2));
+        CompositeSurface->Draw_Rect(background_rect,
+            DSurface::RGB_To_Pixel(object_color.Red, object_color.Green, object_color.Blue));
+
+        /**
+         *  Draw the cameo icon for this type.
+         */
+        Rect torect(icon_pos.X, icon_pos.Y + TacticalRect.Y, icon_width, icon_height);
+        CompositeSurface->Copy_From(torect, *icon_surface, icon_surface->Get_Rect());
+
+        /**
+         *  Draw the number of this type selected.
+         */
+        Fancy_Text_Print("%d", CompositeSurface, &TacticalRect,
+            &counter_pos, white_color, COLOR_TBLACK, TPF_RIGHT, object_count);
     }
 }

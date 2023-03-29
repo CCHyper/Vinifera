@@ -64,17 +64,15 @@ DECLARE_PATCH(_SidebarClass_StripClass_ObjectTypeClass_Custom_Cameo_Image_Patch)
     static const TechnoTypeClassExtension *technotypeext;
     static const ShapeFileStruct *shapefile;
 
-    shapefile = obj->Get_Cameo_Data();
+    //shapefile = obj->Get_Cameo_Data();
 
     _SidebarClass_StripClass_obj = obj;
     _SidebarClass_StripClass_CustomImage = nullptr;
 
     technotypeext = Extension::Fetch<TechnoTypeClassExtension>(reinterpret_cast<const TechnoTypeClass *>(obj));
-    if (technotypeext->CameoImageSurface) {
-        _SidebarClass_StripClass_CustomImage = technotypeext->CameoImageSurface;
-    }
+    _SidebarClass_StripClass_CustomImage = technotypeext->CameoImageSurface;
 
-    _asm { mov eax, shapefile }
+    //_asm { mov eax, shapefile }
 
     JMP_REG(ebx, 0x005F5193);
 }
@@ -119,14 +117,10 @@ DECLARE_PATCH(_SidebarClass_StripClass_Custom_Cameo_Image_Patch)
     GET_REGISTER_STATIC(const ShapeFileStruct *, shapefile, ebx);
     static BSurface *image_surface;
 
-    image_surface = nullptr;
-
     /**
      *  Was a factory object or special image found?
      */
-    if (_SidebarClass_StripClass_CustomImage) {
-        image_surface = _SidebarClass_StripClass_CustomImage;
-    }
+    image_surface = _SidebarClass_StripClass_CustomImage;
 
     /**
      *  Draw the cameo pcx image.
@@ -145,7 +139,7 @@ DECLARE_PATCH(_SidebarClass_StripClass_Custom_Cameo_Image_Patch)
     } else if (shapefile) {
         pointxy.X = pos_x;
         pointxy.Y = pos_y;
-
+    
         CC_Draw_Shape(SidebarSurface, CameoDrawer, shapefile, 0, &pointxy, window_rect, SHAPE_400|SHAPE_NORMAL);
     }
 

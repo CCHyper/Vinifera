@@ -151,4 +151,9 @@ class TechnoTypeClassExtension : public ObjectTypeClassExtension
          *  Pointer to the cameo image surface.
          */
         BSurface *CameoImageSurface;
+
+        /**
+         *  Pointer to the cameo image surface which is scaled.
+         */
+        BSurface *CameoImageScaledSurface;
 };

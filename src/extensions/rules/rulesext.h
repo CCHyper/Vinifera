@@ -90,4 +90,9 @@ class RulesClassExtension final : public GlobalExtensionClass<RulesClass>
          *  on the tactical view?
          */
         bool IsShowSuperWeaponTimers;
+
+        /**
+         *  x
+         */
+        float SelectedObjectsIconScale;
 };

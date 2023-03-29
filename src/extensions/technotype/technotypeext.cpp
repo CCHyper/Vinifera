@@ -34,6 +34,9 @@
 #include "tibsun_globals.h"
 #include "vinifera_util.h"
 #include "spritecollection.h"
+#include "rules.h"
+#include "rulesext.h"
+#include "surfacescale.h"
 #include "vinifera_saveload.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -65,7 +68,8 @@ TechnoTypeClassExtension::TechnoTypeClassExtension(const TechnoTypeClass *this_p
     VoiceDeploy(),
     VoiceHarvest(),
     IdleRate(0),
-    CameoImageSurface(nullptr)
+    CameoImageSurface(nullptr),
+    CameoImageScaledSurface(nullptr)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("TechnoTypeClassExtension::TechnoTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
@@ -94,6 +98,9 @@ TechnoTypeClassExtension::~TechnoTypeClassExtension()
 
     delete CameoImageSurface;
     CameoImageSurface = nullptr;
+
+    delete CameoImageScaledSurface;
+    CameoImageScaledSurface = nullptr;
 }
 
 
@@ -216,6 +223,7 @@ void TechnoTypeClassExtension::Compute_CRC(WWCRCEngine &crc) const
  *  
  *  @author: CCHyper
  */
+#include "drawshape.h"
 bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
 {
     //EXT_DEBUG_TRACE("TechnoTypeClassExtension::Read_INI - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
@@ -269,6 +277,33 @@ bool TechnoTypeClassExtension::Read_INI(CCINIClass &ini)
     BSurface *imagesurface = Vinifera_Get_Image_Surface(This()->CameoFilename);
     if (imagesurface) {
         CameoImageSurface = imagesurface;
+
+    } else {
+        CameoImageSurface = new BSurface(This()->CameoData->Get_Width(),
+                                         This()->CameoData->Get_Height(),
+                                         2);
+        CC_Draw_Shape(CameoImageSurface, CameoDrawer, This()->CameoData, 0, &Point2D(0,0), &CameoImageSurface->Get_Rect());
+    }
+
+    /**
+     *  Scale the cameo graphic is desired.
+     */
+    if (RuleExtension->SelectedObjectsIconScale != 1.0f) {
+
+        float image_scale = RuleExtension->SelectedObjectsIconScale;
+
+        BSurface *scaledsurface = new BSurface(CameoImageSurface->Get_Width() * image_scale,
+                                               CameoImageSurface->Get_Height() * image_scale,
+                                               CameoImageSurface->Get_Bytes_Per_Pixel());
+
+        CameoImageScaledSurface = scaledsurface;
+        ASSERT(CameoImageScaledSurface != nullptr);
+
+        Scale_Surface_Lanczos(CameoImageSurface, scaledsurface);
+        //Scale_Surface_Bilinear(CameoImageSurface, scaledsurface);
+        //Scale_Surface_Bicubic(CameoImageSurface, scaledsurface);
+        //Scale_Surface_Cardinal(CameoImageSurface, scaledsurface);
+        //Scale_Surface_Nearest(CameoImageSurface, scaledsurface);
     }
 
     return true;
