@@ -45,7 +45,7 @@ class MouseTypeClass
     friend class MouseClassExt;
 
     public:
-        MouseTypeClass(int start_frame, int frame_count, int frame_rate, int small_frame, Point2D hotspot);
+        MouseTypeClass(int start_frame, int frame_count, int frame_rate, int small_frame, int small_frame_count, int small_frame_rate, Point2D hotspot);
         MouseTypeClass(const NoInitClass &noinit);
         virtual ~MouseTypeClass();
 
@@ -81,6 +81,16 @@ class MouseTypeClass
          *  Start frame number for small version (if any).
          */
         int SmallFrame;
+
+        /**
+         *  Number of animation frames for small version (if any).
+         */
+        int SmallFrameCount;
+
+        /**
+         *  Frame delay between changing frames for small version (if any).
+         */
+        int SmallFrameRate;
 
         /**
          *  Hotspot X and Y offset.

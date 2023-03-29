@@ -102,7 +102,7 @@ bool MouseClassExt::_Override_Mouse_Shape(MouseType mouse, bool wsmall)
      *  Only certain mouse shapes have a small counterpart. If the requested mouse
      *  shape is not one of these, then force the small size override flag to false.
      */
-    if (control->SmallFrame == -1) {
+    if (control->SmallFrame == -1 || !control->SmallFrameCount) {
         wsmall = false;
     }
 
@@ -113,7 +113,7 @@ bool MouseClassExt::_Override_Mouse_Shape(MouseType mouse, bool wsmall)
     if (!startup || (MouseShapes && ((mouse != CurrentMouseShape) || (wsmall != IsSmall)))) {
         startup = true;
 
-        Timer = control->FrameRate;
+        Timer = wsmall ? control->SmallFrameRate : control->FrameRate;
         Frame = 0;
 
         baseshp = Get_Mouse_Current_Frame(mouse, wsmall);
@@ -139,11 +139,11 @@ void MouseClassExt::_AI(KeyNumType &input, Point2D &xy)
     //MouseStruct const * control = &MouseControl[CurrentMouseShape];
     MouseTypeClass const * control = MouseTypeClass::As_Pointer(CurrentMouseShape);
 
-    if (control->FrameRate && Timer == 0) {
+    if (((IsSmall && control->SmallFrameRate) || control->FrameRate) && Timer == 0) {
 
         Frame++;
-        Frame %= control->FrameCount;
-        Timer = control->FrameRate;
+        Frame %= IsSmall ? control->SmallFrameCount : control->FrameCount;
+        Timer = IsSmall ? control->SmallFrameRate : control->FrameRate;
         int baseframe = Get_Mouse_Current_Frame(CurrentMouseShape, IsSmall);
         Point2D hotspot = Get_Mouse_Hotspot(CurrentMouseShape);
         WWMouse->Set_Cursor(&hotspot, MouseShapes, baseframe);
