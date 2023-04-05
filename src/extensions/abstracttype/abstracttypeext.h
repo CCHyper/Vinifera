@@ -48,6 +48,8 @@ class AbstractTypeClassExtension : public AbstractClassExtension
         AbstractTypeClassExtension(const NoInitClass &noinit);
         virtual ~AbstractTypeClassExtension();
 
+        virtual bool Initialize();
+
         virtual const char *Name() const override;
         virtual const char *Full_Name() const override;
 

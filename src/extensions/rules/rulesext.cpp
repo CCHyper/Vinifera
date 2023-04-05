@@ -31,6 +31,9 @@
 #include "tiberium.h"
 #include "weapontype.h"
 #include "buildingtype.h"
+#include "unittype.h"
+#include "infantrytype.h"
+#include "aircrafttype.h"
 #include "housetype.h"
 #include "side.h"
 #include "wstring.h"
@@ -695,4 +698,420 @@ void RulesClassExtension::Fixups(CCINIClass &ini)
     }
 
     DEBUG_INFO("Rules::Fixups(exit)\n");
+}
+
+
+/**
+ *  This function will reinitialise all of the type classes to their default states
+ *  before the whole rules files is reprocessed.
+ *
+ *  @author: CCHyper
+ */
+void RulesClassExtension::Reinitialise_Type_Classes()
+{
+    /**
+     *  Ensure the game state is currently requested actually reinitialise the rules data.
+     */
+    if (!Vinifera_Developer_IsToReloadRules) {
+        return;
+    }
+
+    for (int index = 0; index < AbstractTypes.Count(); ++index) {
+
+        AbstractTypeClass *atype = AbstractTypes[index];
+        if (atype == nullptr) continue;
+
+        if (atype->What_Am_I() == RTTI_CAMPAIGN
+         || atype->What_Am_I() == RTTI_ISOTILETYPE
+         || atype->What_Am_I() == RTTI_SCRIPTTYPE
+         || atype->What_Am_I() == RTTI_TASKFORCE
+         || atype->What_Am_I() == RTTI_TEAMTYPE
+         || atype->What_Am_I() == RTTI_TRIGGERTYPE
+         || atype->What_Am_I() == RTTI_TAGTYPE) {
+            continue;
+        }
+
+        /**
+         *  ObjectTypeClass
+         */
+        ObjectTypeClass *otype = reinterpret_cast<ObjectTypeClass *>(atype);
+        otype->RadialColor = RGBClass(0,0,0);
+        otype->Armor = ARMOR_NONE;
+        otype->MaxStrength = 0;
+        otype->Image = nullptr;
+        otype->AlphaImage = nullptr;
+        //otype->BodyVoxel = nullptr;
+        //otype->BodyMotion = nullptr;
+        //otype->TurretVoxel = nullptr;
+        //otype->TurretMotion = nullptr;
+        //otype->BarrelVoxel = nullptr;
+        //otype->BarrelMotion = nullptr;
+        otype->MaxDimension = 0;
+        otype->CrushSound = VOC_NONE;
+        std::strncpy(otype->GraphicName, otype->IniName, sizeof(otype->GraphicName));
+        std::memset(otype->AlphaGraphicName, 0, sizeof(otype->AlphaGraphicName));
+        otype->IsTheater = false;
+        otype->IsCrushable = false;
+        otype->IsStealthy = false;
+        otype->IsSelectable = true;
+        otype->IsLegalTarget = true;
+        otype->IsInsignificant = false;
+        otype->IsImmune = false;
+        otype->IsSentient = false;
+        otype->IsFootprint = true;
+        otype->IsVoxel = false;
+        otype->IsNewTheater = false;
+        otype->IsHasRadialIndicator = false;
+        otype->IsIgnoresFirestorm = false;
+        //otype->field_D4.Clear();
+        //otype->field_E8.Clear();
+        //otype->field_FC.Clear();
+        //otype->field_110.Clear();
+
+        ObjectTypeClassExtension *otypeext = Extension::Fetch<ObjectTypeClassExtension>(otype);
+        otypeext->Initialize();
+
+        if (otype->What_Am_I() == RTTI_AIRCRAFTTYPE
+            || otype->What_Am_I() == RTTI_BUILDINGTYPE
+            || otype->What_Am_I() == RTTI_INFANTRYTYPE
+            || otype->What_Am_I() == RTTI_UNITTYPE) {
+
+            /**
+             *  TechnoTypeClass
+             */
+            TechnoTypeClass *ttype = reinterpret_cast<TechnoTypeClass *>(otype);
+            ttype->CollateralDamageCoefficient = 0.33f;
+            //ttype->field_128;
+            ttype->WalkRate = 1;
+            std::memset((void*)&ttype->VeteranAbilities, 0, sizeof(ttype->VeteranAbilities));
+            std::memset((void*)&ttype->EliteAbilities, 0, sizeof(ttype->EliteAbilities));
+            ttype->SpecialThreatValue = 0.0;
+            ttype->MyEffectivenessCoefficient = 0.0;
+            ttype->TargetEffectivenessCoefficient = 0.0;
+            ttype->TargetSpecialThreatCoefficient = 0.0;
+            ttype->TargetStrengthCoefficient = 0.0;
+            ttype->TargetDistanceCoefficient = 0.0;
+            ttype->ThreatAvoidanceCoefficient = 0.0;
+            ttype->SlowdownDistance = 500;
+            ttype->DeaccelerationFactor = 0.002;
+            ttype->AccelerationFactor = 0.003;
+            ttype->CloakingSpeed = 7;
+            ttype->DebrisTypes.Clear();
+            ttype->DebrisMaximums.Clear();
+            std::memset((void*)&ttype->EliteAbilities, 0, sizeof(ttype->EliteAbilities));
+            ttype->Locomotor = __uuidof(TeleportLocomotionClass);
+            ttype->field_1F8 = 0.0;
+            ttype->field_200 = 0.0;
+            ttype->Weight = 1.0;
+            ttype->PhysicalSize = 2.0;
+            ttype->InitialMission = MISSION_HUNT;
+            ttype->RollAngle = 0.523598775598299;
+            ttype->PitchSpeed = 0.25;
+            ttype->PitchAngle = 0.349065850398866;
+            ttype->BuildLimit = 0x7FFFFFFF; // hmm?
+            ttype->Category = CATEGORY_NONE;
+            ttype->field_240 = 0;
+            ttype->DeployTime = 0.0;
+            ttype->FireAngle = 8; // TODO, what scale is this?
+            ttype->PipScale = PipScaleType(0); // TODO, missing enum
+            ttype->Dock.Clear();
+            ttype->DeploysInto = nullptr;
+            ttype->UndeploysInto = nullptr;
+            ttype->VoiceSelect.Clear();
+            ttype->VoiceMove.Clear();
+            ttype->VoiceAttack.Clear();
+            ttype->VoiceDie.Clear();
+            ttype->VoiceFeedback.Clear();
+            ttype->AuxSound1 = VOC_NONE;
+            ttype->AuxSound2 = VOC_NONE;
+            ttype->MZone = MZONE_NORMAL;
+            ttype->ThreatRange = 0;
+            ttype->MaxDebris = 0;
+            ttype->MaxPassengers = 0;
+            ttype->SightRange = 0;
+            ttype->Cost = 0;
+            ttype->FlightLevel = -1;
+            ttype->TechLevel = -1; // TODO Check
+            ttype->Prerequisite.Clear();
+            ttype->Risk = 0;
+            ttype->Reward = 0;
+            ttype->MaxSpeed = MPHType(0);      // TODO, missing enum.
+            ttype->Speed = SPEED_FOOT;      // TODO, check RA?
+            ttype->MaxAmmo = -1;
+            ttype->Ownable = 0;
+            ttype->IsAllowedToStartInMultiplayer = true;
+            std::memset(ttype->CameoFilename, 0, sizeof(ttype->CameoFilename));
+            ttype->CameoData = nullptr;
+            ttype->Rotation = 0;
+            ttype->ROT = 0;
+            ttype->TurretOffset = 0;
+            ttype->Points = 0;
+            ttype->Explosion.Clear();
+            ttype->NaturalParticleSystem = nullptr;
+            ttype->NaturalParticleSystemLocation = TPoint3D<int>(0,0,0);
+            ttype->DamageParticleSystems.Clear();
+            ttype->DamageSmokeOffset = TPoint3D<int>(0,0,0);
+            ttype->ShadowIndex = 0;
+            ttype->Storage = 0;
+            ttype->TurretNotExportedOnGround;
+            ttype->Weapons[WEAPON_SLOT_COUNT];
+            ttype->IsTypeImmune = false;
+            ttype->MoveToShroud = true;
+            ttype->IsTrainable = true;
+            ttype->DamageSparks = true;
+            ttype->TargetLaser = false;
+            ttype->IsImmuneToVeins = false;
+            ttype->IsTiberiumHeal = false;
+            ttype->CloakStop = false;
+            ttype->IsTrain = false;
+            ttype->IsDropship = false;
+            ttype->ToProtect = false;
+            ttype->Disableable = true;
+            ttype->Unbuildable_or_CanBuild = false;
+            ttype->IsDoubleOwned = false;
+            ttype->IsInvisible = false;
+            ttype->IsRadarVisible = false;
+            ttype->IsLeader = false;
+            ttype->IsScanner = false;
+            ttype->IsNominal = false;
+            ttype->IsTurretEquipped = false;
+            ttype->IsRepairable = true;
+            ttype->IsCrew = false;
+            ttype->IsRemappable = false;
+            ttype->IsCloakable = false;
+            ttype->IsSelfHealing = false;
+            ttype->IsExploding = false;
+            ttype->IsNoAutoFire = false;
+            ttype->IsTurretSpins = false;
+            ttype->IsRegulated = false;
+            ttype->IsManualReload = false;
+            ttype->IsVisibleLoad = false;
+            ttype->IsLightningRod = false;
+            ttype->IsHunterSeeker = false;
+            ttype->IsCrusher = false;
+            ttype->IsTiltsWhenCrushes = true;
+            ttype->IsSubterranean = false;
+            ttype->IsAutoCrush = false;
+            ttype->IsAccelerates = true;
+            ttype->ZFudgeCliff = 10;
+            ttype->ZFudgeColumn = 5;
+            ttype->ZFudgeTunnel = 10;
+            ttype->ZFudgeBridge = 0;
+
+            TechnoTypeClassExtension *ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+            ttypeext->Initialize();
+
+            /**
+             *  TechnoType derived.
+             */
+            switch (ttype->What_Am_I()) {
+                case RTTI_INFANTRYTYPE:
+                {
+                    InfantryTypeClassExtension* itypeext = Extension::Fetch<InfantryTypeClassExtension>(ttype);
+                    itypeext->Initialize();
+                    break;
+                }
+                case RTTI_UNITTYPE:
+                {
+                    UnitTypeClass *utype = reinterpret_cast<UnitTypeClass *>(ttype);
+                    utype->MovementRestrictedTo = LAND_NONE;
+                    utype->HalfDamageSmokeLocation = TPoint3D<int>(0,0,0);
+                    utype->IsPassive = false;
+                    utype->IsCrateGoodie = false;
+                    utype->IsToHarvest = false;
+                    utype->IsToVeinHarvest = false;
+                    utype->IsFireAnim = false;
+                    utype->IsLockTurret = false;
+                    utype->IsNoFireWhileMoving = false;
+                    utype->IsDeployToFire = false;
+                    utype->IsTilter = false;
+                    utype->UseTurretShadow = false;
+                    utype->IsTooBigToFitUnderBridge = false;
+                    utype->IsSmallVisceroid = false;
+                    utype->IsLargeVisceroid = false;
+                    utype->IsCarriesCrate = false;
+                    utype->AltImage = nullptr;
+                    utype->IsNonVehicle = false;
+                    utype->IsJellyfish = false;
+                    utype->IsLimpetDrone = false;
+                    utype->IsMobileEMP = false;
+                    utype->IsCoreDefender = false;
+                    utype->StandingFrames = 0;
+                    utype->DeathFrames = 0;
+                    utype->DeathFrameRate = 1;
+                    utype->MaxCharge = 0;
+                    utype->StartCharge = 0;
+                    std::memset(utype->FiringSyncFrame, 0, sizeof(utype->FiringSyncFrame));
+                    utype->StartStandFrame = -1;
+                    utype->StartWalkFrame = -1;
+                    utype->StartFiringFrame = -1;
+                    utype->StartDeathFrame = -1;
+                    utype->MaxDeathCounter = -1;
+                    utype->Facings = 8;
+                    utype->WalkFrames = 12;
+                    utype->FiringFrames = 0;
+                    std::memset(utype->AltImageFile, 0, sizeof(utype->AltImageFile));
+
+                    UnitTypeClassExtension *utypeext = Extension::Fetch<UnitTypeClassExtension>(ttype);
+                    utypeext->Initialize();
+                    break;
+                }
+                case RTTI_BUILDINGTYPE:
+                {
+                    BuildingTypeClass *btype = reinterpret_cast<BuildingTypeClass *>(ttype);
+
+                    BuildingTypeClassExtension* btypeext = Extension::Fetch<BuildingTypeClassExtension>(ttype);
+                    btypeext->Initialize();
+                    break;
+                }
+                case RTTI_AIRCRAFTTYPE:
+                {
+                    AircraftTypeClass *btype = reinterpret_cast<AircraftTypeClass *>(ttype);
+
+                    AircraftTypeClassExtension* atypeext = Extension::Fetch<AircraftTypeClassExtension>(ttype);
+                    atypeext->Initialize();
+                    break;
+                }
+            };
+
+        } else {
+
+            /**
+             *  Non-TechnoTypes
+             */
+            switch (otype->What_Am_I()) {
+                case RTTI_ANIMTYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_BULLETTYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_HOUSETYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_ISOTILETYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_OVERLAYTYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_PARTICLETYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_PARTICLESYSTEMTYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_SCRIPTTYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_SIDE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_SMUDGETYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_SUPERWEAPONTYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_TERRAINTYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_VOXELANIMTYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                    break;
+                case RTTI_TIBERIUM:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_WEAPONTYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+                case RTTI_WARHEADTYPE:
+                {
+                    BuildingTypeClass* btype = reinterpret_cast<BuildingTypeClass*>(ttype);
+
+                    TechnoTypeClassExtension* ttypeext = Extension::Fetch<TechnoTypeClassExtension>(ttype);
+                    ttypeext->Initialize();
+                    break;
+                }
+            };
+
+        }
+
+    }
 }

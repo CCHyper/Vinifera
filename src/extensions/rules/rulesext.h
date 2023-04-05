@@ -65,6 +65,8 @@ class RulesClassExtension final : public GlobalExtensionClass<RulesClass>
         bool AudioVisual(CCINIClass &ini);
         bool Weapons(CCINIClass &ini);
 
+        void Reinitialise_Type_Classes();
+
     private:
         void Check();
         void Fixups(CCINIClass &ini);

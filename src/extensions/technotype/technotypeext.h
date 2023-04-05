@@ -51,6 +51,8 @@ class TechnoTypeClassExtension : public ObjectTypeClassExtension
         TechnoTypeClassExtension(const NoInitClass &noinit);
         virtual ~TechnoTypeClassExtension();
 
+        virtual bool Initialize() override;
+
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 

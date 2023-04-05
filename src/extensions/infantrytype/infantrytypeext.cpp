@@ -187,6 +187,6 @@ bool InfantryTypeClassExtension::Read_INI(CCINIClass &ini)
 
     IsMechanic = ini.Get_Bool(ini_name, "Mechanic", IsMechanic);
     IsOmniHealer = ini.Get_Bool(ini_name, "OmniHealer", IsOmniHealer);
-    
+
     return true;
 }

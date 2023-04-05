@@ -45,6 +45,8 @@ class ObjectTypeClassExtension : public AbstractTypeClassExtension
         ObjectTypeClassExtension(const NoInitClass &noinit);
         virtual ~ObjectTypeClassExtension();
 
+        virtual bool Initialize() override;
+
         virtual void Detach(TARGET target, bool all = true) override;
         virtual void Compute_CRC(WWCRCEngine &crc) const override;
 
