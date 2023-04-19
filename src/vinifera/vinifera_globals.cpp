@@ -38,6 +38,12 @@ bool Vinifera_PrintFileErrors = true;
 bool Vinifera_FatalFileErrors = false;
 bool Vinifera_AssertFileErrors = false;
 
+#ifndef NDEBUG
+bool Vinifera_IsZipFileIOEnabled = true;    // DEBUG TESTING, REMOVE FOR PR
+#else
+bool Vinifera_IsZipFileIOEnabled = false;
+#endif
+
 char Vinifera_ExceptionDatabaseFilename[PATH_MAX] = { "GAME.EDB" };
 char Vinifera_DebugDirectory[PATH_MAX] = { "Debug" };
 char Vinifera_ScreenshotDirectory[PATH_MAX] = { "Screenshots" };

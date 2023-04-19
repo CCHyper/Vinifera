@@ -49,6 +49,7 @@
 #include "extension.h"
 #include "theatertype.h"
 #include "uicontrol.h"
+#include "filesys.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <string>
@@ -110,6 +111,8 @@ bool Vinifera_Load_INI()
     Vinifera_ProjectVersion[sizeof(Vinifera_ProjectVersion)-1] = '\0';
     Vinifera_IconName[sizeof(Vinifera_IconName)-1] = '\0';
     Vinifera_CursorName[sizeof(Vinifera_CursorName)-1] = '\0';
+
+    Vinifera_IsZipFileIOEnabled = ini.Get_Bool("File", "UseZipFiles", Vinifera_IsZipFileIOEnabled);
 
     char buffer[1024];
     if (ini.Get_String("General", "SearchPaths", buffer, sizeof(buffer)) > 0) {
@@ -353,6 +356,7 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
             continue;
         }
 
+#if !defined(VINIFERA_USE_PHYSICSFS)
         /**
          *  #issue-513
          * 
@@ -378,6 +382,12 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
             }
             continue;
         }
+#else
+        /**
+         *  Flag the cd search system to search for files locally.
+         */
+        CD::IsFilesLocal = true;
+#endif
 
         /**
          *  Should assertions only be printed to the debug log?
@@ -467,6 +477,12 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
  */
 bool Vinifera_Startup()
 {
+#if defined(VINIFERA_USE_PHYSICSFS)
+
+    PhysicsFS_Init();
+    PhysicsFS_Test();
+#endif
+
     DWORD rc;
 
     ViniferaSearchPaths.Clear();
@@ -479,6 +495,14 @@ bool Vinifera_Startup()
     }
     
 #ifndef NDEBUG
+
+    /**
+     *  Debug paths for testing the PhysicsFS interface.
+     */
+#if defined(VINIFERA_USE_PHYSICSFS)
+    ViniferaSearchPaths.Add("ZIP");
+#endif
+
     /**
      *  Debug paths for CD contents (folders must contain .DSK files of the same name).
      */
@@ -545,6 +569,17 @@ bool Vinifera_Startup()
     }
 
     if (ViniferaSearchPaths.Count() > 0) {
+
+#if defined(VINIFERA_USE_PHYSICSFS)
+
+        /**
+         *  
+         */
+        for (int i = 0; i < ViniferaSearchPaths.Count(); ++i) {
+            PhysicsFS_AddPath(ViniferaSearchPaths[i]);
+        }
+
+#else
         char *new_path = new char[_MAX_PATH * ViniferaSearchPaths.Count()+1];
         new_path[0] = '\0';
 
@@ -570,6 +605,7 @@ bool Vinifera_Startup()
         delete[] new_path;
 
         DEBUG_INFO("SearchPath: %s\n", CCFileClass::RawPath);
+#endif
     }
 
     /**
@@ -633,6 +669,12 @@ bool Vinifera_Startup()
  */
 bool Vinifera_Shutdown()
 {
+#if defined(VINIFERA_USE_PHYSICSFS)
+
+    PhysicsFS_Shutdown();
+
+#endif
+
     /**
      *  Cleanup mixfiles.
      */
@@ -679,6 +721,12 @@ bool Vinifera_Shutdown()
  */
 int Vinifera_Pre_Init_Game(int argc, char *argv[])
 {
+#if defined(VINIFERA_USE_VFS)
+
+    VFS_Test();
+
+#endif
+
     /**
      *  Read the UI controls and overrides.
      */

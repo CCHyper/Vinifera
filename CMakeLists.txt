@@ -152,6 +152,7 @@ if(NOT ${OPTION_CUSTOM_DEBUGGER_TARGET_NAME} STREQUAL " ")
 endif()
 
 option(OPTION_CHECK_TARGET_BINARIES "This option controls if the launcher should check target binaries before injection." ON)
+#option(OPTION_USE_VFSPP "Use the vfspp file system" ON)
 
 
 ################################################################################
@@ -299,7 +300,33 @@ FetchContent_Declare(
 FetchContent_GetProperties(TSpp)
 if(NOT tspp_POPULATED)
 	FetchContent_Populate(TSpp)
+    message(STATUS "  Source: ${tspp_SOURCE_DIR}")
+    message(STATUS "  Build: ${tspp_BINARY_DIR}")
 	add_subdirectory(${tspp_SOURCE_DIR} ${tspp_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+
+################################################################################
+# Fetch the latest vfspp library
+################################################################################
+if(OPTION_USE_VFSPP)
+    FetchContent_Declare(
+        vfspp
+        GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+        GIT_REPOSITORY https://github.com/Vinifera-Developers/Vinifera-vfspp.git
+        GIT_TAG        origin/master
+    )
+
+    FetchContent_GetProperties(vfspp)
+    if(NOT vfspp_POPULATED)
+        message(STATUS "Fetching vfspp library...")
+        FetchContent_Populate(vfspp)
+        message(STATUS "  Source: ${vfspp_SOURCE_DIR}")
+        message(STATUS "  Build: ${vfspp_BINARY_DIR}")    
+        add_subdirectory(${vfspp_SOURCE_DIR} ${vfspp_BINARY_DIR} EXCLUDE_FROM_ALL)
+    else()
+        message(STATUS "Found vfspp.")
+    endif()
 endif()
 
 
@@ -607,6 +634,43 @@ target_compile_options(${PROJECT_NAME} PUBLIC /MP2)
 target_link_libraries(${PROJECT_NAME} TSpp)
 add_dependencies(${PROJECT_NAME} TSpp)
 
+#
+# Link to the vfspp static library.
+#
+if(OPTION_USE_VFSPP)
+    target_link_libraries(${PROJECT_NAME} vfspp)
+    add_dependencies(${PROJECT_NAME} vfspp)
+
+    # forces __fastcall as default calling convention for the vfspp library.
+    target_compile_options(vfspp PUBLIC /Gr)
+
+#    # vfspp does not provide us with the include path, so we need to add it manually.
+#    target_include_directories(${PROJECT_NAME} PUBLIC
+#            ${physics_fs_SOURCE_DIR}/src/
+#    )
+#    
+#    # Explictly include the vfspp headers in the projects folder listing.
+#    target_sources(physfs PRIVATE
+#                ${physics_fs_SOURCE_DIR}/src/physfs.h
+#                ${physics_fs_SOURCE_DIR}/src/physfs_casefolding.h
+#                ${physics_fs_SOURCE_DIR}/src/physfs_internal.h
+#                ${physics_fs_SOURCE_DIR}/src/physfs_lzmasdk.h
+#                ${physics_fs_SOURCE_DIR}/src/physfs_miniz.h
+#                ${physics_fs_SOURCE_DIR}/src/physfs_platforms.h
+#    )
+#    target_sources(physfs-static PRIVATE
+#                ${physics_fs_SOURCE_DIR}/src/physfs.h
+#                ${physics_fs_SOURCE_DIR}/src/physfs_casefolding.h
+#                ${physics_fs_SOURCE_DIR}/src/physfs_internal.h
+#                ${physics_fs_SOURCE_DIR}/src/physfs_lzmasdk.h
+#                ${physics_fs_SOURCE_DIR}/src/physfs_miniz.h
+#                ${physics_fs_SOURCE_DIR}/src/physfs_platforms.h
+#    )
+    
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VINIFERA_USE_VFSPP=1)
+endif()
+target_compile_definitions(${PROJECT_NAME} PUBLIC VINIFERA_USE_VFS=1)
+    
 # Ensure the launcher is built with the main project.
 add_dependencies(${PROJECT_NAME} Launch${PROJECT_NAME})
 
