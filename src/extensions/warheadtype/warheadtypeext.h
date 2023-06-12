@@ -84,4 +84,11 @@ WarheadTypeClassExtension final : public AbstractTypeClassExtension
         unsigned int ShakePixelYLo;
         unsigned int ShakePixelXHi;
         unsigned int ShakePixelXLo;
+
+        /**
+          *  This value control how damage from this warhead type will reduce
+          *  over distance. The larger the number, the less the damage is reduced
+          *  the further the distance from the source of the damage.
+         */
+        float SpreadFactor;
 };
