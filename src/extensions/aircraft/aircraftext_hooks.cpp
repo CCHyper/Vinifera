@@ -48,6 +48,37 @@
 
 
 /**
+ *  #issue-x
+ * 
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_AircraftClass_Draw_It_Carryall_Cargo_Draw_Offset_Patch)
+{
+    LEA_STACK_STATIC(Point2D *, draw_point, esp, 0x0D0);
+    GET_STACK_STATIC(Rect *, bounds, esp, 0x0D0);
+    GET_REGISTER_STATIC(AircraftClass *, this_ptr, ebp);
+    static FootClass *cargo;
+    static AircraftTypeClassExtension *aircrafttypeext;
+    static UnitTypeClass *argo_unittypeext;
+    static Point2D cargo_draw_point;
+
+    cargo_draw_point.X = draw_point->X;
+    cargo_draw_point.Y = draw_point->Y;
+
+    cargo_draw_point.X += aircrafttypeext->CargoDrawOffset.X;
+    cargo_draw_point.Y += aircrafttypeext->CargoDrawOffset.Y;
+
+    cargo = this_ptr->Cargo.Attached_Object();
+
+    cargo->Draw_It(cargo_draw_point, *bounds);
+
+    JMP(0x00408C27);
+}
+
+
+/**
  *  #issue-996
  * 
  *  Implements IsCurleyShuffle for AircraftTypes.
@@ -333,4 +364,5 @@ void AircraftClassExtension_Hooks()
     Patch_Jump(0x0040C054, &_AircraftClass_Mission_Attack_IsCurleyShuffle_FIRE_AT_TARGET2_Can_Fire_FIRE_OK_Patch);
     Patch_Jump(0x0040BF9D, &_AircraftClass_Mission_Attack_IsCurleyShuffle_FIRE_AT_TARGET2_Can_Fire_FIRE_FACING_Patch);
     Patch_Jump(0x0040C0AC, &_AircraftClass_Mission_Attack_IsCurleyShuffle_FIRE_AT_TARGET2_Can_Fire_DEFAULT_Patch);
+    Patch_Jump(0x00408C05, &_AircraftClass_Draw_It_Carryall_Cargo_Draw_Offset_Patch);
 }

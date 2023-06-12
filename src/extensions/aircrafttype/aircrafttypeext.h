@@ -71,4 +71,9 @@ AircraftTypeClassExtension final : public TechnoTypeClassExtension
          *  This is the rate that this aircraft will reload its ammo when docked with a helipad.
          */
         double ReloadRate;
+
+        /**
+         *  x
+         */
+        TPoint2D<int> CargoDrawOffset;
 };
