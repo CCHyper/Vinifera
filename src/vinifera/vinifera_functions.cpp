@@ -57,6 +57,114 @@
 static DynamicVectorClass<Wstring> ViniferaSearchPaths;
 
 
+static DynamicVectorClass<ModPackageClass*> ModPackages;
+
+static class ModPackageClass
+{
+    public:
+        ModPackageClass(Wstring name, Wstring path) :
+            Name(name),
+            Path(path),
+            SearchPaths(),
+            MixFiles()
+        {
+            ModPackages.Add(this);
+        }
+
+        ~ModPackageClass()
+        {
+            ModPackages.Delete(this);
+        }
+
+        bool Add_Search_Path(Wstring path) { return SearchPaths.Add(path); }
+        bool Add_Mix_File(Wstring path) { return MixFiles.Add(path); }
+
+        bool Has_Mix_Files() const { return MixFiles.Count() > 0; }
+
+    private:
+        /**
+         *  x
+         */
+        Wstring Name;
+
+        /**
+         *  x
+         */
+        Wstring Path;
+
+        /**
+         *  A list of paths, relative to the mod path.
+         */
+        DynamicVectorClass<Wstring> SearchPaths;
+
+        /**
+         *  Additional MIX files to load.
+         */
+        DynamicVectorClass<Wstring> MixFiles;
+};
+
+static bool Search_And_Add_Mod(Wstring path)
+{
+    static const char * const MOD_INI = "MOD.INI";
+
+    static const char * const GENERAL = "General";
+    static const char * const SEARCH_PATH = "SearchPaths";
+    static const char * const MIX_FILES = "MixFiles";
+
+    if (path.Is_Empty() || path.Get_Length() == 0) {
+        return false;
+    }
+
+    Wstring ini_path = path + "\\" + MOD_INI;
+    RawFileClass ini_file(ini_path.Peek_Buffer());
+
+    if (!ini_file.Is_Available()) {
+        return false;
+    }
+
+    INIClass ini;
+    ini.Load(ini_file);
+
+    if (!ini.Is_Loaded()) {
+        return false;
+    }
+
+    Wstring buffer;
+
+    ini.Get_String(GENERAL, "Name", buffer);
+    if (buffer.Is_Empty() || buffer.Get_Length() == 0) {
+        return false;
+    }
+
+    ModPackageClass *mod = new ModPackageClass(buffer, path);
+    if (!mod) {
+        return false;
+    }
+
+    for (int index = 0; index < ini.Entry_Count(SEARCH_PATH); ++index) {
+        buffer = ini.Get_Entry(SEARCH_PATH, index);
+        if (buffer.Is_Empty() || buffer.Get_Length() == 0) continue;
+        mod->Add_Search_Path(buffer);
+
+        // Also add the path to the file system search path.
+        Wstring search_path = path + "\\" + buffer;
+        CCFileClass::Add_Search_Drive(search_path.Peek_Buffer());
+    }
+
+    for (int index = 0; index < ini.Entry_Count(MIX_FILES); ++index) {
+        buffer = ini.Get_Entry(MIX_FILES, index);
+        if (buffer.Is_Empty() || buffer.Get_Length() == 0) continue;
+        mod->Add_Mix_File(buffer);
+    }
+
+    if (!mod->Has_Mix_Files()) {
+        return false;
+    }
+
+    return true;
+}
+
+
 /**
  *  Load any Vinifera settings that provide overrides.
  * 
@@ -376,6 +484,27 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
                  */
                 CD::IsFilesLocal = true;
             }
+            continue;
+        }
+
+        /**
+         *  #issue-513
+         * 
+         *  Re-implements the file search path override logic of "-CD" from Red Alert.
+         */
+        if (std::strstr(string, "-MOD")) {
+            DEBUG_INFO("  - \"-MOD\" argument detected.\n");
+
+            if (std::isspace(string[4]) || !std::isgraph(string[4])) {
+                DEBUG_ERROR("Invalid search path defined!");
+                MessageBox(MainWindow, "Invalid mod search path defined with -MOD command line argument!", "Vinifera", MB_ICONEXCLAMATION|MB_OK);
+                return false;
+            }
+
+            if (Search_And_Add_Mod(&string[4])) {
+                DEBUG_INFO("  - Mod found \"%s\".\n", &string[4]);
+            }
+
             continue;
         }
 
