@@ -395,6 +395,12 @@ void Init_Vinifera_Commands()
 
         cmdptr = new DumpNetworkCRCCommandClass;
         Commands.Add(cmdptr);
+
+        cmdptr = new ToggleAlphaBufferCommandClass;
+        Commands.Add(cmdptr);
+
+        cmdptr = new ToggleDepthBufferCommandClass;
+        Commands.Add(cmdptr);
     }
 
 #ifndef NDEBUG

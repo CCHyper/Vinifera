@@ -3446,3 +3446,77 @@ bool DumpNetworkCRCCommandClass::Process()
 
     return true;
 }
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+const char *ToggleAlphaBufferCommandClass::Get_Name() const
+{
+    return "ToggleAlphaBuffer";
+}
+
+const char *ToggleAlphaBufferCommandClass::Get_UI_Name() const
+{
+    return "Toggle Alpha Buffer";
+}
+
+const char *ToggleAlphaBufferCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *ToggleAlphaBufferCommandClass::Get_Description() const
+{
+    return "Toggle Alpha Buffer.";
+}
+
+bool ToggleAlphaBufferCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    Vinifera_Developer_RenderAlphaBuffer = !Vinifera_Developer_RenderAlphaBuffer;
+
+    return true;
+}
+
+
+/**
+ *  
+ * 
+ *  @author: CCHyper
+ */
+const char *ToggleDepthBufferCommandClass::Get_Name() const
+{
+    return "ToggleDepthBuffer";
+}
+
+const char *ToggleDepthBufferCommandClass::Get_UI_Name() const
+{
+    return "Toggle Depth Buffer";
+}
+
+const char *ToggleDepthBufferCommandClass::Get_Category() const
+{
+    return CATEGORY_DEVELOPER;
+}
+
+const char *ToggleDepthBufferCommandClass::Get_Description() const
+{
+    return "Toggle Depth Buffer.";
+}
+
+bool ToggleDepthBufferCommandClass::Process()
+{
+    if (!Session.Singleplayer_Game()) {
+        return false;
+    }
+
+    Vinifera_Developer_RenderDepthBuffer = !Vinifera_Developer_RenderDepthBuffer;
+
+    return true;
+}

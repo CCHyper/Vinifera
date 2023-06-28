@@ -105,6 +105,7 @@
 
 #include "themeext_hooks.h"
 
+#include "gscreenext_hooks.h"
 #include "displayext_hooks.h"
 #include "sidebarext_hooks.h"
 
@@ -241,6 +242,7 @@ void Extension_Hooks()
 
     ThemeClassExtension_Hooks();
 
+    GScreenClassExtension_Hooks();
     DisplayClassExtension_Hooks();
     SidebarClassExtension_Hooks();
 
