@@ -905,6 +905,7 @@ bool Vinifera_Init_Bootstrap_Mixfiles()
 {
     bool ok;
     MFCC *mix;
+    char buffer[16];
 
     int temp = CD::RequiredCD;
     CD::Set_Required_CD(-2);
@@ -926,6 +927,35 @@ bool Vinifera_Init_Bootstrap_Mixfiles()
         if (mix) {
             mix->Cache();
             DEBUG_INFO(" PCACHE.MIX\n");
+        }
+    }
+
+    for (int i = 99; i >= 0; --i) {
+        std::snprintf(buffer, sizeof(buffer), "PATCH%02d.MIX", i);
+        if (CCFileClass(buffer).Is_Available()) {
+            mix = new MFCC(buffer, &FastKey);
+            ASSERT(mix);
+            if (!mix) {
+                DEBUG_WARNING("Failed to load %s!\n", buffer);
+            } else {
+                ViniferaPatchMixes.Add(mix);
+                DEBUG_INFO(" %s\n", buffer);
+            }
+        }
+    }
+
+    for (int i = 99; i >= 0; --i) {
+        std::snprintf(buffer, sizeof(buffer), "PCACHE%02d.MIX", i);
+        if (CCFileClass(buffer).Is_Available()) {
+            mix = new MFCC(buffer, &FastKey);
+            ASSERT(mix);
+            if (!mix) {
+                DEBUG_WARNING("Failed to load %s!\n", buffer);
+            } else {
+                mix->Cache();
+                ViniferaPatchMixes.Add(mix);
+                DEBUG_INFO(" %s\n", buffer);
+            }
         }
     }
 

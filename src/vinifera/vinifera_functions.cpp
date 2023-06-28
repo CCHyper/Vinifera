@@ -644,6 +644,7 @@ bool Vinifera_Shutdown()
 
     ViniferaMapsMixes.Clear();
     ViniferaMoviesMixes.Clear();
+    ViniferaPatchMixes.Clear();
 
     /**
      *  Cleanup global heaps/vectors.

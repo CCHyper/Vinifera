@@ -87,6 +87,7 @@ extern bool Vinifera_ShowSuperWeaponTimers;
 
 extern DynamicVectorClass<MFCC *> ViniferaMapsMixes;
 extern DynamicVectorClass<MFCC *> ViniferaMoviesMixes;
+extern DynamicVectorClass<MFCC *> ViniferaPatchMixes;
 
 extern MFCC *GenericMix;
 extern MFCC *IsoGenericMix;

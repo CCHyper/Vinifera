@@ -67,6 +67,7 @@ bool Vinifera_ShowSuperWeaponTimers = true;
 
 DynamicVectorClass<MFCC *> ViniferaMapsMixes;
 DynamicVectorClass<MFCC *> ViniferaMoviesMixes;
+DynamicVectorClass<MFCC *> ViniferaPatchMixes;
 
 DynamicVectorClass<EBoltClass *> EBolts;
 DynamicVectorClass<TheaterTypeClass *> TheaterTypes;
