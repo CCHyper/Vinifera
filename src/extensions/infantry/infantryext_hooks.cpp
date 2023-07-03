@@ -52,6 +52,399 @@
 #include "hooker_macros.h"
 
 
+
+#include "overlay.h"
+#include "buildingext.h"
+#include "vox.h"
+#include "iomap.h"
+
+class InfantryClassExt : public InfantryClass
+{
+    public:
+        double _Tiberium_Load() const;
+        bool _Tiberium_Load_Full();
+        int _Mission_Harvest();
+        bool Harvesting();
+        ActionType _What_Action(Cell &cell, bool check_fog = false, bool disallow_force = false) const;
+};
+
+ActionType InfantryClassExt::_What_Action(Cell &cell, bool check_fog, bool disallow_force) const
+{
+    if (Class->Storage != 0) {
+        ActionType action = FootClass::What_Action(cell, check_fog, disallow_force);
+        if (action == ACTION_MOVE && Map[cell].Land_Type() == LAND_TIBERIUM)
+        {
+            return ACTION_HARVEST;
+        }
+    }
+
+    return InfantryClass::What_Action(cell, check_fog, disallow_force);
+}
+
+double InfantryClassExt::_Tiberium_Load() const
+{
+    if (Techno_Type_Class()->Storage != 0) {
+        return Storage.Get_Total_Amount() / Techno_Type_Class()->Storage;
+    }
+
+    return 0.0;
+}
+
+bool InfantryClassExt::_Tiberium_Load_Full()
+{
+    return Tiberium_Load() == 1.0;
+}
+
+bool InfantryClassExt::Harvesting()
+{
+    Cell cell = Coord_Cell(Coord);
+    CellClass *ptr = &Map[cell];
+
+    /*
+    **	Keep waiting if still heading toward a spot to harvest.
+    */
+    if (Target_Legal(NavCom)) return(true);
+
+    if (!_Tiberium_Load_Full() && ptr->Land_Type() == LAND_TIBERIUM) {
+
+        if (Class->Storage != 0) {
+            if (Doing != DO_CRAWL) {
+                Do_Action(DO_CRAWL);
+            }
+            TiberiumType tib = OverlayClass::To_TiberiumType(ptr->Overlay);
+
+            double ratio = Class->Storage - Storage.Get_Total_Amount();
+            if (ratio > 1.0) {
+                ratio = 1.0;
+            }
+
+            int reduce = ptr->Reduce_Tiberium(ratio);
+            if (reduce > 0) {
+                Storage.Increase_Amount(reduce, tib);
+            }
+                //return Class->HarvestRate;
+                //return 150;
+                //return 50;
+        }
+
+        /*
+        **	Lift some Tiberium from the ground. Try to lift a complete
+        **	"level" of Tiberium. A level happens to be 6 steps. If there
+        **	is a partial level, then lift that instead. Never lift more
+        **	than the harvester can carry.
+        */
+        //		int reducer = (ptr->OverlayData % 6) + 1;
+        //int reducer = 1;
+        //OverlayType overlay = ptr->Overlay;
+        //reducer = ptr->Reduce_Tiberium(std::min(reducer, Rule->BailCount - Tiberium));
+        //Tiberium += reducer;
+        //switch (overlay) {
+        //case OVERLAY_GOLD1:
+        //case OVERLAY_GOLD2:
+        //case OVERLAY_GOLD3:
+        //case OVERLAY_GOLD4:
+        //    Gold += reducer;
+        //    break;
+        //
+        //case OVERLAY_GEMS1:
+        //case OVERLAY_GEMS2:
+        //case OVERLAY_GEMS3:
+        //case OVERLAY_GEMS4:
+        //    Gems += reducer;
+        //    if (Rule.BailCount > Tiberium) { Gems++; Tiberium++; }
+        //    if (Rule.BailCount > Tiberium) { Gems++; Tiberium++; }
+        //    if (Rule.BailCount > Tiberium) { Gems++; Tiberium++; }
+        //    break;
+        //
+        //default:
+        //    break;
+        //}
+        //Set_Stage(0);
+        //Set_Rate(Rule.OreDumpRate);
+
+    } else {
+
+        /*
+        **	If the harvester is stopped on a non Tiberium field and the harvester
+        **	isn't loaded with Tiberium, then no further action can be performed
+        **	by this logic routine. Bail with a failure and thus cause a branch to
+        **	a better suited logic processor.
+        */
+        //Set_Stage(0);
+        //Set_Rate(0);
+        return(false);
+    }
+    return(true);
+}
+const int Harvester_Load_List[9] = { 0, 1, 2, 3, 4, 5, 6, 7, 0 };
+
+extern const char *const RadioMessages[RADIO_COUNT];
+
+int InfantryClassExt::_Mission_Harvest()
+{
+#if 0
+    if (Class->Storage != 0) {
+        CellClass *cptr = Get_Cell_Ptr();
+        if (cptr->Land == LAND_TIBERIUM && !_Tiberium_Load_Full()) {
+            if (Doing != DO_CRAWL) {
+                Do_Action(DO_CRAWL);
+            }
+            TiberiumType tib = OverlayClass::To_TiberiumType(cptr->Overlay);
+
+            double ratio = Class->Storage - Storage.Get_Total_Amount();
+            if (ratio > 1.0) {
+                ratio = 1.0;
+            }
+
+            int reduce = cptr->Reduce_Tiberium(ratio);
+            if (reduce > 0) {
+                Storage.Increase_Amount(reduce, tib);
+            }
+            //return Class->HarvestRate;
+            //return 150;
+            return 50;
+        }
+    }
+
+    Do_Action(DO_STAND_READY);
+    Assign_Mission(MISSION_GUARD);
+    return 1;
+#endif
+
+   enum {
+       LOOKING,
+       HARVESTING,
+       FINDHOME,
+       HEADINGHOME,
+       GOINGTOIDLE,
+       UNLOAD,
+   };
+
+   /*
+   **	A non-harvesting type unit will just sit still if it is given the harvest mission. This
+   **	allows combat units to act "brain dead".
+   */
+   if (!Class->Storage || !Class->Dock[0]) return(TICKS_PER_SECOND * 30);
+
+   /*
+   **	If there are no more refineries, then drop into guard mode.
+   */
+   if (!(House->BQuantity.Count_Of(Class->Dock[0]->Type))) {
+       Assign_Mission(MISSION_GUARD);
+       return(1);
+   }
+
+   switch (Status) {
+
+       /*
+       **	Go and find a Tiberium field to harvest.
+       */
+   case LOOKING:
+       //DEBUG_INFO("Infantry Harvester Looking\n");
+       /*
+       **	When full of tiberium, just skip to finding a free refinery
+       **	to unload at.
+       */
+       if (Tiberium_Load() == 1) {
+           Status = FINDHOME;
+           return(1);
+       }
+
+       /*
+       ** Look for ore where we last found some - mine the same patch
+       */
+       if (Target_Legal(ArchiveTarget)) {
+           Assign_Destination(ArchiveTarget);
+           ArchiveTarget = 0;
+       }
+       //IsHarvesting = false;
+       if (Goto_Tiberium(Rule->TiberiumLongScan / CELL_LEPTON_W)) {
+           //IsHarvesting = true;
+           Set_Rate(2);
+           Set_Stage(0);
+           Status = HARVESTING;
+           return(1);
+       } else {
+
+           /*
+           **	If the harvester isn't on Tiberium and it is not heading toward Tiberium, then
+           **	force it to go into guard mode. This will prevent the harvester from repeatedly
+           **	searching for Tiberium.
+           */
+           if (!Target_Legal(NavCom)) {
+
+               /*
+               **	If the archive target is legal, then head there since it is presumed
+               **	that the archive target points to the last place it harvested at. This might
+               **	solve the case where the harvester gets stuck and can't find Tiberium just because
+               **	it is greater than 32 squares away.
+               */
+               if (Target_Legal(ArchiveTarget)) {
+                   Assign_Destination(ArchiveTarget);
+               } else {
+                   Status = GOINGTOIDLE;
+                   IsUseless = true;
+                   House->IsTiberiumShort = true;
+                   return(TICKS_PER_SECOND * 7);
+               }
+           } else {
+               IsUseless = false;
+           }
+       }
+       break;
+
+       /*
+       **	Harvest at current location until full or Tiberium exhausted.
+       */
+   case HARVESTING:
+       //DEBUG_INFO("Infantry Harvester Harvesting\n");
+       //			if (Fetch_Stage() > ARRAY_SIZE(Class->Harvester_Load_List)) {
+       //				Set_Stage(0);
+       //			}
+       if (Fetch_Rate() == 0) {
+           Set_Stage(0);
+           Set_Rate(Rule->HarvesterLoadRate);
+       }
+
+       if (Fetch_Stage() < ARRAY_SIZE(Harvester_Load_List)) return(1);
+       if (!Harvesting()) {
+           //IsHarvesting = false;
+           if (Tiberium_Load() == 1) {
+               Status = FINDHOME;
+               ArchiveTarget = ::As_Target(&Map[Coord_Cell(Coord)]);
+           } else {
+               if (!Goto_Tiberium(Rule->TiberiumShortScan / CELL_LEPTON_W) && !Target_Legal(NavCom)) {
+                   //ArchiveTarget = TARGET_NONE;
+                   Status = FINDHOME;
+               } else {
+                   Status = HARVESTING;
+                   //IsHarvesting = true;
+               }
+           }
+           return(1);
+       }
+       return(1);
+       //			return(TICKS_PER_SECOND*Rule.OreDumpRate);
+
+               /*
+               **	Find and head to refinery.
+               */
+   case FINDHOME:
+       //DEBUG_INFO("Infantry Harvester Finding Home\n");
+       if (!Target_Legal(NavCom)) {
+
+           /*
+           **	Find nearby refinery and head to it?
+           */
+           BuildingClass *nearest = nullptr;
+           for (int i = 0; i < Class->Dock.Count(); i++) {
+               nearest = Find_Docking_Bay(Class->Dock[i]);
+               if (nearest) {
+                   break;
+               }
+           }
+
+           /*
+           **	Since the refinery said it was ok to load, establish radio
+           **	contact with the refinery and then await docking orders.
+           */
+           //RadioMessageType reply = Transmit_Message(RADIO_HELLO, (RadioClass *)nearest);
+           if (nearest != NULL) {
+               //DEBUG_INFO("Home replied ROGER\n");
+               Status = HEADINGHOME;
+               //if (nearest->House == PlayerPtr && (PlayerPtr->Capacity - PlayerPtr->Tiberium) < 300 && PlayerPtr->Capacity > 500 && (PlayerPtr->ActiveBScan & (STRUCTF_REFINERY | STRUCTF_CONST))) {
+               //    Speak(VOX_NEED_MO_CAPACITY);
+               //}
+           } else {
+               //DEBUG_INFO("Home replied %s\n", Name_From_RadioMessage(reply));
+               ScenarioInit++;
+               nearest = nullptr;
+               for (int i = 0; i < Class->Dock.Count(); i++) {
+                   nearest = Find_Docking_Bay(Class->Dock[i]);
+                   if (nearest) {
+                       break;
+                   }
+               }
+               ScenarioInit--;
+               if (nearest != NULL) {
+                   Assign_Destination(&Map[Nearby_Location((TechnoClass *)nearest)]);
+               }
+           }
+       }
+       break;
+
+       /*
+       **	In communication with refinery so that it will successfully dock and
+       **	unload. If, for some reason, radio contact was lost, then hunt for
+       **	another refinery to unload at.
+       */
+   case HEADINGHOME:
+       //DEBUG_INFO("Infantry Harvester Heading Home\n");
+       //Assign_Mission(MISSION_ENTER);
+       Assign_Destination(&Map[Nearby_Location((TechnoClass *)Radio)]);
+       Status = UNLOAD;
+       return(1);
+
+       case UNLOAD:
+        if (Radio && Radio->What_Am_I() == RTTI_BUILDING && Distance(Radio) < 256) {
+            //((BuildingClass *)Radio)->entry_278();
+            //if (Rule->HarvesterDumpRate * TICKS_PER_MINUTE <= (double)v1->f.t.stage.Stage) {
+                TiberiumType slot = (TiberiumType)Storage.First_Used_Slot();
+                int amount = Storage.Get_Amount(slot);
+                if (slot == TIBERIUM_NONE || (amount = Storage.Decrease_Amount(amount, slot), amount <= 0)) {
+                    if (Radio && ((BuildingClass *)Radio)->Class->IsRefinery) {
+                        //BuildingClass_Play_Animation(v49, 8, 0, 0);
+                    }
+                    Status = GOINGTOIDLE;
+                    
+                } else {
+                    House->Tiberium_Harvested(amount, slot);
+                    //v1->f.t.stage.Stage = 0;
+                }
+            //}
+                Goto_Tiberium(Rule->TiberiumShortScan / CELL_LEPTON_W);
+                Status = LOOKING;
+                if (Radio) {
+                    Radio->Transmit_Message(RADIO_ALL_DONE);
+                    //Radio->Radio_Off();
+                }
+
+        } else
+        {
+            //DEBUG_INFO("NavCom %x, Radio %x\n", NavCom, Radio);
+            if (Radio) {
+                //Radio->Transmit_Message(RADIO_OVER_OUT);
+                //Radio->Radio_Off();
+            }
+        }
+
+        return(1);
+
+       /*
+       **	The harvester has nothing to do. There is no Tiberium nearby and
+       **	no where to go.
+       */
+   case GOINGTOIDLE:
+        //DEBUG_INFO("Infantry Harvester Going Idle\n");
+       if (IsUseless) {
+           //if (House->ActiveBScan & STRUCTF_REPAIR) {
+           //    Assign_Mission(MISSION_REPAIR);
+           //} else {
+           //    Assign_Mission(MISSION_HUNT);
+           //}
+       }
+       Assign_Mission(MISSION_GUARD);
+       break;
+
+   }
+
+   return(Get_Current_Mission_Control().Normal_Delay() + Random_Pick(0, 2));
+}
+
+
+
+
+
 /**
  *  #issue-635
  * 
@@ -543,6 +936,9 @@ void InfantryClassExtension_Hooks()
     Patch_Jump(0x004D87E9, &_InfantryClass_Firing_AI_Mechanic_Patch);
     Patch_Jump(0x004D3A7B, &_InfantryClass_Per_Cell_Process_Transport_Attach_Sound_Patch);
     Patch_Jump(0x004D35F9, &_InfantryClass_Per_Cell_Process_Engineer_Capture_Damage_Patch);
+    Patch_Jump(0x00637230, &InfantryClassExt::_Tiberium_Load);
+    Change_Virtual_Address(0x006D218C, Get_Func_Address(&InfantryClassExt::_What_Action));
+    Change_Virtual_Address(0x006D22E8, Get_Func_Address(&InfantryClassExt::_Mission_Harvest));
 
     /**
      *  ACTION_DAMAGE no longer a case in DisplayClass::Left_Mouse_Up to show the
