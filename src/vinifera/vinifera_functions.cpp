@@ -677,8 +677,20 @@ bool Vinifera_Shutdown()
  * 
  *  @author: CCHyper
  */
+#include "developer_window.h"
 int Vinifera_Pre_Init_Game(int argc, char *argv[])
 {
+    /**
+     *  x
+     */
+    if (Vinifera_DeveloperMode) {
+        DEBUG_INFO("About to create .\n");
+        if (!DeveloperModeWindowClass::Create_Window()) {
+            DEBUG_ERROR("Audio: Failed to create debug window!\n");
+            return false;
+        }
+    }
+
     /**
      *  Read the UI controls and overrides.
      */

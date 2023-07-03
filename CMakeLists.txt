@@ -27,7 +27,7 @@
 #******************************************************************************/
  
  # Visual Studio 2017 requires at least 3.7.
-cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.26 FATAL_ERROR)
 
 set(CMAKE_SUPPRESS_REGENERATION true) # Remove ZERO_CHECK project.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON) # Organize projects into folders within the VS solution.
@@ -286,9 +286,15 @@ GlobSources(GLOB HOOKER_SOURCES ${HOOKER_INCLUDE_DIR})
 
 
 ################################################################################
-# Fetch the latest TS++ source code
+# Include the fetch content module.
 ################################################################################
 include(FetchContent)
+message(STATUS "FetchContent dir: ${FETCHCONTENT_BASE_DIR}")
+
+
+################################################################################
+# Fetch the latest TS++ source code
+################################################################################
 FetchContent_Declare(
 	TSpp
 	GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
@@ -300,7 +306,57 @@ FetchContent_GetProperties(TSpp)
 if(NOT tspp_POPULATED)
 	FetchContent_Populate(TSpp)
 	add_subdirectory(${tspp_SOURCE_DIR} ${tspp_BINARY_DIR} EXCLUDE_FROM_ALL)
+    message(STATUS "TS++ source dir: ${tspp_SOURCE_DIR}")
+    message(STATUS "TS++ binary dir: ${tspp_BINARY_DIR}")
 endif()
+
+
+################################################################################
+# Fetch the latest ImGui source code
+################################################################################
+message(STATUS "Pulling in ImGui sources.")
+
+FetchContent_Declare(
+	ImGui
+	GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+	GIT_REPOSITORY https://github.com/ocornut/imgui.git
+	GIT_TAG        origin/master
+)
+
+FetchContent_MakeAvailable(ImGui)
+
+message(STATUS "ImGui source dir: ${imgui_SOURCE_DIR}")
+message(STATUS "ImGui binary dir: ${imgui_BINARY_DIR}")
+
+
+################################################################################
+# Create the ImGui static library.
+################################################################################
+message(STATUS "Creating ImGui static library.")
+
+add_library(ImGui STATIC)
+
+target_include_directories(ImGui
+                           PUBLIC ${imgui_SOURCE_DIR}
+                           PUBLIC ${imgui_SOURCE_DIR}/backends
+                          )
+
+target_sources(ImGui
+               PRIVATE
+               ${imgui_SOURCE_DIR}/imgui_demo.cpp
+               ${imgui_SOURCE_DIR}/imgui_draw.cpp
+               ${imgui_SOURCE_DIR}/imgui_tables.cpp
+               ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+               ${imgui_SOURCE_DIR}/imgui.cpp
+
+               PRIVATE
+               ${imgui_SOURCE_DIR}/backends/imgui_impl_dx11.cpp
+               ${imgui_SOURCE_DIR}/backends/imgui_impl_win32.cpp
+              )
+              
+# forces __fastcall as default calling convention.
+# NOTE: This is required, otherwise Vinifera will fail to link to the library!
+target_compile_options(ImGui PUBLIC /Gr)
 
 
 ################################################################################
@@ -610,13 +666,16 @@ add_dependencies(${PROJECT_NAME} TSpp)
 # Ensure the launcher is built with the main project.
 add_dependencies(${PROJECT_NAME} Launch${PROJECT_NAME})
 
-set(REQUIRED_LIBRARIES ws2_32 dbghelp shlwapi version comctl32)
-
-# Link to any required libraries.
-target_link_libraries(${PROJECT_NAME} ${REQUIRED_LIBRARIES})
-
 # Make build check state of git to check for uncommitted changes.
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_check_git)
+
+# Link to the ImGui static library.
+target_link_libraries(${PROJECT_NAME} ImGui)
+add_dependencies(${PROJECT_NAME} ImGui)
+
+# Link to any required libraries.
+set(REQUIRED_LIBRARIES ws2_32 dbghelp shlwapi shcore version comctl32 dxguid dxgi d3d11 d3dcompiler)
+target_link_libraries(${PROJECT_NAME} ${REQUIRED_LIBRARIES})
 
 
 ################################################################################

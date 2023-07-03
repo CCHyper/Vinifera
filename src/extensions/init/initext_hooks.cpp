@@ -44,6 +44,7 @@
 #include "vinifera_gitinfo.h"
 #include "tspp_gitinfo.h"
 #include "resource.h"
+#include "developer_window.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 #include <Windows.h>
@@ -61,6 +62,24 @@ extern HMODULE DLLInstance;
  */
 #define TS_MAINICON         93
 #define TS_MAINCURSOR       104
+
+
+ /**
+  *  x
+  *
+  *  @author: CCHyper
+  */
+DECLARE_PATCH(_Windows_Message_Handler_ImGui_Patch)
+{
+    DeveloperModeWindowClass::Callback();
+
+    _asm { pop edi }
+    _asm { pop esi }
+    _asm { pop ebp }
+    _asm { pop ebx }
+    _asm { add esp, 0x1C }
+    _asm { retn}
+}
 
 
 /**
@@ -1030,4 +1049,6 @@ void GameInit_Hooks()
      */
     //Patch_Jump(0x00407050, &Vinifera_Addon_Present);
 #endif
+
+    Patch_Jump(0x00574256, &_Windows_Message_Handler_ImGui_Patch);
 }
