@@ -1,14 +1,14 @@
 /*******************************************************************************
-/*                 O P E N  S O U R C E  --  V I N I F E R A                  **
+/*                  O P E N  S O U R C E -- V I N I F E R A                   **
 /*******************************************************************************
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          DEVELOPER_UTIL.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,34 +25,21 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#pragma once
 
-/**
- *  Include the hook headers here.
- */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "newswizzle_hooks.h"
-#include "extension_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-#include "d3d_hooks.h"
+#include "always.h"
 
 
-void Setup_Hooks()
-{
-    Vinifera_Memory_Hooks();
-
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    NewSwizzle_Hooks();
-    Extension_Hooks();
-
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
-
-    D3D_Hooks();
-}
+bool D3D11_ImGui_Initalise(HWND hWnd);
+bool D3D11_ImGui_Initalise_D3D();
+bool D3D11_ImGui_Create_Context();
+bool D3D11_ImGui_Initalise_Fonts();
+bool D3D11_ImGui_Initalise_Style();
+bool D3D11_ImGui_Initalise_Config();
+bool D3D11_ImGui_Initalise_Options();
+bool D3D11_ImGui_Shutdown();
+bool D3D11_ImGui_New_Frame();
+bool D3D11_ImGui_End_Frame();
+bool D3D11_ImGui_Main_Draw_Loop();
+bool D3D11_ImGui_Render();
+bool D3D11_ImGui_Present(bool vsync = false);

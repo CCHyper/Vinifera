@@ -49,6 +49,7 @@
 #include "extension.h"
 #include "theatertype.h"
 #include "uicontrol.h"
+#include "d3d_imgui.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <string>
@@ -667,6 +668,8 @@ bool Vinifera_Shutdown()
 
     DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 
+    D3D11_ImGui_Shutdown();
+
     return true;
 }
 
@@ -677,8 +680,22 @@ bool Vinifera_Shutdown()
  * 
  *  @author: CCHyper
  */
+#include "developer_window.h"
 int Vinifera_Pre_Init_Game(int argc, char *argv[])
 {
+#if 0
+    /**
+     *  x
+     */
+    if (Vinifera_DeveloperMode) {
+        DEBUG_INFO("About to create .\n");
+        if (!DeveloperModeWindowClass::Create_Window()) {
+            DEBUG_ERROR("Audio: Failed to create debug window!\n");
+            return false;
+        }
+    }
+#endif
+
     /**
      *  Read the UI controls and overrides.
      */

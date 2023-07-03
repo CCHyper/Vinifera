@@ -1,14 +1,14 @@
 /*******************************************************************************
-/*                 O P E N  S O U R C E  --  V I N I F E R A                  **
+/*                  O P E N  S O U R C E -- V I N I F E R A                   **
 /*******************************************************************************
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          DEVELOPER_UTIL.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,34 +25,24 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#pragma once
 
-/**
- *  Include the hook headers here.
- */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "newswizzle_hooks.h"
-#include "extension_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-#include "d3d_hooks.h"
+#include "always.h"
+#include <d3d11.h>
+
+class XSurface;
 
 
-void Setup_Hooks()
-{
-    Vinifera_Memory_Hooks();
+extern ID3D11Device* D3D11Device;
+extern ID3D11DeviceContext* D3D11DeviceContext;
+extern IDXGISwapChain* D3D11SwapChain;
+extern ID3D11RenderTargetView* D3D11MainRenderTargetView;
 
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    NewSwizzle_Hooks();
-    Extension_Hooks();
 
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
 
-    D3D_Hooks();
-}
+void D3D11_CreateRenderTarget();
+void D3D11_CleanupRenderTarget();
+bool D3D11_CreateDeviceD3D(HWND hWnd);
+void D3D11_CleanupDeviceD3D();
+
+ID3D11ShaderResourceView* D3D11_CreateTextureFromSurface(XSurface& surface);

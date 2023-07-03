@@ -1,14 +1,14 @@
 /*******************************************************************************
-/*                 O P E N  S O U R C E  --  V I N I F E R A                  **
+/*                  O P E N  S O U R C E -- V I N I F E R A                   **
 /*******************************************************************************
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          DEVELOPER_WINDOW.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,34 +25,35 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#pragma once
 
-/**
- *  Include the hook headers here.
- */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "newswizzle_hooks.h"
-#include "extension_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-#include "d3d_hooks.h"
+#include "always.h"
 
 
-void Setup_Hooks()
+class DeveloperModeWindowClass
 {
-    Vinifera_Memory_Hooks();
+    public:
+        //DeveloperModeWindowClass();
+        //~DeveloperModeWindowClass();
 
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    NewSwizzle_Hooks();
-    Extension_Hooks();
+        static bool Create_Window();
+        static bool Destroy_Window();
 
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
+        // Temp!
+        //static void Callback()
+        //{
+        //    Window_Message_Handler();
+        //    Window_Loop();
+        //}
 
-    D3D_Hooks();
-}
+        static bool Game_View_Window();
+        static bool Asset_Browser_Window();
+        static bool Trigger_List_Window();
+        static bool Team_List_Window();
+
+    private:
+        static void Window_Message_Handler();
+        static void Window_Loop();
+
+    private:
+};

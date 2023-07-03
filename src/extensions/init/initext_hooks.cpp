@@ -44,6 +44,7 @@
 #include "vinifera_gitinfo.h"
 #include "tspp_gitinfo.h"
 #include "resource.h"
+#include "d3d_imgui.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 #include <Windows.h>
@@ -51,6 +52,8 @@
 
 #include "hooker.h"
 #include "hooker_macros.h"
+
+#include <imgui.h>
 
 
 extern HMODULE DLLInstance;
@@ -61,6 +64,53 @@ extern HMODULE DLLInstance;
  */
 #define TS_MAINICON         93
 #define TS_MAINCURSOR       104
+
+
+// Forward declare message handler from imgui_impl_win32.cpp
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+// Win32 message handler
+// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
+// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
+// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
+static LRESULT WINAPI ImGui_Main_Window_Procedure(HWND hWnd, UINT Message, WPARAM wParam, LPARAM lParam)
+{
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, Message, wParam, lParam)) {
+        DEBUG_INFO("Handled by ImGui_ImplWin32_WndProcHandler\n");
+        return true;
+    }
+
+    //DEBUG_INFO("Handled by Main_Window_Procedure\n");
+
+    return Main_Window_Procedure(hWnd, Message, wParam, lParam);
+}
+
+
+
+ /**
+  *  x
+  *
+  *  @author: CCHyper
+  */
+DECLARE_PATCH(_Windows_Message_Handler_ImGui_Patch)
+{
+    //DeveloperModeWindowClass::Callback();
+
+    /**
+     *  Present with vsync, giving the back end tiem to handle any window input.
+     */
+    //D3D11_ImGui_Present(true);
+    //D3D11_ImGui_Render();
+    D3D11_ImGui_Main_Draw_Loop();
+
+    _asm { pop edi }
+    _asm { pop esi }
+    _asm { pop ebp }
+    _asm { pop ebx }
+    _asm { add esp, 0x1C }
+    _asm { retn}
+}
 
 
 /**
@@ -277,6 +327,8 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
 {
     //DEV_DEBUG_INFO("Create_Main_Window(enter)\n");
 
+    D3D11_ImGui_Create_Context();
+
     MainWindow = nullptr;
 
     HWND hWnd = nullptr;
@@ -347,7 +399,8 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
      */
     wc.cbSize         = sizeof(WNDCLASSEX);
     wc.style          = CS_HREDRAW|CS_VREDRAW;
-    wc.lpfnWndProc    = Main_Window_Procedure;
+    //wc.lpfnWndProc    = Main_Window_Procedure;
+    wc.lpfnWndProc    = ImGui_Main_Window_Procedure;
     wc.cbClsExtra     = 0;
     wc.cbWndExtra     = 0;
     wc.hInstance      = (HINSTANCE)hInstance;
@@ -380,61 +433,41 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
     /**
      *  Create our main window.
      */
-    if (Debug_Windowed) {
+    DEBUG_INFO("Create_Main_Window() - Creating desktop window (%d x %d).\n", width, height);
 
-        DEBUG_INFO("Create_Main_Window() - Creating desktop window (%d x %d).\n", width, height);
+    hWnd = CreateWindowEx(
+        WS_EX_LEFT|WS_EX_TOPMOST,
+        "Vinifera",
+        Vinifera_Get_Window_Title(dwPid),
+        WS_SYSMENU|WS_MINIMIZEBOX|WS_CLIPCHILDREN|WS_CAPTION,
+        0, 0, 0, 0,
+        nullptr,
+        nullptr,
+        (HINSTANCE)hInstance,
+        nullptr);
 
-        hWnd = CreateWindowEx(
-            WS_EX_LEFT|WS_EX_TOPMOST,
-            "Vinifera",
-            Vinifera_Get_Window_Title(dwPid),
-            WS_SYSMENU|WS_MINIMIZEBOX|WS_CLIPCHILDREN|WS_CAPTION,
-            0, 0, 0, 0,
-            nullptr,
-            nullptr,
-            (HINSTANCE)hInstance,
-            nullptr);
+    SetRect(&rect, 0, 0, width, height);
 
-        SetRect(&rect, 0, 0, width, height);
+    AdjustWindowRectEx(&rect,
+        GetWindowLong(hWnd, GWL_STYLE),
+        GetMenu(hWnd) != nullptr,
+        GetWindowLong(hWnd, GWL_EXSTYLE));
 
-        AdjustWindowRectEx(&rect,
-            GetWindowLong(hWnd, GWL_STYLE),
-            GetMenu(hWnd) != nullptr,
-            GetWindowLong(hWnd, GWL_EXSTYLE));
+    /**
+     *  #BUGFIX:
+     * 
+     *  Fetch the desktop size, calculate the screen center position the window and move it.
+     */
+    RECT workarea;
+    SystemParametersInfo(SPI_GETWORKAREA, 0, &workarea, 0);
 
-        /**
-         *  #BUGFIX:
-         * 
-         *  Fetch the desktop size, calculate the screen center position the window and move it.
-         */
-        RECT workarea;
-        SystemParametersInfo(SPI_GETWORKAREA, 0, &workarea, 0);
+    int x_pos = (display_width - width) / 2;
+    int y_pos = (((display_height - height) / 2) - (display_height - workarea.bottom));
+    
+    DEBUG_INFO("Create_Main_Window() - Moving window (%d,%d,%d,%d).\n",
+        x_pos, y_pos, (rect.right - rect.left), (rect.bottom - rect.top));
 
-        int x_pos = (display_width - width) / 2;
-        int y_pos = (((display_height - height) / 2) - (display_height - workarea.bottom));
-        
-        DEBUG_INFO("Create_Main_Window() - Moving window (%d,%d,%d,%d).\n",
-            x_pos, y_pos, (rect.right - rect.left), (rect.bottom - rect.top));
-
-        MoveWindow(hWnd, x_pos, y_pos, (rect.right - rect.left), (rect.bottom - rect.top), TRUE);
-
-    } else {
-
-        DEBUG_INFO("Create_Main_Window() - Creating fullscreen window.\n");
-
-        hWnd = CreateWindowEx(
-            WS_EX_TOPMOST,
-            "Vinifera",
-            Vinifera_Get_Window_Title(dwPid),
-            WS_POPUP|WS_CLIPCHILDREN,
-            0, 0,
-            display_width,
-            display_height,
-            nullptr,
-            nullptr,
-            (HINSTANCE)hInstance,
-            nullptr);
-    }
+    MoveWindow(hWnd, x_pos, y_pos, (rect.right - rect.left), (rect.bottom - rect.top), TRUE);
 
     if (!hWnd) {
         DEBUG_INFO("Create_Main_Window() - Failed to create window!\n");
@@ -469,6 +502,11 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
      */
     MainWindow = hWnd;
     ProgramInstance = hInstance;
+
+    D3D11_ImGui_Initalise(hWnd);
+    D3D11_ImGui_Initalise_Style();
+    D3D11_ImGui_Initalise_Config();
+    D3D11_ImGui_Initalise_Options();
 
     /**
      *  #NOTE:
@@ -1030,4 +1068,6 @@ void GameInit_Hooks()
      */
     //Patch_Jump(0x00407050, &Vinifera_Addon_Present);
 #endif
+
+    Patch_Jump(0x00574256, &_Windows_Message_Handler_ImGui_Patch);
 }
