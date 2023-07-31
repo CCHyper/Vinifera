@@ -30,6 +30,7 @@
 #include "debughandler.h"
 #include "purecallhandler.h"
 #include "exceptionhandler.h"
+#include "stackdump.h"
 #include "vinifera_globals.h"
 #include "tspp_assert.h"
 #include "winutil.h"
@@ -564,26 +565,43 @@ static void Assert_Handler_Hooks()
  */
 static LONG __stdcall _Top_Level_Exception_Filter(EXCEPTION_POINTERS *e_info)
 {
-    DEBUG_INFO("Entered _Top_Level_Exception_Filter!\n");
+    DEBUG_WARNING("Entered _Top_Level_Exception_Filter! ExceptionCode: 0x%08x, Eip: 0x%08x\n", e_info->ExceptionRecord->ExceptionCode, e_info->ContextRecord->Eip);
     return Vinifera_Exception_Handler(e_info->ExceptionRecord->ExceptionCode, e_info);
 }
 
 static void __cdecl _Structured_Exception_Translator(unsigned int code, EXCEPTION_POINTERS *e_info)
 {
-    DEBUG_INFO("Entered _Structured_Exception_Translator!\n");
+    DEBUG_WARNING("Entered _Structured_Exception_Translator! ExceptionCode: 0x%08x, Eip: 0x%08x\n", e_info->ExceptionRecord->ExceptionCode, e_info->ContextRecord->Eip);
     Vinifera_Exception_Handler(code, e_info);
 }
 
+/**
+ *  Callback for the stack walker, appends line to the exception print buffer.
+ */
+static void __cdecl Stack_Dump_Handler(const char *buffer)
+{
+    DEBUG_WARNING(buffer);
+}
+
+static int stack_skip_frames = 1; // #TODO: This needs checking. Value of 1 skips the EIP address, which seems ideal.
+
 static LONG WINAPI _Vectored_Exception_Handler(EXCEPTION_POINTERS *e_info)
 {
-    DEBUG_INFO("Entered _Vectored_Exception_Handler!\n");
+    DEBUG_WARNING("Entered _Vectored_Exception_Handler! ExceptionCode: 0x%08x, Eip: 0x%08x\n", e_info->ExceptionRecord->ExceptionCode, e_info->ContextRecord->Eip);
 
     // Make sure the exception code is within the expected range.
     if ((e_info->ExceptionRecord->ExceptionCode & 0xF0000000) == 0xC0000000) {
 
+        //DEBUG_WARNING("Entered _Vectored_Exception_Handler! ExceptionCode: 0x%08x\n", e_info->ExceptionRecord->ExceptionCode);
+
         switch (e_info->ExceptionRecord->ExceptionCode) {
             case STATUS_HEAP_CORRUPTION:
                 DEBUG_WARNING("Heap corruption detected!\n");
+                if (!IsDebuggerPresent()) { __debugbreak(); }
+                Stack_Dump_From_Context(e_info->ContextRecord->Eip, e_info->ContextRecord->Esp, e_info->ContextRecord->Ebp, Stack_Dump_Handler, stack_skip_frames);
+                break;
+            case STATUS_STACK_BUFFER_OVERRUN:
+                DEBUG_WARNING("Stack buffer overrun detected!\n");
                 break;
         };
 
