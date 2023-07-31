@@ -577,6 +577,11 @@ static void __cdecl _Structured_Exception_Translator(unsigned int code, EXCEPTIO
 static LONG WINAPI _Vectored_Exception_Handler(EXCEPTION_POINTERS *e_info)
 {
     DEBUG_INFO("Entered _Vectored_Exception_Handler!\n");
+
+    if (e_info->ExceptionRecord->ExceptionCode == STATUS_HEAP_CORRUPTION) {
+        DEBUG_WARNING("Heap corruption detected!\n");
+    }
+
     return Vinifera_Exception_Handler(e_info->ExceptionRecord->ExceptionCode, e_info);
 }
 
