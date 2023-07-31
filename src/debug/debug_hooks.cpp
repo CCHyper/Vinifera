@@ -559,20 +559,38 @@ static void Assert_Handler_Hooks()
 
 
 /**
- *  Exception handlers to all out implementation.
+ *  Exception handlers to call our implementations.
  * 
  *  @author: CCHyper
  */
 static LONG __stdcall _Top_Level_Exception_Filter(EXCEPTION_POINTERS *e_info)
 {
-    DEBUG_WARNING("Entered _Top_Level_Exception_Filter! ExceptionCode: 0x%08x, Eip: 0x%08x\n", e_info->ExceptionRecord->ExceptionCode, e_info->ContextRecord->Eip);
+    DEBUG_WARNING("Entered _Top_Level_Exception_Filter! ExceptionCode: 0x%08X, Eip: 0x%08X\n", e_info->ExceptionRecord->ExceptionCode, e_info->ContextRecord->Eip);
     return Vinifera_Exception_Handler(e_info->ExceptionRecord->ExceptionCode, e_info);
 }
 
 static void __cdecl _Structured_Exception_Translator(unsigned int code, EXCEPTION_POINTERS *e_info)
 {
-    DEBUG_WARNING("Entered _Structured_Exception_Translator! ExceptionCode: 0x%08x, Eip: 0x%08x\n", e_info->ExceptionRecord->ExceptionCode, e_info->ContextRecord->Eip);
+    DEBUG_WARNING("Entered _Structured_Exception_Translator! ExceptionCode: 0x%08X, Eip: 0x%08X\n", e_info->ExceptionRecord->ExceptionCode, e_info->ContextRecord->Eip);
     Vinifera_Exception_Handler(code, e_info);
+}
+
+
+/**
+ *  Finds the first instance of the address in the loaded database and extracts its info.
+ */
+static bool Exception_Find_Datbase_Entry(uintptr_t address, bool& can_continue, uint32_t& continue_address, bool& ignore, FixedString<1024>& desc)
+{
+    for (int i = 0; i < ExceptionInfoDatabase.Count(); ++i) {
+        if (ExceptionInfoDatabase[i].Address == address) {
+            can_continue = ExceptionInfoDatabase[i].CanContinue;
+            continue_address = ExceptionInfoDatabase[i].ContinueAddress;
+            ignore = ExceptionInfoDatabase[i].Ignore;
+            desc = ExceptionInfoDatabase[i].Description;
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -585,28 +603,145 @@ static void __cdecl Stack_Dump_Handler(const char *buffer)
 
 static int stack_skip_frames = 1; // #TODO: This needs checking. Value of 1 skips the EIP address, which seems ideal.
 
+/**
+ *  The Vectored Exception Handler (VEH) is added to capture heap corruption
+ *  exceptions because those are not reaching the UnhandledExceptionFilter().
+ *  VEH has first and only chance to heap corrutpion exceptions before they
+ *  got 'handled' by Windows.
+ */
 static LONG WINAPI _Vectored_Exception_Handler(EXCEPTION_POINTERS *e_info)
 {
-    DEBUG_WARNING("Entered _Vectored_Exception_Handler! ExceptionCode: 0x%08x, Eip: 0x%08x\n", e_info->ExceptionRecord->ExceptionCode, e_info->ContextRecord->Eip);
-
-    // Make sure the exception code is within the expected range.
-    if ((e_info->ExceptionRecord->ExceptionCode & 0xF0000000) == 0xC0000000) {
-
-        //DEBUG_WARNING("Entered _Vectored_Exception_Handler! ExceptionCode: 0x%08x\n", e_info->ExceptionRecord->ExceptionCode);
-
-        switch (e_info->ExceptionRecord->ExceptionCode) {
-            case STATUS_HEAP_CORRUPTION:
-                DEBUG_WARNING("Heap corruption detected!\n");
-                if (!IsDebuggerPresent()) { __debugbreak(); }
-                Stack_Dump_From_Context(e_info->ContextRecord->Eip, e_info->ContextRecord->Esp, e_info->ContextRecord->Ebp, Stack_Dump_Handler, stack_skip_frames);
-                break;
-            case STATUS_STACK_BUFFER_OVERRUN:
-                DEBUG_WARNING("Stack buffer overrun detected!\n");
-                break;
-        };
-
+    /**
+     *  Make sure the exception code is within the expected range.
+     */
+    if ((e_info->ExceptionRecord->ExceptionCode & 0xF0000000) != 0xC0000000) {
+        return EXCEPTION_CONTINUE_SEARCH;
     }
 
+    DEBUG_WARNING("Entered _Vectored_Exception_Handler! ExceptionCode: 0x%08X, Eip: 0x%08X\n", e_info->ExceptionRecord->ExceptionCode, e_info->ContextRecord->Eip);
+
+    Stack_Dump_From_Context(e_info->ContextRecord->Eip, e_info->ContextRecord->Esp, e_info->ContextRecord->Ebp, Stack_Dump_Handler, stack_skip_frames);
+
+    static FixedString<1024> ExceptionInfoDescription;
+    static bool ExceptionInfoCanContinue = false;
+    static uint32_t ExceptionInfoContinueAddress = 0x0;
+    static bool ExceptionInfoIgnore = false;
+
+    /**
+     *  Search for additional info for this EIP in the exception database.
+     */
+    //Exception_Find_Datbase_Entry(e_info->ContextRecord->Eip, ExceptionInfoCanContinue, ExceptionInfoContinueAddress, ExceptionInfoIgnore, ExceptionInfoDescription);
+
+    //DEV_DEBUG_WARNING("EIP: 0x%08X\n", e_info->ContextRecord->Eip);
+    //DEV_DEBUG_WARNING("CanContinue: %s  Ignore: %s\n", ExceptionInfoCanContinue ? "YES" : "NO", ExceptionInfoIgnore ? "YES" : "NO");
+    //DEV_DEBUG_WARNING("Description: %s\n", ExceptionInfoDescription.Peek_Buffer());
+
+    /**
+     *  Clear previous exception info.
+     */
+    //ExceptionInfoCanContinue = false;
+    //ExceptionInfoIgnore = false;
+    //ExceptionInfoDescription.Clear();
+
+#if 0
+    /**
+     *  Should we ignore this exception and continue?
+     */
+    if (ExceptionInfoCanContinue && ExceptionInfoIgnore) {
+        //DEV_DEBUG_WARNING("Ignoring exception, continuing execution...\n");
+        DWORD* eip = &(ExceptionInfo->ContextRecord->Eip);
+        *eip = ExceptionInfoContinueAddress;
+        return EXCEPTION_CONTINUE_EXECUTION;
+    }
+
+    /**
+     *  Has additional info for this EIP been loaded from the exception database?
+     */
+    if (ExceptionInfoDescription.Peek_Buffer()[0] != '\0') {
+        DEBUG_WARNING("Additional Information:\r\n");
+        DEBUG_WARNING("\r\nAdditional Information:\n");
+        DEBUG_WARNING("  %s\r\n", ExceptionInfoDescription.Peek_Buffer());
+        DEBUG_WARNING("  %s\n\n", ExceptionInfoDescription.Peek_Buffer());
+        DEBUG_WARNING("\r\n");
+    }
+#endif
+
+    switch (e_info->ExceptionRecord->ExceptionCode) {
+        case STATUS_HEAP_CORRUPTION:
+            DEBUG_WARNING("Heap corruption detected!\n");
+            break;
+        case STATUS_STACK_BUFFER_OVERRUN:
+            DEBUG_WARNING("Stack buffer overrun detected!\n");
+            break;
+    };
+
+#ifndef NDEBUG
+    if (IsDebuggerPresent()) { __debugbreak(); }
+#endif
+
+    /**
+     *  Log various other know exceptions which we can continue;
+     */
+    DWORD *eip = &(ExceptionInfo->ContextRecord->Eip);
+    switch (*eip) {
+
+        // Blitters
+        case 0x00469129: // BlitTransXlatAlphaZRead
+            *eip = 0x00469163;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        case 0x00469AD6: // BlitTransXlatAlphaZReadWrite
+            *eip = 0x00469B1A;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        case 0x004681B4: // BlitTransDarkenZReadWrite
+            *eip = 0x004681E6;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        case 0x004690EF: // BlitTransXlatAlphaZRead
+            *eip = 0x00469163;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        case 0x00469AA0: // BlitTransXlatAlphaZReadWrite
+            *eip = 0x00469B1A;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        case 0x006A8D16: // BlitPlain
+            *eip = 0x006A8D1F;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        case 0x004668A8: // BlitTransXlat
+            *eip = 0x004668AD;
+            return EXCEPTION_CONTINUE_EXECUTION;
+
+        // RLE Blitters
+        case 0x0046C7E2: // RLEBlitTransXlatAlphaZReadWrite
+            *eip = 0x0046C837;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        case 0x0046BA24: // RLEBlitTransXlatAlphaZRead
+            *eip = 0x0046BA55;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        case 0x0046AF75: // RLEBlitTransDarkenZReadWrite
+            *eip = 0x0046AFB5;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        case 0x0046C7A7: // RLEBlitTransXlatAlphaZReadWrite
+            *eip = 0x0046C837;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        case 0x0046AF6E: // RLEBlitTransDarkenZReadWrite
+            *eip = 0x0046AFB5;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        case 0x0046B9E9: // RLEBlitTransXlatAlphaZRead
+            *eip = 0x0046BA55;
+            return EXCEPTION_CONTINUE_EXECUTION;
+        case 0x0046AF8A: // RLEBlitTransDarkenZReadWrite
+            *eip = 0x0046AFB5;
+            return EXCEPTION_CONTINUE_EXECUTION;
+
+        case 0x006703D4: // WaveClass
+            *eip = 0x00670499;
+            return EXCEPTION_CONTINUE_EXECUTION;
+
+        default:
+            break;
+    }
+
+    /**
+     *  Let Windows deal with the exception (the process will crash).
+     */
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
@@ -627,7 +762,10 @@ void Debug_Hooks()
      */
     SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)&_Top_Level_Exception_Filter);
     _set_se_translator((_se_translator_function)&_Structured_Exception_Translator);
-    AddVectoredExceptionHandler(1, _Vectored_Exception_Handler);
+
+    #define CALL_FIRST 1 // This handler will get called first.
+    #define CALL_LAST 0 // This handler will get called last.
+    AddVectoredExceptionHandler(CALL_FIRST, _Vectored_Exception_Handler);
 
     /**
      *  Hook in the Exception handler.

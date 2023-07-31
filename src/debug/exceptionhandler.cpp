@@ -86,11 +86,6 @@ FixedString<65536> ExceptionBuffer;
 
 static TextFileClass ExceptionFile;
 
-static FixedString<1024> ExceptionInfoDescription;
-static bool ExceptionInfoCanContinue = false;
-static uint32_t ExceptionInfoContinueAddress = 0x0;
-static bool ExceptionInfoIgnore = false;
-
 
 /**
  *  The installable exception intercept function pointer.
@@ -117,24 +112,6 @@ void Clear_All_Surfaces()
     if (TileSurface) TileSurface->Clear();
     if (SidebarSurface) SidebarSurface->Clear();
     if (AlternateSurface) AlternateSurface->Clear();
-}
-
-
-/**
- *  Finds the first instance of the address in the loaded database and extracts its info.
- */
-static bool Exception_Find_Datbase_Entry(uintptr_t address, bool &can_continue, uint32_t &continue_address, bool &ignore, FixedString<1024> &desc)
-{
-    for (int i = 0; i < ExceptionInfoDatabase.Count(); ++i) {
-        if (ExceptionInfoDatabase[i].Address == address) {
-            can_continue = ExceptionInfoDatabase[i].CanContinue;
-            continue_address = ExceptionInfoDatabase[i].ContinueAddress;
-            ignore = ExceptionInfoDatabase[i].Ignore;
-            desc = ExceptionInfoDatabase[i].Description;
-            return true;
-        }
-    }
-    return false;
 }
 
 
@@ -385,17 +362,6 @@ static void Dump_Exception_Info(unsigned int e_code, struct _EXCEPTION_POINTERS 
     Exception_Printf("Exception occurred at 0x%" PRIPTRSIZE PRIXPTR "\r\n", context->Eip);
 
     Exception_Printf("\r\n");
-
-    /**
-     *  Has additional info for this EIP been loaded from the exception database?
-     */
-    if (ExceptionInfoDescription.Peek_Buffer()[0] != '\0') {
-        Exception_Printf("Additional Information:\r\n");
-        DEBUG_WARNING("\r\nAdditional Information:\n");
-        Exception_Printf("  %s\r\n", ExceptionInfoDescription.Peek_Buffer());
-        DEBUG_WARNING("  %s\n\n", ExceptionInfoDescription.Peek_Buffer());
-        Exception_Printf("\r\n");
-    }
 
     DEBUG_WARNING("Call dump...\n");
     //Exception_Printf("Call stack:\r\n");
@@ -694,7 +660,8 @@ static INT_PTR CALLBACK Exception_Dialog_Proc(HWND hDlg, UINT uMsg, WPARAM wPara
     /**
      *  Disable/Enable the Continue button.
      */
-    EnableWindow(GetDlgItem(hDlg, IDC_EXCEPTION_CONTINUE), ExceptionInfoCanContinue ? TRUE : FALSE); // Continue button
+    //EnableWindow(GetDlgItem(hDlg, IDC_EXCEPTION_CONTINUE), ExceptionInfoCanContinue ? TRUE : FALSE); // Continue button
+    EnableWindow(GetDlgItem(hDlg, IDC_EXCEPTION_CONTINUE), FALSE); // Continue button
 
     switch (uMsg) {
         case WM_MOVING:
@@ -826,97 +793,7 @@ static INT_PTR Exception_Dialog()
 
 LONG Vinifera_Exception_Handler(unsigned int e_code, struct _EXCEPTION_POINTERS *e_info)
 {
-    DWORD *eip = &(ExceptionInfo->ContextRecord->Eip);
-    switch (*eip) {
-
-        /* Fog of war crashes */
-        case 0x0046C7E2:
-            *eip = 0x0046C837;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x0046BA24:
-            *eip = 0x0046BA55;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x0046AF75:
-            *eip = 0x0046AFB5;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x00469129:
-            *eip = 0x00469163;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x00469AD6:
-            *eip = 0x00469B1A;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x0046C7A7:
-            *eip = 0x0046C837;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x0046AF6E:
-            *eip = 0x0046AFB5;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x00469AA0:
-            *eip = 0x00469B1A;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x0046B9E9:
-            *eip = 0x0046BA55;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x004681B4:
-            *eip = 0x004681E6;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x004690EF:
-            *eip = 0x00469163;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x0046AF8A:
-            *eip = 0x0046AFB5;
-            return EXCEPTION_CONTINUE_EXECUTION;
-
-        /* non-fog of war crashes*/
-        case 0x006A8D16:
-            *eip = 0x006A8D1F;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x006703d4:
-            *eip = 0x00670499;
-            return EXCEPTION_CONTINUE_EXECUTION;
-        case 0x004668a8:
-            *eip = 0x004668AD;
-            return EXCEPTION_CONTINUE_EXECUTION;
-
-        default:
-            break;
-    }
-
-
-
-
-
-
-    /**
-     *  Search for additional info for this EIP in the exception database.
-     */
-    Exception_Find_Datbase_Entry(e_info->ContextRecord->Eip, ExceptionInfoCanContinue, ExceptionInfoContinueAddress, ExceptionInfoIgnore, ExceptionInfoDescription);
-
-    //DEV_DEBUG_WARNING("EIP: 0x%08X\n", e_info->ContextRecord->Eip);
-    //DEV_DEBUG_WARNING("CanContinue: %s  Ignore: %s\n", ExceptionInfoCanContinue ? "YES" : "NO", ExceptionInfoIgnore ? "YES" : "NO");
-    //DEV_DEBUG_WARNING("Description: %s\n", ExceptionInfoDescription.Peek_Buffer());
-
-    /**
-     *  Should we ignore this exception and continue?
-     */
-    if (ExceptionInfoCanContinue && ExceptionInfoIgnore) {
-        //DEV_DEBUG_WARNING("Ignoring exception, continuing execution...\n");
-        DWORD *eip = &(ExceptionInfo->ContextRecord->Eip);
-        *eip = ExceptionInfoContinueAddress;
-        return EXCEPTION_CONTINUE_EXECUTION;
-    }
-
     DEBUG_WARNING("********************************** EXCEPTION **********************************!\n");
-
-
-
-
-    /**
-     *  Clear previous exception info.
-     */
-    ExceptionInfoCanContinue = false;
-    ExceptionInfoIgnore = false;
-    ExceptionInfoDescription.Clear();
 
     /**
      *  
