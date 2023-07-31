@@ -564,12 +564,20 @@ static void Assert_Handler_Hooks()
  */
 static LONG __stdcall _Top_Level_Exception_Filter(EXCEPTION_POINTERS *e_info)
 {
+    DEBUG_INFO("Entered _Top_Level_Exception_Filter!\n");
     return Vinifera_Exception_Handler(e_info->ExceptionRecord->ExceptionCode, e_info);
 }
 
 static void __cdecl _Structured_Exception_Translator(unsigned int code, EXCEPTION_POINTERS *e_info)
 {
+    DEBUG_INFO("Entered _Structured_Exception_Translator!\n");
     Vinifera_Exception_Handler(code, e_info);
+}
+
+static LONG WINAPI _Vectored_Exception_Handler(EXCEPTION_POINTERS *e_info)
+{
+    DEBUG_INFO("Entered _Vectored_Exception_Handler!\n");
+    return Vinifera_Exception_Handler(e_info->ExceptionRecord->ExceptionCode, e_info);
 }
 
 
@@ -585,10 +593,15 @@ void Debug_Hooks()
     Hook_Function(0x006B51E5, &Vinifera_PureCall_Handler);
 
     /**
-     *  Hook in the Exception handler.
+     *  Set the exception handlers.
      */
     SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER)&_Top_Level_Exception_Filter);
     _set_se_translator((_se_translator_function)&_Structured_Exception_Translator);
+    AddVectoredExceptionHandler(1, _Vectored_Exception_Handler);
+
+    /**
+     *  Hook in the Exception handler.
+     */
     Hook_Function(0x005FF7D0, &_Top_Level_Exception_Filter);
     Hook_Function(0x00496350, &Vinifera_Exception_Handler);
     //ASM_Hook_Function(0x00495610, Dump_Exception_Info);
