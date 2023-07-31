@@ -578,11 +578,18 @@ static LONG WINAPI _Vectored_Exception_Handler(EXCEPTION_POINTERS *e_info)
 {
     DEBUG_INFO("Entered _Vectored_Exception_Handler!\n");
 
-    if (e_info->ExceptionRecord->ExceptionCode == STATUS_HEAP_CORRUPTION) {
-        DEBUG_WARNING("Heap corruption detected!\n");
+    // Make sure the exception code is within the expected range.
+    if ((e_info->ExceptionRecord->ExceptionCode & 0xF0000000) == 0xC0000000) {
+
+        switch (e_info->ExceptionRecord->ExceptionCode) {
+            case STATUS_HEAP_CORRUPTION:
+                DEBUG_WARNING("Heap corruption detected!\n");
+                break;
+        };
+
     }
 
-    return Vinifera_Exception_Handler(e_info->ExceptionRecord->ExceptionCode, e_info);
+    return EXCEPTION_CONTINUE_SEARCH;
 }
 
 
