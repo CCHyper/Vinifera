@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          BUILDINGEXT.H
+ *  @file          AUDIO_MANAGER.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended AircraftClass class.
+ *  @brief         Installable MiniAudio audio driver.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,41 +27,59 @@
  ******************************************************************************/
 #pragma once
 
-#include "abstractext.h"
-#include "object.h"
-#include "audio_event.h"
+#ifdef USE_MINIAUDIO
+
+#include "always.h"
+#include "wstring.h"
+#include "audio_defines.h"
 
 
-class AircraftClass;
-class HouseClass;
+class AudioVocClass;
+class AudioHandleClass;
+
+struct ma_sound;
+typedef ma_sound ma_sound_group;
 
 
-class ObjectClassExtension : public AbstractClassExtension
+/**
+ *  
+ */
+class AudioEventHandleClass
 {
     public:
-        /**
-         *  IPersistStream
-         */
-        IFACEMETHOD(Load)(IStream *pStm);
-        IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
+        AudioEventHandleClass() : Voc(nullptr), Handle(nullptr) {}
+        AudioEventHandleClass(AudioVocClass &voc);
+        virtual ~AudioEventHandleClass();
 
-    public:
-        ObjectClassExtension(const ObjectClass *this_ptr);
-        ObjectClassExtension(const NoInitClass &noinit);
-        virtual ~ObjectClassExtension();
+        virtual bool Init(Wstring filename);
 
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
+        virtual AudioVocClass &Get_Voc() const { return *Voc; }
 
-        virtual const char *Name() const override;
-        virtual const char *Full_Name() const override;
+        virtual bool Start();
+        virtual bool Stop(float fade_out_seconds = 0.0f, bool fade = false);
 
-        virtual ObjectClass *This() const override { return reinterpret_cast<ObjectClass *>(AbstractClassExtension::This()); }
-        virtual const ObjectClass *This_Const() const override { return reinterpret_cast<const ObjectClass *>(AbstractClassExtension::This_Const()); }
+        virtual bool Pause();
+        virtual bool Resume();
 
-    public:
+        virtual bool Is_Playing() const;
+
+        virtual bool Set_Looping(bool loop);
+        virtual bool Set_Volume(float volume);
+        virtual bool Set_Pitch(float pitch);
+        virtual bool Set_Pan(float pan);
+
+        virtual bool Mute();
+
+    private:
         /**
          *  x
          */
-        AudioEventHandleClass AmbientSound;
+        AudioVocClass *Voc;
+
+        /**
+         *  x
+         */
+        AudioHandleClass *Handle;
 };
+
+#endif

@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          BUILDINGEXT.H
+ *  @file          AUDIO_UTIL.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended AircraftClass class.
+ *  @brief         Various audio utility functions.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,41 +27,40 @@
  ******************************************************************************/
 #pragma once
 
-#include "abstractext.h"
-#include "object.h"
-#include "audio_event.h"
+#include "always.h"
+#include "tibsun_defines.h"
+#include "vinifera_globals.h"
+#include "wstring.h"
+#include "dsaudio.h"
+#include "debughandler.h"
 
 
-class AircraftClass;
-class HouseClass;
+class CCINIClass;
 
 
-class ObjectClassExtension : public AbstractClassExtension
-{
-    public:
-        /**
-         *  IPersistStream
-         */
-        IFACEMETHOD(Load)(IStream *pStm);
-        IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
+/**
+ *  x
+ */
+#define AUDIO_DEBUG_INFO(x, ...) if (Vinifera_AudioDebug) { DEBUG_INFO(x, ##__VA_ARGS__); } 
+#define AUDIO_DEBUG_WARNING(x, ...) if (Vinifera_AudioDebug) { DEBUG_WARNING(x, ##__VA_ARGS__); } 
+#define AUDIO_DEBUG_ERROR(x, ...) if (Vinifera_AudioDebug) { DEBUG_ERROR(x, ##__VA_ARGS__); } 
 
-    public:
-        ObjectClassExtension(const ObjectClass *this_ptr);
-        ObjectClassExtension(const NoInitClass &noinit);
-        virtual ~ObjectClassExtension();
 
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        virtual const char *Name() const override;
-        virtual const char *Full_Name() const override;
-
-        virtual ObjectClass *This() const override { return reinterpret_cast<ObjectClass *>(AbstractClassExtension::This()); }
-        virtual const ObjectClass *This_Const() const override { return reinterpret_cast<const ObjectClass *>(AbstractClassExtension::This_Const()); }
-
-    public:
-        /**
-         *  x
-         */
-        AudioEventHandleClass AmbientSound;
-};
+/**
+ *  These wrappers are required due to the stack being used when calling
+ *  a static function.
+ */
+void Theme_Queue_Song(ThemeType theme);
+bool Theme_Play_Song(ThemeType theme);
+void Theme_Stop(bool fade);
+void Theme_Suspend();
+void Theme_Resume();
+bool Theme_Is_Paused();
+ThemeType Theme_What_Is_Playing();
+int Theme_Max_Themes();
+bool Theme_Is_Allowed(ThemeType theme);
+const char * Theme_Full_Name(ThemeType theme);
+void Theme_Clear();
+void Theme_Scan();
+int Theme_Process(CCINIClass &ini);
+bool Theme_Fill_In_All();

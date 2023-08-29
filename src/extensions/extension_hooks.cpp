@@ -104,6 +104,7 @@
 #include "optionsext_hooks.h"
 
 #include "themeext_hooks.h"
+#include "msengineext_hooks.h"
 
 #include "displayext_hooks.h"
 #include "sidebarext_hooks.h"

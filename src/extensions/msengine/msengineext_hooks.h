@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          BUILDINGEXT.H
+ *  @file          MSENGINEEXT_HOOKS.H
  *
  *  @author        CCHyper
  *
- *  @brief         Extended AircraftClass class.
+ *  @brief         Contains the hooks for the extended MS classes.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -27,41 +27,5 @@
  ******************************************************************************/
 #pragma once
 
-#include "abstractext.h"
-#include "object.h"
-#include "audio_event.h"
 
-
-class AircraftClass;
-class HouseClass;
-
-
-class ObjectClassExtension : public AbstractClassExtension
-{
-    public:
-        /**
-         *  IPersistStream
-         */
-        IFACEMETHOD(Load)(IStream *pStm);
-        IFACEMETHOD(Save)(IStream *pStm, BOOL fClearDirty);
-
-    public:
-        ObjectClassExtension(const ObjectClass *this_ptr);
-        ObjectClassExtension(const NoInitClass &noinit);
-        virtual ~ObjectClassExtension();
-
-        virtual void Detach(TARGET target, bool all = true) override;
-        virtual void Compute_CRC(WWCRCEngine &crc) const override;
-
-        virtual const char *Name() const override;
-        virtual const char *Full_Name() const override;
-
-        virtual ObjectClass *This() const override { return reinterpret_cast<ObjectClass *>(AbstractClassExtension::This()); }
-        virtual const ObjectClass *This_Const() const override { return reinterpret_cast<const ObjectClass *>(AbstractClassExtension::This_Const()); }
-
-    public:
-        /**
-         *  x
-         */
-        AudioEventHandleClass AmbientSound;
-};
+void MSEngineExtension_Hooks();

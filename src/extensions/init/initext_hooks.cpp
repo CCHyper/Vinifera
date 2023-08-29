@@ -34,16 +34,23 @@
 #include "special.h"
 #include "playmovie.h"
 #include "cd.h"
+#include "ccfile.h"
+#include "ccini.h"
 #include "newmenu.h"
 #include "addon.h"
 #include "command.h"
 #include "theme.h"
+#include "voc.h"
 #include "session.h"
 #include "iomap.h"
 #include "dsaudio.h"
 #include "vinifera_gitinfo.h"
 #include "tspp_gitinfo.h"
 #include "resource.h"
+#include "audio_manager.h"
+#include "audio_util.h"
+#include "audio_voc.h"
+#include "audio_vox.h"
 #include "asserthandler.h"
 #include "debughandler.h"
 #include <Windows.h>
@@ -61,6 +68,236 @@ extern HMODULE DLLInstance;
  */
 #define TS_MAINICON         93
 #define TS_MAINCURSOR       104
+
+
+static bool Read_Sound_Ini()
+{
+    CCFileClass file;
+    CCINIClass ini;
+
+    DEBUG_INFO("Reading SOUND.INI\n");
+
+    file.Set_Name("SOUND.INI");
+    if (!file.Is_Available()) {
+        DEBUG_ERROR("Failed to find SOUND.INI!\n");
+        return false;
+    }
+    if (!ini.Load(file, false)) {
+        DEBUG_ERROR("Failed to load SOUND.INI!\n");
+        return false;
+    }
+
+    DEBUG_INFO("About to call VocClass::Process(SOUND.INI)...\n");
+    AudioVocClass::Clear();
+    AudioVocClass::Process(ini);
+
+    if (Addon_Installed(ADDON_FIRESTORM)) {
+
+        DEBUG_INFO("Reading SOUND01.INI\n");
+
+        file.Set_Name("SOUND01.INI");
+        if (file.Is_Available()) {
+            if (ini.Load(file, false)) {
+
+                /**
+                 *  We no longer clear before loading SOUND01.INI as it
+                 *  is now loaded as an "addition" to SOUND.INI.
+                 */
+                DEBUG_INFO("About to call VocClass::Process(SOUND01.INI) as addition...\n");
+                //AudioVocClass::Clear();
+                AudioVocClass::Process(ini);
+
+            } else {
+                DEBUG_ERROR("Failed to load SOUND01.INI!\n");
+            }
+        } else {
+            DEBUG_WARNING("Failed to find SOUND01.INI!\n");
+        }
+    }
+
+    DEBUG_INFO("About to call VocClass::Scan()...\n");
+    AudioVocClass::Scan();
+
+    return true;
+}
+
+static bool Read_Theme_Ini()
+{
+    CCFileClass file;
+    CCINIClass ini;
+
+    DEBUG_INFO("Reading THEME.INI\n");
+
+    file.Set_Name("THEME.INI");
+    if (!file.Is_Available()) {
+        DEBUG_ERROR("Failed to find THEME.INI!\n");
+        return false;
+    }
+    if (!ini.Load(file, false)) {
+        DEBUG_ERROR("Failed to load THEME.INI!\n");
+        return false;
+    }
+
+    DEBUG_INFO("About to call Theme.Process(THEME.INI)...\n");
+    Theme_Clear();
+    Theme_Process(ini);
+
+    if (Addon_Installed(ADDON_FIRESTORM)) {
+
+        DEBUG_INFO("Reading THEME01.INI\n");
+
+        file.Set_Name("THEME01.INI");
+        if (file.Is_Available()) {
+            if (ini.Load(file, false)) {
+
+                /**
+                 *  We no longer clear before loading THEME01.INI as it
+                 *  is now loaded as an "addition" to THEME.INI.
+                 */
+                DEBUG_INFO("About to call Theme.Process(THEME01.INI) as addition...\n");
+                //Theme.Clear();
+                Theme_Process(ini);
+
+            } else {
+                DEBUG_ERROR("Failed to load THEME01.INI!\n");
+            }
+        } else {
+            DEBUG_WARNING("Failed to find THEME01.INI!\n");
+        }
+    }
+
+    DEBUG_INFO("About to call Theme.Scan()...\n");
+    Theme_Scan();
+
+    return true;
+}
+
+static bool Read_Speech_Ini()
+{
+    /**
+     *  x
+     */
+    DEBUG_INFO("About to call AudioVoxClass::One_Time...\n");
+    AudioVoxClass::One_Time();
+
+#ifndef NDEBUG
+    /**
+     *  Write the default speech file to ini.
+     */
+    {
+        CCFileClass vox_write_file("SPEECH.DBG");
+        CCINIClass vox_write_ini;
+        vox_write_file.Delete();
+        AudioVoxClass::Write_Default_Speech_INI(vox_write_ini);
+        vox_write_ini.Save(vox_write_file, false);
+        vox_write_file.Close();
+    }
+#endif
+
+    DEBUG_INFO("Reading SPEECH.INI\n");
+    CCFileClass file;
+    CCINIClass ini;
+
+    file.Set_Name("SPEECH.INI");
+    if (file.Is_Available()) {
+
+        ini.Load(file, false);
+
+        /**
+         *  We no longer clear before loading SOUND.INI as 
+         *  all the original speeches are instantiated when
+         *  One_Time() is called.
+         */
+        //AudioVoxClass::Clear();
+        if (!AudioVoxClass::Process(ini)) {
+            DEV_DEBUG_ERROR("Failed to read SPEECH.INI!\n");
+            return EXIT_FAILURE;
+        }
+
+    } else {
+        DEV_DEBUG_WARNING("SPEECH.INI not found!\n");
+    }
+
+    if (Addon_Installed(ADDON_FIRESTORM)) {
+
+        file.Set_Name("SPEECH01.INI");
+        if (file.Is_Available()) {
+
+            ini.Load(file, false);
+
+            /**
+             *  We no longer clear before loading SOUND01.INI as it
+             *  is now loaded as an "addition" to THEME.INI.
+             */
+            //AudioVoxClass::Clear();
+            if (!AudioVoxClass::Process(ini)) {
+                DEV_DEBUG_ERROR("Failed to read SPEECH01.INI!\n");
+                return EXIT_FAILURE;
+            }
+
+        } else {
+            DEV_DEBUG_WARNING("SPEECH01.INI not found!\n");
+        }
+    }
+
+    DEBUG_INFO("About to call AudioVoxClass::Scan()...\n");
+    AudioVoxClass::Scan();
+
+    return true;
+}
+
+
+DECLARE_PATCH(_Init_Game_Read_SOUND_THEME_INI_Patch)
+{
+    if (!Read_Sound_Ini()) {
+        goto return_fail;
+    }
+    if (!Read_Theme_Ini()) {
+        goto return_fail;
+    }
+
+    Read_Speech_Ini();
+
+    JMP(0x004E0AFF);
+
+return_fail:
+    _asm { mov ebx, 0x0FFFFFFFF }
+    JMP(0x004E0A69);
+}
+
+DECLARE_PATCH(_Init_Game_Read_THEME_INI_Patch)
+{
+//    if (!Read_Theme_Ini()) {
+//        goto return_fail;
+//    }
+//
+    JMP(0x004E0AD9);
+//
+//return_fail:
+//    _asm { mov ebx, 0x0FFFFFFFF }
+//    JMP(0x004E0B4F);
+}
+
+
+/**
+ *  x
+ *
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Windows_Message_Handler_ImGui_Patch)
+{
+#if 0
+    AudioManager.Debug_Window_Message_Handler();
+    AudioManager.Debug_Window_Loop();
+#endif
+
+    _asm { pop edi }
+    _asm { pop esi }
+    _asm { pop ebp }
+    _asm { pop ebx }
+    _asm { add esp, 0x1C }
+    _asm { retn}
+}
 
 
 /**
@@ -183,6 +420,9 @@ static bool CCFile_Validate_Is_Available(const char *filename, int size)
 static bool Vinifera_Play_Startup_Movies()
 {
     static const int VINIFERA_VQA_SIZE = 704889;
+#ifdef USE_MINIAUDIO
+    static const int MINIAUD_VQA_SIZE = 84135;
+#endif
     static const int WWLOGO_VQA_SIZE = 2415362;
 
     if (Special.IsFromInstall) {
@@ -197,6 +437,13 @@ static bool Vinifera_Play_Startup_Movies()
             return false;
         }
         Play_Movie("VINIFERA.VQA");
+#ifdef USE_MINIAUDIO
+        if (!CCFile_Validate_Is_Available("MINIAUD.VQA", MINIAUD_VQA_SIZE)) {
+            DEBUG_ERROR("Failed to find MINIAUD.VQA!\n");
+            return false;
+        }
+        Play_Movie("MINIAUD.VQA");
+#endif
         if (!CCFile_Validate_Is_Available("WWLOGO.VQA", WWLOGO_VQA_SIZE)) {
             DEBUG_ERROR("Failed to find WWLOGO.VQA!\n");
             return false;
@@ -267,6 +514,7 @@ static bool Vinifera_Addon_Present()
 }
 #endif
 
+extern bool ImGui_Create_Main_Window(HINSTANCE hInstance);
 
 /**
  *  Creates the main window for Tiberian Sun
@@ -462,7 +710,9 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
 
     SetCursor(hCursor);
 
+#ifndef USE_MINIAUDIO
     Audio.AudioFocusLossFunction = &Focus_Loss;
+#endif
 
     /**
      *  Save the handle to our main window.
@@ -479,6 +729,8 @@ void Vinifera_Create_Main_Window(HINSTANCE hInstance, int nCmdShow, int width, i
     GameInFocus = true;
 
     //DEV_DEBUG_INFO("Create_Main_Window(exit)\n");
+
+    //ImGui_Create_Main_Window(hInstance);
 }
 
 
@@ -759,7 +1011,7 @@ bool Vinifera_Init_Secondary_Mixfiles()
         DEBUG_INFO(" SCORES.MIX\n", buffer);
     }
 	ScoresPresent = true;
-	Theme.Scan();
+    Theme_Scan();
 
     /**
      *  #issue-513
@@ -1030,4 +1282,10 @@ void GameInit_Hooks()
      */
     //Patch_Jump(0x00407050, &Vinifera_Addon_Present);
 #endif
+
+    //Patch_Jump(0x00574256, &_Windows_Message_Handler_ImGui_Patch);
+
+    Patch_Jump(0x004E08EE, &_Init_Game_Read_SOUND_THEME_INI_Patch);
+    Patch_Jump(0x004E0B22, 0x004E0B4F);
+    Patch_Jump(0x004E0BD8, 0x004E0C05);
 }

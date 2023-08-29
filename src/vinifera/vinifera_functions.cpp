@@ -49,6 +49,7 @@
 #include "extension.h"
 #include "theatertype.h"
 #include "uicontrol.h"
+#include "audio_util.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <string>
@@ -434,6 +435,15 @@ bool Vinifera_Parse_Command_Line(int argc, char *argv[])
         }
 #endif
 
+        /**
+         *  Enable audio debug output?
+         */
+        if (stricmp(string, "-AUDIO_DEBUG") == 0) {
+            DEBUG_INFO("  - Extensive audio engine debugging.\n");
+            Vinifera_AudioDebug = true;
+            continue;
+        }
+
     }
 
     if (argc > 1) {
@@ -485,6 +495,37 @@ bool Vinifera_Startup()
     ViniferaSearchPaths.Add("TS1");
     ViniferaSearchPaths.Add("TS2");
     ViniferaSearchPaths.Add("TS3");
+#endif
+
+#if defined(USE_MINIAUDIO)
+    /**
+     *  Search paths for use with the new audio engine.
+     */
+    ViniferaSearchPaths.Add("SOUNDS");
+    ViniferaSearchPaths.Add("SPEECH");
+    ViniferaSearchPaths.Add("MUSIC");
+
+#ifndef NDEBUG
+    ViniferaSearchPaths.Add("MUSIC\\FLAC");
+    ViniferaSearchPaths.Add("MUSIC\\WAV");
+    ViniferaSearchPaths.Add("MUSIC\\OGG");
+    ViniferaSearchPaths.Add("MUSIC\\MP3");
+    ViniferaSearchPaths.Add("MUSIC\\AUD");
+
+    ViniferaSearchPaths.Add("SOUNDS");
+    ViniferaSearchPaths.Add("SOUNDS\\FLAC");
+    ViniferaSearchPaths.Add("SOUNDS\\WAV");
+    ViniferaSearchPaths.Add("SOUNDS\\OGG");
+    ViniferaSearchPaths.Add("SOUNDS\\MP3");
+    ViniferaSearchPaths.Add("SOUNDS\\AUD");
+
+    ViniferaSearchPaths.Add("SPEECH");
+    ViniferaSearchPaths.Add("SPEECH\\FLAC");
+    ViniferaSearchPaths.Add("SPEECH\\WAV");
+    ViniferaSearchPaths.Add("SPEECH\\OGG");
+    ViniferaSearchPaths.Add("SPEECH\\MP3");
+    ViniferaSearchPaths.Add("SPEECH\\AUD");
+#endif
 #endif
 
     /**

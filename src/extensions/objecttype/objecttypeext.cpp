@@ -27,6 +27,8 @@
  ******************************************************************************/
 #include "objecttypeext.h"
 #include "objecttype.h"
+#include "audio_event.h"
+#include "voc.h"
 #include "ccini.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -40,7 +42,8 @@
 ObjectTypeClassExtension::ObjectTypeClassExtension(const ObjectTypeClass *this_ptr) :
     AbstractTypeClassExtension(this_ptr),
     GraphicName(),
-    AlphaGraphicName()
+    AlphaGraphicName(),
+    AmbientSound(VOC_NONE)
 {
     //if (this_ptr) EXT_DEBUG_TRACE("ObjectTypeClassExtension::ObjectTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 }
@@ -82,7 +85,7 @@ HRESULT ObjectTypeClassExtension::Load(IStream *pStm)
     if (FAILED(hr)) {
         return E_FAIL;
     }
-    
+
     return hr;
 }
 
@@ -151,6 +154,14 @@ bool ObjectTypeClassExtension::Read_INI(CCINIClass &ini)
     if (!ini.Is_Present(ini_name)) {
         return false;
     }
-    
+
+    AmbientSound = ini.Get_VocType(ini_name, "AmbientSound", AmbientSound);
+#ifndef USE_MINIAUDIO
+    if (AmbientSound != VOC_NONE) {
+        DEBUG_WARNING("%s : \"AmbientSound\" is unavailable in this build!\n", ini_name);
+    }
+#endif
+
+
     return true;
 }

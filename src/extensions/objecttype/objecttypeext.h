@@ -29,6 +29,7 @@
 
 #include "abstracttypeext.h"
 #include "objecttype.h"
+#include "wstring.h"
 
 
 class ObjectTypeClassExtension : public AbstractTypeClassExtension
@@ -67,4 +68,8 @@ class ObjectTypeClassExtension : public AbstractTypeClassExtension
         char AlphaGraphicName[24 + 1];
 
     public:
+        /**
+         *  x
+         */
+        VocType AmbientSound;
 };

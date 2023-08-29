@@ -124,8 +124,10 @@ original_code:
  */
 void ThemeClassExtension_Init()
 {
+#ifndef USE_MINIAUDIO
     Patch_Jump(0x006439E5, &_ThemeClass_ThemeControl_Constructor_Patch);
     Patch_Jump(0x00643B45, &_ThemeClass_ThemeControl_Inlined_Constructor_Patch);
     //Patch_Jump(0x, &_ThemeClass_ThemeControl_Destructor_Patch); // No destructor to hook, extension should clean up on exit.
     Patch_Jump(0x00643AAB, &_ThemeClass_ThemeControl_Read_INI_Patch);
+#endif
 }

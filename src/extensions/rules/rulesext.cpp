@@ -38,6 +38,7 @@
 #include "noinit.h"
 #include "swizzle.h"
 #include "addon.h"
+#include "audio_util.h"
 #include "vinifera_saveload.h"
 #include "asserthandler.h"
 #include "debughandler.h"
@@ -296,6 +297,11 @@ void RulesClassExtension::Process(CCINIClass &ini)
      *  Fixup various inconsistencies in the original INI files.
      */
     Fixups(ini);
+
+    /**
+     *  x
+     */
+    Theme_Fill_In_All();
 }
 
 

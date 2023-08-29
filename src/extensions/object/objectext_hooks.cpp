@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          OPTIONSEXT_HOOKS.CPP
+ *  @file          OBJECTEXT_HOOKS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks for the extended OptionsClass.
+ *  @brief         Contains the hooks for the extended ObjectClass.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,12 +25,11 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "optionsext_hooks.h"
-#include "optionsext_init.h"
-#include "options.h"
-#include "optionsext.h"
-#include "tibsun_globals.h"
+#include "objectext_hooks.h"
+#include "objectext.h"
+#include "object.h"
 #include "audio_voc.h"
+#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -44,30 +43,46 @@
  * 
  *  @author: CCHyper
  */
-static int Options_SoundVolume_To_Int() { return Options.SoundVolume * 255; }
-DECLARE_PATCH(_OptionsClass_Set_Sound_Volume_Patch)
+DECLARE_PATCH(_ObjectClass_Limbo_AmbientSound_Patch)
 {
-#ifdef USE_MINIAUDIO
-    AudioVocClass::Set_Volume(Options_SoundVolume_To_Int());
-#endif
+    GET_REGISTER_STATIC(ObjectClass *, this_ptr, esi);
+    static ObjectClassExtension *this_ext;
+
+    this_ext = Extension::Fetch<ObjectClassExtension>(this_ptr);
+
+    AudioVocClass::Stop_Audio_Event(this_ext->AmbientSound, this_ptr->Coord);
+
+    //JMP();
+}
+
+
+/**
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_ObjectClass_AI_AmbientSound_Patch)
+{
+    GET_REGISTER_STATIC(ObjectClass *, this_ptr, esi);
+    static ObjectClassExtension *this_ext;
+
+    this_ext = Extension::Fetch<ObjectClassExtension>(this_ptr);
 
     /**
-     *  Stolen bytes/code.
+     *  x
      */
-    _asm { pop esi }
-    _asm { ret 8 }
+    if (!this_ptr->IsInLimbo) {
+        AudioVocClass::Update_Audio_Event(this_ext->AmbientSound, this_ptr->Coord);
+    }
+
+    //JMP();
 }
 
 
 /**
  *  Main function for patching the hooks.
  */
-void OptionsClassExtension_Hooks()
+void ObjectClassExtension_Hooks()
 {
-    /**
-     *  Initialises the extended class.
-     */
-    OptionsClassExtension_Init();
-
-    Patch_Jump(0x00589B68, &_OptionsClass_Set_Sound_Volume_Patch);
+    //Patch_Jump(0x00584C18, &_ObjectClass_AI_AmbientSound_Patch);
 }

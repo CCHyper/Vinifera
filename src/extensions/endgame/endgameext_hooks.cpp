@@ -29,7 +29,7 @@
 #include "tibsun_globals.h"
 #include "endgame.h"
 #include "scenario.h"
-#include "theme.h"
+#include "audio_util.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
@@ -84,7 +84,7 @@ DECLARE_PATCH(_Select_Game_Set_EndGameClass_Difficulty_Patch)
     /**
      *  Stolen bytes/code.
      */
-    Theme.Stop(true);
+    Theme_Stop(true);
 
     JMP(0x004E2AE3);
 }
