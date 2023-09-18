@@ -152,6 +152,7 @@ if(NOT ${OPTION_CUSTOM_DEBUGGER_TARGET_NAME} STREQUAL " ")
 endif()
 
 option(OPTION_CHECK_TARGET_BINARIES "This option controls if the launcher should check target binaries before injection." ON)
+option(OPTION_ENABLE_ZIP "Build ZIP archive support" ON)
 
 
 ################################################################################
@@ -299,7 +300,57 @@ FetchContent_Declare(
 FetchContent_GetProperties(TSpp)
 if(NOT tspp_POPULATED)
 	FetchContent_Populate(TSpp)
+    message(STATUS "  Source: ${tspp_SOURCE_DIR}")
+    message(STATUS "  Build: ${tspp_BINARY_DIR}")
 	add_subdirectory(${tspp_SOURCE_DIR} ${tspp_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+
+# ################################################################################
+# # Fetch the latest kuba zip library
+# ################################################################################
+# if(OPTION_ENABLE_ZIP)
+#     FetchContent_Declare(
+#         zip
+#         GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+#         GIT_REPOSITORY https://github.com/kuba--/zip.git
+#         GIT_TAG        origin/master
+#     )
+# 
+#     FetchContent_GetProperties(zip)
+#     if(NOT zip_POPULATED)
+#         message(STATUS "Fetching kuba zip library...")
+#         FetchContent_Populate(zip)
+#         message(STATUS "  Source: ${zip_SOURCE_DIR}")
+#         message(STATUS "  Build: ${zip_BINARY_DIR}")
+#         #add_subdirectory(${zip_SOURCE_DIR} ${zip_BINARY_DIR} EXCLUDE_FROM_ALL)
+#     else()
+#         message(STATUS "Found kuba zip.")
+#     endif()
+# endif()
+
+
+################################################################################
+# Fetch the latest ZipLib library
+################################################################################
+if(OPTION_ENABLE_ZIP)
+    FetchContent_Declare(
+        zip_lib
+        GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+        GIT_REPOSITORY https://github.com/Vinifera-Developers/Vinifera-ZipLib.git
+        GIT_TAG        origin/master
+    )
+
+    FetchContent_GetProperties(zip_lib)
+    if(NOT zip_lib_POPULATED)
+        message(STATUS "Fetching ZipLib library...")
+        FetchContent_Populate(zip_lib)
+        message(STATUS "  Source: ${zip_lib_SOURCE_DIR}")
+        message(STATUS "  Build: ${zip_lib_BINARY_DIR}")
+        add_subdirectory(${zip_lib_SOURCE_DIR} ${zip_lib_BINARY_DIR} EXCLUDE_FROM_ALL)
+    else()
+        message(STATUS "Found ZipLib.")
+    endif()
 endif()
 
 
@@ -606,6 +657,10 @@ target_compile_options(${PROJECT_NAME} PUBLIC /MP2)
 # Link to the TS++ static library.
 target_link_libraries(${PROJECT_NAME} TSpp)
 add_dependencies(${PROJECT_NAME} TSpp)
+
+# Link to the ZipLib static library.
+target_link_libraries(${PROJECT_NAME} ZipLib)
+add_dependencies(${PROJECT_NAME} ZipLib)
 
 # Ensure the launcher is built with the main project.
 add_dependencies(${PROJECT_NAME} Launch${PROJECT_NAME})

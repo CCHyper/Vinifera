@@ -44,6 +44,8 @@ extern bool Vinifera_PrintFileErrors;
 extern bool Vinifera_FatalFileErrors;
 extern bool Vinifera_AssertFileErrors;
 
+extern bool Vinifera_IsZipFileIOEnabled;
+
 extern char Vinifera_ExceptionDatabaseFilename[PATH_MAX];
 extern char Vinifera_DebugDirectory[PATH_MAX];
 extern char Vinifera_ScreenshotDirectory[PATH_MAX];

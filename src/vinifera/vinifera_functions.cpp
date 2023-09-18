@@ -53,6 +53,9 @@
 #include "asserthandler.h"
 #include <string>
 
+#include "zipfile1.h"
+#include "zipfile2.h"
+
 
 static DynamicVectorClass<Wstring> ViniferaSearchPaths;
 
@@ -110,6 +113,8 @@ bool Vinifera_Load_INI()
     Vinifera_ProjectVersion[sizeof(Vinifera_ProjectVersion)-1] = '\0';
     Vinifera_IconName[sizeof(Vinifera_IconName)-1] = '\0';
     Vinifera_CursorName[sizeof(Vinifera_CursorName)-1] = '\0';
+
+    Vinifera_IsZipFileIOEnabled = ini.Get_Bool("File", "UseZipFiles", Vinifera_IsZipFileIOEnabled);
 
     char buffer[1024];
     if (ini.Get_String("General", "SearchPaths", buffer, sizeof(buffer)) > 0) {
@@ -536,6 +541,21 @@ bool Vinifera_Startup()
         return false;
 #endif
     }
+
+
+    if (Vinifera_IsZipFileIOEnabled) {
+
+        ZipFileClass2 * zip = new ZipFileClass2("MOVIES01.ZIP");
+
+        zip->Load();
+
+        delete zip;
+
+    }
+
+
+
+
 
     /**
      *  Current path (perhaps set set with -CD) should go next.
