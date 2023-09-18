@@ -41,6 +41,7 @@
 #include "session.h"
 #include "iomap.h"
 #include "dsaudio.h"
+#include "physicsfs.h"
 #include "vinifera_gitinfo.h"
 #include "tspp_gitinfo.h"
 #include "resource.h"
@@ -600,7 +601,6 @@ bool Vinifera_Prep_For_Side(SideType side)
  */
 bool Vinifera_Init_Secondary_Mixfiles()
 {
-    MFCC *mix;
     char buffer[16];
 
     DEBUG_INFO("\n"); // Fixes missing new-line after "Init Secondary Mixfiles....." print.
@@ -613,36 +613,30 @@ bool Vinifera_Init_Secondary_Mixfiles()
      * 
      *  @author: CCHyper
      */
-    if (CCFileClass("GENERIC.MIX").Is_Available()) {
-        GenericMix = new MFCC("GENERIC.MIX", &FastKey);
-        ASSERT(GenericMix);
+    GenericMix = nullptr;
+    if (CCFileClass("GENERIC.ZIP").Is_Available()) {
+        if (PhysicsFS_AddArchive("GENERIC.ZIP")) {
+            DEBUG_INFO(" GENERIC.ZIP\n");
+        } else {
+            DEV_DEBUG_WARNING("Failed to load GENERIC.MIX!\n");
+        }
     }
-    if (!GenericMix) {
-        DEV_DEBUG_WARNING("Failed to load GENERIC.MIX!\n");
-    } else {
-        GenericMix->Cache();
-        DEBUG_INFO(" GENERIC.MIX\n");
-    }
-    if (CCFileClass("ISOGEN.MIX").Is_Available()) {
-        IsoGenericMix = new MFCC("ISOGEN.MIX", &FastKey);
-        ASSERT(IsoGenericMix);
-    }
-    if (!IsoGenericMix) {
-        DEV_DEBUG_WARNING("Failed to load ISOGEN.MIX!\n");
-    } else {
-        IsoGenericMix->Cache();
-        DEBUG_INFO(" ISOGEN.MIX\n");
+    IsoGenericMix = nullptr;
+    if (CCFileClass("ISOGEN.ZIP").Is_Available()) {
+        if (PhysicsFS_AddArchive("ISOGEN.ZIP")) {
+            DEBUG_INFO(" ISOGEN.ZIP\n");
+        } else {
+            DEV_DEBUG_WARNING("Failed to load ISOGEN.MIX!\n");
+        }
     }
 
-    if (CCFileClass("CONQUER.MIX").Is_Available()) {
-        ConquerMix = new MFCC("CONQUER.MIX", &FastKey);
-        ASSERT(ConquerMix);
-    }
-    if (!ConquerMix) {
-        DEBUG_WARNING("Failed to load CONQUER.MIX!\n");
-        //return false; // #issue-110: Unable to load startup mix files is no longer a fatal error.
-    } else {
-        DEBUG_INFO(" CONQUER.MIX\n");
+    ConquerMix = nullptr;
+    if (CCFileClass("CONQUER.ZIP").Is_Available()) {
+        if (PhysicsFS_AddArchive("CONQUER.ZIP")) {
+            DEBUG_INFO(" CONQUER.ZIP\n");
+        } else {
+            DEBUG_WARNING("Failed to load CONQUER.MIX!\n");
+        }
     }
 
     int cd = CD::Get_Volume_Index();
@@ -669,94 +663,81 @@ bool Vinifera_Init_Secondary_Mixfiles()
      */
     if (CD::IsFilesLocal) {
 
-        std::snprintf(buffer, sizeof(buffer), "MAPS*.MIX");
+        MapsMix = nullptr;
+        std::snprintf(buffer, sizeof(buffer), "MAPS*.ZIP");
         if (CCFileClass::Find_First_File(buffer)) {
             DEBUG_INFO(" %s\n", buffer);
-            MapsMix = new MFCC(buffer, &FastKey);
-            ASSERT(MapsMix);
-            while (CCFileClass::Find_Next_File(buffer)) {
-                DEBUG_INFO(" %s\n", buffer);
-                mix = new MFCC(buffer, &FastKey);
-                ASSERT(mix);
-                if (mix) {
-                    ViniferaMapsMixes.Add(mix);
+            if (CCFileClass(buffer).Is_Available()) {
+                if (PhysicsFS_AddArchive(buffer)) {
+                    DEBUG_INFO(" %s\n", buffer);
                 }
             }
         }
         CCFileClass::Find_Close();
 
     } else {
-        std::snprintf(buffer, sizeof(buffer), "MAPS%02d.MIX", cd);
+        MapsMix = nullptr;
+        std::snprintf(buffer, sizeof(buffer), "MAPS%02d.ZIP", cd);
         if (CCFileClass(buffer).Is_Available()) {
-            MapsMix = new MFCC(buffer, &FastKey);
-            ASSERT(MapsMix);
+            if (PhysicsFS_AddArchive(buffer)) {
+                DEBUG_INFO(" %s\n", buffer);
+            } else {
+                DEBUG_WARNING("Failed to load %s!\n", buffer);
+            }
         }
     }
-    if (!MapsMix) {
-        DEBUG_WARNING("Failed to load %s!\n", buffer);
-        //return false; // #issue-110: Unable to load startup mix files is no longer a fatal error.
-    } else {
-        if (!CD::IsFilesLocal) DEBUG_INFO(" %s\n", buffer);
-    }
+    if (!CD::IsFilesLocal) DEBUG_INFO(" %s\n", buffer);
 
-    if (CCFileClass("MULTI.MIX").Is_Available()) {
-        MultiMix = new MFCC("MULTI.MIX", &FastKey);
-        ASSERT(MultiMix);
-    }
-    if (!MultiMix) {
-        DEBUG_WARNING("Failed to load MULTI.MIX!\n");
-        //return false; // #issue-110: Unable to load startup mix files is no longer a fatal error.
-    } else {
-        DEBUG_INFO(" MULTI.MIX\n", buffer);
+    MultiMix = nullptr;
+    if (CCFileClass("MULTI.ZIP").Is_Available()) {
+        if (PhysicsFS_AddArchive("MULTI.ZIP")) {
+            DEBUG_INFO(" MULTI.ZIP\n");
+        }
+        else {
+            DEBUG_WARNING("Failed to load MULTI.ZIP!\n");
+        }
     }
 
     if (Addon_Installed(ADDON_FIRESTORM)) {
-        if (CCFileClass("SOUNDS01.MIX").Is_Available()) {
-            FSSoundsMix = new MFCC("SOUNDS01.MIX", &FastKey);
-            ASSERT(FSSoundsMix);
+        FSSoundsMix = nullptr;
+        if (CCFileClass("SOUNDS01.ZIP").Is_Available()) {
+            if (PhysicsFS_AddArchive("SOUNDS01.ZIP")) {
+                DEBUG_INFO(" SOUNDS01.ZIP\n");
+            }
+            else {
+                DEBUG_WARNING("Failed to load SOUNDS01.ZIP!\n");
+            }
         }
-        if (!FSSoundsMix) {
-            DEBUG_WARNING("Failed to load SOUNDS01.MIX!\n");
-            //return false; // #issue-110: Unable to load startup mix files is no longer a fatal error.
+    }
+
+    SoundsMix = nullptr;
+    if (CCFileClass("SOUNDS.ZIP").Is_Available()) {
+        if (PhysicsFS_AddArchive("SOUNDS.ZIP")) {
+            DEBUG_INFO(" SOUNDS.ZIP\n");
         } else {
-            DEBUG_INFO(" SOUNDS01.MIX\n", buffer);
+            DEBUG_WARNING("Failed to load SOUNDS.ZIP!\n");
         }
     }
 
-    if (CCFileClass("SOUNDS.MIX").Is_Available()) {
-        SoundsMix = new MFCC("SOUNDS.MIX", &FastKey);
-        ASSERT(SoundsMix);
-    }
-    if (!SoundsMix) {
-        DEBUG_WARNING("Failed to load SOUNDS.MIX!\n");
-        //return false; // #issue-110: Unable to load startup mix files is no longer a fatal error.
-    } else {
-        DEBUG_INFO(" SOUNDS.MIX\n", buffer);
-    }
-
-    if (CCFileClass("SCORES01.MIX").Is_Available()) {
-        FSScoresMix = new MFCC("SCORES01.MIX", &FastKey);
-        ASSERT(FSScoresMix);
-    }
-    if (!FSScoresMix) {
-        DEBUG_WARNING("Failed to load SCORES01.MIX!\n");
-        //return false; // #issue-110: Unable to load startup mix files is no longer a fatal error.
-    } else {
-        DEBUG_INFO(" SCORES01.MIX\n", buffer);
+    FSScoresMix = nullptr;
+    if (CCFileClass("SCORES01.ZIP").Is_Available()) {
+        if (PhysicsFS_AddArchive("SCORES01.ZIP")) {
+            DEBUG_INFO(" SCORES01.ZIP\n");
+        } else {
+            DEBUG_WARNING("Failed to load SCORES01.ZIP!\n");
+        }
     }
 
 	/*
 	**	Register the score mixfile.
 	*/
-    if (CCFileClass("SCORES.MIX").Is_Available()) {
-        ScoreMix = new MFCC("SCORES.MIX", &FastKey);
-        ASSERT(ScoreMix);
-    }
-    if (!ScoreMix) {
-        DEBUG_WARNING("Failed to load SCORES.MIX!\n");
-        //return false; // #issue-110: Unable to load startup mix files is no longer a fatal error.
-    } else {
-        DEBUG_INFO(" SCORES.MIX\n", buffer);
+    ScoreMix = nullptr;
+    if (CCFileClass("SCORES.ZIP").Is_Available()) {
+        if (PhysicsFS_AddArchive("SCORES.ZIP")) {
+            DEBUG_INFO(" SCORES.ZIP\n");
+        } else {
+            DEBUG_WARNING("Failed to load SCORES.ZIP!\n");
+        }
     }
 	ScoresPresent = true;
 	Theme.Scan();
@@ -778,11 +759,11 @@ bool Vinifera_Init_Secondary_Mixfiles()
             ASSERT(MoviesMix);
             while (CCFileClass::Find_Next_File(buffer)) {
                 DEBUG_INFO(" %s\n", buffer);
-                mix = new MFCC(buffer, &FastKey);
-                ASSERT(mix);
-                if (mix) {
-                    ViniferaMoviesMixes.Add(mix);
-                }
+                //mix = new MFCC(buffer, &FastKey);
+                //ASSERT(mix);
+                //if (mix) {
+                //    ViniferaMoviesMixes.Add(mix);
+                //}
             }
         }
         CCFileClass::Find_Close();
@@ -812,34 +793,26 @@ bool Vinifera_Init_Secondary_Mixfiles()
  */
 bool Vinifera_Init_Expansion_Mixfiles()
 {
-    MFCC *mix;
     char buffer[16];
 
     for (int i = 99; i >= 0; --i) {
-        std::snprintf(buffer, sizeof(buffer), "EXPAND%02d.MIX", i);
+        std::snprintf(buffer, sizeof(buffer), "EXPAND%02d.ZIP", i);
         if (CCFileClass(buffer).Is_Available()) {
-            mix = new MFCC(buffer, &FastKey);
-            ASSERT(mix);
-            if (!mix) {
-                DEBUG_WARNING("Failed to load %s!\n", buffer);
-            } else {
-                ExpansionMixFiles.Add(mix);
+            if (PhysicsFS_AddArchive(buffer)) {
                 DEBUG_INFO(" %s\n", buffer);
+            } else {
+                DEBUG_WARNING("Failed to load %s!\n", buffer);
             }
         }
     }
 
     for (int i = 99; i >= 0; --i) {
-        std::snprintf(buffer, sizeof(buffer), "ECACHE%02d.MIX", i);
+        std::snprintf(buffer, sizeof(buffer), "ECACHE%02d.ZIP", i);
         if (CCFileClass(buffer).Is_Available()) {
-            mix = new MFCC(buffer, &FastKey);
-            ASSERT(mix);
-            if (!mix) {
-                DEBUG_WARNING("Failed to load %s!\n", buffer);
-            } else {
-                mix->Cache();
-                ExpansionMixFiles.Add(mix);
+            if (PhysicsFS_AddArchive(buffer)) {
                 DEBUG_INFO(" %s\n", buffer);
+            } else {
+                DEBUG_WARNING("Failed to load %s!\n", buffer);
             }
         }
     }
@@ -876,15 +849,13 @@ bool Vinifera_Init_Expansion_Mixfiles()
     CCFileClass::Find_Close();
 #else
     for (int i = 99; i >= 0; --i) {
-        std::snprintf(buffer, sizeof(buffer), "ELOCAL%02d.MIX", i);
+        std::snprintf(buffer, sizeof(buffer), "ELOCAL%02d.ZIP", i);
         if (CCFileClass(buffer).Is_Available()) {
-            mix = new MFCC(buffer, &FastKey);
-            ASSERT(mix);
-            if (!mix) {
-                DEBUG_WARNING("Failed to load %s!\n", buffer);
-            } else {
-                ExpansionMixFiles.Add(mix);
+            if (PhysicsFS_AddArchive(buffer)) {
                 DEBUG_INFO(" %s\n", buffer);
+            }
+            else {
+                DEBUG_WARNING("Failed to load %s!\n", buffer);
             }
         }
     }
@@ -912,20 +883,17 @@ bool Vinifera_Init_Bootstrap_Mixfiles()
     DEBUG_INFO("\n"); // Fixes missing new-line after "Bootstrap..." print.
     //DEBUG_INFO("Init bootstrap mixfiles...\n");
 
-    if (CCFileClass("PATCH.MIX").Is_Available()) {
-        mix = new MFCC("PATCH.MIX", &FastKey);
-        ASSERT(mix);
-        if (mix) {
-            DEBUG_INFO(" PATCH.MIX\n");
+    if (CCFileClass("ZIP/PATCH.ZIP").Is_Available()) {
+        if (PhysicsFS_AddArchive("ZIP/PATCH.ZIP")) {
+            DEBUG_INFO(" ZIP/PATCH.ZIP\n");
         }
     }
 
-    if (CCFileClass("PCACHE.MIX").Is_Available()) {
-        mix = new MFCC("PCACHE.MIX", &FastKey);
-        ASSERT(mix);
-        if (mix) {
-            mix->Cache();
-            DEBUG_INFO(" PCACHE.MIX\n");
+    PhysicsFS_LogSearchPaths();
+
+    if (CCFileClass("PCACHE.ZIP").Is_Available()) {
+        if (PhysicsFS_AddArchive("PCACHE.ZIP")) {
+            DEBUG_INFO(" PCACHE.ZIP\n");
         }
     }
 
@@ -933,39 +901,36 @@ bool Vinifera_Init_Bootstrap_Mixfiles()
 
     Addon_Present();
 
-    TibSunMix = new MFCC("TIBSUN.MIX", &FastKey);
-    ASSERT(TibSunMix);
-    if (!TibSunMix) {
-        DEBUG_WARNING("Failed to load TIBSUN.MIX!\n");
-        //return false; // #issue-110: Unable to load startup mix files is no longer a fatal error.
-    } else {
-        DEBUG_INFO(" TIBSUN.MIX\n");
+    TibSunMix = nullptr;
+    if (CCFileClass("TIBSUN.ZIP").Is_Available()) {
+        if (PhysicsFS_AddArchive("TIBSUN.ZIP")) {
+            DEBUG_INFO(" TIBSUN.ZIP\n");
+        } else {
+            DEBUG_WARNING("Failed to load TIBSUN.ZIP!\n");
+        }
     }
 
     /*
     **	Bootstrap enough of the system so that the error dialog
     *   box can successfully be displayed.
     */
-    CacheMix = new MFCC("CACHE.MIX", &FastKey);
-    ASSERT(CacheMix);
-    if (!CacheMix) {
-        DEBUG_WARNING("Failed to load CACHE.MIX!\n");
-        //return false; // #issue-110: Unable to load startup mix files is no longer a fatal error.
-    } else {
-        if (!CacheMix->Cache()) {
-            DEBUG_WARNING("Failed to cache CACHE.MIX!\n");
-            return false;
+    CacheMix = nullptr;
+    if (CCFileClass("CACHE.ZIP").Is_Available()) {
+        if (PhysicsFS_AddArchive("CACHE.ZIP")) {
+            DEBUG_INFO(" CACHE.ZIP\n");
+        } else {
+            DEBUG_WARNING("Failed to load CACHE.ZIP!\n");
         }
-        DEBUG_INFO(" CACHE.MIX\n");
     }
 
-    LocalMix = new MFCC("LOCAL.MIX", &FastKey);
-    ASSERT(LocalMix);
-    if (!LocalMix) {
-        DEBUG_WARNING("Failed to load LOCAL.MIX!\n");
-        //return false; // #issue-110: Unable to load startup mix files is no longer a fatal error.
-    } else {
-        DEBUG_INFO(" LOCAL.MIX\n");
+    LocalMix = nullptr;
+    if (CCFileClass("LOCAL.ZIP").Is_Available()) {
+        if (PhysicsFS_AddArchive("LOCAL.ZIP")) {
+            DEBUG_INFO(" LOCAL.ZIP\n");
+        }
+        else {
+            DEBUG_WARNING("Failed to load LOCAL.ZIP!\n");
+        }
     }
 
     CD::Set_Required_CD(temp);

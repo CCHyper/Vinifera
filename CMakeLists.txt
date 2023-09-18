@@ -152,6 +152,8 @@ if(NOT ${OPTION_CUSTOM_DEBUGGER_TARGET_NAME} STREQUAL " ")
 endif()
 
 option(OPTION_CHECK_TARGET_BINARIES "This option controls if the launcher should check target binaries before injection." ON)
+#option(OPTION_ENABLE_ZIP "Build ZIP archive support" ON)
+option(OPTION_USE_PHYSICSFS "Use the PhysicsFS file system" ON)
 
 
 ################################################################################
@@ -299,7 +301,52 @@ FetchContent_Declare(
 FetchContent_GetProperties(TSpp)
 if(NOT tspp_POPULATED)
 	FetchContent_Populate(TSpp)
+    message(STATUS "  Source: ${tspp_SOURCE_DIR}")
+    message(STATUS "  Build: ${tspp_BINARY_DIR}")
 	add_subdirectory(${tspp_SOURCE_DIR} ${tspp_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
+
+
+################################################################################
+# Fetch the latest PhysicsFS library
+################################################################################
+if(OPTION_USE_PHYSICSFS)
+    FetchContent_Declare(
+        physics_fs
+        GIT_REMOTE_UPDATE_STRATEGY CHECKOUT
+        GIT_REPOSITORY https://github.com/icculus/physfs.git
+        GIT_TAG        origin/stable-3.2
+    )
+
+    FetchContent_GetProperties(physics_fs)
+    if(NOT physics_fs_POPULATED)
+        message(STATUS "Fetching PhysicsFS library...")
+        FetchContent_Populate(physics_fs)
+        message(STATUS "  Source: ${physics_fs_SOURCE_DIR}")
+        message(STATUS "  Build: ${physics_fs_BINARY_DIR}")
+        
+        # Disable formats we don't wish to support.
+        set(PHYSFS_ARCHIVE_GRP FALSE)
+        set(PHYSFS_ARCHIVE_WAD FALSE)
+        set(PHYSFS_ARCHIVE_CSM FALSE)
+        set(PHYSFS_ARCHIVE_HOG FALSE)
+        set(PHYSFS_ARCHIVE_MVL FALSE)
+        set(PHYSFS_ARCHIVE_QPAK FALSE)
+        set(PHYSFS_ARCHIVE_SLB FALSE)
+        set(PHYSFS_ARCHIVE_ISO9660 FALSE)
+        set(PHYSFS_ARCHIVE_VDF FALSE)
+        
+        # Build as a static library.
+        set(PHYSFS_BUILD_STATIC TRUE)
+        
+        # Remove the test and docs targets.
+        set(PHYSFS_BUILD_TEST FALSE)
+        set(PHYSFS_BUILD_DOCS FALSE)
+        
+        add_subdirectory(${physics_fs_SOURCE_DIR} ${physics_fs_BINARY_DIR} EXCLUDE_FROM_ALL)
+    else()
+        message(STATUS "Found PhysicsFS.")
+    endif()
 endif()
 
 
@@ -606,6 +653,43 @@ target_compile_options(${PROJECT_NAME} PUBLIC /MP2)
 # Link to the TS++ static library.
 target_link_libraries(${PROJECT_NAME} TSpp)
 add_dependencies(${PROJECT_NAME} TSpp)
+
+#
+# Link to the PhysicsFS static library.
+#
+if(OPTION_USE_PHYSICSFS)
+    target_link_libraries(${PROJECT_NAME} physfs-static)
+    add_dependencies(${PROJECT_NAME} physfs-static)
+
+    # forces __fastcall as default calling convention for the PhysicsFS library.
+    target_compile_options(physfs PUBLIC /Gr)
+    target_compile_options(physfs-static PUBLIC /Gr)
+
+    # PhysicsFS does not provide us with the include path, so we need to add it manually.
+    target_include_directories(${PROJECT_NAME} PUBLIC
+            ${physics_fs_SOURCE_DIR}/src/
+    )
+    
+    # Explictly include the PhysicsFS headers in the projects folder listing.
+    target_sources(physfs PRIVATE
+                ${physics_fs_SOURCE_DIR}/src/physfs.h
+                ${physics_fs_SOURCE_DIR}/src/physfs_casefolding.h
+                ${physics_fs_SOURCE_DIR}/src/physfs_internal.h
+                ${physics_fs_SOURCE_DIR}/src/physfs_lzmasdk.h
+                ${physics_fs_SOURCE_DIR}/src/physfs_miniz.h
+                ${physics_fs_SOURCE_DIR}/src/physfs_platforms.h
+    )
+    target_sources(physfs-static PRIVATE
+                ${physics_fs_SOURCE_DIR}/src/physfs.h
+                ${physics_fs_SOURCE_DIR}/src/physfs_casefolding.h
+                ${physics_fs_SOURCE_DIR}/src/physfs_internal.h
+                ${physics_fs_SOURCE_DIR}/src/physfs_lzmasdk.h
+                ${physics_fs_SOURCE_DIR}/src/physfs_miniz.h
+                ${physics_fs_SOURCE_DIR}/src/physfs_platforms.h
+    )
+    
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VINIFERA_USE_PHYSICSFS=1)
+endif()
 
 # Ensure the launcher is built with the main project.
 add_dependencies(${PROJECT_NAME} Launch${PROJECT_NAME})

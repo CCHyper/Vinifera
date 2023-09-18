@@ -25,6 +25,9 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
+
+#if !defined(VINIFERA_USE_PHYSICSFS)
+
 #include "ccfileext_hooks.h"
 #include "ccfile.h"
 #include "cd.h"
@@ -83,6 +86,7 @@ void CCFileClassExt::_Error(FileErrorType error, bool can_retry, const char *fil
     }
 }
 
+#endif
 
 
 /**
@@ -90,5 +94,7 @@ void CCFileClassExt::_Error(FileErrorType error, bool can_retry, const char *fil
  */
 void CCFileClassExtension_Hooks()
 {
+#if !defined(VINIFERA_USE_PHYSICSFS)
     Patch_Jump(0x00449820, &CCFileClassExt::_Error);
+#endif
 }
