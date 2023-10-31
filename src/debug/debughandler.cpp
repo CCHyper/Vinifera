@@ -294,7 +294,7 @@ static void Debug_Console_Init()
     /**
      *  Set console size.
      */
-    Set_Console_Properties(DebugConsoleHandle, 0, 0, 82, 60);
+    Set_Console_Properties(DebugConsoleHandle, 0, 0, 110, 60);
 
     COORD buffsize = { 82, 4096 };
     SetConsoleScreenBufferSize(DebugConsoleHandle, buffsize);
