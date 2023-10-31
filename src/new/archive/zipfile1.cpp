@@ -28,12 +28,12 @@
 #include "zipfile1.h"
 //#include "search.h"
 #include "crc32.h"
-#include "rawfile.h"
+#include "ccfile.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
 #include <algorithm>
-
+#include <thread>
 
 
 
@@ -66,7 +66,7 @@ ZipFileClass::ZipFileClass(Wstring filename) :
     ZipFileHandle(nullptr),
     ZipFileBuffer()
 {
-    RawFileClass file(Filename.Peek_Buffer());
+    CDFileClass file(Filename.Peek_Buffer());
     if (!file.Is_Available()) {
         DEBUG_WARNING("Zip::Zip - Failed to find \"%s\"!\n", Filename.Peek_Buffer());
         return;
@@ -80,36 +80,35 @@ ZipFileClass::~ZipFileClass()
     Unload();
 }
 
-bool ZipFileClass::Load()
+void ZipFileClass::zip_load_function(ZipFileClass *zip_file)
 {
     int zip_error = ZIP_ENOINIT;
 
-    if (ZipFileHandle) {
-        DEBUG_WARNING("Zip::Load - Archive \"%s\" has already been loaded!\n", Filename.Peek_Buffer());
-        return true;
-    }
+    // Flag as loading in to memory.
+    zip_file->IsLoading = true;
 
-    DEBUG_INFO("Zip::Load - Loading \"%s\".\n", Filename.Peek_Buffer());
+    unsigned char *buff = new unsigned char [zip_file->ZipFileBuffer.Get_Size()];
 
-    zip_t * zip_handle = zip_stream_open((const char *)ZipFileBuffer.Get_Buffer(), ZipFileBuffer.Get_Size(), 0, 'r');
+    zip_t * zip_handle = zip_stream_open((const char *)buff, zip_file->ZipFileBuffer.Get_Size(), ZIP_DEFAULT_COMPRESSION_LEVEL, 'r');
+    //zip_t * zip_handle = zip_stream_open((const char *)zip_file->ZipFileBuffer.Get_Buffer(), zip_file->ZipFileBuffer.Get_Size(), 0, 'r');
     if (!zip_handle) {
-        DEBUG_WARNING("Zip::Load - Failed to open stream for \"%s\"!\n", Filename.Peek_Buffer());
-        return false;
+        DEBUG_WARNING("Zip::Load - Failed to open stream for \"%s\"!\n", zip_file->Filename.Peek_Buffer());
+        return;
     }
 
-    DEBUG_INFO("Zip::Load - About to create file index for \"%s\"...\n", Filename.Peek_Buffer());
+    DEBUG_INFO("Zip::Load - About to create file index for \"%s\"...\n", zip_file->Filename.Peek_Buffer());
 
     int entries_total = zip_entries_total(zip_handle);
     for (int index = 0; index < entries_total; ++index) {
 
         FileInfoStruct info;
-        info.Archive = this;
+        info.Archive = zip_file;
 
         zip_error = zip_entry_openbyindex(zip_handle, index);
         if (zip_error < 0) {
             DEBUG_WARNING("Zip::Load - Failed to open entry with index '%d'!\n", index);
             DEBUG_WARNING("zip error - %s!\n", zip_strerror(zip_error));
-            return false;
+            return;
         }
 
         // Get entry name.
@@ -143,13 +142,41 @@ bool ZipFileClass::Load()
             // the compressed size of a folder, and if he does, its useless anyway
             info.CompressedSize = -1;
 
-        } else {
+        }
+        else {
             //info.Filename = info.Basename;
         }
 
         zip_entry_close(zip_handle);
 
-        FileList.Add_Index(info.FilenameCRC32, info);
+        zip_file->FileList.Add_Index(info.FilenameCRC32, info);
+    }
+
+    // Reset loading flag.
+    zip_file->IsLoading = false;
+}
+
+bool ZipFileClass::Load(bool in_thread)
+{
+    if (ZipFileHandle) {
+        DEBUG_WARNING("Zip::Load - Archive \"%s\" has already been loaded!\n", Filename.Peek_Buffer());
+        return true;
+    }
+
+    DEBUG_INFO("Zip::Load - Loading \"%s\".\n", Filename.Peek_Buffer());
+
+    /**
+     *  x
+     */
+    if (in_thread) {
+
+        std::thread first(zip_load_function, this);
+
+        DEBUG_INFO("Zip::Load - Loading contents of \"%s\" in worker thread...\n", Filename.Peek_Buffer());
+
+    } else {
+        zip_load_function(this);
+        DEBUG_INFO("Zip::Load - Load complete for \"%s\".\n", Filename.Peek_Buffer());
     }
 
     if (FileList.Count() == 0) {

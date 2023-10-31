@@ -76,7 +76,7 @@ class ArchiveFileClass
 
         virtual bool Is_Read_Only() const { return IsReadOnly; }
 
-        virtual bool Load() = 0;
+        virtual bool Load(bool in_thread = false) = 0;
         virtual bool Unload() = 0;
 
         virtual bool Open(Wstring &filename, bool ready_only = true) = 0;

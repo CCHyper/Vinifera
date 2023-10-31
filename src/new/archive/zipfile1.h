@@ -41,7 +41,7 @@ class ZipFileClass : public ArchiveFileClass, public Node<ZipFileClass *>
         ZipFileClass(Wstring filename);
         virtual ~ZipFileClass();
 
-        virtual bool Load() override;
+        virtual bool Load(bool in_thread = false) override;
         virtual bool Unload() override;
 
         virtual bool Open(Wstring &filename, bool ready_only = true) override;
@@ -53,6 +53,9 @@ class ZipFileClass : public ArchiveFileClass, public Node<ZipFileClass *>
         virtual const FileInfoStruct * Find_File_Info(Wstring &filename, bool read_only = true) override;
 
     private:
+        static void zip_load_function(ZipFileClass* zip_file);
+
+    private:
         /**
          *  The zip archive handle.
          */
@@ -62,4 +65,9 @@ class ZipFileClass : public ArchiveFileClass, public Node<ZipFileClass *>
          *  x
          */
         Buffer ZipFileBuffer;
+
+        /**
+         *  x
+         */
+        bool IsLoading;
 };

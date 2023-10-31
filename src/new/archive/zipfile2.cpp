@@ -35,6 +35,8 @@
 #include <algorithm>
 
 
+#if 0
+
 #include "ZipFile.h"
 #include "ZipArchive.h"
 #include "streams/memstream.h"
@@ -1072,6 +1074,11 @@ void ZipFileClass2::List_All_Entries(Wstring within)
     zip_close(zip);
 }
 #endif
+
+
+#endif
+
+
 
 
 #endif

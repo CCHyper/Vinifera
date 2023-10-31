@@ -659,8 +659,8 @@ target_link_libraries(${PROJECT_NAME} TSpp)
 add_dependencies(${PROJECT_NAME} TSpp)
 
 # Link to the ZipLib static library.
-target_link_libraries(${PROJECT_NAME} ZipLib)
-add_dependencies(${PROJECT_NAME} ZipLib)
+#target_link_libraries(${PROJECT_NAME} ZipLib)
+#add_dependencies(${PROJECT_NAME} ZipLib)
 
 # Ensure the launcher is built with the main project.
 add_dependencies(${PROJECT_NAME} Launch${PROJECT_NAME})

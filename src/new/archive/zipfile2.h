@@ -33,6 +33,8 @@
 #include "listnode.h"
 #include "wstring.h"
 
+#if 0
+
 #include "ZipFile.h"
 #include "ZipArchive.h"
 
@@ -90,3 +92,5 @@ class ZipFileClass2 : public ArchiveFileClass, public Node<ZipFileClass2 *>
 
         IndexClass<unsigned int, ZipEntryStruct> ZipFileIndex;
 };
+
+#endif

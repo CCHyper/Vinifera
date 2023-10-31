@@ -484,6 +484,8 @@ bool Vinifera_Startup()
     }
     
 #ifndef NDEBUG
+    ViniferaSearchPaths.Add("ZIP");
+
     /**
      *  Debug paths for CD contents (folders must contain .DSK files of the same name).
      */
@@ -541,21 +543,6 @@ bool Vinifera_Startup()
         return false;
 #endif
     }
-
-
-    if (Vinifera_IsZipFileIOEnabled) {
-
-        ZipFileClass2 * zip = new ZipFileClass2("MOVIES01.ZIP");
-
-        zip->Load();
-
-        delete zip;
-
-    }
-
-
-
-
 
     /**
      *  Current path (perhaps set set with -CD) should go next.
@@ -699,6 +686,21 @@ bool Vinifera_Shutdown()
  */
 int Vinifera_Pre_Init_Game(int argc, char *argv[])
 {
+
+    if (Vinifera_IsZipFileIOEnabled) {
+
+        ZipFileClass* zip = new ZipFileClass("PATCH.ZIP");
+
+        zip->Load();
+
+        delete zip;
+
+    }
+
+
+
+
+
     /**
      *  Read the UI controls and overrides.
      */
