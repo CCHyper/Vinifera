@@ -29,6 +29,7 @@
 #include "animtype.h"
 #include "ccini.h"
 #include "tibsun_defines.h"
+#include "vinifera_globals.h"
 #include "wwcrc.h"
 #include "extension.h"
 #include "asserthandler.h"
@@ -52,6 +53,11 @@ AnimTypeClassExtension::AnimTypeClassExtension(const AnimTypeClass *this_ptr) :
     //if (this_ptr) EXT_DEBUG_TRACE("AnimTypeClassExtension::AnimTypeClassExtension - Name: %s (0x%08X)\n", Name(), (uintptr_t)(This()));
 
     AnimTypeExtensions.Add(this);
+
+    // See hooks in animtypeext_hooks.cpp
+    if (DEMAND_ORIGINAL) {
+        const_cast<AnimTypeClass*>(this_ptr)->IsDemandLoad = true;
+    }
 }
 
 

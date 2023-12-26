@@ -31,6 +31,7 @@
 #include "animtypeext.h"
 #include "supertype.h"
 #include "fatal.h"
+#include "vinifera_globals.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 
@@ -127,4 +128,29 @@ void AnimTypeClassExtension_Hooks()
     Patch_Jump(0x00419B40, &AnimTypeClassExt::_Free_Image);
     Patch_Jump(0x004187DB, &_AnimTypeClass_DTOR_Free_Image_Patch);
     Patch_Jump(0x00419C0B, &_AnimTypeClass_SDDTOR_Free_Image_Patch);
+
+    /**
+     *  Removes any code related to "DemandLoad" if the developer has requested so.
+     */
+    if (Vinifera_IsAlwaysDemandLoad) {
+
+        // AnimTypeClass::AnimTypeClass()
+        //Patch_Byte(0x+1, 0x86); // bl(0) -> al(1)     // #NOTE: Not possible, see AnimTypeClassExtension constructor.
+
+        // OverlayTypeClass::~OverlayTypeClass()
+        Patch_Byte_Range(0x0058D164, 0x90, 6);
+        Patch_Byte_Range(0x0058D170, 0x90, 2);
+        Patch_Byte_Range(0x0058D179, 0x90, 2);
+        Patch_Jump(0x0058D17B, 0x0058D18B);
+
+        // OverlayTypeClass::~OverlayTypeClass() (inlined in SDDTOR)
+        Patch_Byte_Range(0x0058DC54, 0x90, 6);
+        Patch_Byte_Range(0x0058DC60, 0x90, 2);
+        Patch_Byte_Range(0x0058DC69, 0x90, 2);
+        Patch_Jump(0x0058DC6B, 0x0058DC7B);
+
+        // OverlayTypeClass::Get_Image_Data()
+        Patch_Jump(0x0058DB34, 0x0058DB42);
+
+    }
 }

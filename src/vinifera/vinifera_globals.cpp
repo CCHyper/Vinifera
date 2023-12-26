@@ -65,7 +65,7 @@ bool Vinifera_NoTacticalVersionString = false;
 
 bool Vinifera_ShowSuperWeaponTimers = true;
 
-bool Vinifera_IsAlwaysDemandLoad = false;
+DemandLoadType Vinifera_DemandLoadState = DEMAND_ORIGINAL;
 
 DynamicVectorClass<MFCC *> ViniferaMapsMixes;
 DynamicVectorClass<MFCC *> ViniferaMoviesMixes;

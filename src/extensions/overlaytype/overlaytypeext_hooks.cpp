@@ -118,27 +118,52 @@ void OverlayTypeClassExtension_Hooks()
     Patch_Jump(0x0058DC6B, &_OverlayTypeClass_SDDTOR_Free_Image_Patch);
 
     /**
-     *  Removes code related to "DemandLoad".
+     *  Removes any code related to "DemandLoad" if the developer has requested so.
      */
-    if (Vinifera_IsAlwaysDemandLoad) {
+    switch (Vinifera_DemandLoadState) {
 
-        // OverlayTypeClass::OverlayTypeClass()
-        Patch_Byte(0x0058D061+1, 0x86); // bl(0) -> al(1)
+        case DEMAND_ALWAYS:
+        {
+            // OverlayTypeClass::OverlayTypeClass()
+            Patch_Byte(0x0058D061 + 1, 0x86); // bl(0) -> al(1)
 
-        // OverlayTypeClass::~OverlayTypeClass()
-        Patch_Byte_Range(0x0058D164, 0x90, 6);
-        Patch_Byte_Range(0x0058D170, 0x90, 2);
-        Patch_Byte_Range(0x0058D179, 0x90, 2);
-        Patch_Jump(0x0058D17B, 0x0058D18B);
+            // OverlayTypeClass::~OverlayTypeClass()
+            Patch_Byte_Range(0x0058D164, 0x90, 6);
+            Patch_Byte_Range(0x0058D170, 0x90, 2);
+            Patch_Byte_Range(0x0058D179, 0x90, 2);
+            Patch_Jump(0x0058D17B, 0x0058D18B);
 
-        // OverlayTypeClass::~OverlayTypeClass() (inlined in SDDTOR)
-        Patch_Byte_Range(0x0058DC54, 0x90, 6);
-        Patch_Byte_Range(0x0058DC60, 0x90, 2);
-        Patch_Byte_Range(0x0058DC69, 0x90, 2);
-        Patch_Jump(0x0058DC6B, 0x0058DC7B);
+            // OverlayTypeClass::~OverlayTypeClass() (inlined in SDDTOR)
+            Patch_Byte_Range(0x0058DC54, 0x90, 6);
+            Patch_Byte_Range(0x0058DC60, 0x90, 2);
+            Patch_Byte_Range(0x0058DC69, 0x90, 2);
+            Patch_Jump(0x0058DC6B, 0x0058DC7B);
 
-        // OverlayTypeClass::Get_Image_Data()
-        Patch_Jump(0x0058DB34, 0x0058DB42);
+            // OverlayTypeClass::Get_Image_Data()
+            Patch_Jump(0x0058DB34, 0x0058DB42);
 
-    }
+            break;
+        }
+
+        case DEMAND_NEVER:
+        {
+            // OverlayTypeClass::~OverlayTypeClass()
+            Patch_Byte_Range(0x0058D164, 0x90, 6);
+            Patch_Byte_Range(0x0058D170, 0x90, 2);
+            Patch_Byte_Range(0x0058D179, 0x90, 2);
+            Patch_Jump(0x0058D17B, 0x0058D18B);
+
+            // OverlayTypeClass::~OverlayTypeClass() (inlined in SDDTOR)
+            Patch_Byte_Range(0x0058DC54, 0x90, 6);
+            Patch_Byte_Range(0x0058DC60, 0x90, 2);
+            Patch_Byte_Range(0x0058DC69, 0x90, 2);
+            Patch_Jump(0x0058DC6B, 0x0058DC7B);
+
+            // OverlayTypeClass::Get_Image_Data()
+            Patch_Jump(0x0058DB34, 0x0058DB42);
+
+            break;
+        }
+
+    };
 }

@@ -85,7 +85,13 @@ extern bool Vinifera_NoTacticalVersionString;
 
 extern bool Vinifera_ShowSuperWeaponTimers;
 
-extern bool Vinifera_IsAlwaysDemandLoad;
+typedef enum DemandLoadType {
+    DEMAND_ORIGINAL,
+    DEMAND_NEVER,
+    DEMAND_ALWAYS,
+} DemandLoadType;
+
+extern DemandLoadType Vinifera_DemandLoadState;
 
 extern DynamicVectorClass<MFCC *> ViniferaMapsMixes;
 extern DynamicVectorClass<MFCC *> ViniferaMoviesMixes;

@@ -128,7 +128,9 @@ bool Vinifera_Load_INI()
 #endif
     }
 
-    Vinifera_IsAlwaysDemandLoad = ini.Get_Bool("Game", "AlwaysDemandLoad", Vinifera_IsAlwaysDemandLoad);
+    char buffer[256];
+
+    ini.Get_String("Game", "AlwaysDemandLoad", buffer, sizeof(buffer));
 
     return true;
 }
