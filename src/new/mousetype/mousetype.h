@@ -30,6 +30,7 @@
 #include "always.h"
 #include "iomap.h"
 #include "point.h"
+#include "wstring.h"
 
 
 class CCINIClass;
@@ -45,23 +46,33 @@ class MouseTypeClass
     friend class MouseClassExt;
 
     public:
+        MouseTypeClass(const char *name);
         MouseTypeClass(int start_frame, int frame_count, int frame_rate, int small_frame, int small_frame_count, int small_frame_rate, Point2D hotspot, Point2D small_hotspot);
         MouseTypeClass(const NoInitClass &noinit);
         virtual ~MouseTypeClass();
 
+        Wstring Get_Name() const { return Name; }
+
         static void One_Time();
 
-        static bool Read_Mouse_INI(CCINIClass &ini);
+        static bool Read_INI(CCINIClass &ini);
 #ifndef NDEBUG
-        static bool Write_Default_Mouse_INI(CCINIClass &ini);
+        static bool Write_Default_INI(CCINIClass &ini);
 #endif
 
         static const MouseTypeClass *As_Pointer(MouseType type);
         static const MouseTypeClass *As_Pointer(const char *name);
+        static const MouseTypeClass &As_Reference(MouseType type);
+        static const MouseTypeClass &As_Reference(const char *name);
         static MouseType From_Name(const char *name);
         static const char *Name_From(MouseType type);
 
     private:
+        static MouseTypeClass *Find_Or_Make(const char *name);
+
+    private:
+        Wstring Name;
+
         /**
          *  Starting frame number.
          */
@@ -105,4 +116,10 @@ class MouseTypeClass
     private:
         static MouseTypeClass MouseControl[MOUSE_COUNT];
         static const char *MouseTypeClass::MouseNames[MOUSE_COUNT];
+
+    public:
+        static MouseType CanMoveMouse;
+        static MouseType NoMoveMouse;
+        static MouseType CanAttackMouse;
+        static MouseType StayAttackMouse;
 };

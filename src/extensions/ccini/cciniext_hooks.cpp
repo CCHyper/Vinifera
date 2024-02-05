@@ -33,6 +33,7 @@
 #include "weapontype.h"
 #include "animtype.h"
 #include "theatertype.h"
+#include "actiontype.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
@@ -58,6 +59,8 @@ static class CCINIClassExt final : public CCINIClass
 
         TheaterType _Get_TheaterType(const char *section, const char *entry, const TheaterType defvalue);
         bool _Put_TheaterType(const char *section, const char *entry, TheaterType value);
+
+        ActionType _Get_ActionType(const char *section, const char *entry, const ActionType defvalue);
 };
 
 
@@ -165,6 +168,23 @@ bool CCINIClassExt::_Put_TheaterType(const char *section, const char *entry, The
 
 
 /**
+ *  Reimplementation of CCINIClass::Get_ActionType to support ActionTypeClass.
+ *  
+ *  @author: CCHyper
+ */
+ActionType CCINIClassExt::_Get_ActionType(const char *section, const char *entry, const ActionType defvalue)
+{
+    char buffer[2048];
+
+    if (CCINIClass::Get_String(section, entry, "", buffer, sizeof(buffer))) {
+        return ActionTypeClass::From_Name(buffer);
+    }
+
+    return defvalue;
+}
+
+
+/**
  *  Fetch a list of AnimTypes.
  * 
  *  @author: CCHyper
@@ -258,4 +278,6 @@ void CCINIClassExtension_Hooks()
 
     Patch_Jump(0x0044B310, &CCINIClassExt::_Get_TheaterType);
     Patch_Jump(0x0044B360, &CCINIClassExt::_Put_TheaterType);
+
+    Patch_Jump(0x0044AC20, &CCINIClassExt::_Get_ActionType);
 }
