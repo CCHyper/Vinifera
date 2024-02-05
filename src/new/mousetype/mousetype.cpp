@@ -32,12 +32,6 @@
 #include "debughandler.h"
 
 
-MouseType MouseTypeClass::CanMoveMouse;
-MouseType MouseTypeClass::NoMoveMouse;
-MouseType MouseTypeClass::CanAttackMouse;
-MouseType MouseTypeClass::StayAttackMouse;
-
-
 /**
  *  These are the ASCII names for the mouse control types.
  */
@@ -477,14 +471,6 @@ bool MouseTypeClass::Write_Default_INI(CCINIClass &ini)
 
         ini.Put_String(MOUSE, mousectrl.Name.Peek_Buffer(), buffer);
     }
-
-    /**
-     *  
-     */
-    CanMoveMouse = From_Name("CanMove");
-    NoMoveMouse = From_Name("NoMove");
-    CanAttackMouse = From_Name("CanAttack");
-    StayAttackMouse = From_Name("StayAttack");
 
     return true;
 }

@@ -33,6 +33,12 @@
 #include "debughandler.h"
 
 
+ActionType ActionTypeClass::CanMoveAction;
+ActionType ActionTypeClass::NoMoveAction;
+ActionType ActionTypeClass::CanAttackAction;
+ActionType ActionTypeClass::StayAttackAction;
+
+
 /**
  *  These are the ASCII names for the action types.
  */
@@ -265,6 +271,18 @@ bool ActionTypeClass::Read_INI(CCINIClass &ini)
         DEV_DEBUG_INFO("Action: Name: %s Mouse: %s ShadowMouse: %s\n",
             actionctrl->Name.Peek_Buffer(), MouseTypeClass::Name_From(actionctrl->Mouse), MouseTypeClass::Name_From(actionctrl->ShadowMouse));
     }
+
+    /**
+     *  
+     */
+    CanMoveAction = From_Name("CanMove");
+    ASSERT_FATAL(CanMoveAction != ACTION_NONE);
+    NoMoveAction = From_Name("NoMove");
+    ASSERT_FATAL(NoMoveAction != ACTION_NONE);
+    CanAttackAction = From_Name("CanAttack");
+    ASSERT_FATAL(CanAttackAction != ACTION_NONE);
+    StayAttackAction = From_Name("StayAttack");
+    ASSERT_FATAL(StayAttackAction != ACTION_NONE);
 
     return true;
 }

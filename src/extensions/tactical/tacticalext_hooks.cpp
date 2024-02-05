@@ -44,6 +44,26 @@
 #include "hooker_macros.h"
 
 
+#if 0
+/**
+ *  #issue-x
+ * 
+ *  x
+ * 
+ *  @author: CCHyper
+ */
+DECLARE_PATCH(_Tactical_Tactical_Draw_Waypoint_Paths_Mouse_Patch)
+{
+
+
+    _asm { mov esi, start_frame }
+    _asm { mov esi, start_frame }
+
+    JMP_REG(ecx, 0x00616FEB);
+}
+#endif
+
+
 /**
  *  #issue-315
  * 
@@ -363,6 +383,8 @@ void TacticalExtension_Hooks()
     Patch_Jump(0x00616E9A, &_Tactical_Draw_Rally_Points_NormaliseLineAnimation_Patch);
     Patch_Jump(0x006172DB, &_Tactical_Draw_Waypoint_Paths_NormaliseLineAnimation_Patch);
     Patch_Jump(0x00617327, &_Tactical_Draw_Waypoint_Paths_DrawNormalLine_Patch);
+
+    //Patch_Jump(0x00617327, &_Tactical_Tactical_Draw_Waypoint_Paths_Mouse_Patch);
 
     /**
      *  #issue-351

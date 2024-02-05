@@ -61,7 +61,7 @@ static void Display_Set_Mouse_Cursor(ActionType action, bool shadow, bool wsmall
         
         mouse = ActionTypeClass::As_Reference(action).Get_Shadow_Mouse();
 
-        if (mouse == MouseTypeClass::NoMoveMouse) {
+        if (mouse == ActionTypeClass::NoMoveAction) {
             if (CurrentObjects.Count() == 0 ||
                 (!CurrentObjects[0]->Is_Techno() || !CurrentObjects[0]->Techno_Type_Class()->MoveToShroud)) {
 
@@ -75,10 +75,10 @@ static void Display_Set_Mouse_Cursor(ActionType action, bool shadow, bool wsmall
         
         mouse = ActionTypeClass::As_Reference(action).Get_Mouse();
 
-        if (mouse == MouseTypeClass::CanAttackMouse) {
+        if (mouse == ActionTypeClass::CanAttackAction) {
             if (!cellptr ||
                 CurrentObjects.Count() != 1 ||
-                (!CurrentObjects[0]->Is_Techno() || ((TechnoClass *)!CurrentObjects[0])->In_Range_Of((ObjectClass*)cellptr))) {
+                (!CurrentObjects[0]->Is_Techno() || ((TechnoClass *)!CurrentObjects[0])->In_Range_Of((ObjectClass *)cellptr))) {
 
                 mouse = MouseTypeClass::CanAttackMouse;
             } else {

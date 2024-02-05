@@ -71,4 +71,10 @@ class ActionTypeClass
     private:
         static ActionTypeClass ActionControl[ACTION_COUNT];
         static const char *ActionNames[ACTION_COUNT];
+
+    public:
+        static ActionType CanMoveAction;
+        static ActionType NoMoveAction;
+        static ActionType CanAttackAction;
+        static ActionType StayAttackAction;
 };
