@@ -116,11 +116,12 @@ bool MouseClassExt::_Override_Mouse_Shape(MouseType mouse, bool wsmall)
         Timer = wsmall ? control->SmallFrameRate : control->FrameRate;
         Frame = 0;
 
+        IsSmall = wsmall;
+
         baseshp = Get_Mouse_Current_Frame(mouse, wsmall);
         Point2D hotspot = Get_Mouse_Hotspot(mouse);
         WWMouse->Set_Cursor(&hotspot, MouseShapes, baseshp);
         CurrentMouseShape = mouse;
-        IsSmall = wsmall;
         return true;
     }
     return false;
@@ -189,7 +190,9 @@ Point2D MouseClassExt::_Get_Mouse_Hotspot(MouseType mouse) const
         //MouseStruct const * control = &MouseControl[mouse];
         MouseTypeClass const * control = MouseTypeClass::As_Pointer(mouse);
 
-        int hotspot_x = control->Hotspot.X;
+        int hotspot_x = IsSmall ? control->SmallHotspot.X : control->Hotspot.X;
+        int hotspot_y = IsSmall ? control->SmallHotspot.X : control->Hotspot.X;
+
         switch (hotspot_x) {
             case MOUSE_HOTSPOT_CENTER:
                 hotspot.X = MouseShapes->Get_Width() / 2;
@@ -203,7 +206,6 @@ Point2D MouseClassExt::_Get_Mouse_Hotspot(MouseType mouse) const
                 break;
         };
 
-        int hotspot_y = control->Hotspot.Y;
         switch (hotspot_y) {
             case MOUSE_HOTSPOT_CENTER:
                 hotspot.Y = MouseShapes->Get_Height() / 2;
