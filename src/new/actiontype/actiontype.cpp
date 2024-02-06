@@ -33,10 +33,10 @@
 #include "debughandler.h"
 
 
-ActionType ActionTypeClass::CanMoveAction;
-ActionType ActionTypeClass::NoMoveAction;
-ActionType ActionTypeClass::CanAttackAction;
-ActionType ActionTypeClass::StayAttackAction;
+ActionType ActionTypeClass::CanMoveAction = ACTION_NONE;
+ActionType ActionTypeClass::NoMoveAction = ACTION_NONE;
+ActionType ActionTypeClass::CanAttackAction = ACTION_NONE;
+ActionType ActionTypeClass::StayAttackAction = ACTION_NONE;
 
 
 /**

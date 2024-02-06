@@ -61,7 +61,7 @@ static void Display_Set_Mouse_Cursor(ActionType action, bool shadow, bool wsmall
         
         mouse = ActionTypeClass::As_Reference(action).Get_Shadow_Mouse();
 
-        if (mouse == ActionTypeClass::NoMoveAction) {
+        if (action == ActionTypeClass::NoMoveAction) {
             if (CurrentObjects.Count() == 0 ||
                 (!CurrentObjects[0]->Is_Techno() || !CurrentObjects[0]->Techno_Type_Class()->MoveToShroud)) {
 
@@ -75,7 +75,7 @@ static void Display_Set_Mouse_Cursor(ActionType action, bool shadow, bool wsmall
         
         mouse = ActionTypeClass::As_Reference(action).Get_Mouse();
 
-        if (mouse == ActionTypeClass::CanAttackAction) {
+        if (action == ActionTypeClass::CanAttackAction) {
             if (!cellptr ||
                 CurrentObjects.Count() != 1 ||
                 (!CurrentObjects[0]->Is_Techno() || ((TechnoClass *)!CurrentObjects[0])->In_Range_Of((ObjectClass *)cellptr))) {
@@ -93,7 +93,7 @@ static void Display_Set_Mouse_Cursor(ActionType action, bool shadow, bool wsmall
 
 DECLARE_PATCH(_DisplayClass_Mouse_Left_Up_Set_Mouse)
 {
-    __asm pop     ebp
+    _asm { pop ebp }
 
     GET_REGISTER_STATIC(ActionType, action, ebx);
     GET_STACK_STATIC8(bool, shadow, esp, 0x20);

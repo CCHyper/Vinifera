@@ -116,4 +116,10 @@ class MouseTypeClass
     private:
         static MouseTypeClass MouseControl[MOUSE_COUNT];
         static const char *MouseTypeClass::MouseNames[MOUSE_COUNT];
+
+    public:
+        static MouseType CanMoveMouse;
+        static MouseType NoMoveMouse;
+        static MouseType CanAttackMouse;
+        static MouseType StayAttackMouse;
 };

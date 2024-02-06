@@ -32,6 +32,12 @@
 #include "debughandler.h"
 
 
+MouseType MouseTypeClass::CanMoveMouse = MOUSE_NORMAL;
+MouseType MouseTypeClass::NoMoveMouse = MOUSE_NORMAL;
+MouseType MouseTypeClass::CanAttackMouse = MOUSE_NORMAL;
+MouseType MouseTypeClass::StayAttackMouse = MOUSE_NORMAL;
+
+
 /**
  *  These are the ASCII names for the mouse control types.
  */
@@ -371,6 +377,18 @@ bool MouseTypeClass::Read_INI(CCINIClass &ini)
         mousectrl->SmallHotspot.Y = mousectrl->Hotspot.Y;
 
     }
+
+    /**
+     *  
+     */
+    CanMoveMouse = From_Name("CanMove");
+    ASSERT_FATAL(CanMoveMouse != MOUSE_NORMAL);
+    NoMoveMouse = From_Name("NoMove");
+    ASSERT_FATAL(NoMoveMouse != MOUSE_NORMAL);
+    CanAttackMouse = From_Name("CanAttack");
+    ASSERT_FATAL(CanAttackMouse != MOUSE_NORMAL);
+    StayAttackMouse = From_Name("StayAttack");
+    ASSERT_FATAL(StayAttackMouse != MOUSE_NORMAL);
 
     return true;
 }
