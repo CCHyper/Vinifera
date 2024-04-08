@@ -49,6 +49,7 @@
 #include "extension.h"
 #include "theatertype.h"
 #include "uicontrol.h"
+#include "binkmovie.h"
 #include "debughandler.h"
 #include "asserthandler.h"
 #include <string>
@@ -519,6 +520,9 @@ bool Vinifera_Startup()
 //    ViniferaSearchPaths.Add("MAPS\\MULTIPLAYER");
 //    ViniferaSearchPaths.Add("MAPS\\MISSION");
 //#endif
+
+    // Set the additional search path for the Bink movie player.
+    BinkMoviePlayer::Set_Search_Path("MOVIES//");
 
     /**
      *  Load Vinifera settings and overrides.

@@ -4,11 +4,11 @@
  *
  *  @project       Vinifera
  *
- *  @file          PLAYMOVIE_HOOKS.CPP
+ *  @file          BINKMOVIE_HOOKS.CPP
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the hooks related to Play_Movie and related functions.
+ *  @brief         Contains the hooks for the bink movie player.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,34 +25,26 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "playmovie_hooks.h"
-#include "tibsun_globals.h"
-#include "options.h"
-#include "campaign.h"
-#include "campaignext.h"
-#include "scenario.h"
-#include "vqa.h"
-#include "movie.h"
-#include "playmovie.h"
-#include "cd.h"
-#include "wstring.h"
+#include "binkmovie_hooks.h"
 #include "binkmovie.h"
 #include "binkloaddll.h"
+#include "tibsun_globals.h"
 #include "dsurface.h"
 #include "iomap.h"
 #include "session.h"
+#include "playmovie.h"
 #include "vox.h"
+#include "wstring.h"
 #include "dsaudio.h"
 #include "wwmouse.h"
 #include "wwkeyboard.h"
-#include "extension.h"
 #include "fatal.h"
 #include "debughandler.h"
 #include "asserthandler.h"
+#include <string>
 
 #include "hooker.h"
 #include "hooker_macros.h"
-
 
 
 #include "tspp.h"
@@ -65,7 +57,7 @@ bool &InScenario = Make_Global<bool>(0x007E48FC);
 /**
  *  Global instance of the Bink movie player used for sidebar videos.
  */
-static BinkMoviePlayer IngameBinkPlayer;
+/*static*/ BinkMoviePlayer IngameBinkPlayer;
 
 
 /**
@@ -105,7 +97,7 @@ static void Redraw_Sidebar_Area()
 
 
 /**
- *  Play a Bink movie file.
+ *  Play a Bink movie.
  * 
  *  @author: CCHyper
  */
@@ -121,20 +113,16 @@ static bool Play_Movie_As_Bink(const char *name, ThemeType theme, bool clear_bef
         return false;
     }
 
-    /**
-     *  The movie is about to start, do we need to clear the screen?
-     */
     if (clear_before) {
         HiddenSurface->Clear();
         GScreenClass::Blit(true, HiddenSurface);
     }
 
     /**
-     *  Create an instance of the Bink movie player.
+     *  
      */
-    BinkMoviePlayer binkplayer(name, stretch_allowed);
+    BinkMoviePlayer binkplayer(name, stretch_allowed);    
     if (!binkplayer.File_Loaded()) {
-        DEBUG_ERROR("Failed to load Bink movie file '%s'!", name);
         return false;
     }
 
@@ -145,9 +133,6 @@ static bool Play_Movie_As_Bink(const char *name, ThemeType theme, bool clear_bef
      */
     binkplayer.Play();
 
-    /**
-     *  The movie has finished, do we need to clear the screen?
-     */
     if (clear_after) {
         HiddenSurface->Clear();
         GScreenClass::Blit(true, HiddenSurface);
@@ -169,17 +154,18 @@ static bool Play_Movie_As_Bink(const char *name, ThemeType theme, bool clear_bef
  */
 bool Vinifera_Is_Movie_Available(const char *name)
 {
-    Wstring vqa_name = name;
+    static char filename_buffer[32];
+    std::strncpy(filename_buffer, name, sizeof(filename_buffer));
     
     /**
      *  Find the location of the file extension separator.
      */
-    char *_movie_name = std::strchr((char *)vqa_name.Peek_Buffer(), '.');
+    char *movie_name = std::strchr((char *)filename_buffer, '.');
     
     /**
      *  Unexpected filename format passed in?
      */
-    if (!_movie_name) {
+    if (!movie_name) {
         return false;
     }
 
@@ -187,19 +173,19 @@ bool Vinifera_Is_Movie_Available(const char *name)
      *  Insert a null-char where the "." was. This will give us the actual
      *  movie name without the extension, allowing us to rebuild them.
      */
-    *_movie_name = '\0';
-    Wstring movie_name = _movie_name;
+    *movie_name = '\0';
 
-    movie_name.To_Upper();
+    const char *upper_filename = strupr((char *)filename_buffer);
 
-    movie_name.Concat(".BIK");
+    char bink_buffer[32-4];
+    std::snprintf(bink_buffer, sizeof(bink_buffer), "%s.BIK", upper_filename);
 
-    bool bink_available = CCFileClass(movie_name.Peek_Buffer()).Is_Available();
+    bool bink_available = CCFileClass(bink_buffer).Is_Available();
 
     /**
      *  Do a secondary check to see if the video is available in the sub directory.
      */
-    const Wstring movies_dir_filename = BinkMoviePlayer::Get_Search_Path() + movie_name;
+    const char *movies_dir_filename = (std::string(BinkMoviePlayer::Get_Search_Directory()) + std::string(bink_buffer)).c_str();
     if (RawFileClass(movies_dir_filename).Is_Available()) {
         return true;
     }
@@ -214,7 +200,7 @@ bool Vinifera_Is_Movie_Available(const char *name)
     /**
      *  Finally check if the VQA is available.
      */
-    return CCFileClass(vqa_name).Is_Available();
+    return CCFileClass(name).Is_Available();
 }
 
 
@@ -263,7 +249,7 @@ void Vinifera_Play_Movie(const char *name, ThemeType theme, bool clear_before, b
         /**
          *  Do a secondary check to see if the video is available in the sub directory.
          */
-        const Wstring movies_dir_filename = BinkMoviePlayer::Get_Search_Path() + bink_buffer;
+        const char *movies_dir_filename = (std::string(BinkMoviePlayer::Get_Search_Directory()) + std::string(bink_buffer)).c_str();
         if (RawFileClass(movies_dir_filename).Is_Available()) {
             bink_available = true;
         }
@@ -311,7 +297,7 @@ void Vinifera_Play_Movie(const char *name, ThemeType theme, bool clear_before, b
  * 
  *  @author: CCHyper
  */
-static bool Play_Ingame_Movie_As_Bink(const Wstring &filename)
+static bool Play_Ingame_Movie_As_Bink(const char *filename)
 {
     /**
      *  Load Bink dll imports if not already loaded.
@@ -343,7 +329,7 @@ static bool Play_Ingame_Movie_As_Bink(const Wstring &filename)
     }
 
     /**
-     *  Set video position. This must be performed before Open() so the Bink
+     *  Set video position. This must be performed before Open so the Bink
      *  handle is created with this position to adjust it.
      */
     if (!IngameBinkPlayer.Set_Position(sidebar_rect, ((SidebarSurface->Width-140)/2)+1, 27)) {
@@ -371,6 +357,8 @@ static bool Play_Ingame_Movie_As_Bink(const Wstring &filename)
 
     IngameBinkPlayer.IsPlaying = true;
 
+    DEBUG_INFO("Play_Ingame_Movie \"%s\" as Bink!\n", filename);
+
     return true;
 }
 
@@ -384,44 +372,51 @@ static void _Play_Ingame_Movie_Intercept(VQType vqtype)
     if (vqtype == VQ_NONE || vqtype >= Movies.Count()) {
         return;
     }
-
+    
     // Get pointer to movie name entry
-    Wstring movie_name = Movies[vqtype];
-
+    const char *movie_name = Movies[vqtype];
+    
+    static char filename_buffer[32];
+    std::strncpy(filename_buffer, movie_name, 32);
+    
     // Invalid filename
-    if (movie_name.Is_Empty()) {
-        DEBUG_WARNING("Invalid movie filename!\n");
+    if (filename_buffer[0] == '\0') {
+        DEBUG_INFO("Invalid movie filename \"%s\"!\n", filename_buffer);
         return;
     }
 
-    movie_name.To_Upper();
+    char *upper_filename = strupr((char *)filename_buffer);
 
-    Wstring bink_buffer = movie_name + ".BIK";
-    Wstring vqa_buffer = movie_name + ".VQA";
-
+    char bink_buffer[32-4];
+    std::sprintf(bink_buffer, "%s.BIK", upper_filename);
+    
+    char vqa_buffer[32-4];
+    std::sprintf(vqa_buffer, "%s.VQA", upper_filename);
+    
     bool bink_available = CCFileClass(bink_buffer).Is_Available();
-    bool vqa_available = CCFileClass(vqa_buffer).Is_Available();
 
     /**
      *  Do a secondary check to see if the video is available in the sub directory.
      */
-    const Wstring movies_dir_filename = BinkMoviePlayer::Get_Search_Path() + bink_buffer;
+    const char *movies_dir_filename = (std::string(BinkMoviePlayer::Get_Search_Directory()) + std::string(bink_buffer)).c_str();
     if (RawFileClass(movies_dir_filename).Is_Available()) {
         bink_available = true;
     }
     
     // If the movie exists as a .BIK, if so, play as Bink!
     if (bink_available) {
-        DEBUG_INFO("Play_Ingame_Movie \"%s\" as Bink!\n", movie_name.Peek_Buffer());
-        Play_Ingame_Movie_As_Bink(bink_buffer);
-        
-    // The movie did not exist as a .BIK, attempt to play the .VQA.
-    } else if (vqa_available) {
-        DEBUG_INFO("Play_Ingame_Movie \"%s\" as VQA!\n", movie_name.Peek_Buffer());
-        Play_Ingame_Movie(vqtype);
+        if (Play_Ingame_Movie_As_Bink(bink_buffer)) {
+            return;
+        }
+    }
 
+    // The movie did not exist as a .BIK, attempt to play the .VQA.
+    if (CCFileClass(vqa_buffer).Is_Available()) {
+        DEBUG_INFO("Play_Ingame_Movie \"%s\" as VQA!\n", upper_filename);
+        Play_Ingame_Movie(VQType(vqtype));
+        
     } else {
-        DEBUG_INFO("Failed to play ingame movie \"%s\"!\n", movie_name.Peek_Buffer());
+        DEBUG_INFO("Failed to play ingame movie \"%s\"!\n", upper_filename);
     }
 }
 
@@ -778,7 +773,7 @@ DECLARE_PATCH(_GScreenClass_Blit_Draw_Bink_Frame_Patch)
 
 
 /**
- *  Main function for patching the Bink Movie hooks.
+ *  Main function for patching the hooks.
  */
 void BinkMovie_Hooks()
 {
@@ -826,329 +821,9 @@ void BinkMovie_Hooks()
     Patch_Call(0x00685EA0, &_Movie_Handle_Focus_Intercept);
 
     Patch_Jump(0x00685C35, &_Windows_Procedure_Draw_Bink_Frame_Patch);
-}
-
-
-/**
- *  Scale up the input rect to the desired width and height, while maintaining the aspect ratio.
- * 
- *  @author: CCHyper
- */
-static bool Scale_Video_Rect(Rect &rect, int max_width, int max_height, bool maintain_ratio = false)
-{
-    /**
-     *  No need to scale the rect if it is larger than the max width/height
-     */
-    bool smaller = rect.Width < max_width && rect.Height < max_height;
-    if (!smaller) {
-        return false;
-    }
 
     /**
-     *  This is a workaround for edge case issues with some versions
-     *  of cnc-ddraw. This ensures the available draw area is actually
-     *  the resolution the user defines, not what the cnc-ddraw forces
-     *  the primary surface to.
+     *  Set the additional search path when looking for the Bink video.
      */
-    int surface_width = std::clamp(HiddenSurface->Width, 0, Options.ScreenWidth);
-    int surface_height = std::clamp(HiddenSurface->Height, 0, Options.ScreenHeight);
-
-    if (maintain_ratio) {
-
-        double dSurfaceWidth = surface_width;
-        double dSurfaceHeight = surface_height;
-        double dSurfaceAspectRatio = dSurfaceWidth / dSurfaceHeight;
-
-        double dVideoWidth = rect.Width;
-        double dVideoHeight = rect.Height;
-        double dVideoAspectRatio = dVideoWidth / dVideoHeight;
-    
-        /**
-         *  If the aspect ratios are the same then the screen rectangle
-         *  will do, otherwise we need to calculate the new rectangle.
-         */
-        if (dVideoAspectRatio > dSurfaceAspectRatio) {
-            int nNewHeight = (int)(surface_width/dVideoWidth*dVideoHeight);
-            int nCenteringFactor = (surface_height - nNewHeight) / 2;
-            rect.X = 0;
-            rect.Y = nCenteringFactor;
-            rect.Width = surface_width;
-            rect.Height = nNewHeight;
-
-        } else if (dVideoAspectRatio < dSurfaceAspectRatio) {
-            int nNewWidth = (int)(surface_height/dVideoHeight*dVideoWidth);
-            int nCenteringFactor = (surface_width - nNewWidth) / 2;
-            rect.X = nCenteringFactor;
-            rect.Y = 0;
-            rect.Width = nNewWidth;
-            rect.Height = surface_height;
-
-        } else {
-            rect.X = 0;
-            rect.Y = 0;
-            rect.Width = surface_width;
-            rect.Height = surface_height;
-        }
-
-    } else {
-        rect.X = 0;
-        rect.Y = 0;
-        rect.Width = surface_width;
-        rect.Height = surface_height;
-    }
-
-    return true;
-}
-
-
-/**
- *  #issue-292
- * 
- *  Videos stretch to the whole screen size and ignore the video aspect ratio.
- * 
- *  @author: CCHyper
- */
-DECLARE_PATCH(_Play_Movie_Scale_By_Ratio_Patch)
-{
-    GET_REGISTER_STATIC(MovieClass *, this_ptr, esi);
-    static Rect stretched_rect;
-
-    /**
-     *  Calculate the stretched rect for this video, maintaining the video ratio.
-     */
-    stretched_rect = this_ptr->VideoRect;
-    if (Scale_Video_Rect(stretched_rect, HiddenSurface->Width, HiddenSurface->Height, true)) {
-
-        /**
-         *  Stretched rect calculated, assign it to the movie instance.
-         */
-        this_ptr->StretchRect = stretched_rect;
-
-        DEBUG_INFO("Stretching movie - VideoRect: %d,%d -> StretchRect: %d,%d\n",
-                this_ptr->VideoRect.Width, this_ptr->VideoRect.Height,
-                this_ptr->StretchRect.Width, this_ptr->StretchRect.Height);
-
-        /*DEBUG_GAME("Stretching movie %dx%d -> %dx%d\n",
-            this_ptr->VideoRect.Width, this_ptr->VideoRect.Height, this_ptr->StretchRect.Width, this_ptr->StretchRect.Height);*/
-    }
-
-    JMP(0x00563805);
-}
-
-
-/**
- *  #issue-95
- * 
- *  Patch for handling the campaign intro movies
- *  for "The First Decade" and "Freeware TS" installations.
- * 
- *  @author: CCHyper
- */
-static bool Play_Intro_Movie(CampaignType campaign_id)
-{
-    /**
-     *  Catch any cases where we might be starting a non-campaign scenario.
-     */
-    if (campaign_id == CAMPAIGN_NONE) {
-        return false;
-    }
-
-    if (Scen->Scenario != 1) {
-        return false;
-    }
-
-    char movie_filename[32];
-    VQType intro_vq = VQ_NONE;
-
-    /**
-     *  Fetch the campaign disk id.
-     */
-    CampaignClass *campaign = Campaigns[campaign_id];
-    DiskID cd_num = campaign->WhichCD;
-
-    /**
-     *  Check if the current campaign is an original GDI or NOD campaign.
-     */
-    bool is_original_gdi = (cd_num == DISK_GDI && (Wstring(campaign->IniName) == "GDI1" || Wstring(campaign->IniName) == "GDI1A") && Wstring(campaign->Scenario) == "GDI1A.MAP");
-    bool is_original_nod = (cd_num == DISK_NOD && (Wstring(campaign->IniName) == "NOD1" || Wstring(campaign->IniName) == "NOD1A") && Wstring(campaign->Scenario) == "NOD1A.MAP");
-
-    /**
-     *  #issue-762
-     * 
-     *  Fetch the campaign extension (if available) and get the custom intro movie.
-     * 
-     *  @author: CCHyper
-     */
-    CampaignClassExtension *campaignext = Extension::Fetch<CampaignClassExtension>(campaign);
-    if (campaignext->IntroMovie[0] != '\0') {
-        std::snprintf(movie_filename, sizeof(movie_filename), "%s.VQA", campaignext->IntroMovie);
-        DEBUG_INFO("About to play \"%s\".\n", movie_filename);
-        Play_Movie(movie_filename);
-
-    /**
-     *  If this is an original Tiberian Sun campaign, play the respective intro movie.
-     */
-    } else if (is_original_gdi || is_original_nod) {
-
-        /**
-         *  "The First Decade" and "Freeware TS" installations reshuffle
-         *  the movie files due to all mix files being local now and a
-         *  primitive "no-cd" added;
-         *  
-         *  MOVIES01.MIX -> INTRO.VQA (GDI) is now INTR0.VQA
-         *  MOVIES02.MIX -> INTRO.VQA (NOD) is now INTR1.VQA
-         * 
-         *  Build the movie filename based on the current campaigns desired CD (see DiskID enum). 
-         */
-        std::snprintf(movie_filename, sizeof(movie_filename), "INTR%d.VQA", cd_num);
-
-        /**
-         *  Now play the movie if it is found, falling back to original behavior otherwise.
-         */
-        if (CCFileClass(movie_filename).Is_Available()) {
-            DEBUG_INFO("About to play \"%s\".\n", movie_filename);
-            Play_Movie(movie_filename);
-
-        } else if (CCFileClass("INTRO.VQA").Is_Available()) {
-            DEBUG_INFO("About to play \"INTRO.VQA\".\n");
-            Play_Movie("INTRO.VQA");
-
-        } else {
-            DEBUG_WARNING("Failed to find Intro movie!\n");
-            return false;
-        }
-
-    } else {
-        DEBUG_WARNING("No campaign intro movie defined.\n");
-    }
-
-    return true;
-}
-
-DECLARE_PATCH(_Start_Scenario_Intro_Movie_Patch)
-{
-    GET_REGISTER_STATIC(CampaignType, campaign_id, ebx);
-    GET_REGISTER_STATIC(char *, name, ebp);
-
-    Play_Intro_Movie(campaign_id);
-
-read_scenario:
-    //JMP(0x005DB319);
-
-    /**
-     *  The First Decade" and "Freeware TS" EXE's actually have patched code at
-     *  the address 0x005DB319, so lets handle the debug log print ourself and
-     *  jump back at a safe location.
-     */
-    DEBUG_GAME("Reading scenario: %s\n", name);
-    JMP(0x005DB327);
-}
-
-
-/**
- *  #issue-95
- * 
- *  Patch for handling the campaign intro movies for "The First Decade"
- *  and "Freeware TS" installations when selecting "Intro / Sneak Peak" on
- *  the main menu.
- * 
- *  @author: CCHyper
- */
-static void Play_Intro_SneakPeak_Movies()
-{
-    /**
-     *  Backup the current volume.
-     */
-    //int disk = CD::RequiredCD;
-
-    /**
-     *  Find out what movies are available locally.
-     */
-    bool intro_available = CCFileClass("INTRO.VQA").Is_Available();
-    bool intr0_available = CCFileClass("INTR0.VQA").Is_Available();
-    bool sizzle_available = CCFileClass("SIZZLE1.VQA").Is_Available();
-
-    bool movie_pair_available = (intro_available && sizzle_available) || (intr0_available && sizzle_available);
-
-    /**
-     *  If at least one of the movie pairs were found, we can go ahead and play
-     *  them, otherwise set the required disk to GDI and request it if not present.
-     */
-    if (movie_pair_available || (CD::Set_Required_CD(DISK_GDI), CD().Is_Available(DISK_GDI))) {
-        
-        /**
-         *  Play the intro movie (GDI).
-         * 
-         *  If the renamed intro is found play that, otherwise falling back to original behavior.
-         */
-        if (intr0_available) {
-            DEBUG_INFO("About to play INTR0.VQA.\n");
-            Play_Movie("INTR0.VQA");
-
-            /**
-             *  Also attempt to play the NOD intro, just because its a nice improvement.
-             */
-            DEBUG_INFO("About to play INTR1.VQA.\n");
-            Play_Movie("INTR1.VQA");
-    
-        } else {
-        
-            DEBUG_INFO("About to play INTRO.VQA.\n");
-            Play_Movie("INTRO.VQA");
-        }
-
-        /**
-         *  Play the sizzle/showreel. This exists loosely on both disks, so we tell
-         *  the VQA playback to not use the normal mix file handler.
-         */
-        VQA_Clear_Option(OPTION_USE_MIX_HANDLER);
-        DEBUG_INFO("About to play SIZZLE1.VQA.\n");
-        Play_Movie("SIZZLE1.VQA");
-        VQA_Set_Option(OPTION_USE_MIX_HANDLER);
-
-    } else {
-        DEBUG_WARNING("Failed to find Intro and Sizzle movies!\n");
-    }
-
-    /**
-     *  Restore the previous volume.
-     */
-    //CD::Set_Required_CD(disk);
-    //CD().Force_Available(disk);
-}
-
-
-DECLARE_PATCH(_Select_Game_Intro_SneakPeak_Movies_Patch)
-{
-    Play_Intro_SneakPeak_Movies();
-
-    JMP(0x004E288B);
-}
-
-
-/**
- *  Main function for patching the hooks.
- */
-void PlayMovieExtension_Hooks()
-{
-    Patch_Jump(0x005DB2DE, &_Start_Scenario_Intro_Movie_Patch);
-    Patch_Jump(0x004E2796, &_Select_Game_Intro_SneakPeak_Movies_Patch);
-
-    /**
-     *  #issue-287
-     * 
-     *  Main menu transition videos incorrectly scale up when "StretchMovies=true".
-     *  Changes Change Play_Movie "stretch_allowed" arg to false.
-     * 
-     *  @author: CCHyper
-     */
-    Patch_Byte(0x0057FF34+1, 0); // TS_TITLE.VQA
-    Patch_Byte(0x0057FECF+1, 0); // FS_TITLE.VQA
-
-    Patch_Jump(0x00563795, &_Play_Movie_Scale_By_Ratio_Patch);
-
-    /**
-     *  Patch in new movie systems here.
-     */
-    BinkMovie_Hooks();
+    BinkMoviePlayer::Set_Search_Directory("MOVIES\\");
 }

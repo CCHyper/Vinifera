@@ -4,11 +4,12 @@
  *
  *  @project       Vinifera
  *
- *  @file          SETUP_HOOKS.CPP
+ *  @file          BINK_LOAD_DLL.H
  *
  *  @author        CCHyper
  *
- *  @brief         Contains the main function that sets up all hooks.
+ *  @brief         Utility functions for performing one-time loading of
+ *                 Bink library functions from the DLL.
  *
  *  @license       Vinifera is free software: you can redistribute it and/or
  *                 modify it under the terms of the GNU General Public License
@@ -25,34 +26,38 @@
  *                 If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-#include "setup_hooks.h"
+#pragma once
 
-/**
- *  Include the hook headers here.
- */
-#include "vinifera_newdel.h"
-#include "crt_hooks.h"
-#include "debug_hooks.h"
-#include "vinifera_hooks.h"
-#include "newswizzle_hooks.h"
-#include "extension_hooks.h"
-#include "cncnet4_hooks.h"
-#include "cncnet5_hooks.h"
-#include "binkmovie_hooks.h"
+#include "always.h"
+#include "bink.h"
 
 
-void Setup_Hooks()
-{
-    Vinifera_Memory_Hooks();
+extern bool BinkImportsLoaded;
 
-    CRT_Hooks();
-    Debug_Hooks();
-    Vinifera_Hooks();
-    NewSwizzle_Hooks();
-    Extension_Hooks();
 
-    CnCNet4_Hooks();
-    CnCNet5_Hooks();
+bool Load_Bink_DLL();
+void Unload_Bink_DLL();
 
-    BinkMovie_Hooks();
-}
+
+extern BINKCLOSE BinkClose;
+extern BINKDDSURFACETYPE BinkDDSurfaceType;
+extern BINKSETVOLUME BinkSetVolume;
+extern BINKGETERROR BinkGetError;
+extern BINKOPEN BinkOpen;
+extern BINKSETSOUNDSYSTEM BinkSetSoundSystem;
+extern BINKOPENDIRECTSOUND BinkOpenDirectSound;
+extern BINKGOTO BinkGoto;
+extern BINKPAUSE BinkPause;
+extern BINKNEXTFRAME BinkNextFrame;
+extern BINKCOPYTOBUFFER BinkCopyToBuffer;
+extern BINKDOFRAME BinkDoFrame;
+extern BINKWAIT BinkWait;
+extern BINKBUFFEROPEN BinkBufferOpen;
+extern BINKBUFFERCLOSE BinkBufferClose;
+extern BINKBUFFERLOCK BinkBufferLock;
+extern BINKBUFFERUNLOCK BinkBufferUnlock;
+extern BINKBUFFERBLIT BinkBufferBlit;
+extern BINKGETRECTS BinkGetRects;
+extern BINKBUFFERSETSCALE BinkBufferSetScale;
+extern BINKBUFFERSETOFFSET BinkBufferSetOffset;
+extern BINKSETSOUNDTRACK BinkSetSoundTrack;
