@@ -106,7 +106,8 @@ static HANDLE DebugConsoleHandle = nullptr;
 
 /*static*/ bool DisableDebuggerOutput = false;
 
-static bool DebugHandler_DeveloperMode = false;
+/*static*/ bool DebugHandler_DeveloperMode = false;
+/*static*/ bool DebugHandler_DeveloperWindow = false;
 
 static bool DebugHandler_NoConsole = false;
 
@@ -370,6 +371,7 @@ void __cdecl Vinifera_Debug_Handler_Startup()
     DebugHandler_DeveloperMode = Vinifera_DeveloperMode || (std::strstr(cmdline, "-DEVELOPER") != nullptr);
     DebugHandler_NoConsole = std::strstr(cmdline, "-NOCONSOLE") != nullptr;
     bool enable_console = Vinifera_DeveloperMode || (std::strstr(cmdline, "-CONSOLE") != nullptr);
+    DebugHandler_DeveloperWindow = Vinifera_DeveloperMode || (std::strstr(cmdline, "-DEVELOPER_WINDOW") != nullptr);
 
 #ifdef NDEBUG
     if (DebugHandler_DeveloperMode) {

@@ -27,7 +27,7 @@
 #******************************************************************************/
  
  # Visual Studio 2017 requires at least 3.7.
-cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.26 FATAL_ERROR)
 
 set(CMAKE_SUPPRESS_REGENERATION true) # Remove ZERO_CHECK project.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON) # Organize projects into folders within the VS solution.
@@ -152,6 +152,8 @@ if(NOT ${OPTION_CUSTOM_DEBUGGER_TARGET_NAME} STREQUAL " ")
 endif()
 
 option(OPTION_CHECK_TARGET_BINARIES "This option controls if the launcher should check target binaries before injection." ON)
+
+option(OPTION_MINIAUDIO "Enable the MiniAudio library." ON)
 
 
 ################################################################################
@@ -410,6 +412,7 @@ target_include_directories(${PROJECT_NAME} BEFORE PUBLIC
 		${CMAKE_CURRENT_BINARY_DIR}/generated
 )
 
+
 # Set custom debugging target name (only works if the custom path option has been set!).
 if(NOT ${OPTION_CUSTOM_DEBUGGER_DIRECTORY_PATH} STREQUAL " " AND
 	NOT ${OPTION_CUSTOM_DEBUGGER_TARGET_NAME} STREQUAL " ")
@@ -520,7 +523,14 @@ message(STATUS "Build: Preview")
 else()
 message(STATUS "Build: Unofficial")
 endif()
+if(OPTION_MINIAUDIO)
+message(STATUS "Build: MiniAudio Enabled")
+endif()
 
+# Enable the MiniAudio sources to be compiled.
+if(OPTION_MINIAUDIO)
+target_compile_definitions(${PROJECT_NAME} PUBLIC USE_MINIAUDIO=1)
+endif()
 
 #
 # Add/Remove flags required for trying matching pre-compiled game code.
@@ -609,7 +619,7 @@ add_dependencies(${PROJECT_NAME} TSpp)
 # Ensure the launcher is built with the main project.
 add_dependencies(${PROJECT_NAME} Launch${PROJECT_NAME})
 
-set(REQUIRED_LIBRARIES ws2_32 dbghelp shlwapi version comctl32)
+set(REQUIRED_LIBRARIES ws2_32 dbghelp shlwapi shcore version comctl32 dxguid dxgi d3d11 d3dcompiler)
 
 # Link to any required libraries.
 target_link_libraries(${PROJECT_NAME} ${REQUIRED_LIBRARIES})

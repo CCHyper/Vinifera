@@ -65,6 +65,8 @@
 #include "setup_hooks.h"
 
 
+extern bool DebugHandler_DeveloperWindow;
+
 static DynamicVectorClass<Wstring> ViniferaSearchPaths;
 
 
@@ -552,6 +554,13 @@ bool Vinifera_Startup()
 #endif
     }
 
+    // We need to do this here rather than in debughandler.cpp, see comment in developer_wnd.cpp.
+    if (DebugHandler_DeveloperWindow) {
+        DEBUG_INFO("Creating developer window.\n");
+        Vinifera_DeveloperWindow.Init();
+        Vinifera_DeveloperWindow.Show();
+    }
+
     DEBUG_INFO("Setting up conditional hooks.\n");
     Setup_Conditional_Hooks();
 
@@ -693,6 +702,9 @@ bool Vinifera_Shutdown()
 
     delete AircraftTracker;
     AircraftTracker = nullptr;
+
+    Vinifera_DeveloperWindow.Hide();
+    Vinifera_DeveloperWindow.Shutdown();
 
     DEV_DEBUG_INFO("Shutdown - New Count: %d, Delete Count: %d\n", Vinifera_New_Count, Vinifera_Delete_Count);
 

@@ -31,6 +31,8 @@
 #include "vector.h"
 #include "ccfile.h"
 
+#include "developer_wnd.h"
+
 
 class PrerequisiteGroupClass;
 class KamikazeTrackerClass;
@@ -84,6 +86,11 @@ extern bool Vinifera_Developer_FrameStep;
 extern int Vinifera_Developer_FrameStepCount;
 extern bool Vinifera_Developer_AIControl;
 extern bool Vinifera_Developer_IsToReloadRules;
+
+/*
+ *  Creating this here forces it to be created.
+ */
+static DeveloperWindowClass Vinifera_DeveloperWindow;
 
 
 /**
