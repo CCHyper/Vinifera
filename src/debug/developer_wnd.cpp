@@ -61,6 +61,18 @@
 #include "aircrafttype.h"
 
 
+
+
+extern void __cdecl Developer_Window_Helper_At_Exit();
+
+
+ID3D11Device * _D3DDevice = nullptr;
+float _DrawScale = 1.0f;
+
+
+
+
+
 //
 // !! IMPORTANT !!
 // 
@@ -106,7 +118,7 @@ static RECT Get_Monitor_Rect(HWND hWnd)
     return mi.rcWork;
 }
 
-bool IsWindowFullscreen(HWND hWnd)
+static bool Is_Window_Fullscreen(HWND hWnd)
 {
     if (!IsWindow(hWnd)) {
         return false;
@@ -137,14 +149,14 @@ bool IsWindowFullscreen(HWND hWnd)
     return sameSize && !hasDecorations;
 }
 
-// Compile-time helper to check build type
-constexpr bool IsReleaseBuild() {
-#ifdef NDEBUG
-    return true;
-#else
-    return false;
-#endif
+
+
+
+static void __cdecl Developer_Window_At_Exit()
+{
+    Developer_Window_Helper_At_Exit();
 }
+
 
 
 /**
@@ -297,7 +309,7 @@ bool DeveloperWindowClass::Shutdown()
 bool DeveloperWindowClass::Show(bool and_create)
 {
     // We can only show this window when the user is running the game in "windowed mode".
-    if (IsWindowFullscreen(MainWindow)) {
+    if (Is_Window_Fullscreen(MainWindow)) {
         return false;
     }
 
@@ -433,6 +445,8 @@ bool DeveloperWindowClass::Create_Device_D3D(HWND hWnd)
 
     Create_Render_Target();
 
+    _D3DDevice = D3DDevice;
+
     return true;
 }
 
@@ -460,6 +474,9 @@ void DeveloperWindowClass::Cleanup_Device_D3D()
         D3DDevice->Release();
         D3DDevice = nullptr;
     }
+
+    // Cleanup.
+    _D3DDevice = nullptr;
 }
 
 bool DeveloperWindowClass::Create_Window()
@@ -520,7 +537,9 @@ bool DeveloperWindowClass::Create_Window()
     }
 
     // Resposition and resize the window based on the monitor scale.
-    float monitor_scale = Get_Monitor_DPI_Scale(hWnd);
+    _DrawScale = Get_Monitor_DPI_Scale(hWnd);
+
+    float monitor_scale = _DrawScale;
     RECT monitor_rect = Get_Monitor_Rect(hWnd);
 
     int screenWidth  = monitor_rect.right - monitor_rect.left;
@@ -568,9 +587,8 @@ bool DeveloperWindowClass::Create_Window()
     //io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
     // Update and scale the UI.
-    float scale = Get_Monitor_DPI_Scale(WindowHandle);
-    style.ScaleAllSizes(scale);
-    io.FontGlobalScale = scale; // Scales all text globally
+    style.ScaleAllSizes(_DrawScale);
+    io.FontGlobalScale = _DrawScale; // Scales all text globally
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -613,8 +631,15 @@ bool DeveloperWindowClass::Create_Window()
     // Store the window handle.
     WindowHandle = hWnd;
 
+    // 
+    std::atexit(Developer_Window_At_Exit);
+
     return true;
 }
+
+
+
+
 
 
 
@@ -625,7 +650,7 @@ bool DeveloperWindowClass::Create_Window()
 static int SelectedIndex = -1;
 static int CurrentTab = 2;      // Start on "Rules" tab where the editor is
 
-
+#include "filepng.h"
 void DeveloperWindowClass::Window_Render_Loop()
 {
     if (!WindowHandle) {
@@ -704,6 +729,9 @@ void DeveloperWindowClass::Window_Render_Loop()
     }
     if (true) {
     }
+
+
+
 
     Render_Frame();
 
