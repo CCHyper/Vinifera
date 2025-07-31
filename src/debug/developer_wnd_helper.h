@@ -44,7 +44,7 @@ enum VQType;
  *
  */
 
-namespace CCImGui
+namespace MyImGui
 {
 
 void ShowUnitTypePicker(UnitTypeClass ** value, const char * label);
@@ -76,10 +76,12 @@ bool SliderScalarAuto(const char * label, T * v, float min = -1000.f, float max 
     }
 }
 
-void DrawRulesEditor(bool *pOpen);
-void DrawScenarioEditor(bool *pOpen);
-void DrawSpecialEditor(bool *pOpen);
-void DrawGlobalsEditor(bool *pOpen);
-void DrawTypesEditor(bool *pOpen);
+void DoCheatsWindow(bool *pOpen);
+void DoDebugWindow(bool *pOpen);
+void DoRulesEditor(bool *pOpen);
+void DoScenarioEditor(bool *pOpen);
+void DoSpecialEditor(bool *pOpen);
+void DoGlobalsEditor(bool *pOpen);
+void DoTypesEditor(bool *pOpen);
 
 } // CCImGui namespace end

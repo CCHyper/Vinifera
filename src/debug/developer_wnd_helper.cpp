@@ -35,6 +35,7 @@
 #include "tibsun_globals.h"
 #include "tibsun_functions.h"
 #include "vinifera_defines.h"
+#include "vinifera_globals.h"
 #include "aircrafttype.h"
 #include "buildingtype.h"
 #include "infantrytype.h"
@@ -51,8 +52,10 @@
 #include "aircraft.h"
 #include "building.h"
 #include "infantry.h"
+#include "house.h"
 #include "rules.h"
 #include "scenario.h"
+#include "session.h"
 
 #include "testlocomotion.h"
 
@@ -1387,13 +1390,13 @@ void ImGui_Draw_HouseTypeClass(HouseTypeClass * ptr)
     ImGui::InputInt("RemapColor", reinterpret_cast<int*>(&ptr->RemapColor));
 
     // Bias sliders
-    CCImGui::SliderScalarAuto("FirepowerBias", &ptr->FirepowerBias, 0.0, 3.0);
-    CCImGui::SliderScalarAuto("GroundspeedBias", &ptr->GroundspeedBias, 0.0, 3.0);
-    CCImGui::SliderScalarAuto("AirspeedBias", &ptr->AirspeedBias, 0.0, 3.0);
-    CCImGui::SliderScalarAuto("ArmorBias", &ptr->ArmorBias, 0.0, 3.0);
-    CCImGui::SliderScalarAuto("ROFBias", &ptr->ROFBias, 0.0, 3.0);
-    CCImGui::SliderScalarAuto("CostBias", &ptr->CostBias, 0.0, 3.0);
-    CCImGui::SliderScalarAuto("BuildSpeedBias", &ptr->BuildSpeedBias, 0.0, 3.0);
+    MyImGui::SliderScalarAuto("FirepowerBias", &ptr->FirepowerBias, 0.0, 3.0);
+    MyImGui::SliderScalarAuto("GroundspeedBias", &ptr->GroundspeedBias, 0.0, 3.0);
+    MyImGui::SliderScalarAuto("AirspeedBias", &ptr->AirspeedBias, 0.0, 3.0);
+    MyImGui::SliderScalarAuto("ArmorBias", &ptr->ArmorBias, 0.0, 3.0);
+    MyImGui::SliderScalarAuto("ROFBias", &ptr->ROFBias, 0.0, 3.0);
+    MyImGui::SliderScalarAuto("CostBias", &ptr->CostBias, 0.0, 3.0);
+    MyImGui::SliderScalarAuto("BuildSpeedBias", &ptr->BuildSpeedBias, 0.0, 3.0);
 
     // Strings
     char suffixBuf[sizeof(ptr->Suffix) + 1] = {};
@@ -1826,7 +1829,7 @@ void ImGui_Draw_Class(AbstractClass * ptr)
  * 
  */
 
-void CCImGui::ShowUnitTypePicker(UnitTypeClass ** value, const char * label)
+void MyImGui::ShowUnitTypePicker(UnitTypeClass ** value, const char * label)
 {
     // Display current selection as a button
     const char * currentName = (*value)->IniName;
@@ -1871,8 +1874,149 @@ void CCImGui::ShowUnitTypePicker(UnitTypeClass ** value, const char * label)
  * Windows
  * 
  */
-void CCImGui::DrawRulesEditor(bool *pOpen)
+void MyImGui::DoCheatsWindow(bool *pOpen)
 {
+    bool disabled = false;
+    if (Session.Players.Count() > 1) {
+        disabled = true;
+    }
+
+    // Don't continue if flag pointer is NULL
+    if (!pOpen) {
+        return;
+    }
+
+    // Open a window with a close button in the corner
+    if (!ImGui::Begin("Cheats", pOpen)) {
+        ImGui::End(); // required to balance ImGui::Begin()
+        return;
+    }
+
+    ImGui::Columns(2, nullptr, false);  // Two columns, no vertical separator
+
+    // Row 1
+    {
+    ImGui::Text("Instant Build (Player)");
+    ImGui::NextColumn();
+    ImGui::Checkbox("##InstantBuildPlayer", &Vinifera_Developer_InstantBuild);
+    ImGui::NextColumn();
+    }
+
+    // Row 2
+    {
+    ImGui::Text("Instant Build (Computer)");
+    ImGui::NextColumn();
+    ImGui::Checkbox("##InstantBuildPlayer", &Vinifera_Developer_AIInstantBuild);
+    ImGui::NextColumn();
+    }
+
+    // Row 3
+    {
+    ImGui::Text("Outcome");
+    ImGui::NextColumn();
+
+    float totalWidth = ImGui::GetContentRegionAvail().x;
+    float spacing = ImGui::GetStyle().ItemSpacing.x;
+    float buttonWidth = (totalWidth - 2 * spacing) / 3;
+
+    if (ImGui::Button("Win", ImVec2(buttonWidth, 0))) {
+        /**
+         *  Player wins.
+         */
+        PlayerPtr->Flag_To_Win();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Lose", ImVec2(buttonWidth, 0))) {
+        /**
+         *  Player loses.
+         */
+        PlayerPtr->Flag_To_Lose();
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Die", ImVec2(buttonWidth, 0))) {
+        /**
+         *  Player dies.
+         */
+        PlayerPtr->Flag_To_Die();
+    }
+    ImGui::NextColumn();
+    }
+
+    // Row 4
+    {
+    ImGui::Text("Give $10,000 credits to player");
+    ImGui::NextColumn();
+    if (ImGui::Button("Grant")) {
+    /**
+     *  Give 10,000 credits to the player.
+     */
+    PlayerPtr->Refund_Money(10000);
+    }
+    ImGui::NextColumn();
+    }
+
+    // Row 5
+    {
+    ImGui::Text("Give $10,000 credits to player");
+    ImGui::NextColumn();
+    if (ImGui::Button("Grant")) {
+    /**
+     *  Give 10,000 credits to the player.
+     */
+    PlayerPtr->Refund_Money(10000);
+    }
+    ImGui::NextColumn();
+    }
+
+    // End columns and window
+    ImGui::Columns(1);
+
+    ImGui::End();
+}
+
+void MyImGui::DoDebugWindow(bool *pOpen)
+{
+    bool disabled = false;
+    if (Session.Players.Count() > 1) {
+        disabled = true;
+    }
+
+    // Don't continue if flag pointer is NULL
+    if (!pOpen) {
+        return;
+    }
+
+    // Open a window with a close button in the corner
+    if (!ImGui::Begin("Debug", pOpen)) {
+        ImGui::End(); // required to balance ImGui::Begin()
+        return;
+    }
+
+    ImGui::Columns(2, nullptr, false);  // Two columns, no vertical separator
+
+    // Row 1
+    {
+    ImGui::Text("Instant Build (Player)");
+    ImGui::NextColumn();
+    ImGui::Checkbox("##InstantBuildPlayer", &Vinifera_Developer_InstantBuild);
+    ImGui::NextColumn();
+    }
+
+    ImGui::NextColumn();
+
+    // End columns and window
+    ImGui::Columns(1);
+
+    ImGui::End();
+}
+
+void MyImGui::DoRulesEditor(bool *pOpen)
+{
+    bool disabled = false;
+    if (Session.Players.Count() > 1) {
+        disabled = true;
+    }
+
     // Don't continue if flag pointer is NULL
     if (!pOpen) {
         return;
@@ -1974,8 +2118,13 @@ void CCImGui::DrawRulesEditor(bool *pOpen)
     ImGui::End();
 }
 
-void CCImGui::DrawScenarioEditor(bool *pOpen)
+void MyImGui::DoScenarioEditor(bool *pOpen)
 {
+    bool disabled = false;
+    if (Session.Players.Count() > 1) {
+        disabled = true;
+    }
+
     // Don't continue if flag pointer is NULL
     if (!pOpen) {
         return;
@@ -2067,7 +2216,7 @@ void CCImGui::DrawScenarioEditor(bool *pOpen)
     ImGui::Checkbox("InputLock", &Scen->InputLock);
 
     // Floats
-    CCImGui::SliderScalarAuto("CarryOverPercent", &Scen->CarryOverPercent, 0.0f, 100.0f);
+    MyImGui::SliderScalarAuto("CarryOverPercent", &Scen->CarryOverPercent, 0.0f, 100.0f);
 
     // Enums — placeholder combos
     const char* campaign_names[] = { "None", "GDI", "Nod", "Custom" };  // Replace with actual
@@ -2117,12 +2266,23 @@ void CCImGui::DrawScenarioEditor(bool *pOpen)
     ImGui::End();
 }
 
-void CCImGui::DrawSpecialEditor(bool *pOpen)
+void MyImGui::DoSpecialEditor(bool *pOpen)
 {
+    bool disabled = false;
+    if (Session.Players.Count() > 1) {
+        disabled = true;
+    }
+
+
 }
 
-void CCImGui::DrawGlobalsEditor(bool *pOpen)
+void MyImGui::DoGlobalsEditor(bool *pOpen)
 {
+    bool disabled = false;
+    if (Session.Players.Count() > 1) {
+        disabled = true;
+    }
+
     // Don't continue if flag pointer is NULL
     if (!pOpen) {
         return;
@@ -2249,10 +2409,14 @@ void CCImGui::DrawGlobalsEditor(bool *pOpen)
     ImGui::End();
 }
 
-void CCImGui::DrawTypesEditor(bool *pOpen)
+void MyImGui::DoTypesEditor(bool *pOpen)
 {
-    if (!ImGui::Begin("Types", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-    {
+    bool disabled = false;
+    if (Session.Players.Count() > 1) {
+        disabled = true;
+    }
+
+    if (!ImGui::Begin("Types", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::End();
         return;
     }

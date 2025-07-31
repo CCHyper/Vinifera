@@ -673,12 +673,14 @@ void DeveloperWindowClass::Window_Render_Loop()
     );
     ImGui::SetWindowPos(ImVec2(0, 0));  // top-left corner
 
+    static bool CheatsOpen = false;
     static bool RulesOpen = false;
     static bool ScenarioOpen = false;
     static bool SpecialOpen = false;
     static bool GlobalsOpen = false;
     static bool TypesOpen = false;
 
+    static bool ShowCheatsWindow = false;
     static bool ShowRulesEditor = false;
     static bool ShowScenarioEditor = false;
     static bool ShowSpecialEditor = false;
@@ -686,6 +688,10 @@ void DeveloperWindowClass::Window_Render_Loop()
     static bool ShowTypesEditor = false;
 
     // Add clickable buttons directly
+    if (ImGui::Button("Cheats")) {
+        ShowCheatsWindow = !ShowCheatsWindow;
+    }
+    ImGui::SameLine();
     if (ImGui::Button("Rules")) {
         ShowRulesEditor = !ShowRulesEditor;
     }
@@ -707,7 +713,10 @@ void DeveloperWindowClass::Window_Render_Loop()
     }
 
     ImGui::End();
-
+    
+    if (ShowCheatsWindow) {
+        CCImGui::DrawCheatsWindow(&CheatsOpen);
+    }
     if (ShowRulesEditor) {
         CCImGui::DrawRulesEditor(&RulesOpen);
     }
