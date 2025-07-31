@@ -30,6 +30,8 @@
 #include "abstracttypeext.h"
 #include "objecttype.h"
 
+#include "wstring.h"
+
 
 class ObjectTypeClassExtension : public AbstractTypeClassExtension
 {
@@ -92,4 +94,10 @@ class ObjectTypeClassExtension : public AbstractTypeClassExtension
          */
         VoxelObject WaterVoxel;
         VoxelIndexClass WaterVoxelIndex;
+
+        /**
+         *  x
+         */
+        VocType AmbientSound;
+        //Wstring AmbientSoundName;
 };

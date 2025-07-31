@@ -33,6 +33,7 @@
 
 class AircraftClass;
 class HouseClass;
+class AudioVocClass;
 
 
 class ObjectClassExtension : public AbstractClassExtension
@@ -59,4 +60,8 @@ class ObjectClassExtension : public AbstractClassExtension
         virtual const ObjectClass *This_Const() const override { return reinterpret_cast<const ObjectClass *>(AbstractClassExtension::This_Const()); }
 
     public:
+        /**
+         *  x
+         */
+        AudioVocClass * AmbientSound;
 };
